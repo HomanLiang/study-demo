@@ -1,6 +1,6 @@
 # 尚硅谷 Netty 核心技术及源码剖析--学习笔记
 
-1. Netty 介绍和应用场景
+1. [Netty 介绍和应用场景](https://github.com/HomanLiang/study-demo/blob/main/netty-demo/document/chapter1.md)
 2. Java BIO 编程
 3. Java NIO 编程
 
