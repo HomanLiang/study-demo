@@ -3,12 +3,30 @@
 ## Netty 的介绍
 
 1. Netty 是由 JBOSS 提供的一个 Java 开源框架，现在 Github 上的独立项目
+
 2. Netty 是一个异步的、基于事件驱动的网络应用框架，用以快速开发高性能、高可靠性的网络 IO 程序。
+
 3. Netty 主要针对在 TCP 协议下，面向 Clients 端的高并发应用，或者 Peer-to-Peer 场景下的大量数据持续传输的应用。
+
 4. Netty 本质是一个 NIO 框架，适用于服务器通讯相关的多种应用场景。
+
+   ![]( https://raw.githubusercontent.com/HomanLiang/study-demo/main/netty-demo/document/pic/1.png )
+
 5. 要透彻理解 Netty ，需要先学习 NIO，这样我们才能阅读 Netty 的源码。
 
 
+
+## Netty的特点
+1. 高并发
+Netty是一款基于NIO（Nonblocking I/O，非阻塞IO）开发的网络通信框架，对比于BIO（Blocking I/O，阻塞IO），他的并发性能得到了很大提高 。
+
+2. 传输快
+Netty的传输快其实也是依赖了NIO的一个特性——零拷贝。
+
+3. 封装好
+  Netty封装了NIO操作的很多细节，提供易于使用的API。
+
+  
 
 ## Netty 的应用场景
 
