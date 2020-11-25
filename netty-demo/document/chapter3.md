@@ -1076,15 +1076,25 @@ public class GroupChatClient {
 
 ![]( https://raw.githubusercontent.com/HomanLiang/study-demo/main/netty-demo/document/pic/20.png )
 
+## Java AIO 基本介绍
+
+- JDK 7 引入了 Asynchronous I/O，即 AIO。在进行 I/O 编程中，常用到两种模式：Reactor和 Proactor。Java 的 NIO 就是 Reactor，当有事件触发时，服务器端得到通知，进行相应的处理
+
+- AIO 即 NIO2.0，叫做异步不阻塞的 IO。AIO 引入异步通道的概念，采用了 Proactor 模式，简化了程序编写，有效的请求才启动线程，它的特点是先由操作系统完成后才通知服务端程序启动线程去处理，一般适用于连接数较多且连接时间较长的应用
+
+- 目前 AIO 还没有广泛应用，Netty 也是基于NIO, 而不是AIO， 因此我们就不详解AIO了，有兴趣的同学可以参考 <<Java新一代网络编程模型AIO原理及Linux系统AIO介绍>>  http://www.52im.net/thread-306-1-1.html  
 
 
 
+## BIO、NIO、AIO对比表
 
+![]( https://raw.githubusercontent.com/HomanLiang/study-demo/main/netty-demo/document/pic/32.png )
 
+举例说明 
 
-
-
-
+- 同步阻塞：到理发店理发，就一直等理发师，直到轮到自己理发。
+- 同步非阻塞：到理发店理发，发现前面有其它人理发，给理发师说下，先干其他事情，一会过来看是否轮到自己.
+- 异步非阻塞：给理发师打电话，让理发师上门服务，自己干其它事情，理发师自己来家给你理发
 
 
 
