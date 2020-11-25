@@ -1,3 +1,7 @@
+[toc]
+
+
+
 # Netty 介绍和应用场景
 
 ## Netty 的介绍
@@ -24,7 +28,7 @@ Netty是一款基于NIO（Nonblocking I/O，非阻塞IO）开发的网络通信�
 Netty的传输快其实也是依赖了NIO的一个特性——零拷贝。
 
 3. 封装好
-  Netty封装了NIO操作的很多细节，提供易于使用的API。
+    Netty封装了NIO操作的很多细节，提供易于使用的API。
 
   
 
