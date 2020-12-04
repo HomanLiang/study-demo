@@ -6,7 +6,7 @@
 4. [Java NIO 与零拷贝]( https://github.com/HomanLiang/study-demo/blob/main/netty-demo/document/chapter4.md )
 5. [Netty 概述]( https://github.com/HomanLiang/study-demo/blob/main/netty-demo/document/chapter5.md )
 6. [Netty 高性能架构设计]( https://github.com/HomanLiang/study-demo/blob/main/netty-demo/document/chapter6.md )
-7. Netty 核心模块组件
+7. [Netty 核心模块组件]( https://github.com/HomanLiang/study-demo/blob/main/netty-demo/document/chapter7.md )
 8. Google ProtoBuf
 9. Netty 编码器和 Handler 的调用机制
 10. TCP 粘包和拆包及解决方案
