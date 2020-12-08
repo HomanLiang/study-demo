@@ -19,7 +19,7 @@
         <dependency>
             <groupId>com.google.protobuf</groupId>
             <artifactId>protobuf-java</artifactId>
-            <version>3.4.0</version>
+            <version>3.6.1</version>
         </dependency>
     </dependencies>
     <build>
@@ -40,8 +40,12 @@
                 <version>0.5.1</version>
                 <extensions>true</extensions>
                 <configuration>
-                    <protoSourceRoot>${project.basedir}/src/main/proto</protoSourceRoot>
-                    <protocArtifact>com.google.protobuf:protoc:3.2.0:exe:${os.detected.classifier}</protocArtifact>
+                    <!-- Protobuf 协议文件的路径 -->
+                    <protoSourceRoot>${project.basedir}/src/main/proto/config</protoSourceRoot>
+                    <!-- Java 文件的目标路径 -->
+                    <outputDirectory>${project.basedir}/src/main/proto/generateFiles</outputDirectory>
+                    <!-- Protobuf 代码生成工具的路径 -->
+                    <protocArtifact>com.google.protobuf:protoc:3.6.1:exe:${os.detected.classifier}</protocArtifact>
                 </configuration>
                 <executions>
                     <execution>
