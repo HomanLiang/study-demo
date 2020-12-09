@@ -1,4 +1,4 @@
-package com.homan.netty.codec;
+package com.homan.netty.protobuf;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
@@ -19,7 +19,7 @@ public class NettyClientHandler extends ChannelInboundHandlerAdapter {
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
         // 发生一个Student 对象到服务器
-        StudentPOJO.Student student = StudentPOJO.Student.newBuilder().setId(4).setName("智多星 吴用").build();
+        com.homan.netty.codec.StudentPOJO.Student student = com.homan.netty.codec.StudentPOJO.Student.newBuilder().setId(4).setName("智多星 吴用").build();
         // Teacher , Member ,Message
         ctx.writeAndFlush(student);
     }

@@ -1,4 +1,4 @@
-package com.homan.netty.codec;
+package com.homan.netty.protobuf;
 
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.ChannelFuture;
