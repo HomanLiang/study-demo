@@ -383,9 +383,15 @@ public class HandlerClientHandler extends SimpleChannelInboundHandler<Long> {
 }
 ```
 
-运行结果图
+**运行结果图**
 
+客户端
 
+![]( https://raw.githubusercontent.com/HomanLiang/study-demo/main/netty-demo/document/pic/9_4.png )
+
+服务器端
+
+![]( https://raw.githubusercontent.com/HomanLiang/study-demo/main/netty-demo/document/pic/9_5.png )
 
 
 
