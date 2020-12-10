@@ -136,4 +136,4 @@ spring.cloud.nacos.discovery.server-addr=192.168.241.4:8848,192.168.241.5:8848,1
 
 5. 查看Nacos控制台的结果
 
-![结果](https://github.com/HMLIANG/demo-dubbo-nacos/blob/main/picture/nacos_provider.png "结果")
+![](https://raw.githubusercontent.com/HomanLiang/study-demo/main/spring-cloud-alibaba-demo/demo-dubbo-nacos-main/picture/nacos_provider.png)
