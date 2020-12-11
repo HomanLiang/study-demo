@@ -15,5 +15,6 @@
 
 
 
-**示例代码：**https://github.com/HomanLiang/study-demo/tree/main/netty-demo
+示例代码：https://github.com/HomanLiang/study-demo/tree/main/netty-demo
 
+视频教程：https://www.bilibili.com/video/BV1DJ411m7NR
