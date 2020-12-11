@@ -22,7 +22,7 @@
 
 为了方便你理解，我画了一副图：
 
-![]( https://raw.githubusercontent.com/HomanLiang/pictures/main/netty-demo/21.png )
+![]( https://raw.githubusercontent.com/HomanLiang/pictures/main/study-demo/netty-demo/21.png )
 
 可以看到，整个数据的传输过程，都要需要 CPU 亲自参与搬运数据的过程，而且这个过程，CPU 是不能做其他事情的。
 
@@ -34,7 +34,7 @@
 
 那使用 DMA 控制器进行数据传输的过程究竟是什么样的呢？下面我们来具体看看。
 
-![]( https://raw.githubusercontent.com/HomanLiang/pictures/main/netty-demo/22.png )
+![]( https://raw.githubusercontent.com/HomanLiang/pictures/main/study-demo/netty-demo/22.png )
 
 具体过程：
 - 用户进程调用 read 方法，向操作系统发出 I/O 请求，请求读取数据到自己的内存缓冲区中，进程进入阻塞状态；
@@ -66,7 +66,7 @@ write(socket, tmp_buf, len);
 
  代码很简单，虽然就两行代码，但是这里面发生了不少的事情。 
 
-![]( https://raw.githubusercontent.com/HomanLiang/pictures/main/netty-demo/23.png )
+![]( https://raw.githubusercontent.com/HomanLiang/pictures/main/study-demo/netty-demo/23.png )
 
 首先，期间共发生了 **4 次用户态与内核态的上下文切换**，因为发生了两次系统调用，一次是 read() ，一次是 write()，每次系统调用都得先从用户态切换到内核态，等内核完成任务后，再从内核态切换回用户态。
 
@@ -127,7 +127,7 @@ write(sockfd, buf, len);
 
  `mmap()` 系统调用函数会直接把内核缓冲区里的数据「**映射**」到用户空间，这样，操作系统内核与用户空间就不需要再进行任何的数据拷贝操作。 
 
-![]( https://raw.githubusercontent.com/HomanLiang/pictures/main/netty-demo/24.png )
+![]( https://raw.githubusercontent.com/HomanLiang/pictures/main/study-demo/netty-demo/24.png )
 
 具体过程如下：
 - 应用进程调用了 mmap() 后，DMA 会把磁盘的数据拷贝到内核的缓冲区里。接着，应用进程跟操作系统内核「共享」这个缓冲区；
@@ -155,7 +155,7 @@ ssize_t sendfile(int out_fd, int in_fd, off_t *offset, size_t count);
 
 其次，该系统调用，可以直接把内核缓冲区里的数据拷贝到 socket 缓冲区里，不再拷贝到用户态，这样就只有 2 次上下文切换，和 3 次数据拷贝。如下图：
 
-![]( https://raw.githubusercontent.com/HomanLiang/pictures/main/netty-demo/25.png )
+![]( https://raw.githubusercontent.com/HomanLiang/pictures/main/study-demo/netty-demo/25.png )
 
 但是这还不是真正的零拷贝技术，如果网卡支持 SG-DMA（*The Scatter-Gather Direct Memory Access*）技术（和普通的 DMA 有所不同），我们可以进一步减少通过 CPU 把内核缓冲区里的数据拷贝到 socket 缓冲区的过程。
 
@@ -172,7 +172,7 @@ scatter-gather: on
 
 所以，这个过程之中，只进行了 2 次数据拷贝，如下图：
 
-![]( https://raw.githubusercontent.com/HomanLiang/pictures/main/netty-demo/26.png )
+![]( https://raw.githubusercontent.com/HomanLiang/pictures/main/study-demo/netty-demo/26.png )
 
 这就是所谓的**零拷贝（\*Zero-copy\*）技术，因为我们没有在内存层面去拷贝数据，也就是说全程没有通过 CPU 来搬运数据，所有的数据都是通过 DMA 来进行传输的。**。
 
@@ -199,7 +199,7 @@ public long transferFrom(FileChannel fileChannel, long position, long count) thr
 
 曾经有大佬专门写过程序测试过，在同样的硬件条件下，传统文件传输和零拷拷贝文件传输的性能差异，你可以看到下面这张测试数据图，使用了零拷贝能够缩短 `65%` 的时间，大幅度提升了机器传输数据的吞吐量。 
 
-![]( https://raw.githubusercontent.com/HomanLiang/pictures/main/netty-demo/27.png )
+![]( https://raw.githubusercontent.com/HomanLiang/pictures/main/study-demo/netty-demo/27.png )
 
 数据来源于：https://developer.ibm.com/articles/j-zerocopy/
 
@@ -267,7 +267,7 @@ sendfile 配置的具体意思:
 
 我们先来看看最初的例子，当调用 read 方法读取文件时，进程实际上会阻塞在 read 方法调用，因为要等待磁盘数据的返回，如下图：
 
-![]( https://raw.githubusercontent.com/HomanLiang/pictures/main/netty-demo/28.png )
+![]( https://raw.githubusercontent.com/HomanLiang/pictures/main/study-demo/netty-demo/28.png )
 
 具体过程：
 
@@ -277,7 +277,7 @@ sendfile 配置的具体意思:
 
 对于阻塞的问题，可以用异步 I/O 来解决，它工作方式如下图：
 
-![]( https://raw.githubusercontent.com/HomanLiang/pictures/main/netty-demo/29.png )
+![]( https://raw.githubusercontent.com/HomanLiang/pictures/main/study-demo/netty-demo/29.png )
 
 它把读操作分为两部分：
 
@@ -486,9 +486,9 @@ public class NewIOClient {
 
 结果对比图
 
-![]( https://raw.githubusercontent.com/HomanLiang/pictures/main/netty-demo/30.png )
+![]( https://raw.githubusercontent.com/HomanLiang/pictures/main/study-demo/netty-demo/30.png )
 
-![]( https://raw.githubusercontent.com/HomanLiang/pictures/main/netty-demo/31.png )
+![]( https://raw.githubusercontent.com/HomanLiang/pictures/main/study-demo/netty-demo/31.png )
 
 
 

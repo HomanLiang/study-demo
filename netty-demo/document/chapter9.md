@@ -6,7 +6,7 @@
 2. ChannelHandler 充当了处理入站和出站数据的应用程序逻辑的容器。例如，实现 ChannelInboundHandler 接口（或 ChannelInboundHandlerAdapter ），你就可以接收入站事件和数据，这些数据会被业务逻辑处理。当要给客户端发送响应时，也可以从 ChannelInboundHandler 冲刷数据。业务逻辑通常写在一个或者多个 ChannelInboundHandler 中。ChannelOutboundHandler 原理一样，只不过它是用来处理出站数据的
 3. ChannelPipeline 提供了 ChannelHandler 链的容器。以客户端应用程序为例，如果事件的运动方向是从客户端到服务端的，那么我们称这些事件为出站的，即客户端发送给服务端的数据会通过 pipeline 中的一系列ChannelOutboundHandler，并被这些 Handler 处理，反之则称为入站的
 
-![]( https://raw.githubusercontent.com/HomanLiang/pictures/main/netty-demo/9_1.png )
+![]( https://raw.githubusercontent.com/HomanLiang/pictures/main/study-demo/netty-demo/9_1.png )
 
 
 
@@ -21,7 +21,7 @@
 
 1. 关系继承图
 
-![]( https://raw.githubusercontent.com/HomanLiang/pictures/main/netty-demo/9_2.png )
+![]( https://raw.githubusercontent.com/HomanLiang/pictures/main/study-demo/netty-demo/9_2.png )
 
 2. 由于不可能知道远程节点是否会一次性发送一个完整的信息，tcp有可能出现粘包拆包的问题，这个类会对入站数据进行缓冲，直到它准备好被处理
 
@@ -43,7 +43,7 @@ public class ToIntegerDecoder extends ByteToMessageDecoder {
 - 这个例子，每次入站从 ByteBuf 中读取4字节，将其解码为一个 int ，然后将它添加到下一个 List 中。当没有更多元素可以被添加到该 List 中时，它的内容将会被发送给下一个 ChannelInboundHandler 。int 在被添加到 List 中时，会被自动装箱为 Integer 。在调用 readInt() 方法前必须验证所输入的 ByteBuf 是否具有足够的数据
 - decode 执行分析图 [示意图]
 
-![]( https://raw.githubusercontent.com/HomanLiang/pictures/main/netty-demo/9_3.png )
+![]( https://raw.githubusercontent.com/HomanLiang/pictures/main/study-demo/netty-demo/9_3.png )
 
 
 
@@ -361,11 +361,11 @@ public class HandlerClientHandler extends SimpleChannelInboundHandler<Long> {
 
 客户端
 
-![]( https://raw.githubusercontent.com/HomanLiang/pictures/main/netty-demo/9_6.png )
+![]( https://raw.githubusercontent.com/HomanLiang/pictures/main/study-demo/netty-demo/9_6.png )
 
 服务器端
 
-![]( https://raw.githubusercontent.com/HomanLiang/pictures/main/netty-demo/9_7.png )
+![]( https://raw.githubusercontent.com/HomanLiang/pictures/main/study-demo/netty-demo/9_7.png )
 
 
 
@@ -413,11 +413,11 @@ public class MyByteToLongDecoder2 extends ReplayingDecoder<Void> {
 
 客户端
 
-![]( https://raw.githubusercontent.com/HomanLiang/pictures/main/netty-demo/9_4.png )
+![]( https://raw.githubusercontent.com/HomanLiang/pictures/main/study-demo/netty-demo/9_4.png )
 
 服务器端
 
-![]( https://raw.githubusercontent.com/HomanLiang/pictures/main/netty-demo/9_5.png )
+![]( https://raw.githubusercontent.com/HomanLiang/pictures/main/study-demo/netty-demo/9_5.png )
 
 
 
@@ -434,7 +434,7 @@ public class MyByteToLongDecoder2 extends ReplayingDecoder<Void> {
 3. `HttpObjectDecoder`：一个HTTP数据的解码器
 4. `LengthFieldBasedFrameDecoder`：通过指定长度来标识整包消息，这样就可以自动的处理黏包和半包消息。
 
-![]( https://raw.githubusercontent.com/HomanLiang/pictures/main/netty-demo/9_8.png )
+![]( https://raw.githubusercontent.com/HomanLiang/pictures/main/study-demo/netty-demo/9_8.png )
 
 
 
