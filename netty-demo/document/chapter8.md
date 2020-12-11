@@ -5,7 +5,7 @@
 1. 编写网络应用程序时，因为数据在网络中传输的都是二进制字节码数据，在发送数据时就需要编码，接收数据时就需要解码 
 2. codec (编解码器) 的组成部分有两个：decoder (解码器)和 encoder (编码器)。encoder 负责把业务数据转换成字节码数据，decoder 负责把字节码数据转换成业务数据
 
-![]( https://raw.githubusercontent.com/HomanLiang/study-demo/main/netty-demo/document/pic/8_1.png )
+![]( https://raw.githubusercontent.com/HomanLiang/pictures/main/netty-demo/8_1.png )
 
 
 
@@ -45,7 +45,7 @@
 
 ### Protobuf 使用示意图
 
-![]( https://raw.githubusercontent.com/HomanLiang/study-demo/main/netty-demo/document/pic/8_2.png )
+![]( https://raw.githubusercontent.com/HomanLiang/pictures/main/netty-demo/8_2.png )
 
 
 
@@ -107,7 +107,7 @@
 
 2. 通过步骤1设置配置文件目录和生成的Java文件目录
 
-![]( https://raw.githubusercontent.com/HomanLiang/study-demo/main/netty-demo/document/pic/8_3.png )
+![]( https://raw.githubusercontent.com/HomanLiang/pictures/main/netty-demo/8_3.png )
 
 3. 配置文件
 
@@ -123,13 +123,13 @@
 
 4. 双击`protobuf:compile`生成 Java 文件
 
-![]( https://raw.githubusercontent.com/HomanLiang/study-demo/main/netty-demo/document/pic/8_4.png )
+![]( https://raw.githubusercontent.com/HomanLiang/pictures/main/netty-demo/8_4.png )
 
-![]( https://raw.githubusercontent.com/HomanLiang/study-demo/main/netty-demo/document/pic/8_5.png )
+![]( https://raw.githubusercontent.com/HomanLiang/pictures/main/netty-demo/8_5.png )
 
 5. 再把生成的 Java 文件移到指定目录使用
 
-![]( https://raw.githubusercontent.com/HomanLiang/study-demo/main/netty-demo/document/pic/8_6.png )
+![]( https://raw.githubusercontent.com/HomanLiang/pictures/main/netty-demo/8_6.png )
 
 
 
@@ -1073,11 +1073,11 @@ public class NettyClientHandler extends ChannelInboundHandlerAdapter {
 
 服务器端
 
-![]( https://raw.githubusercontent.com/HomanLiang/study-demo/main/netty-demo/document/pic/8_10.png )
+![]( https://raw.githubusercontent.com/HomanLiang/pictures/main/netty-demo/8_10.png )
 
 客户端
 
-![]( https://raw.githubusercontent.com/HomanLiang/study-demo/main/netty-demo/document/pic/8_11.png )
+![]( https://raw.githubusercontent.com/HomanLiang/pictures/main/netty-demo/8_11.png )
 
 
 
@@ -1412,15 +1412,15 @@ public class NettyClientHandler extends ChannelInboundHandlerAdapter {
 
 客户端1
 
-![]( https://raw.githubusercontent.com/HomanLiang/study-demo/main/netty-demo/document/pic/8_7.png )
+![]( https://raw.githubusercontent.com/HomanLiang/pictures/main/netty-demo/8_7.png )
 
 客户端2
 
-![]( https://raw.githubusercontent.com/HomanLiang/study-demo/main/netty-demo/document/pic/8_8.png )
+![]( https://raw.githubusercontent.com/HomanLiang/pictures/main/netty-demo/8_8.png )
 
 服务器端
 
-![]( https://raw.githubusercontent.com/HomanLiang/study-demo/main/netty-demo/document/pic/8_9.png )
+![]( https://raw.githubusercontent.com/HomanLiang/pictures/main/netty-demo/8_9.png )
 
 
 

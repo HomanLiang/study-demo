@@ -30,7 +30,7 @@
 
 Selector、Channel 和 Buffer 的关系图（简单版）：
 
-![]( https://raw.githubusercontent.com/HomanLiang/study-demo/main/netty-demo/document/pic/4.png )
+![]( https://raw.githubusercontent.com/HomanLiang/pictures/main/netty-demo/4.png )
 
 关系图说明：
 
@@ -50,13 +50,13 @@ Selector、Channel 和 Buffer 的关系图（简单版）：
 
 缓冲区（Buffer）：缓冲区本质上是一个可以读写数据的内存块，可以理解成是一个容器对象（含数组），该对象提供了一组方法，可以更轻松地使用内存块，缓冲区对象内置了一些机制，能够跟踪和记录缓冲区的状态变化情况。Channel 提供从文件、网络读取数据的渠道，但是读取或者写入的数据都必须经由 Buffer，如图：
 
-![]( https://raw.githubusercontent.com/HomanLiang/study-demo/main/netty-demo/document/pic/5.png )
+![]( https://raw.githubusercontent.com/HomanLiang/pictures/main/netty-demo/5.png )
 
 ### Buffer 类及其子类
 
 1. 在 NIO 中，Buffer 是一个顶层父类，它是一个抽象类，类的层级关系图：
 
-   ![]( https://raw.githubusercontent.com/HomanLiang/study-demo/main/netty-demo/document/pic/6.png )
+   ![]( https://raw.githubusercontent.com/HomanLiang/pictures/main/netty-demo/6.png )
 
    常用 Buffer 子类一览：
 
@@ -70,11 +70,11 @@ Selector、Channel 和 Buffer 的关系图（简单版）：
 
 2. Buffer 类定义了所有的缓冲区都具有的四个属性来提供关于其所有包含的数据元素的信息：
 
-   ![]( https://raw.githubusercontent.com/HomanLiang/study-demo/main/netty-demo/document/pic/7.png )
+   ![]( https://raw.githubusercontent.com/HomanLiang/pictures/main/netty-demo/7.png )
 
 3. Buffer 类相关方法一览：
 
-   ![]( https://raw.githubusercontent.com/HomanLiang/study-demo/main/netty-demo/document/pic/8.png )
+   ![]( https://raw.githubusercontent.com/HomanLiang/pictures/main/netty-demo/8.png )
 
 4. Buffer 简单示例：
 
@@ -126,7 +126,7 @@ Selector、Channel 和 Buffer 的关系图（简单版）：
 
 从前面可以看出对于 Java 中的基本数据类型（Boolean 除外），都有一个 Buffer 类型与之相对应，最常用的自然是 ByteBuffer 类（二进制数据），该类的主要方法
 
-![]( https://raw.githubusercontent.com/HomanLiang/study-demo/main/netty-demo/document/pic/9.png )
+![]( https://raw.githubusercontent.com/HomanLiang/pictures/main/netty-demo/9.png )
 
 
 
@@ -149,7 +149,7 @@ Selector、Channel 和 Buffer 的关系图（简单版）：
 
 4. 示意图：
 
-   ![]( https://raw.githubusercontent.com/HomanLiang/study-demo/main/netty-demo/document/pic/10.png )
+   ![]( https://raw.githubusercontent.com/HomanLiang/pictures/main/netty-demo/10.png )
 
 
 
@@ -259,7 +259,7 @@ public class FileChannel02 {
 
 代码演示：
 
-![]( https://raw.githubusercontent.com/HomanLiang/study-demo/main/netty-demo/document/pic/11.png )
+![]( https://raw.githubusercontent.com/HomanLiang/pictures/main/netty-demo/11.png )
 
 ```java
 package com.homan.nio.channel;
@@ -549,7 +549,7 @@ public class FileChannel04 {
 
 ### Selector 示意图和特点说明
 
-![]( https://raw.githubusercontent.com/HomanLiang/study-demo/main/netty-demo/document/pic/12.png )
+![]( https://raw.githubusercontent.com/HomanLiang/pictures/main/netty-demo/12.png )
 
 说明如下：
 
@@ -565,7 +565,7 @@ public class FileChannel04 {
 
 Selector 类是一个抽象类，常用方法和说明如下：
 
-![]( https://raw.githubusercontent.com/HomanLiang/study-demo/main/netty-demo/document/pic/13.png )
+![]( https://raw.githubusercontent.com/HomanLiang/pictures/main/netty-demo/13.png )
 
 
 
@@ -584,7 +584,7 @@ Selector 类是一个抽象类，常用方法和说明如下：
 
 Selector、SelectionKey、ServerSocketChannel 和 SocketChannel 关系梳理图
 
-![]( https://raw.githubusercontent.com/HomanLiang/study-demo/main/netty-demo/document/pic/14.png )
+![]( https://raw.githubusercontent.com/HomanLiang/pictures/main/netty-demo/14.png )
 
 对上图的说明：
 
@@ -745,7 +745,7 @@ public class NIOClient {
 
 2. Selection 相关方法
 
-   ![]( https://raw.githubusercontent.com/HomanLiang/study-demo/main/netty-demo/document/pic/15.png )
+   ![]( https://raw.githubusercontent.com/HomanLiang/pictures/main/netty-demo/15.png )
 
 
 
@@ -755,7 +755,7 @@ public class NIOClient {
 
 2. 相关方法如下：
 
-   ![]( https://raw.githubusercontent.com/HomanLiang/study-demo/main/netty-demo/document/pic/16.png )
+   ![]( https://raw.githubusercontent.com/HomanLiang/pictures/main/netty-demo/16.png )
 
 
 
@@ -765,7 +765,7 @@ public class NIOClient {
 
 2. 相关方法如下：
 
-   ![]( https://raw.githubusercontent.com/HomanLiang/study-demo/main/netty-demo/document/pic/17.png )
+   ![]( https://raw.githubusercontent.com/HomanLiang/pictures/main/netty-demo/17.png )
 
 
 
@@ -1066,15 +1066,15 @@ public class GroupChatClient {
 
 服务器端：
 
-![]( https://raw.githubusercontent.com/HomanLiang/study-demo/main/netty-demo/document/pic/18.png )
+![]( https://raw.githubusercontent.com/HomanLiang/pictures/main/netty-demo/18.png )
 
 客户端1（发送”111“）：
 
-![]( https://raw.githubusercontent.com/HomanLiang/study-demo/main/netty-demo/document/pic/19.png )
+![]( https://raw.githubusercontent.com/HomanLiang/pictures/main/netty-demo/19.png )
 
 客户端2（收到服务器端转发的”111“）
 
-![]( https://raw.githubusercontent.com/HomanLiang/study-demo/main/netty-demo/document/pic/20.png )
+![]( https://raw.githubusercontent.com/HomanLiang/pictures/main/netty-demo/20.png )
 
 ## Java AIO 基本介绍
 
@@ -1088,7 +1088,7 @@ public class GroupChatClient {
 
 ## BIO、NIO、AIO对比表
 
-![]( https://raw.githubusercontent.com/HomanLiang/study-demo/main/netty-demo/document/pic/32.png )
+![]( https://raw.githubusercontent.com/HomanLiang/pictures/main/netty-demo/32.png )
 
 举例说明 
 

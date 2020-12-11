@@ -18,7 +18,7 @@
 Netty is *an asynchronous event-driven network application framework*
 for rapid development of maintainable high performance protocol servers & clients. 
 
-![]( https://raw.githubusercontent.com/HomanLiang/study-demo/main/netty-demo/document/pic/33.png )
+![]( https://raw.githubusercontent.com/HomanLiang/pictures/main/netty-demo/33.png )
 
 1. Netty 是由 JBOSS 提供的一个 Java 开源框架。Netty 提供异步的、基于事件驱动的网络应用程序框架，用以快速开发高性能、高可靠性的网络 IO 程序
 2. Netty 可以帮助你快速、简单的开发出一个网络应用，相当于简化和流程化了 NIO 的开发过程

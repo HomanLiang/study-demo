@@ -20,7 +20,7 @@
 
 ### 工作原理图
 
-![]( https://raw.githubusercontent.com/HomanLiang/study-demo/main/netty-demo/document/pic/34.png )
+![]( https://raw.githubusercontent.com/HomanLiang/pictures/main/netty-demo/34.png )
 
 1. 黄色的框表示对象
 2. 蓝色的框表示线程
@@ -48,13 +48,13 @@
    - 通知者模式(Notifier)
 2. 基于线程池复用线程资源：不必再为每个连接创建线程，将连接完成后的业务处理任务分配给线程进行处理，一个线程可以处理多个连接的业务。
 
-![]( https://raw.githubusercontent.com/HomanLiang/study-demo/main/netty-demo/document/pic/35.png )
+![]( https://raw.githubusercontent.com/HomanLiang/pictures/main/netty-demo/35.png )
 
 
 
 ### I/O 复用结合线程池，就是 Reactor 模式基本设计思想，如图：
 
-![]( https://raw.githubusercontent.com/HomanLiang/study-demo/main/netty-demo/document/pic/36.png )
+![]( https://raw.githubusercontent.com/HomanLiang/pictures/main/netty-demo/36.png )
 
 对上图说明：
 
@@ -84,7 +84,7 @@
 ## 单 Reactor 单线程
 
 工作原理示意图（演示下NIO 群聊说明）：
-![]( https://raw.githubusercontent.com/HomanLiang/study-demo/main/netty-demo/document/pic/37.png )
+![]( https://raw.githubusercontent.com/HomanLiang/pictures/main/netty-demo/37.png )
 
 **方案说明**：
 
@@ -118,7 +118,7 @@
 
 **工作原理示意图**：
 
-![]( https://raw.githubusercontent.com/HomanLiang/study-demo/main/netty-demo/document/pic/38.png )
+![]( https://raw.githubusercontent.com/HomanLiang/pictures/main/netty-demo/38.png )
 
 **方案说明**：
 
@@ -143,7 +143,7 @@
 
 **工作原理示意图**：
 
-![]( https://raw.githubusercontent.com/HomanLiang/study-demo/main/netty-demo/document/pic/39.png )
+![]( https://raw.githubusercontent.com/HomanLiang/pictures/main/netty-demo/39.png )
 
 针对单 Reactor 多线程模型中，Reactor 在单线程中运行，高并发场景下容易成为性能瓶颈，可以让 Reactor 在多线程中运行
 
@@ -162,7 +162,7 @@
 
 **Scalable IO in Java 对 Multiple Reactors 的原理图解**：
 
-![]( https://raw.githubusercontent.com/HomanLiang/study-demo/main/netty-demo/document/pic/40.png )
+![]( https://raw.githubusercontent.com/HomanLiang/pictures/main/netty-demo/40.png )
 
 
 
@@ -204,7 +204,7 @@
 
 Netty 主要基于主从 Reactors 多线程模型（如图）做了一定的改进，其中主从 Reactor 多线程模型有多个 Reactor
 
-![]( https://raw.githubusercontent.com/HomanLiang/study-demo/main/netty-demo/document/pic/41.png )
+![]( https://raw.githubusercontent.com/HomanLiang/pictures/main/netty-demo/41.png )
 
 **对上图说明**
 
@@ -218,13 +218,13 @@ Netty 主要基于主从 Reactors 多线程模型（如图）做了一定的改�
 
 Netty 主要基于主从 Reactors 多线程模型（如图）做了一定的改进，其中主从 Reactor 多线程模型有多个 Reactor
 
-![]( https://raw.githubusercontent.com/HomanLiang/study-demo/main/netty-demo/document/pic/42.png )
+![]( https://raw.githubusercontent.com/HomanLiang/pictures/main/netty-demo/42.png )
 
 
 
 ### 工作原理示意图-详细版
 
-![]( https://raw.githubusercontent.com/HomanLiang/study-demo/main/netty-demo/document/pic/43.png )
+![]( https://raw.githubusercontent.com/HomanLiang/pictures/main/netty-demo/43.png )
 
 **对上图的说明：**
 
@@ -509,11 +509,11 @@ public class NettyClientHandler extends ChannelInboundHandlerAdapter {
 
 服务器端：
 
-![]( https://raw.githubusercontent.com/HomanLiang/study-demo/main/netty-demo/document/pic/44.png )
+![]( https://raw.githubusercontent.com/HomanLiang/pictures/main/netty-demo/44.png )
 
 客户端：
 
-![]( https://raw.githubusercontent.com/HomanLiang/study-demo/main/netty-demo/document/pic/45.png )
+![]( https://raw.githubusercontent.com/HomanLiang/pictures/main/netty-demo/45.png )
 
 
 
@@ -647,11 +647,11 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter {
 
 服务器端
 
-![]( https://raw.githubusercontent.com/HomanLiang/study-demo/main/netty-demo/document/pic/48.png )
+![]( https://raw.githubusercontent.com/HomanLiang/pictures/main/netty-demo/48.png )
 
 客户端
 
-![]( https://raw.githubusercontent.com/HomanLiang/study-demo/main/netty-demo/document/pic/49.png )
+![]( https://raw.githubusercontent.com/HomanLiang/pictures/main/netty-demo/49.png )
 
 **方案再说明：**
 
@@ -690,9 +690,9 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter {
 
 ### 工作原理示意图
 
-![]( https://raw.githubusercontent.com/HomanLiang/study-demo/main/netty-demo/document/pic/46.png )
+![]( https://raw.githubusercontent.com/HomanLiang/pictures/main/netty-demo/46.png )
 
-![]( https://raw.githubusercontent.com/HomanLiang/study-demo/main/netty-demo/document/pic/47.png )
+![]( https://raw.githubusercontent.com/HomanLiang/pictures/main/netty-demo/47.png )
 
 说明:
 
@@ -887,11 +887,11 @@ public class HttpServerHandler extends SimpleChannelInboundHandler<HttpObject> {
 
 PostMan运行结果
 
-![]( https://raw.githubusercontent.com/HomanLiang/study-demo/main/netty-demo/document/pic/50.png )
+![]( https://raw.githubusercontent.com/HomanLiang/pictures/main/netty-demo/50.png )
 
 服务器端
 
-![]( https://raw.githubusercontent.com/HomanLiang/study-demo/main/netty-demo/document/pic/51.png )
+![]( https://raw.githubusercontent.com/HomanLiang/pictures/main/netty-demo/51.png )
 
 
 

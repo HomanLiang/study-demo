@@ -14,7 +14,7 @@
 
 4. Netty 本质是一个 NIO 框架，适用于服务器通讯相关的多种应用场景。
 
-   ![]( https://raw.githubusercontent.com/HomanLiang/study-demo/main/netty-demo/document/pic/1.png )
+   ![]( https://raw.githubusercontent.com/HomanLiang/pictures/main/netty-demo/1.png )
 
 5. 要透彻理解 Netty ，需要先学习 NIO，这样我们才能阅读 Netty 的源码。
 

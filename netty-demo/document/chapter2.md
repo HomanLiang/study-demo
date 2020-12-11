@@ -17,13 +17,13 @@
 
 同步并阻塞（传统阻塞型），服务器实现模式为一个连接一个线程，即客户端有连接请求时服务器端就需要启动一个线程进行处理，如果这个连接不做任何事情会造成不必要的线程开销。
 
-![BIO 简单示意图]( https://raw.githubusercontent.com/HomanLiang/study-demo/main/netty-demo/document/pic/2.png )
+![BIO 简单示意图]( https://raw.githubusercontent.com/HomanLiang/pictures/main/netty-demo/2.png )
 
 ### Java NIO
 
 同步非阻塞，服务器实现模式为一个线程处理多个请求（连接），即客户端发送的连接请求都会注册到多路复用器上，多路复用器轮询到连接有 I/O 请求就进行处理。
 
-![NIO 简单示意图]( https://raw.githubusercontent.com/HomanLiang/study-demo/main/netty-demo/document/pic/3.png )
+![NIO 简单示意图]( https://raw.githubusercontent.com/HomanLiang/pictures/main/netty-demo/3.png )
 
 ### Java AIO
 

@@ -65,7 +65,7 @@
    - ChannelOutboundHandlerAdapter 用于处理出站 I/O 操作。
    - ChannelDuplexHandler 用于处理入站和出站事件。
 
-![]( https://raw.githubusercontent.com/HomanLiang/study-demo/main/netty-demo/document/pic/52.png )
+![]( https://raw.githubusercontent.com/HomanLiang/pictures/main/netty-demo/52.png )
 
 4. 我们经常需要自定义一个 Handler 类去继承 ChannelInboundHandlerAdapter，然后通过重写相应方法实现业务逻辑，我们接下来看看一般都需要重写哪些方法
 
@@ -150,7 +150,7 @@ ChannelPipeline 是一个重点：
    - 一个 Channel 包含了一个 ChannelPipeline，而 ChannelPipeline 中又维护了一个由 ChannelHandlerContext 组成的双向链表，并且每个 ChannelHandlerContext 中又关联着一个 ChannelHandler
    - 入站事件和出站事件在一个双向链表中，入站事件会从链表 head 往后传递到最后一个入站的 handler，出站事件会从链表 tail 往前传递到最前一个出站的 handler，两种类型的 handler 互不干扰
 
-![]( https://raw.githubusercontent.com/HomanLiang/study-demo/main/netty-demo/document/pic/53.png )
+![]( https://raw.githubusercontent.com/HomanLiang/pictures/main/netty-demo/53.png )
 
 4. 常用方法
    - `ChannelPipeline addFirst(ChannelHandler... handlers)`，把一个业务处理类（handler）添加到链中的第一个位置
@@ -193,7 +193,7 @@ ChannelPipeline 是一个重点：
    - 通常是 OP_ACCEPT 事件，然后将接收到的 SocketChannel 交给 WorkerEventLoopGroup
    - WorkerEventLoopGroup 会由 next 选择其中一个 EventLoop来将这个 SocketChannel 注册到其维护的 Selector 并对其后续的 IO 事件进行处理
 
-![]( https://raw.githubusercontent.com/HomanLiang/study-demo/main/netty-demo/document/pic/54.png )
+![]( https://raw.githubusercontent.com/HomanLiang/pictures/main/netty-demo/54.png )
 
 4. 常用方法
    - `public NioEventLoopGroup()`，构造方法
@@ -213,7 +213,7 @@ public static ByteBuf copiedBuffer(CharSequence string, Charset charset)
 
 3. 举例说明Unpooled 获取 Netty的数据容器ByteBuf 的基本使用 【案例演示】
 
-![]( https://raw.githubusercontent.com/HomanLiang/study-demo/main/netty-demo/document/pic/55.png )
+![]( https://raw.githubusercontent.com/HomanLiang/pictures/main/netty-demo/55.png )
 
 **代码演示：**
 
@@ -263,7 +263,7 @@ public class NettyByteBuf01 {
 
 结果图
 
-![]( https://raw.githubusercontent.com/HomanLiang/study-demo/main/netty-demo/document/pic/56.png )
+![]( https://raw.githubusercontent.com/HomanLiang/pictures/main/netty-demo/56.png )
 
 案例2
 
@@ -316,7 +316,7 @@ public class NettyByteBuf02 {
 }
 ```
 
-![]( https://raw.githubusercontent.com/HomanLiang/study-demo/main/netty-demo/document/pic/57.png )
+![]( https://raw.githubusercontent.com/HomanLiang/pictures/main/netty-demo/57.png )
 
 
 
@@ -612,15 +612,15 @@ public class GroupChatClientHandler extends SimpleChannelInboundHandler<String> 
 
 服务器端
 
-![]( https://raw.githubusercontent.com/HomanLiang/study-demo/main/netty-demo/document/pic/58.png )
+![]( https://raw.githubusercontent.com/HomanLiang/pictures/main/netty-demo/58.png )
 
 客户端--发送消息”1“
 
-![]( https://raw.githubusercontent.com/HomanLiang/study-demo/main/netty-demo/document/pic/59.png )
+![]( https://raw.githubusercontent.com/HomanLiang/pictures/main/netty-demo/59.png )
 
 其他客户端--接收到消息
 
-![]( https://raw.githubusercontent.com/HomanLiang/study-demo/main/netty-demo/document/pic/60.png )
+![]( https://raw.githubusercontent.com/HomanLiang/pictures/main/netty-demo/60.png )
 
 
 
@@ -751,7 +751,7 @@ public class HeartBeatServerHandler extends ChannelInboundHandlerAdapter {
 
 结果图
 
-![]( https://raw.githubusercontent.com/HomanLiang/study-demo/main/netty-demo/document/pic/61.png )
+![]( https://raw.githubusercontent.com/HomanLiang/pictures/main/netty-demo/61.png )
 
 
 
@@ -952,11 +952,11 @@ hello.html
 
 聊天界面
 
-![]( https://raw.githubusercontent.com/HomanLiang/study-demo/main/netty-demo/document/pic/62.png )
+![]( https://raw.githubusercontent.com/HomanLiang/pictures/main/netty-demo/62.png )
 
 服务器端
 
-![]( https://raw.githubusercontent.com/HomanLiang/study-demo/main/netty-demo/document/pic/63.png )
+![]( https://raw.githubusercontent.com/HomanLiang/pictures/main/netty-demo/63.png )
 
 
 
