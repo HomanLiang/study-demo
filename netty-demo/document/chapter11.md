@@ -14,8 +14,8 @@
 
 #### 说明
 
-1. 源码需要剖析到 Netty 调用`doBind`方法， 追踪到 `NioServerSocketChannel`的`doBind`
-2. 并且要 Debug 程序到 `NioEventLoop类` 的`run` 代码 ，无限循环，在服务器端运行。
+- 源码需要剖析到 Netty 调用`doBind`方法， 追踪到 `NioServerSocketChannel`的`doBind`
+- 并且要 Debug 程序到 `NioEventLoop类` 的`run` 代码 ，无限循环，在服务器端运行。
 
 ![](https://raw.githubusercontent.com/HomanLiang/pictures/main/study-demo/netty-demo/11_1.png)
 
@@ -137,7 +137,7 @@
    **EchoServerHandler**
 
    ```java
-package com.homan.netty.source.echo;
+   package com.homan.netty.source.echo;
    
    import io.netty.channel.ChannelHandler.Sharable;
    import io.netty.channel.ChannelHandlerContext;
@@ -179,10 +179,12 @@ package com.homan.netty.source.echo;
        }
    }
    ```
-   
+
    说明：
 
-   1. 这是一个普通的处理器类，用于处理客户端发送的消息，在我这里，我们简单的解析出客户端传过来的内容然后打印，最后发送字符串给客户端
+   这是一个普通的处理器类，用于处理客户端发送的消息，在我这里，我们简单的解析出客户端传过来的内容然后打印，最后发送字符串给客户端
+
+   
 
 2. 分析 EventLoopGroup 的过程
 
