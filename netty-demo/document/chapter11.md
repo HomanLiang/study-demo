@@ -132,12 +132,14 @@
 
       - `finally` 块中的代码将在服务器关闭时优雅关闭所有资源
 
+   
+
    **EchoServerHandler**
 
    ```java
 package com.homan.netty.source.echo;
    
-import io.netty.channel.ChannelHandler.Sharable;
+   import io.netty.channel.ChannelHandler.Sharable;
    import io.netty.channel.ChannelHandlerContext;
    import io.netty.channel.ChannelInboundHandlerAdapter;
    
@@ -179,7 +181,7 @@ import io.netty.channel.ChannelHandler.Sharable;
    ```
    
    说明：
-   
+
    1. 这是一个普通的处理器类，用于处理客户端发送的消息，在我这里，我们简单的解析出客户端传过来的内容然后打印，最后发送字符串给客户端
 
 2. 分析 EventLoopGroup 的过程
