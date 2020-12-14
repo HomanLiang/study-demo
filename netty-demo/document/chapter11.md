@@ -137,53 +137,13 @@
    **EchoServerHandler**
 
    ```java
-package com.homan.netty.source.echo;
-   
-   import io.netty.channel.ChannelHandler.Sharable;
-   import io.netty.channel.ChannelHandlerContext;
-   import io.netty.channel.ChannelInboundHandlerAdapter;
-   
-   /**
-    * Handler implementation for the echo server.
-    *
-    * @author hmliang
-    */
-   @Sharable
-   public class EchoServerHandler extends ChannelInboundHandlerAdapter {
-   
-       @Override
-       public void channelRead(ChannelHandlerContext ctx, Object msg) {
-           ctx.write(msg);
-       }
-   
-       @Override
-       public void handlerAdded(ChannelHandlerContext ctx) throws Exception {
-           super.handlerAdded(ctx);
-       }
-   
-       @Override
-       public void handlerRemoved(ChannelHandlerContext ctx) throws Exception {
-           super.handlerRemoved(ctx);
-       }
-   
-       @Override
-       public void channelReadComplete(ChannelHandlerContext ctx) {
-           ctx.flush();
-       }
-   
-       @Override
-       public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
-           // Close the connection when an exception is raised.
-           cause.printStackTrace();
-           ctx.close();
-       }
-   }
+
    ```
    
    说明：
-
+   
    1. 这是一个普通的处理器类，用于处理客户端发送的消息，在我这里，我们简单的解析出客户端传过来的内容然后打印，最后发送字符串给客户端
-
+   
 2. 分析 EventLoopGroup 的过程
 
    1. 构造器方法
