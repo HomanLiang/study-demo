@@ -109,7 +109,7 @@
 
       - `new NioEventLoopGroup(1);` 这个1表示 `bossGroup` 事件组有1个线程你可以指定，如果 `new NioEventLoopGroup()` 会含有默认个线程 `cpu核数*2`，即可以充分的利用多核的优势
 
-        ```java
+        ```
         DEFAULT_EVENT_LOOP_THREADS = Math.max(1, SystemPropertyUtil.getInt(
                 "io.netty.eventLoopThreads", NettyRuntime.availableProcessors() * 2));
         ```
@@ -137,18 +137,58 @@
    **EchoServerHandler**
 
    ```java
-
+package com.homan.netty.source.echo;
+   
+   import io.netty.channel.ChannelHandler.Sharable;
+   import io.netty.channel.ChannelHandlerContext;
+   import io.netty.channel.ChannelInboundHandlerAdapter;
+   
+   /**
+    * Handler implementation for the echo server.
+    *
+    * @author hmliang
+    */
+   @Sharable
+   public class EchoServerHandler extends ChannelInboundHandlerAdapter {
+   
+       @Override
+       public void channelRead(ChannelHandlerContext ctx, Object msg) {
+           ctx.write(msg);
+       }
+   
+       @Override
+       public void handlerAdded(ChannelHandlerContext ctx) throws Exception {
+           super.handlerAdded(ctx);
+       }
+   
+       @Override
+       public void handlerRemoved(ChannelHandlerContext ctx) throws Exception {
+           super.handlerRemoved(ctx);
+       }
+   
+       @Override
+       public void channelReadComplete(ChannelHandlerContext ctx) {
+           ctx.flush();
+       }
+   
+       @Override
+       public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
+           // Close the connection when an exception is raised.
+           cause.printStackTrace();
+           ctx.close();
+       }
+   }
    ```
    
    说明：
-   
+
    1. 这是一个普通的处理器类，用于处理客户端发送的消息，在我这里，我们简单的解析出客户端传过来的内容然后打印，最后发送字符串给客户端
-   
+
 2. 分析 EventLoopGroup 的过程
 
    1. 构造器方法
 
-      ```java
+      ```
           public NioEventLoopGroup(int nThreads) {
               this(nThreads, (Executor) null);
           }
@@ -156,7 +196,7 @@
 
    2. 1调用下面构造器方法
 
-      ```java
+      ```
           public NioEventLoopGroup(int nThreads, Executor executor) {
               this(nThreads, executor, SelectorProvider.provider());
           }
@@ -164,7 +204,7 @@
 
    3. 2调用下面构造器方法
 
-      ```java
+      ```
           public NioEventLoopGroup(
                   int nThreads, ThreadFactory threadFactory, final SelectorProvider selectorProvider) {
               this(nThreads, threadFactory, selectorProvider, DefaultSelectStrategyFactory.INSTANCE);
@@ -173,7 +213,7 @@
 
    4. 3调用下面构造器方法
 
-      ```java
+      ```
           public NioEventLoopGroup(int nThreads, ThreadFactory threadFactory,
               final SelectorProvider selectorProvider, final SelectStrategyFactory selectStrategyFactory) {
               super(nThreads, threadFactory, selectorProvider, selectStrategyFactory, RejectedExecutionHandlers.reject());
@@ -183,7 +223,7 @@
 
    5. 上面的 super() 方法是父类：`MultithreadEventLoopGroup`
 
-      ```java
+      ```
           protected MultithreadEventLoopGroup(int nThreads, ThreadFactory threadFactory, Object... args) {
               super(nThreads == 0 ? DEFAULT_EVENT_LOOP_THREADS : nThreads, threadFactory, args);
           }
@@ -281,7 +321,7 @@
 
    1. `ServerBootstrap` 是个空构造，但有默认的成员变量
 
-      ```java
+      ```
           private final Map<ChannelOption<?>, Object> childOptions = new LinkedHashMap<ChannelOption<?>, Object>();
           private final Map<AttributeKey<?>, Object> childAttrs = new LinkedHashMap<AttributeKey<?>, Object>();
       	// config 对象，会在后面起很大作用
@@ -294,7 +334,7 @@
 
    2. 分析一下 ServerBootstrap 基本使用情况
 
-      ```java
+      ```
                   ServerBootstrap b = new ServerBootstrap();
                   b.group(bossGroup, workerGroup)
                    .channel(NioServerSocketChannel.class)
@@ -329,7 +369,7 @@
 
    2. `bind` 方法代码，追踪到创建了一个端口对象，并做了一些空判断，核心代码 `doBind`
 
-      ```java
+      ```
           public ChannelFuture bind(SocketAddress localAddress) {
               validate();
               if (localAddress == null) {
@@ -341,7 +381,7 @@
 
    3. `doBind` 源码剖析，核心是两个方法 `initAndRegister` 和 `doBind0`
 
-      ```java
+      ```
           private ChannelFuture doBind(final SocketAddress localAddress) {
               final ChannelFuture regFuture = initAndRegister();
               final Channel channel = regFuture.channel();
@@ -384,7 +424,7 @@
 
    4. 分析说 `initAndRegister`
 
-      ```java
+      ```
           final ChannelFuture initAndRegister() {
               Channel channel = null;
               try {
@@ -444,7 +484,7 @@
 
    5. init 方法会调用 addLast，现在进入到 addLast 方法内查看
 
-      ```java
+      ```
           @Override
           public final ChannelPipeline addLast(EventExecutorGroup group, String name, ChannelHandler handler) {
               final AbstractChannelHandlerContext newCtx;
@@ -516,14 +556,11 @@
       ```
 
       说明：
-
       - 该方法的参数为 `initAndRegister` 的 `future`，`NioServerSocketChannel`的端口地址，`NioServerSocketChannel` 的 `promise`
-
-        
 
       2. 往下看，将调用 `LoggingHandler` 的 `invokeBind` 方法，最后会追到
 
-      ```java
+      ```
               @Override
               public void bind(
                       ChannelHandlerContext ctx, SocketAddress localAddress, ChannelPromise promise)
@@ -534,7 +571,7 @@
 
       3. 继续追踪 `AbstractChannel` 的 `bind` 方法
 
-         ```java
+         ```
                  @Override
                  public final void bind(final SocketAddress localAddress, final ChannelPromise promise) {
                      assertEventLoop();
@@ -583,7 +620,7 @@
 
       4. 最终 `doBind` 就会追踪到 `NioServerSocketChannel` 的 `doBind`，说明 `Netty` 底层使用的是 `Nio`
 
-         ```java
+         ```
              @Override
              protected void doBind(SocketAddress localAddress) throws Exception {
                  if (PlatformDependent.javaVersion() >= 7) {
@@ -598,7 +635,7 @@
 
 5. 继续往下执行，服务器就会进入到（`NioEventLoop` 类）一个循环代码，进行监听
 
-   ```java
+   ```
        @Override
        protected void run() {
            for (;;) {
