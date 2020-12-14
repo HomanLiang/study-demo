@@ -25,7 +25,7 @@
 
 1. Demo 源码的基本理解
 
-   `EchoServer`
+   **EchoServer**
 
    ```java
    package com.homan.netty.source.echo;
@@ -132,7 +132,7 @@
 
       - `finally` 块中的代码将在服务器关闭时优雅关闭所有资源
 
-   `EchoServerHandler`
+   **EchoServerHandler**
 
    ```java
 package com.homan.netty.source.echo;
