@@ -6,7 +6,7 @@
 2. 由于 TCP 无消息保护边界, 需要在接收端处理消息边界问题，也就是我们所说的粘包、拆包问题
 3. TCP粘包、拆包图解
 
-![]( https://raw.githubusercontent.com/HomanLiang/pictures/main/study-demo/netty-demo/10_1.png )
+![]( https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/netty-demo/10_1.png )
 
 **上图说明：**
 
@@ -237,15 +237,15 @@ public class TcpClientInitializer extends ChannelInitializer<SocketChannel> {
 
 客户端1
 
-![]( https://raw.githubusercontent.com/HomanLiang/pictures/main/study-demo/netty-demo/10_2.png )
+![]( https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/netty-demo/10_2.png )
 
 客户端2
 
-![]( https://raw.githubusercontent.com/HomanLiang/pictures/main/study-demo/netty-demo/10_3.png )
+![]( https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/netty-demo/10_3.png )
 
 服务器端
 
-![]( https://raw.githubusercontent.com/HomanLiang/pictures/main/study-demo/netty-demo/10_4.png )
+![]( https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/netty-demo/10_4.png )
 
 
 
@@ -261,7 +261,7 @@ public class TcpClientInitializer extends ChannelInitializer<SocketChannel> {
 1. 要求客户端发送 5 个 Message 对象, 客户端每次发送一个 Message 对象
 2. 服务器端每次接收一个Message, 分5次进行解码， 每读取到 一个Message , 会回复一个Message 对象 给客户端
 
-![]( https://raw.githubusercontent.com/HomanLiang/pictures/main/study-demo/netty-demo/10_5.png )
+![]( https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/netty-demo/10_5.png )
 
 **代码示例**
 
@@ -596,11 +596,11 @@ public class TcpClientHandler extends SimpleChannelInboundHandler<MessageProtoco
 
 客户端
 
-![]( https://raw.githubusercontent.com/HomanLiang/pictures/main/study-demo/netty-demo/10_6.png )
+![]( https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/netty-demo/10_6.png )
 
 服务器端
 
-![]( https://raw.githubusercontent.com/HomanLiang/pictures/main/study-demo/netty-demo/10_7.png )
+![]( https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/netty-demo/10_7.png )
 
 
 

@@ -17,7 +17,7 @@
 - 源码需要剖析到 Netty 调用`doBind`方法， 追踪到 `NioServerSocketChannel`的`doBind`
 - 并且要 Debug 程序到 `NioEventLoop类` 的`run` 代码 ，无限循环，在服务器端运行。
 
-![](https://raw.githubusercontent.com/HomanLiang/pictures/main/study-demo/netty-demo/11_1.png)
+![](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/netty-demo/11_1.png)
 
 
 
