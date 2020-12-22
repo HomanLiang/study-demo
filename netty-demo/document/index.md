@@ -16,7 +16,7 @@
 14. [Netty 核心源码剖析（ChannelPipeline 调度 handler 的源码剖析）]( https://github.com/HomanLiang/study-demo/blob/main/netty-demo/document/chapter14.md )
 15. [Netty 核心源码剖析（Netty 心跳(heartbeat)服务源码剖析）]( https://github.com/HomanLiang/study-demo/blob/main/netty-demo/document/chapter15.md )
 16. [Netty 核心源码剖析（Netty 核心组件 EventLoop 源码剖析）]( https://github.com/HomanLiang/study-demo/blob/main/netty-demo/document/chapter16.md )
-17. [Netty 核心源码剖析（七）]( https://github.com/HomanLiang/study-demo/blob/main/netty-demo/document/chapter17.md )
+17. [Netty 核心源码剖析（Handler 中加入线程池和Context 中添加线程池的源码剖析）]( https://github.com/HomanLiang/study-demo/blob/main/netty-demo/document/chapter17.md )
 18. [用 Netty 自己实现 Dubbo RPC]( https://github.com/HomanLiang/study-demo/blob/main/netty-demo/document/chapter18.md )
 
 
