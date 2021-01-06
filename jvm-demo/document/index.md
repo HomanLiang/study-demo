@@ -4,6 +4,7 @@
 2. [类加载子系统](https://github.com/HomanLiang/study-demo/blob/main/jvm-demo/document/chapter1_2.md)
 3. [运行时数据区概述及线程](https://github.com/HomanLiang/study-demo/blob/main/jvm-demo/document/chapter1_3.md)
 4. [程序计数器（PC 寄存器）](https://github.com/HomanLiang/study-demo/blob/main/jvm-demo/document/chapter1_4.md)
+5. [虚拟机栈](https://github.com/HomanLiang/study-demo/blob/main/jvm-demo/document/chapter1_5.md)
 
 
 
