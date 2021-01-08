@@ -348,15 +348,15 @@ Java 中任何一个普通的方法其实都具备虚函数的特征，它们相
 
 Dog 虚方法表
 
-![image-20210108094846509](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/jvm-demo/image-20210108094846509.png)
+![image-20210108113408741](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/jvm-demo/image-20210108113408741.png)
 
 CockerSpaniel 虚方法表
 
-![image-20210108095025071](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/jvm-demo/image-20210108095025071.png)
+![image-20210108113432941](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/jvm-demo/image-20210108113432941.png)
 
 Cat 虚方法表
 
-![image-20210108095059262](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/jvm-demo/image-20210108095059262.png)
+![image-20210108113457637](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/jvm-demo/image-20210108113457637.png)
 
 
 
@@ -378,13 +378,30 @@ Cat 虚方法表
    - 一个方法在正常调用完成之后究竟需要使用哪一个返回指令还需要根据方法返回值的实际数据类型而定。
    - 在字节码指令中，返回指令包含 ireturn（当返回值是 boolean、byte、char、short 和 int 类型使用）、lreturn、freturn、dreturn 以及 areturn，另外还有一个 return 指令供声明为 void 的方法、实例初始化方法、类和接口的初始化方法使用
 
-2. 
+2. 在方法执行的过程中遇到了异常（Exception），并且这个异常没有在方法内进行处理，也就是只要在本方法的异常表中没有搜索到匹配的异常处理器，就会导致方法退出。简称异常完成出口。
+
+   方法执行过程中抛出异常时的异常处理，存储在一个异常处理表，方便再发生异常的时候找到处理异常的代码
+
+   ![image-20210108112628328](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/jvm-demo/image-20210108112628328.png)
 
 
 
+## 一些附加信息
+
+![image-20210108113530506](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/jvm-demo/image-20210108113530506.png)
+
+栈帧中还允许携带与 Java 虚拟机实现相关的一些附加信息。例如，对程序调试提供支持的信息。
 
 
 
+## 栈的相关面试题
+
+- 举例栈溢出的情况？（StackOverflowError）
+  - 通过 -Xss 设置栈的大小、OOM
+- 调整栈大小，就能保证不出现溢出吗？不能
+- 分配的栈内存越大越好吗？不是
+- 垃圾回收是否会涉及到虚拟机栈？不会的
+- 方法中定义的局部变量是否线程安全？具体问题具体分析
 
 
 
