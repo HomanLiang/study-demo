@@ -6,6 +6,7 @@
 4. [程序计数器（PC 寄存器）](https://github.com/HomanLiang/study-demo/blob/main/jvm-demo/document/chapter1_4.md)
 5. [虚拟机栈](https://github.com/HomanLiang/study-demo/blob/main/jvm-demo/document/chapter1_5.md)
 6. [本地方法接口](https://github.com/HomanLiang/study-demo/blob/main/jvm-demo/document/chapter1_6.md)
+7. [本地方法栈](https://github.com/HomanLiang/study-demo/blob/main/jvm-demo/document/chapter1_7.md)
 
 
 
