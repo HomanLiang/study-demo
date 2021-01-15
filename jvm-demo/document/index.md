@@ -8,6 +8,7 @@
 6. [本地方法接口](https://github.com/HomanLiang/study-demo/blob/main/jvm-demo/document/chapter1_6.md)
 7. [本地方法栈](https://github.com/HomanLiang/study-demo/blob/main/jvm-demo/document/chapter1_7.md)
 8. [堆](https://github.com/HomanLiang/study-demo/blob/main/jvm-demo/document/chapter1_8.md)
+9. [方法区](https://github.com/HomanLiang/study-demo/blob/main/jvm-demo/document/chapter1_9.md)
 
 
 
