@@ -9,6 +9,7 @@
 7. [本地方法栈](https://github.com/HomanLiang/study-demo/blob/main/jvm-demo/document/chapter1_7.md)
 8. [堆](https://github.com/HomanLiang/study-demo/blob/main/jvm-demo/document/chapter1_8.md)
 9. [方法区](https://github.com/HomanLiang/study-demo/blob/main/jvm-demo/document/chapter1_9.md)
+10. [对象的实例化、内存布局与访问定位](https://github.com/HomanLiang/study-demo/blob/main/jvm-demo/document/chapter1_10.md)
 
 
 
