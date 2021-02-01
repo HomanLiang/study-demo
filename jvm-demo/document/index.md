@@ -12,6 +12,7 @@
 10. [对象的实例化、内存布局与访问定位](https://github.com/HomanLiang/study-demo/blob/main/jvm-demo/document/chapter1_10.md)
 11. [直接内存](https://github.com/HomanLiang/study-demo/blob/main/jvm-demo/document/chapter1_11.md)
 12. [执行引擎](https://github.com/HomanLiang/study-demo/blob/main/jvm-demo/document/chapter1_12.md)
+13. [String Table](https://github.com/HomanLiang/study-demo/blob/main/jvm-demo/document/chapter1_13.md)
 
 
 
