@@ -154,9 +154,41 @@ Java 语言规范里要求完全相同的字符串字面量，应该包含同样
 
 ## StringTable的垃圾回收
 
+![image-20210203213844074](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/jvm-demo/image-20210203213844074.png)
+
+
+
 
 
 ## G1 中的 String 去重操作
+
+![image-20210203213931228](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/jvm-demo/image-20210203213931228.png)
+
+- 背景：对许多 Java 应用（有大的也有小的）做的测试得出以下结果：
+  - 堆存活数据集合里面 String 对象占了 25%
+  - 堆存活数据集合里面重复的 String 对象有 13.5%
+  - String 对象的平均长度是 45
+- 许多大规模的 Java 应用的瓶颈在于内存，测试表明，在这些类型的应用里面，Java 堆中存活的数据集合差不多 25% 是String 对象。更进一步，这里面差不多一半 String 对象是重复，重复的意思是说：`string1.equals(string2)=true`。堆上存在重复的 String 对象必然是一种内存的浪费。这个项目将在 G1 垃圾收集器中实现自动持续对重复的 String 对象进行去重，这样就能避免浪费内存。
+
+- 实现
+  - 当垃圾收集器工作的时候，会访问堆上存活的对象。对每一个访问的对象都会检查是否是候选的要去重的 String 对象。
+  - 如果是，把这个对象的一个引用插入到队列中等待后续的处理。一个去重的线程在后台运行，处理这个队列。处理队列的一个元素意味着从队列删除这个元素，然后尝试去重它引用的     String 对象。
+  - 使用一个 Hashtable 来记录所有的被 String 对象使用的不重复的 char 数组。当去重的时候，会查这个 Hashtable,来看堆上是否已经存在一个一模一样的 char 数组。
+  - 如果存在，String 对象会被调整引用那个数组，释放对原来的数组的引用，最终会被垃圾收集器回收掉。
+  - 如果查找失败，char 数组会被插入到 Hashtable，这样以后的时候就可以共享这个数组了。
+
+- 命令行选项
+  - UseStringDeduplication(bool): 开启 String 去重，默认是不开启的，需要手动开启。
+  - PrintStringDeduplicationStatistics(bool):打印详细的去重统计信息
+  - StringDeduplicationAgeThreshold(uintx): 达到这个年龄的String对象被认为是去重的候选对象
+
+
+
+
+
+
+
+
 
 
 
