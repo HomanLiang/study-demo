@@ -14,6 +14,7 @@
 12. [执行引擎](https://github.com/HomanLiang/study-demo/blob/main/jvm-demo/document/chapter1_12.md)
 13. [StringTable](https://github.com/HomanLiang/study-demo/blob/main/jvm-demo/document/chapter1_13.md)
 14. [垃圾回收概述](https://github.com/HomanLiang/study-demo/blob/main/jvm-demo/document/chapter1_14.md)
+15. [垃圾回收相关算法](https://github.com/HomanLiang/study-demo/blob/main/jvm-demo/document/chapter1_15.md)
 
 
 
