@@ -582,19 +582,179 @@ G1的初衷就是要避免Full GC的出现。但是如果上述方式不能正�
 
 ## 垃圾回收器总结
 
+### 7种经典垃圾回收器总结
+
+截止JDK 1.8，一共有7款不同的垃圾收集器。每一款不同的垃圾收集器都有不同的特点，在具体使用的时候，需要根据具体的情况选用不同的垃圾收集器。
+
+![image-20210217113030589](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/jvm-demo/image-20210217113030589.png)
+
+GC发展阶段：Serial->Parallel（并行）->CMS（并发）->G1->ZGC
 
 
 
+### 垃圾回收器组合
+
+不同厂商、不同版本的虚拟机实现差别很大。HotSpot 虚拟机在 JDK7/8后所有收集器及组合（连线），如下图：
+
+![image-20210217113531420](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/jvm-demo/image-20210217113531420.png)
+
+1. 两个收集器间有连线，表明它们可以搭配使用：Serial/Serial Old、Serial/CMS、ParNew/Serial Old、ParNew/CMS、Parallel Scavenge/Serial Old、Parallel Scavenge/Parallel Old、G1;
+2. 其中 Serial Old作为CMS出现“Concurrent Mode Failure”失败的后备预案。
+3. （红色虚线）由于维护和兼容性测试的成本，在JDK 8时将Serial+CMS、ParNew+Serial Old这两个组合声明为Deprecated（JEP 173），并在JDK 9中完全取消了这些组合的支持（JEP214），即：移除。
+4. （绿色虚线）JDK 14中：弃用Parallel Scavenge和Serial Old GC组合（JEP 366）
+5. （青色虚线）JDK 14中：删除CMS垃圾回收器（JEP 363）
 
 
+
+### 怎么选择垃圾回收器？
+
+- Java 垃圾收集器的配置对于JVM优化来说是一个重要的选择，选择合适的垃圾收集器可以让JVM的性能有一个很大的提升。
+- 怎么选择垃圾收集器？
+  - 优先调整堆的大小让JVM自适应完成
+  - 如果内存小于100M，使用串行收集器
+  - 如果是单核、单机程序，并且没有停顿时间的要求，串行收集器
+  - 如果是多CPU、需要高吞吐量、允许停顿时间超过1秒，选择并行或者JVM自己选择
+  - 如果是多CPU、追求低停顿时间，需快速响应（比如延迟不能超过1秒，如互联网应用），使用并发收集器。官方推荐G1，性能高。现在互联网的项目，基本都是使用G1.
+- 最后需要明确一个观点：
+  - 没有最好的收集器，更没有万能的收集器；
+  - 调优永远是针对特定场景、特定需求，不存在一劳永逸的收集器。
+
+### 面试
+
+- 对于垃圾收集，面试官可以循序渐进从理论、实践各种角度深入，也未必是要求面试者什么都懂。但如果你懂得原理，一定会成为面试中的加分项。这里较通用、基础性的部分如下：
+  - 垃圾收集的算法有哪些？如果判断一个对象是否可以回收？
+  - 垃圾收集器工作的基本流程
+- 另外，大家需要多关注垃圾回收器这一章的各种常用的参数。
 
 
 
 ## GC日志分析
 
+通过阅读GC日志，我们可以了解Java虚拟机内存分配与回收策略。
+
+内存分配与垃圾回收的参数列表
+
+`-XX:+PrintGC`：输出GC日志。类似：-verbose:gc
+
+`-XX:+PrintGCDetails`：输出GC的详细日志
+
+`-XX:+PrintGCTimeStamps`：输出GC的时间戳（以基准时间的形式）
+
+`-XX:+PrintGCDateStamps`：输出GC的时间戳（以日期的形式，如2013-05-04T21:53:59.234+0800）
+
+`-XX:PrintHeapAtGC`：在进行GC的前后打印出堆的信息
+
+`-Xloggc:../logs/gc.log：`日志文件的输出路径
 
 
 
+### GC日志分析--案例1
+
+- 打开GC日志：
+
+  ```
+  -verbose:gc
+  ```
+
+  
+
+- 这个只会显示总的GC堆的变化，如下：
+
+![image-20210217123801917](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/jvm-demo/image-20210217123801917.png)
+
+- 参数解析：
+
+  ![image-20210217123856607](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/jvm-demo/image-20210217123856607.png)
+
+
+
+### GC日志分析--案例2
+
+- 打开GC日志：
+
+  ```
+  -verbose:gc -XX:+PrintGCDetails
+  ```
+
+  
+
+- 输出信息如下：
+
+  ![image-20210217124343421](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/jvm-demo/image-20210217124343421.png)
+
+- 参数解析：
+
+  ![image-20210217124418973](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/jvm-demo/image-20210217124418973.png)
+
+
+
+### GC日志分析--案例3
+
+- 打开GC日志：
+
+  ```
+  -verbose:gc -XX:+PrintGCDetails -XX:+PrintGCTimeStamps -XX:PrintGCDateStamps
+  ```
+
+  
+
+- 输出信息如下：（说明：带上了日期和时间）
+
+  ![image-20210217124554060](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/jvm-demo/image-20210217124554060.png)
+
+### GC日志分析--案例4
+
+- 如果想把GC日志存到文件的话，是下面这个参数：
+
+  ```
+  -Xloggc:/path/to/gc.log
+  ```
+
+  
+
+### 日志补充说明
+
+- Allocation Failure
+
+- [PSYoungGen: 5986K->696K(8704K)] 5986K->704K(9216K)
+
+  中括号内：GC 回收前年轻代大小，回收后大小，（年轻代总大小）
+
+  括号外：GC回收年轻代和老年代大小，回收后大小，（年轻代和老年代总大小）
+
+- user 代表用户态回收耗时，sys 内核态回收耗时， real 实际耗时。由于多核的原因，时间总和可能会超过real时间
+
+![image-20210217140148467](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/jvm-demo/image-20210217140148467.png)
+
+
+
+### Minor GC 日志
+
+![image-20210217140236599](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/jvm-demo/image-20210217140236599.png)
+
+
+
+### Full GC日志
+
+![image-20210217140329340](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/jvm-demo/image-20210217140329340.png)
+
+
+
+### GC日志分析--案例5
+
+![image-20210217140413506](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/jvm-demo/image-20210217140413506.png)
+
+![image-20210217140426457](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/jvm-demo/image-20210217140426457.png)
+
+![image-20210217140446150](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/jvm-demo/image-20210217140446150.png)
+
+
+
+### GC日志分析工具
+
+可以用一些工具去分析这些GC日志
+
+常用的日志分析工具有：GCViewer、[GCEasy](https://gceasy.io/)、GCHisto、GCLogViewer、Hpjmeter、garbagecat等。
 
 
 
@@ -602,31 +762,47 @@ G1的初衷就是要避免Full GC的出现。但是如果上述方式不能正�
 
 ## 垃圾回收器的新发展
 
+### 垃圾回收器的新发展
+
+![image-20210217153724879](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/jvm-demo/image-20210217153724879.png)
+
+### JDK 11 新特性
+
+![image-20210217153739481](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/jvm-demo/image-20210217153739481.png)
+
+### OpenJDK 12 的 Shenandoah GC
+
+- 现在 G1 回收器已成为默认回收器好几年了。
+- 我们还看到了引入了两个新的收集器：ZGC（JDK11出现）和Shennadoah(OpenJDK 12)
+  - 主打特点：低停顿时间
+
+![image-20210217154034278](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/jvm-demo/image-20210217154034278.png)
+
+![image-20210217154100501](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/jvm-demo/image-20210217154100501.png)
+
+![image-20210217154121723](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/jvm-demo/image-20210217154121723.png)
 
 
 
+### 令人震惊、革命性的ZGC
 
+![image-20210217154200326](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/jvm-demo/image-20210217154200326.png)
 
+![image-20210217154213558](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/jvm-demo/image-20210217154213558.png)
 
+![image-20210217154224758](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/jvm-demo/image-20210217154224758.png)
 
+![image-20210217154237306](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/jvm-demo/image-20210217154237306.png)
 
+![image-20210217154253605](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/jvm-demo/image-20210217154253605.png)
 
+![image-20210217154305705](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/jvm-demo/image-20210217154305705.png)
 
+### 其它垃圾回收器：AliGC
 
+![image-20210217154330772](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/jvm-demo/image-20210217154330772.png)
 
-
-
-
-
-
-
-
-
-
-
-
-
-
+![image-20210217154349162](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/jvm-demo/image-20210217154349162.png)
 
 
 
