@@ -3,7 +3,7 @@
 1. [搜索引擎相关概念](https://github.com/HomanLiang/study-demo/blob/main/elastic-search-demo/document/chapter1.md)
 2. 准备工作
 3. [基本术语](https://github.com/HomanLiang/study-demo/blob/main/elastic-search-demo/document/chapter3.md)
-4. [简单API](https://github.com/HomanLiang/study-demo/blob/main/elastic-search-demo/document/chapter4.md)
+4. [REST APIs](https://github.com/HomanLiang/study-demo/blob/main/elastic-search-demo/document/chapter4.md)
 5. [分词](https://github.com/HomanLiang/study-demo/blob/main/elastic-search-demo/document/chapter5.md)
 6. [简单搜索](https://github.com/HomanLiang/study-demo/blob/main/elastic-search-demo/document/chapter6.md)
 7. [父-子关系文档](https://github.com/HomanLiang/study-demo/blob/main/elastic-search-demo/document/chapter7.md)
