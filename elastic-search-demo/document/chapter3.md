@@ -2,7 +2,7 @@
 
 
 
-# 基本术语
+# ElasticSearch 入门简介
 
 ## ES 与 MySQL 术语对比
 

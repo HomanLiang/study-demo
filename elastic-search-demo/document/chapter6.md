@@ -2,7 +2,7 @@
 
 
 
-# REST APIs--简单搜索
+# ElasticSearch 查询
 
 ## 按查询条件数量维度
 

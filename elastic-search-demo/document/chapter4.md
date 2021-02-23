@@ -2,935 +2,213 @@
 
 
 
-# REST APIs
+# ElasticSearch 分词器
 
-ES 提供了多种操作数据的方式，其中较为常见的方式就是RESTful风格的API。
+## 参考文档
 
-简单的体验：利用Postman发起HTTP请求（当然也可以在命令行中使用curl命令）。
+- [官方文档](https://www.elastic.co/guide/en/elasticsearch/reference/7.4/analysis.html)
 
-[官方文档](https://www.elastic.co/guide/en/elasticsearch/reference/7.4/rest-apis.html)
 
 
+## 分词简介
 
-## Index APIs
+ES 作为一个开源的搜索引擎，其核心自然在于搜索，而搜索不同于我们在 MySQL 中的 select 查询语句，无论我们在百度搜索一个关键字，或者在京东搜索一个商品时，常常无法很准确的给出一个关键字，例如我们在百度希望搜索“Java教程”，我们希望结果是“Java教程”、“Java”、“Java基础教程”，甚至是“教程Java”。MySQL虽然能满足前三种查询结果，但无法满足最后一种搜索结果。
 
-### 创建索引
+虽然我们很难做到对于百度或者京东的搜索（这甚至需要了解Lucene和搜索的底层原理），但我们能借助ES做出一款不错的搜索产品。
 
-#### 简单创建索引
+ES的搜索中，分词是非常重要的概念。掌握分词原理，对待一个不甚满意的搜索结果我们能定位是哪里出了问题，从而做出相应的调整。
 
-```
-PUT /twitter
-{
-    "settings" : {
-        "number_of_shards" : 3,
-        "number_of_replicas" : 2
-    }
-}
-```
+ES中，只对字符串进行分词，在ElasticSearch2.x版本中，字符串类型只有string，ElasticSearch5.x版本后字符串类型分为了text和keyword类型，需要明确的分词只有text类型。
 
-number_of_shards：分片数，默认1
+ES的默认分词器是standard，对于英文搜索它没有问题，但对于中文搜索它会将所有的中文字符串挨个拆分，也就是它会将“中国”拆分为“中”和“国”两个单词，这带来的问题会是搜索关键字为“中国”时，将不会有任何结果，ES会将搜索字段进行拆分后搜索。当然，你可以指定让搜索的字段不进行分词，例如设置为keyword字段。
 
-number_of_replicas：备份数，默认1
 
-或者
 
-```
-PUT /twitter
-```
+## ES常用内置分词器
 
+### standard
 
-
-#### 创建索引并指定索引的映射 Mapping
-
-```
-PUT /test
-{
-    "settings" : {
-        "number_of_shards" : 1
-    },
-    "mappings" : {
-        "properties" : {
-            "field1" : { "type" : "text" }
-        }
-    }
-}
-```
-
-
-
-#### 创建索引并给索引指定别名 Aliases
-
-```
-PUT /test
-{
-    "aliases" : {
-        "alias_1" : {},
-        "alias_2" : {
-            "filter" : {
-                "term" : {"user" : "kimchy" }
-            },
-            "routing" : "kimchy"
-        }
-    }
-}
-```
-
-
-
-#### 创建成功返回结果
-
-```
-{
-    "acknowledged": true,
-    "shards_acknowledged": true,
-    "index": "test"
-}
-```
-
-
-
-### 修改索引
-
-#### 修改索引设置 settings
-
-```
-PUT /twitter/_settings
-{
-    "index" : {
-        "number_of_replicas" : 2
-    }
-}
-```
-
-#### 修改索引别名 Aliases
-
-##### 增加别名
-
-```console
-POST /_aliases
-{
-    "actions" : [
-        { "add" : { "index" : "twitter", "alias" : "alias1" } }
-    ]
-}
-```
-
-##### 移除别名
-
-```
-POST /_aliases
-{
-    "actions" : [
-        { "remove" : { "index" : "test1", "alias" : "alias1" } }
-    ]
-}
-```
-
-##### 重命名别名
-
-```
-POST /_aliases
-{
-    "actions" : [
-        { "remove" : { "index" : "test1", "alias" : "alias1" } },
-        { "add" : { "index" : "test1", "alias" : "alias2" } }
-    ]
-}
-```
-
-
-
-
-
-### 查看指定索引
-
-#### 查询索引
-
-Request:
-
-```
-GET /<alias>
-```
-
-查询所有索引
-
-Request:
-
-```
-GET /_all
-```
-
-
-
-#### 查询索引别名
-
-```
-GET /_alias
-
-GET /_alias/<alias>
-
-GET /<index>/_alias/<alias>
-```
-
-
-
-#### 查询索引设置
-
-Request:
-
-```
-GET /<index>/_settings
-
-GET /<index>/_settings/<setting>
-GET /log_2013_-*/_settings/index.number_*
-```
-
-
-
-#### 查询映射
-
-```
-GET /_mapping
-
-GET /<index>/_mapping
-```
-
-
-
-### 删除索引
-
-#### 删除索引
-
-Request:
-
-```
-DELETE /<index>
-```
-
-#### 删除别名
-
-Request:
-
-```
-DELETE /<index>/_alias/<alias>
-
-DELETE /<index>/_aliases/<alias>
-```
-
-
-
-### 分词 Analyze
-
-#### 查询使用分词器
-
-```
-GET /_analyze
-
-POST /_analyze
-
-GET /<index>/_analyze
-
-POST /<index>/_analyze
-```
-
-#### 测试分词器结果
-
-```
-GET /_analyze
-{
-  "analyzer" : "standard",
-  "text" : "this is a test"
-}
-```
-
-```
-GET /_analyze
-{
-  "analyzer" : "standard",
-  "text" : ["this is a test", "the second text"]
-}
-```
-
-
-
-
-
-## Document APIs
-
-### 插入文档
-
-- Create document IDs automatically
-
-```
-POST twitter/_doc/
-{
-    "user" : "kimchy",
-    "post_date" : "2009-11-15T14:12:12",
-    "message" : "trying out Elasticsearch"
-}
-```
-
-​	返回结果：
-
-```
-{
-    "_shards" : {
-        "total" : 2,
-        "failed" : 0,
-        "successful" : 2
-    },
-    "_index" : "twitter",
-    "_type" : "_doc",
-    "_id" : "W0tpsmIBdwcYyG50zbta",
-    "_version" : 1,
-    "_seq_no" : 0,
-    "_primary_term" : 1,
-    "result": "created"
-}
-```
-
-- Insert a JSON document into the `twitter` index with an `_id` of 1:
-
-```
-PUT twitter/_doc/1
-{
-    "user" : "kimchy",
-    "post_date" : "2009-11-15T14:12:12",
-    "message" : "trying out Elasticsearch"
-}
-```
-
-​	The API returns the following result:
-
-```
-{
-    "_shards" : {
-        "total" : 2,
-        "failed" : 0,
-        "successful" : 2
-    },
-    "_index" : "twitter",
-    "_type" : "_doc",
-    "_id" : "1",
-    "_version" : 1,
-    "_seq_no" : 0,
-    "_primary_term" : 1,
-    "result" : "created"
-}
-```
-
-- Use the `_create` resource to index a document into the `twitter` index if no document with that ID exists:
-
-```console
-PUT twitter/_create/1
-{
-    "user" : "kimchy",
-    "post_date" : "2009-11-15T14:12:12",
-    "message" : "trying out Elasticsearch"
-}
-```
-
-- Set the `op_type` parameter to *create* to index a document into the `twitter` index if no document with that ID exists:
-
-```console
-PUT twitter/_doc/1?op_type=create
-{
-    "user" : "kimchy",
-    "post_date" : "2009-11-15T14:12:12",
-    "message" : "trying out Elasticsearch"
-}
-```
-
-
-
-### 查询文档
-
-#### 查询单个文档
-
-Request:
-
-```
-GET <index>/_doc/<_id>
-
-HEAD <index>/_doc/<_id>
-
-GET <index>/_source/<_id>
-
-HEAD <index>/_source/<_id>
-```
-示例：
-
-```
-GET twitter/_doc/0
-```
-
-返回结果
-
-```console-result
-{
-    "_index" : "twitter",
-    "_type" : "_doc",
-    "_id" : "0",
-    "_version" : 1,
-    "_seq_no" : 10,
-    "_primary_term" : 1,
-    "found": true,
-    "_source" : {
-        "user" : "kimchy",
-        "date" : "2009-11-15T14:12:12",
-        "likes": 0,
-        "message" : "trying out Elasticsearch"
-    }
-}
-```
-
-#### Multi get API
-
-Request:
-
-```
-GET /_mget
-
-GET /<index>/_mget
-```
-
-示例：
-
-```console
-GET /test/_doc/_mget
-{
-    "docs" : [
-        {
-            "_id" : "1"
-        },
-        {
-            "_id" : "2"
-        }
-    ]
-}
-```
-
-或者
-
-```console
-GET /twitter/_mget
-{
-    "ids" : ["1", "2"]
-}
-```
-
-
-
-### 修改文档
-
-#### 单个文档更新
-
-Request:
-
-```
-POST /<index>/_update/<_id>
-```
-
-示例：
-
-```console
-POST test/_update/1
-{
-    "doc" : {
-        "name" : "new_name"
-    }
-}
-```
-
-返回结果
-
-```console
-{
-   "_shards": {
-        "total": 0,
-        "successful": 0,
-        "failed": 0
-   },
-   "_index": "test",
-   "_type": "_doc",
-   "_id": "1",
-   "_version": 7,
-   "_primary_term": 1,
-   "_seq_no": 6,
-   "result": "noop"
-}
-```
-
-
-
-#### 单个文档Upsert
-
-If the document does not already exist, the contents of the `upsert` element are inserted as a new document. If the document exists, the `script` is executed:
-
-```console
-POST test/_update/1
-{
-    "script" : {
-        "source": "ctx._source.counter += params.count",
-        "lang": "painless",
-        "params" : {
-            "count" : 4
-        }
-    },
-    "upsert" : {
-        "counter" : 1
-    }
-}
-```
-
-#### 单个文档 Scripted Upsert
-
-To run the script whether or not the document exists, set `scripted_upsert` to `true`:
-
-```console
-POST sessions/_update/dh3sgudg8gsrgl
-{
-    "scripted_upsert":true,
-    "script" : {
-        "id": "my_web_session_summariser",
-        "params" : {
-            "pageViewEvent" : {
-                "url":"foo.com/bar",
-                "response":404,
-                "time":"2014-01-01 12:32"
-            }
-        }
-    },
-    "upsert" : {}
-}
-```
-
-
-
-#### 单个文档 Doc as Upsert
-
-Instead of sending a partial `doc` plus an `upsert` doc, you can set `doc_as_upsert` to `true` to use the contents of `doc` as the `upsert` value:
-
-```console
-POST test/_update/1
-{
-    "doc" : {
-        "name" : "new_name"
-    },
-    "doc_as_upsert" : true
-}
-```
-
-#### 通过查询更新
-
-```console
-POST twitter/_update_by_query
-{
-  "script": {
-    "source": "ctx._source.likes++",
-    "lang": "painless"
-  },
-  "query": {
-    "term": {
-      "user": "kimchy"
-    }
-  }
-}
-```
-
-
-
-
-
-### 删除文档
-
-#### 单个文档删除
-
-Request:
-
-```
-DELETE /<index>/_doc/<_id>
-```
-
-示例：
-
-```console
-DELETE /twitter/_doc/1
-```
-
-返回结果:
-
-```console-result
-{
-    "_shards" : {
-        "total" : 2,
-        "failed" : 0,
-        "successful" : 2
-    },
-    "_index" : "twitter",
-    "_type" : "_doc",
-    "_id" : "1",
-    "_version" : 2,
-    "_primary_term": 1,
-    "_seq_no": 5,
-    "result": "deleted"
-}
-```
-
-
-
-#### 通过查询删除
-
-Request:
-
-```
-POST /<index>/_delete_by_query
-```
-
-示例：
-
-```console
-POST /twitter/_delete_by_query
-{
-  "query": {
-    "match": {
-      "message": "some message"
-    }
-  }
-}
-```
-
-返回结果
-
-```console_result
-{
-  "took" : 147,
-  "timed_out": false,
-  "total": 119,
-  "deleted": 119,
-  "batches": 1,
-  "version_conflicts": 0,
-  "noops": 0,
-  "retries": {
-    "bulk": 0,
-    "search": 0
-  },
-  "throttled_millis": 0,
-  "requests_per_second": -1.0,
-  "throttled_until_millis": 0,
-  "failures" : [ ]
-}
-```
-
-
-
-### Bulk API
-
-Performs multiple indexing or delete operations in a single API call. This reduces overhead and can greatly increase indexing speed.
-
-Request:
-
-```
-POST /_bulk
-
-POST /<index>/_bulk
-```
+支持中英文，中文会议单个字切割。他会将词汇单元转换成小写形式，并去除停用词和标点符号
 
 示例：
 
 ```
-POST _bulk
-{ "index" : { "_index" : "test", "_id" : "1" } }
-{ "field1" : "value1" }
-{ "delete" : { "_index" : "test", "_id" : "2" } }
-{ "create" : { "_index" : "test", "_id" : "3" } }
-{ "field1" : "value3" }
-{ "update" : {"_id" : "1", "_index" : "test"} }
-{ "doc" : {"field2" : "value2"} }
-```
-
-返回结果
-
-```js
+POST _analyze
 {
-   "took": 30,
-   "errors": false,
-   "items": [
-      {
-         "index": {
-            "_index": "test",
-            "_type": "_doc",
-            "_id": "1",
-            "_version": 1,
-            "result": "created",
-            "_shards": {
-               "total": 2,
-               "successful": 1,
-               "failed": 0
-            },
-            "status": 201,
-            "_seq_no" : 0,
-            "_primary_term": 1
-         }
-      },
-      {
-         "delete": {
-            "_index": "test",
-            "_type": "_doc",
-            "_id": "2",
-            "_version": 1,
-            "result": "not_found",
-            "_shards": {
-               "total": 2,
-               "successful": 1,
-               "failed": 0
-            },
-            "status": 404,
-            "_seq_no" : 1,
-            "_primary_term" : 2
-         }
-      },
-      {
-         "create": {
-            "_index": "test",
-            "_type": "_doc",
-            "_id": "3",
-            "_version": 1,
-            "result": "created",
-            "_shards": {
-               "total": 2,
-               "successful": 1,
-               "failed": 0
-            },
-            "status": 201,
-            "_seq_no" : 2,
-            "_primary_term" : 3
-         }
-      },
-      {
-         "update": {
-            "_index": "test",
-            "_type": "_doc",
-            "_id": "1",
-            "_version": 2,
-            "result": "updated",
-            "_shards": {
-                "total": 2,
-                "successful": 1,
-                "failed": 0
-            },
-            "status": 200,
-            "_seq_no" : 3,
-            "_primary_term" : 4
-         }
-      }
-   ]
-}
-```
-
-
-
-## Search APIs
-
-### Search
-
-Request:
-
-```
-GET /<index>/_search
-
-POST /<index>/_search
-
-GET /_search
-
-POST /_search
-```
-
-- 示例1：查询指定索引
-
-```console
-GET /twitter/_search?q=user:kimchy
-```
-
-​	返回结果：
-
-```console-result
-{
-  "took" : 5,
-  "timed_out" : false,
-  "_shards" : {
-    "total" : 1,
-    "successful" : 1,
-    "skipped" : 0,
-    "failed" : 0
-  },
-  "hits" : {
-    "total" : {
-      "value" : 1,
-      "relation" : "eq"
-    },
-    "max_score" : 1.3862944,
-    "hits" : [
-      {
-        "_index" : "twitter",
-        "_type" : "_doc",
-        "_id" : "0",
-        "_score" : 1.3862944,
-        "_source" : {
-          "date" : "2009-11-15T14:12:12",
-          "likes" : 0,
-          "message" : "trying out Elasticsearch",
-          "user" : "kimchy"
-        }
-      }
-    ]
-  }
-}
-```
-
-- 示例2：查询多个索引
-
-  ```console
-  GET /kimchy,elasticsearch/_search?q=user:kimchy
-  ```
-
-
-
-- 示例3：查询全部索引
-
-  ```console
-  GET /_search?q=user:kimchy
-  
-  GET /_all/_search?q=user:kimchy
-  
-  GET /*/_search?q=user:kimchy
-  ```
-
-
-
-### URI Search
-
-完全通过URI查询，包括查询条件。
-
-```console
-GET twitter/_search?q=user:kimchy
-```
-
-
-
-### Request Body Search
-
-通过方法体请求搜索（**后面会详细讲**）
-
-Request:
-
-```
-GET /<index>/_search
-{
-  "query": {<parameters>}
-}
-```
-
-示例：
-
-```console
-GET /twitter/_search
-{
-    "query" : {
-        "term" : { "user" : "kimchy" }
-    }
+  "analyzer": "standard",
+  "text": ["my name is 张某某 X"]
 }
 ```
 
 返回结果：
 
-```console
+![image-20210221181543854](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/elastic-search-demo/image-20210221181543854.png)
+
+
+
+### simple
+
+首先会通过非字母字符来分割文本信息，然后将词汇单元统一为小写形式。该分析器会去掉数字类型的字符。中文原样输出
+
+
+
+示例：
+
+```
+POST _analyze
 {
-    "took": 1,
-    "timed_out": false,
-    "_shards":{
-        "total" : 1,
-        "successful" : 1,
-        "skipped" : 0,
-        "failed" : 0
-    },
-    "hits":{
-        "total" : {
-            "value": 1,
-            "relation": "eq"
-        },
-        "max_score": 1.3862944,
-        "hits" : [
-            {
-                "_index" : "twitter",
-                "_type" : "_doc",
-                "_id" : "0",
-                "_score": 1.3862944,
-                "_source" : {
-                    "user" : "kimchy",
-                    "message": "trying out Elasticsearch",
-                    "date" : "2009-11-15T14:12:12",
-                    "likes" : 0
+  "analyzer": "simple",
+  "text": ["my name is 张某某 X"]
+}
+```
+
+返回结果：
+
+![image-20210221181822018](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/elastic-search-demo/image-20210221181822018.png)
+
+
+
+### whitespace 
+
+
+
+示例：
+
+```
+POST _analyze
+{
+  "analyzer": "whitespace",
+  "text": ["my name is 张某某 X"]
+}
+```
+
+返回结果：
+
+仅仅是去除空格，对字符没有lowcase化并且不对生成的词汇单元进行其他的规范化处理。
+
+![image-20210221181913326](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/elastic-search-demo/image-20210221181913326.png)
+
+
+
+### stop
+
+小写处理，停用词过滤(the,a,is)
+
+
+
+### keyword 
+
+不分词，直接将输入当作输出
+
+
+
+## IK分词器
+
+### IK分词器的安装
+
+**下载地址：**https://github.com/medcl/elasticsearch-analysis-ik/releases在这上面有elasticsearch所对应版本的IK分词器以编译的包，可以在上面找到对应版本进行下载使用
+
+1. 下载：
+
+   ```
+   wget https://github.com/medcl/elasticsearch-analysis-ik/releases/download/v7.5.1/elasticsearch-analysis-ik-7.5.1.zip
+   ```
+
+   
+
+2. 在解压到elasticsearch/plugin/ik/文件夹中，ik文件夹需要自己建
+
+   ```
+   unzip elasticsearch-analysis-ik-7.5.1.zip -d $ES_HOME/plugins/ik/
+   ```
+
+   把$ES_HOME替换成你elasticsearch所在目录即可
+
+3. 重启elasticsearch后就可以用了
+
+
+
+### 使用ik分词器
+
+创建索引时指定分词器：
+
+```
+PUT my_index
+{
+    "settings": {
+        "analysis": {
+            "analyzer": {
+                "ik": {
+                    "tokenizer": "ik_max_word"
                 }
             }
-        ]
+        }
+    },
+    "mappings": {
+        "properties": {
+            "title": {
+                "type": "text"
+            },
+            "content": {
+                "type": "text",
+                "analyzer": "ik_max_word"
+            }
+        }
     }
 }
 ```
 
+IK分词器示例：
+
+1. ik_smart:会做最粗粒度的拆分
+
+   ```
+   POST _analyze
+   {
+     "analyzer": "ik_smart",
+     "text": ["我是中国人"]
+   }
+   ```
+
+   ![image-20210221190812724](C:\Users\hmliang\AppData\Roaming\Typora\typora-user-images\image-20210221190812724.png)
+
+2. ik_max_word:会将文本做最细粒度的拆分
+
+   ```
+   POST _analyze
+   {
+     "analyzer": "ik_max_word",
+     "text": ["我是中国人"]
+   }
+   ```
+
+   ![image-20210221190902406](C:\Users\hmliang\AppData\Roaming\Typora\typora-user-images\image-20210221190902406.png)
 
 
 
+### 扩展词典
 
-### Count API
-
-获取匹配查询的文档数量
-
-Request:
+在`$ES_HOME/plugins/ik/elasticsearch-analysis-ik-7.5.1/config/IKAnalyzer.cfg.xml` 配置文件下
 
 ```
-GET /<index>/_count
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+	<comment>IK Analyzer 扩展配置</comment>
+	<!--用户可以在这里配置自己的扩展字典 -->
+	<entry key="ext_dict">custom.dic</entry>
+	 <!--用户可以在这里配置自己的扩展停止词字典-->
+	<entry key="ext_stopwords"></entry>
+	<!--用户可以在这里配置远程扩展字典 -->
+	<!-- <entry key="remote_ext_dict">words_location</entry> -->
+	<!--用户可以在这里配置远程扩展停止词字典-->
+	<!-- <entry key="remote_ext_stopwords">words_location</entry> -->
+</properties>
 ```
 
-示例：
+其中custom.dic为自定义的扩展字典， 内容可以根据自己需要，自定义分词的文字。
 
-```console
-PUT /twitter/_doc/1?refresh
-{
-    "user": "kimchy"
-}
-
-GET /twitter/_count?q=user:kimchy
-
-GET /twitter/_count
-{
-    "query" : {
-        "term" : { "user" : "kimchy" }
-    }
-}
-```
-
-返回结果：
-
-```console
-{
-    "count" : 1,
-    "_shards" : {
-        "total" : 1,
-        "successful" : 1,
-        "skipped" : 0,
-        "failed" : 0
-    }
-}
-```
-
-
-
-
-
-
-
-
+保存后重启elasticsearch即可看到自己想要的分词效果。
 
 
 
