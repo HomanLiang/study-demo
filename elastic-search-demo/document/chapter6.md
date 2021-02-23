@@ -4,239 +4,97 @@
 
 # ElasticSearch 查询
 
-## 按查询条件数量维度
+ES 中的查询 API 有两种：
 
-### 无条件搜索
+- **URI Search**：HTTP GET 请求的方式。
+- **Request Body Search**：基于 Json 数据格式的 **DSL**（Query Domain Specific Language）。
+
+
+
+## 指定查询范围
+
+通过 URI 可以指定在哪些索引中进行查询，有下面几种格式：
+
+- `/_search`：在所有的索引中进行搜索。
+
+- `/index_name/_search`：在 `index_name` 索引中进行搜索。
+
+- `/index1,index2/_search`：在 `index1` 和 `index2` 索引中进行搜索。
+
+- `/index*/_search`：在所有的以 `index` 为前缀的索引中进行搜索。
+
+  
+
+## URI 查询
+
+URI 查询使用 HTTP GET 请求的方式，使用 `q` 指定查询的内容，格式如下：
+
+```shell
+curl -XGET http://localhost:9200/index_name/_search?q=key:val
+```
+
+简写为：
+
+```shell
+GET /index_name/_search?q=key:val
+```
+
+其表示的含义是：在 `index_name` 索引中的所有文档中，查询 `key` 字段的值为 `val` 的内容。
+
+
+
+## Request Body 查询
+
+Request Body 查询可以使用 GET 或 POST 方式，格式如下：
 
 ```
-GET /index/_search?pretty
-```
-
-
-
-### 单条件搜索
-
-#### term 精确搜索
-
-类似于关系型数据库的等于，但搜索词**不会分词**
-
-```
-GET /index/_search
+curl -XGET/POST http://localhost:9200/index_name/_search -H 'Content-Type: application/json' -d'
 {
-    "query" : {
-        "term" : { "待查询字段" : "搜索词" }
-    }
+ "query": {
+ "match_all":{}
+ }
+}'
+```
+
+简写为：
+
+```
+POST index_name/_search
+{
+	"query": {
+		"match_all": {}
+	}
 }
 ```
 
 
 
-#### match 模糊搜索
-
-类似于关系型数据库的等于，但搜索词**会分词**
-
-```
-GET /index/_search
-{
-    "query" : {
-        "match" : { "待查询字段" : "搜索词" }
-    }
-}
-```
+## ES 查询的响应内容
 
+如果查询成功，会返回如下格式的内容：
 
+![image-20210223231349880](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/elastic-search-demo/image-20210223231349880.png)
 
-#### fuzzy 更智能的模糊搜索
+返回的结果集会以 `_score` 评分进行排序，`_score` 评分指的是查询的相关性。
 
-fuzzy 也是一个模糊查询，它看起来更加智能。它类似于搜狗输入法中允许语法错误，但仍能搜出你想要的结果。
 
-```
-GET /index/_search
-{
-    "query" : {
-        "fuzzy" : { "name" : "kevon" }
-    }
-}
-```
 
-ES 返回结果包括name="kevin",name="kevin yu"
+## 相关性指标
 
+搜索的相关性有 3 种衡量指标：
 
+- **查准率**：尽可能返回较少的无关文档。
+- **查全率**：尽可能返回较多的相关文档。
+- **结果排名**：查询结果排名是否准确。
 
-### 多条件搜索
+在 ES 中可以通过调整查询的参数来改善搜素的查准率和查全率。
 
-当搜索需要多个条件时，条件与条件之间的关系有“与”、“或”、“非”，正如关系型数据库中的“and”、“or"、”not“
 
-在ES中表示”与“关系的关键字`must`，表示”或“关系的是关键字`should`，还有表示”非“的关键字`must_not`
 
-示例1：待查询字段1=搜索词1 或者 待查询字段2=搜索词2
 
-```
-GET /index/_search
-{
-    "query" : {
-    	"bool": {
-            "should" : [
-                {
-                    "term" : { "待查询字段1" : "搜索词1" }
-                },
-                {
-                    "term" : { "待查询字段2" : "搜索词2" }
-                }
-            ]
-    	}
-    }
-}
-```
 
-示例2：待查询字段1=搜索词1 并且 !(待查询字段2=搜索词2)
 
-```
-GET /index/_search
-{
-    "query" : {
-    	"bool": {
-            "must" : [
-                {
-                    "term" : { "待查询字段1" : "搜索词1" }
-                }
-            ],
-            "must_not" : [
-                {
-                    "term" : { "待查询字段2" : "搜索词2" }
-                }
-            ]
-    	}
-    }
-}
-```
 
+**参考文章：**
 
-
-
-
-## 按等值、范围查询维度
-
-### 范围查询
-
-示例：待查询字段>=0 and 待查询字段<100
-
-```
-GET /index/_search
-{
-    "query" : {
-        "range" : { 
-        	"待查询字段" : {
-        		"gte": 0,
-        		"lt": 100
-        	}
-        }
-    }
-}
-```
-
-
-
-
-
-### 存在查询
-
-示例：返回在原始字段中至少有一个非空值的文档：
-
-```
-GET /index/_search
-{
-    "query" : {
-        "exists" : { 
-        	"field" : "name"
-        }
-    }
-}
-```
-
-
-
-### 不存在查询
-
-示例：此查询返回在 user 字段中没有值的文档。
-
-```
-GET /index/_search
-{
-    "query" : {
-    	"bool": {
-    		"must_not": {
-                "exists" : { 
-                    "field" : "user"
-                }
-    		}
-    	}
-    }
-}
-```
-
-
-
-### 分页搜索
-
-```
-GET /index/_search
-{
-    "query" : {
-        "term" : { "待查询字段" : "搜索词" }
-    },
-    "from": 0,
-    "size": 10
-}
-```
-
-
-
-### 排序
-
-```
-GET /index/_search
-{
-    "query" : {
-        "term" : { "待查询字段" : "搜索词" }
-    },
-    "from": 0,
-    "size": 10,
-    "sort": {
-    	"age": {
-    		"order": "desc"
-    	}
-    }
-}
-```
-
-ES默认升序排序，如果不指定排序字段的排序，则sort字段可直接写为 "sort":"age"
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+[ElasticSearch 查询](https://www.cnblogs.com/codeshell/p/14389415.html)
