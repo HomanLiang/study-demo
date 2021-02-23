@@ -10,95 +10,279 @@
 
 
 
-## 分词简介
+## 精确值与全文本
 
-ES 作为一个开源的搜索引擎，其核心自然在于搜索，而搜索不同于我们在 MySQL 中的 select 查询语句，无论我们在百度搜索一个关键字，或者在京东搜索一个商品时，常常无法很准确的给出一个关键字，例如我们在百度希望搜索“Java教程”，我们希望结果是“Java教程”、“Java”、“Java基础教程”，甚至是“教程Java”。MySQL虽然能满足前三种查询结果，但无法满足最后一种搜索结果。
+ES 中有 **精确值**（Exact Values）与 **全文本**（Full Text）之分：
 
-虽然我们很难做到对于百度或者京东的搜索（这甚至需要了解Lucene和搜索的底层原理），但我们能借助ES做出一款不错的搜索产品。
-
-ES的搜索中，分词是非常重要的概念。掌握分词原理，对待一个不甚满意的搜索结果我们能定位是哪里出了问题，从而做出相应的调整。
-
-ES中，只对字符串进行分词，在ElasticSearch2.x版本中，字符串类型只有string，ElasticSearch5.x版本后字符串类型分为了text和keyword类型，需要明确的分词只有text类型。
-
-ES的默认分词器是standard，对于英文搜索它没有问题，但对于中文搜索它会将所有的中文字符串挨个拆分，也就是它会将“中国”拆分为“中”和“国”两个单词，这带来的问题会是搜索关键字为“中国”时，将不会有任何结果，ES会将搜索字段进行拆分后搜索。当然，你可以指定让搜索的字段不进行分词，例如设置为keyword字段。
-
-
-
-## ES常用内置分词器
-
-### standard
-
-支持中英文，中文会议单个字切割。他会将词汇单元转换成小写形式，并去除停用词和标点符号
+- 精确值：包括数字，日期，一个具体字符串（例如"Hello World"）。
+  - 在 ES 中用 [keyword](https://www.elastic.co/guide/en/elasticsearch/reference/current/keyword.html) 数据类型表示。
+  - 精确值不需要做分词处理。
+- 全文本：非结构化的文本数据
+  - 在 ES 中用 [text](https://www.elastic.co/guide/en/elasticsearch/reference/current/text.html) 数据类型表示。
+  - 全文本需要做分词处理。
 
 示例：
+
+![image-20210223225131176](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/elastic-search-demo/image-20210223225131176.png)
+
+
+
+## 分词过程
+
+搜索引擎需要建立单词（Term / Token）与倒排索引项的对应关系，那么首先就需要将文档拆分为单词，这个过程叫做分词。
+
+比如将 hello world 拆分为 hello 和 world，这就是分词过程。
+
+
+
+## 分词器
+
+ES 使用分词器（Analyzer）对文档进行分词，ES 中内置了很多分词器供我们使用，我们也可以定制自己的分词器。
+
+一个分词器有 3 个组成部分，分词过程会依次经过这些部分：
+
+1. Character Filters：字符过滤，用于删去某些字符。该组件可以有 0 或多个。
+1. Tokenizer：分词过程，按照某个规则将文档切分为单词，比如用空格来切分。该组件有且只能有一个。
+1. Token Filter：对切分好的单词进一步加工，比如大小写转换，删除停用词等。该组件可以有 0 或多个。
+
+
+
+## ES 中的分词器
+
+ES 有下面这些[内置的分词器](https://www.elastic.co/guide/en/elasticsearch/reference/current/analysis-analyzers.html)：
+
+- Standard Analyzer：默认分词器，按词切分，转小写处理，也可以过滤停用词（默认关闭）。
+  - 在 ES 中的名称为 `standard`
+
+- Simple Analyzer：按照非字母切分，非字母会被去除，转小写处理。
+  - 在 ES 中的名称为 `simple`
+- Stop Analyzer：按照非字母切分，非字母会被去除，转小写处理，停用词过滤(the、a、is 等)。
+  - 在 ES 中的名称为 `stop`
+- Whitespace Analyzer：按照空格切分，不转小写。
+  - 在 ES 中的名称为 `whitespace`
+- Keyword Analyzer：不做任何的分词处理，直接将输入当作输出。
+  - 在 ES 中的名称为 keyword
+- Pattern Analyzer：通过正则表达式进行分词，默认为\W+非字符分隔，然后会进行转小写处理。
+  - 在 ES 中的名称为 `pattern`
+- Language Analyzers：提供了30多种常见语言的分词器，比如：
+  - `english`：英语分词器，会对英文单词进行归一化处理，去掉停用词等。
+    - 归一化处理：比如 `running` 变为 `run`，`goods` 变为 `good` 等。
+
+
+
+## 测试分词器
+
+我们可以通过下面的 API 来测试分词器：
+
+```
+GET _analyze
+{
+  "analyzer": "AnalyzerName",
+  "text": "内容"
+}
+```
+
+
+
+## 自定义分词器
+
+当 ES 中的内置分词器不能满足需求时，我们可以[定制自己的分词器](https://www.elastic.co/guide/en/elasticsearch/reference/current/analysis-custom-analyzer.html)。
+
+在上文中已经介绍过一个分词器由 3 部分组成：
+
+- Character Filters：字符过滤，用于删去某些字符。
+  - 该组件可以有 0 或多个。
+- Tokenizer：分词过程，按照某个规则将文档切分为单词，比如用空格来切分。
+  - 该组件有且只能有一个。
+- Token Filter：对切分好的单词进一步加工，比如大小写转换，删除停用词等。
+  - 该组件可以有 0 或多个。
+
+
+
+### 内置分词器组件
+
+ES 对这 3 部分都有内置：
+
+- 内置 Character Filters
+  - [HTML Strip](https://www.elastic.co/guide/en/elasticsearch/reference/current/analysis-htmlstrip-charfilter.html)：去除 HTML 标签。
+  - [Mapping](https://www.elastic.co/guide/en/elasticsearch/reference/current/analysis-mapping-charfilter.html)：字符串替换。
+  - [Pattern Replace](https://www.elastic.co/guide/en/elasticsearch/reference/current/analysis-pattern-replace-charfilter.html)：正则匹配替换。
+- [内置 Tokenizer](https://www.elastic.co/guide/en/elasticsearch/reference/current/analysis-tokenizers.html)：有 15 种。
+- [内置 Token Filter](https://www.elastic.co/guide/en/elasticsearch/reference/current/analysis-tokenfilters.html)：有将近 50 种。
+
+**Character Filters** 示例：
+
+```
+# 使用 html_strip
+POST _analyze
+{
+  "tokenizer":"keyword",
+  "char_filter":["html_strip"],
+  "text": "<b>hello world</b>"
+}
+
+# 使用 mapping
+POST _analyze
+{
+  "tokenizer": "standard",
+  "char_filter": [
+      {
+        "type" : "mapping",
+        "mappings" : [ "- => _"]
+      }
+    ],
+  "text": "123-456, I-test! test-990 650-555-1234"
+}
+
+# 正则匹配替换
+POST _analyze
+{
+  "tokenizer": "standard",
+  "char_filter": [
+      {
+        "type" : "pattern_replace",
+        "pattern" : "http://(.*)",
+        "replacement" : "$1"
+      }
+    ],
+    "text" : "http://www.elastic.co"
+}
+```
+
+**Token Filter** 示例：
 
 ```
 POST _analyze
 {
-  "analyzer": "standard",
-  "text": ["my name is 张某某 X"]
+  "tokenizer": "whitespace",
+  "filter": ["stop"],
+  "text": ["The gilrs in China are playing this game!"]
 }
-```
 
-返回结果：
-
-![image-20210221181543854](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/elastic-search-demo/image-20210221181543854.png)
-
-
-
-### simple
-
-首先会通过非字母字符来分割文本信息，然后将词汇单元统一为小写形式。该分析器会去掉数字类型的字符。中文原样输出
-
-
-
-示例：
-
-```
+# 先 lowercase 再 stop
 POST _analyze
 {
-  "analyzer": "simple",
-  "text": ["my name is 张某某 X"]
+  "tokenizer": "whitespace",
+  "filter": ["lowercase","stop"],
+  "text": ["The gilrs in China are playing this game!"]
 }
 ```
 
-返回结果：
-
-![image-20210221181822018](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/elastic-search-demo/image-20210221181822018.png)
 
 
+### 自定义分词器
 
-### whitespace 
-
-
-
-示例：
+[自定义分词器](https://www.elastic.co/guide/en/elasticsearch/reference/current/analysis-custom-analyzer.html)需要使用 **settings** 配置，示例：
 
 ```
-POST _analyze
+PUT index_name
 {
-  "analyzer": "whitespace",
-  "text": ["my name is 张某某 X"]
+  "settings": {        # 固定写法
+    "analysis": {      # 固定写法
+      "analyzer": {    # 固定写法
+        "my_custom_analyzer": {     # 自定义分词器的名称
+          "type": "custom",         # 固定写法
+          "tokenizer": "standard",  # 定义 tokenizer
+          "char_filter": [          # 定义 char_filter
+            "html_strip"
+          ],
+          "filter": [               # 定义 token filter
+            "lowercase",
+            "asciifolding"
+          ]
+        }
+      }
+    }
+  }
+}
+
+# 更复杂的一个示例
+PUT index_name
+{
+  "settings": {         # 固定写法
+    "analysis": {       # 固定写法
+      "analyzer": {     # 固定写法
+        "my_custom_analyzer": {         # 自定义分词器的名称
+          "type": "custom",             # 固定写法
+          "char_filter": [              # 定义 char_filter
+            "emoticons"                 # 在下面定义
+          ],
+          "tokenizer": "punctuation",   # 定义 tokenizer
+          "filter": [                   # 定义 token filter
+            "lowercase",
+            "english_stop"              # 在下面定义
+          ]
+        }
+      },
+      
+      "tokenizer": {                   # 自定义 tokenizer
+        "punctuation": {               # 自定义的 tokenizer 名称
+          "type": "pattern",           # type
+          "pattern": "[ .,!?]"         # 分词规则
+        }
+      },
+      
+      "char_filter": {                 # 自定义 char_filter
+        "emoticons": {                 # 自定义的 char_filter 名称
+          "type": "mapping",           # type
+          "mappings": [                # 规则
+            ":) => _happy_",
+            ":( => _sad_"
+          ]
+        }
+      },
+      
+      "filter": {                      # 自定义 token filter
+        "english_stop": {              # 自定义 token filter 名称
+          "type": "stop",              # type
+          "stopwords": "_english_"     
+        }
+      }
+    }
+  }
+}
+
+# 使用自定义分词器
+POST index_name/_analyze
+{
+  "analyzer": "my_custom_analyzer",
+  "text": "I'm a :) person, and you?"
 }
 ```
 
-返回结果：
-
-仅仅是去除空格，对字符没有lowcase化并且不对生成的词汇单元进行其他的规范化处理。
-
-![image-20210221181913326](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/elastic-search-demo/image-20210221181913326.png)
 
 
+## 安装分词器插件
 
-### stop
+我们还可以通过**安装插件**的方式，来安装其它分词器。
 
-小写处理，停用词过滤(the,a,is)
+比如安装 **analysis-icu** 分词器，它是一个不错的中文分词器：
 
+```
+elasticsearch-plugin install analysis-icu
+```
 
+**analysis-icu** 在 ES 中的名称为 `icu_analyzer`。
 
-### keyword 
+还有一些其它的中文分词器：
 
-不分词，直接将输入当作输出
+- [IK 分词器](https://github.com/medcl/elasticsearch-analysis-ik)
+- [THULAC](https://github.com/microbun/elasticsearch-thulac-plugin/)：是由清华大学自然语言处理与社会人文计算实验室研制的一套中文分词器。
+- [hanlp 分词器](https://github.com/KennFalcon/elasticsearch-analysis-hanlp)：基于 [HanLP](https://www.hanlp.com/)。
+- [Pinyin 分词器](https://github.com/medcl/elasticsearch-analysis-pinyin)
+
+其它分词器：
+
+- [中科院计算所 NLPIR](http://ictclas.nlpir.org/nlpir/)
+- [ansj分词器](https://github.com/NLPchina/ansj_seg)
+- [哈工大的LTP](https://github.com/HIT-SCIR/ltp)
+- [清华大学THULAC](https://github.com/thunlp/THULAC)
+- [斯坦福分词器](https://nlp.stanford.edu/software/segmenter.shtml)
+- [Hanlp分词器](https://github.com/hankcs/HanLP)
+- [结巴分词](https://github.com/yanyiwu/cppjieba)
+- [KCWS分词器](https://github.com/koth/kcws)
+- [ZPar](https://github.com/frcchang/zpar/releases)
+- [IKAnalyzer](https://github.com/wks/ik-analyzer)
 
 
 
@@ -212,3 +396,12 @@ IK分词器示例：
 
 
 
+
+
+
+
+
+
+**参考文章：**
+
+[ElasticSearch 分词器](https://www.cnblogs.com/codeshell/p/14389403.html)
