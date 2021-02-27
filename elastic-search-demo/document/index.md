@@ -10,10 +10,13 @@
 8. [ElasticSearch DSL 查询](https://github.com/HomanLiang/study-demo/blob/main/elastic-search-demo/document/chapter8.md)
 9. [ElasticSearch 搜索模板与建议](https://github.com/HomanLiang/study-demo/blob/main/elastic-search-demo/document/chapter9.md)
 10. [ElasticSearch 聚合分析](https://github.com/HomanLiang/study-demo/blob/main/elastic-search-demo/document/chapter10.md)
-11. Java客户端
-12. 实战：ELK日志分析系统
-13. 实战：多数据源同步
-14. 面试题
+11. [ElasticSearch Mapping](https://github.com/HomanLiang/study-demo/blob/main/elastic-search-demo/document/chapter11.md)
+12. [ElasticSearch 数据建模](https://github.com/HomanLiang/study-demo/blob/main/elastic-search-demo/document/chapter12.md)
+13. [ElasticSearch 性能优化](https://github.com/HomanLiang/study-demo/blob/main/elastic-search-demo/document/chapter13.md)
+14. Java客户端
+15. 实战：ELK日志分析系统
+16. 实战：多数据源同步
+17. 面试题
 
 
 
