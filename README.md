@@ -22,7 +22,7 @@
 
 ## ElasticSearch
 
-ElasticSearch 学习笔记
+[ElasticSearch 学习笔记](https://github.com/HomanLiang/study-demo/blob/main/elastic-search-demo/document/index.md )
 
 
 
