@@ -6,7 +6,7 @@
 4. [Redis 基本命令](https://github.com/HomanLiang/study-demo/blob/main/redis-demo/document/chapter4.md)
 5. [Redis 发布订阅](https://github.com/HomanLiang/study-demo/blob/main/redis-demo/document/chapter5.md)
 6. [Redis 事务](https://github.com/HomanLiang/study-demo/blob/main/redis-demo/document/chapter6.md)
-7. [Redis 持久化](https://github.com/HomanLiang/study-demo/blob/main/redis-demo/document/chapter6.md)
+7. [Redis 持久化](https://github.com/HomanLiang/study-demo/blob/main/redis-demo/document/chapter7.md)
 8. Redis 复制
 9. Redis 高可用
 10. Redis 过期策略

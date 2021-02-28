@@ -22,4 +22,10 @@
 
 ## ElasticSearch
 
-[ElasticSearch学习笔记](https://github.com/HomanLiang/study-demo/blob/main/elastic-search-demo/document/index.md)
+[ElasticSearch 学习笔记](https://github.com/HomanLiang/study-demo/blob/main/elastic-search-demo/document/index.md)
+
+
+
+## Redis
+
+[ElasticSearch 学习笔记](https://github.com/HomanLiang/study-demo/blob/main/redis-demo/document/index.md)
