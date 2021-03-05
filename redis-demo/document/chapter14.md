@@ -809,3 +809,164 @@ public class LimiterController {
 
 
 
+## 计数器（string）
+如知乎每个问题的被浏览器次数
+![Image](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/redis-demo/20210305212201.png)
+
+```
+set key 0
+incr key // incr readcount::{帖子id} 每阅读一次
+get key // get readcount::{帖子id} 获取阅读量
+```
+
+
+
+## 分布式全局唯一id（string）
+
+分布式全局唯一id的实现方式有很多，这里只介绍用redis实现
+![Image [2]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/redis-demo/20210305212302.png)
+每次获取userId的时候，对userId加1再获取，可以改进为如下形式
+![Image [3]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/redis-demo/20210305212303.png)
+直接获取一段userId的最大值，缓存到本地慢慢累加，快到了userId的最大值时，再去获取一段，一个用户服务宕机了，也顶多一小段userId没有用到
+
+```
+set userId 0
+incr usrId //返回1
+incrby userId 1000 //返回10001
+```
+
+
+
+## 消息队列（list）
+
+在list里面一边进，一边出即可
+```
+# 实现方式一
+# 一直往list左边放
+lpush key value 
+# key这个list有元素时，直接弹出，没有元素被阻塞，直到等待超时或发现可弹出元素为止，上面例子超时时间为10s
+brpop key value 10 
+
+# 实现方式二
+rpush key value
+blpop key value 10
+```
+![Image [4]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/redis-demo/20210305212401.png)
+
+
+
+## 新浪/Twitter用户消息列表（list）
+
+![Image [5]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/redis-demo/20210305212402.png)
+假如说小编li关注了2个微博a和b，a发了一条微博（编号为100）就执行如下命令
+
+```
+lpush msg::li 100
+```
+b发了一条微博（编号为200）就执行如下命令：
+```
+lpush msg::li 200
+```
+假如想拿最近的10条消息就可以执行如下命令（最新的消息一定在list的最左边）：
+```
+# 下标从0开始，[start,stop]是闭区间，都包含
+lrange msg::li 0 9 
+```
+
+
+
+## 抽奖活动（set）
+
+```
+# 参加抽奖活动
+sadd key {userId} 
+
+# 获取所有抽奖用户，大轮盘转起来
+smembers key 
+
+# 抽取count名中奖者，并从抽奖活动中移除
+spop key count 
+
+# 抽取count名中奖者，不从抽奖活动中移除
+srandmember key count
+```
+
+
+
+## 实现点赞，签到，like等功能(set)
+
+![Image [6]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/redis-demo/20210305212503.png)
+```
+# 1001用户给8001帖子点赞
+sadd like::8001 1001
+
+# 取消点赞
+srem like::8001 1001
+
+# 检查用户是否点过赞
+sismember like::8001 1001 
+
+# 获取点赞的用户列表
+smembers like::8001 
+
+# 获取点赞用户数
+scard like::8001 
+```
+
+
+
+## 实现关注模型，可能认识的人（set）
+
+![Image [7]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/redis-demo/20210305212506.png)
+```
+seven关注的人
+sevenSub -> {qing, mic, james}
+青山关注的人
+qingSub->{seven,jack,mic,james}
+Mic关注的人
+MicSub->{seven,james,qing,jack,tom}
+```
+```
+# 返回sevenSub和qingSub的交集，即seven和青山的共同关注
+sinter sevenSub qingSub -> {mic,james}
+
+# 我关注的人也关注他,下面例子中我是seven
+# qing在micSub中返回1，否则返回0
+sismember micSub qing
+sismember jamesSub qing
+
+# 我可能认识的人,下面例子中我是seven
+# 求qingSub和sevenSub的差集，并存在sevenMayKnow集合中
+sdiffstore sevenMayKnow qingSub sevenSub -> {seven,jack}
+```
+
+
+
+## 电商商品筛选（set）
+
+![Image [8]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/redis-demo/20210305212507.png)
+```
+每个商品入库的时候即会建立他的静态标签列表如，品牌，尺寸，处理器，内存
+# 将拯救者y700P-001和ThinkPad-T480这两个元素放到集合brand::lenovo
+sadd brand::lenovo 拯救者y700P-001 ThinkPad-T480
+sadd screenSize::15.6 拯救者y700P-001 机械革命Z2AIR
+sadd processor::i7 拯救者y700P-001 机械革命X8TIPlus
+
+# 获取品牌为联想，屏幕尺寸为15.6，并且处理器为i7的电脑品牌(sinter为获取集合的交集)
+sinter brand::lenovo screenSize::15.6 processor::i7 -> 拯救者y700P-001
+```
+
+
+
+## 排行版（zset）
+
+redis的zset天生是用来做排行榜的、好友列表, 去重, 历史记录等业务需求
+![Image [9]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/redis-demo/20210305212601.png)
+```
+# user1的用户分数为 10
+zadd ranking 10 user1
+zadd ranking 20 user2
+
+# 取分数最高的3个用户
+zrevrange ranking 0 2 withscores
+```

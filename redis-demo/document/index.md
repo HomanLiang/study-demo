@@ -14,7 +14,7 @@
 12. [Redis 高可用](https://github.com/HomanLiang/study-demo/blob/main/redis-demo/document/chapter12.md)
 13. [Redis 最佳实践](https://github.com/HomanLiang/study-demo/blob/main/redis-demo/document/chapter13.md)
 14. [Redis 应用场景](https://github.com/HomanLiang/study-demo/blob/main/redis-demo/document/chapter14.md)
-15. 
-16. Redis Java API
-17. Redis 实际问题解决
+15. [Redis Java API](https://github.com/HomanLiang/study-demo/blob/main/redis-demo/document/chapter15.md)
+16. [Redis 实际问题解决](https://github.com/HomanLiang/study-demo/blob/main/redis-demo/document/chapter16.md)
+17. [Redis为什么这么快](https://github.com/HomanLiang/study-demo/blob/main/redis-demo/document/chapter17.md)
 18. Redis 面试题

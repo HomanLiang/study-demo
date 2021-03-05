@@ -265,5 +265,101 @@ try {
 
 
 
+## redis 为什么是单线程的？
+因为CPU不是Redis的瓶颈。Redis的瓶颈最有可能是机器内存或者网络带宽。既然单线程容易实现，而且CPU不会成为瓶颈，那就顺理成章地采用单线程的方案了。关于redis的性能，官方网站也有，普通笔记本轻松处理每秒几十万的请求，参见：How fast is Redis?
+
+如果万一CPU成为你的Redis瓶颈了，或者，你就是不想让服务器其他核闲置，那怎么办？
+
+那也很简单，你多起几个Redis进程就好了。Redis是keyvalue数据库，又不是关系数据库，数据之间没有约束。只要客户端分清哪些key放在哪个Redis进程上就可以了。redis-cluster可以帮你做的更好。
+
+单线程可以处理高并发请求吗？
+
+当然可以了，Redis都实现了。
+
+有一点概念需要澄清，并发并不是并行。
+
+（相关概念：并发性I/O流，意味着能够让一个计算单元来处理来自多个客户端的流请求。并行性，意味着服务器能够同时执行几个事情，具有多个计算单元）
+
+Redis总体快速的原因：
+
+采用队列模式将并发访问变为串行访问（？）
+
+单线程指的是网络请求模块使用了一个线程（所以不需考虑并发安全性），其他模块仍用了多个线程。
+
+总体来说快速的原因如下：
+1. 绝大部分请求是纯粹的内存操作（非常快速）
+1. 采用单线程,避免了不必要的上下文切换和竞争条件
+1. 非阻塞IO
+
+内部实现采用epoll，采用了epoll+自己实现的简单的事件框架。epoll中的读、写、关闭、连接都转化成了事件，然后利用epoll的多路复用特性，绝不在io上浪费一点时间
+
+这3个条件不是相互独立的，特别是第一条，如果请求都是耗时的，采用单线程吞吐量及性能可想而知了。应该说redis为特殊的场景选择了合适的技术方案。
+
+
+
+## jedis 和 redisson 有哪些区别？
+
+### 概述
+本文的主要内容为对比Redis的两个框架：Jedis与Redisson，分析各自的优势与缺点，为项目中Java缓存方案中的Redis编程模型的选择提供参考。
+
+### Jedis与Redisson对比
+#### 概况对比
+Jedis是Redis的Java实现的客户端，其API提供了比较全面的Redis命令的支持；Redisson实现了分布式和可扩展的Java数据结构，和Jedis相比，功能较为简单，不支持字符串操作，不支持排序、事务、管道、分区等Redis特性。Redisson的宗旨是促进使用者对Redis的关注分离，从而让使用者能够将精力更集中地放在处理业务逻辑上。
+#### 编程模型
+Jedis中的方法调用是比较底层的暴露的Redis的API，也即Jedis中的Java方法基本和Redis的API保持着一致，了解Redis的API，也就能熟练的使用Jedis。而Redisson中的方法则是进行比较高的抽象，每个方法调用可能进行了一个或多个Redis方法调用。
+
+如下分别为Jedis和Redisson操作的简单示例：
+
+Jedis设置key-value与set操作：
+Jedis jedis = …;
+jedis.set("key", "value");
+List<String> values = jedis.mget("key", "key2", "key3");
+
+Redisson操作map：
+Redisson redisson = …
+RMap map = redisson.getMap("my-map"); // implement java.util.Map
+map.put("key", "value");
+map.containsKey("key");
+map.get("key");
+
+#### 可伸缩性
+Jedis使用阻塞的I/O，且其方法调用都是同步的，程序流需要等到sockets处理完I/O才能执行，不支持异步。Jedis客户端实例不是线程安全的，所以需要通过连接池来使用Jedis。
+Redisson使用非阻塞的I/O和基于Netty框架的事件驱动的通信层，其方法调用是异步的。Redisson的API是线程安全的，所以可以操作单个Redisson连接来完成各种操作。
+
+#### 数据结构
+Jedis仅支持基本的数据类型如：String、Hash、List、Set、Sorted Set。
+Redisson不仅提供了一系列的分布式Java常用对象，基本可以与Java的基本数据结构通用，还提供了许多分布式服务，其中包括（BitSet, Set, Multimap, SortedSet, Map, List, Queue, BlockingQueue, Deque, BlockingDeque, Semaphore, Lock, AtomicLong, CountDownLatch, Publish / Subscribe, Bloom filter, Remote service, Spring cache, Executor service, Live Object service, Scheduler service）。
+
+在分布式开发中，Redisson可提供更便捷的方法。
+
+#### 第三方框架整合
+1. Redisson提供了和Spring框架的各项特性类似的，以Spring XML的命名空间的方式配置RedissonClient实例和它所支持的所有对象和服务；
+2. Redisson完整的实现了Spring框架里的缓存机制；
+3. Redisson在Redis的基础上实现了Java缓存标准规范；
+4. Redisson为Apache Tomcat集群提供了基于Redis的非黏性会话管理功能。该功能支持Apache Tomcat的6、7和8版。
+5. Redisson还提供了Spring Session会话管理器的实现。
+
+
+
+## Redis 与 Memcached 相比有哪些优势？
+
+之前也用过redis，当时是用来存储一些热数据，量也不大，但是操作很频繁。现在项目中用的是MongoDB，目前是百万级的数据，将来会有千万级、亿级。
+
+就Redis和MongoDB来说，大家一般称之为Redis缓存、MongoDB数据库。这也是有道有理有根据的，Redis主要把数据存储在内存中，其“缓存”的性质远大于其“数据存储“的性质，其中数据的增删改查也只是像变量操作一样简单；
+
+MongoDB却是一个“存储数据”的系统，增删改查可以添加很多条件，就像SQL数据库一样灵活，这一点在面试的时候很受用。
+
+MongoDB语法与现有关系型数据库SQL语法比较
+
+> https://www.cnblogs.com/java-spring/p/9488200.html
+
+**Mongodb与Redis应用指标对比**
+
+![640](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/redis-demo/20210305220101.webp)
+
+
+
+
+
 
 
