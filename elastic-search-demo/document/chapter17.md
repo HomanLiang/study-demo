@@ -753,5 +753,50 @@ index.translog.flush_threshold_ops: 50000
 
 
 
+## Elasticsearch如何保证数据不丢失？
+
+### 如何保证数据写入过程中不丢
+
+数据写入请求达到时，以需要的数据格式组织并写入磁盘的过程叫做数据提交，对应es就是创建倒排索引，维护segment文件
+如果我们同步的方式，来处理上述过程，那么系统的吞吐量将很低
+如果我们以异步的方式，先写入内存，然后再异步提交到磁盘，则有可能因为机器故障而而丢失还未写入到磁盘中的数据
+
+为了解决这个问题，一般的存储系统都会设计transag log (事务日志)或这write ahead log(预写式日志)。它的作用是，将最近的写入数据或操作以日志的形式直接落盘，从而使得即便系统崩溃后，依然可以基于这些磁盘日志进行数据恢复。
+
+Mysql有redo undo log ，而HBASE、LevelDB，RockDB等采用的LSM tree则提供了write ahead log 这样的设计，来保证数据的不丢失
+
+#### 直接落盘的 translog 为什么不怕降低写入吞吐量？
+
+上述论述中，数据以同步方式落盘会有性能问题，为什么将translog和wal直接落盘不影响性能？原因如下：
+
+- 写的日志不需要维护复杂的数据结构，它仅用于记录还未真正提交的业务数据。所以体量小
+- 并且以顺序方式写盘，速度快
+
+es默认是每个请求都会同步落盘translog ，即配置`index.translog.durability` 为`request`。当然对于一些可以丢数据的场景，我们可以将`index.translog.durability`配置为`async` 来提升写入translog的性能，该配置会异步写入translog到磁盘。具体多长时间写一次磁盘，则通过`index.translog.sync_interval`来控制
+
+前面说了，为了保证translog足够小，所以translog不能无限扩张，需要在一定量后，将其对应的真实业务数据以其最终数据结构(es是倒排索引)提交到磁盘，这个动作称为flush ，它会实际的对底层Lucene 进行一次commit。我们可以通过`index.translog.flush_threshold_size` 来配置translog多大时，触发一次flush。每一次flush后，原translog将被删除，重新创建一个新的translog
+
+elasticsearch本身也提供了flush api来触发上述commit动作，但无特殊需求，尽量不要手动触发
+
+### 如何保证已写数据在集群中不丢
+
+对每个shard采用副本机制。保证写入每个shard的数据不丢
+
+### in-memory buffer
+
+前述translog只是保证数据不丢，为了其记录的高效性，其本身并不维护复杂的数据结构。 实际的业务数据的会先写入到in-memory buffer中，当调用refresh后，该buffer中的数据会被清空，转而reopen一个segment,使得其数据对查询可见。但这个segment本身也还是在内存中，如果系统宕机，数据依然会丢失。需要通过translog进行恢复
+
+其实这跟lsm tree非常相似，新写入内存的业务数据存放在内存的MemTable（对应es的in-memory buffer），它对应热数据的写入，当达到一定量并维护好数据结构后，将其转成内存中的ImmutableMemTable(对应es的内存segment)，它变得可查询。
+
+### 总结
+
+- refresh 用于将写入内存in-memory buffer数据，转为查询可见的segment
+  ![image-20210306215721985](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/elastic-search-demo/image-20210306215721985.png)
+- 每次一次写入除了写入内存外in-memory buffer，还会默认的落盘translog
+  ![image-20210306215748639](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/elastic-search-demo/image-20210306215748639.png)
+- translog 达到一定量后，触发in-memory buffer落盘，并清空自己，这个动作叫做flush
+  ![image-20210306215812266](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/elastic-search-demo/image-20210306215812266.png)
+- 如遇当前写入的shard宕机，则可以通过磁盘中的translog进行数据恢复
+
 
 

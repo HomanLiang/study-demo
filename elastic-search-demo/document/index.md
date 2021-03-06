@@ -13,10 +13,15 @@
 11. [ElasticSearch Mapping](https://github.com/HomanLiang/study-demo/blob/main/elastic-search-demo/document/chapter11.md)
 12. [ElasticSearch 数据建模](https://github.com/HomanLiang/study-demo/blob/main/elastic-search-demo/document/chapter12.md)
 13. [ElasticSearch 性能优化](https://github.com/HomanLiang/study-demo/blob/main/elastic-search-demo/document/chapter13.md)
-14. Java客户端
-15. 实战：ELK日志分析系统
-16. 实战：多数据源同步
+14. [ElasticSearch 分布式集群](https://github.com/HomanLiang/study-demo/blob/main/elastic-search-demo/document/chapter14.md)
+15. [ElasticSearch 集群安全](https://github.com/HomanLiang/study-demo/blob/main/elastic-search-demo/document/chapter15.md)
+16. [ElasticSearch 集群的规划部署与运维](https://github.com/HomanLiang/study-demo/blob/main/elastic-search-demo/document/chapter16.md)
 17. [ElasticSearch 面试题](https://github.com/HomanLiang/study-demo/blob/main/elastic-search-demo/document/chapter17.md)
+18. [ElasticSearch 相关性算分](https://github.com/HomanLiang/study-demo/blob/main/elastic-search-demo/document/chapter18.md)
+19. [ElasticSearch 第三方组件](https://github.com/HomanLiang/study-demo/blob/main/elastic-search-demo/document/chapter19.md)
+20. Java 客户端
+21. 实战：ELK日志分析系统
+22. 实战：多数据源同步
 
 
 
