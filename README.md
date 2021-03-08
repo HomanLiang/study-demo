@@ -29,3 +29,10 @@
 ## Redis
 
 [Redis 学习笔记](https://github.com/HomanLiang/study-demo/blob/main/redis-demo/document/index.md)
+
+
+
+## MySQL
+
+[MySQL 学习笔记](https://github.com/HomanLiang/study-demo/blob/main/mysql-demo/document/index.md)
+
