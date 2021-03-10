@@ -61,7 +61,7 @@ Selector、Channel 和 Buffer 的关系图（简单版）：
    常用 Buffer 子类一览：
 
    - ByteBuffer：存储字节数据到缓冲区
-   - ShortBuffer：存储字符串数据到缓冲区
+   - ShortBuffer：存储短型数据到缓冲区
    - CharBuffer：存储字符数据到缓冲区
    - IntBuffer：存储整型数据到缓冲区
    - LongBuffer：存储长整型数据到缓冲区

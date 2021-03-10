@@ -49,7 +49,7 @@
 ## Selector
 
 1. Netty 基于 Selector 对象实现 I/O 多路复用，通过 Selector 一个线程可以监听多个连接的 Channel 事件。
-   当向一个 Selector 中注册 Channel 后，Selector 内部的机制就可以自动不断地查询(Select) 这些注册的 
+   当向一个 Selector 中注册 Channel 后，Selector 内部的机制就可以自动不断地查询(Select) 这些注册的 Channel
 2. Channel 是否有已就绪的 I/O 事件（例如可读，可写，网络连接完成等），这样程序就可以很简单地使用一个线程高效地管理多个 Channel 
 
 
@@ -60,8 +60,8 @@
 2. ChannelHandler 本身并没有提供很多方法，因为这个接口有许多的方法需要实现，方便使用期间，可以继承它的子类
 3. ChannelHandler 及其实现类一览图(后)
    - ChannelInboundHandler 用于处理入站 I/O 事件。
-   - ChannelOutboundHandler 用于处理出站 I/O 操作。
-   - ChannelInboundHandlerAdapter 用于处理入站 I/O 事件。
+   - ChannelOutboundHandler 用于处理出站 I/O 事件。
+   - ChannelInboundHandlerAdapter 用于处理入站 I/O 操作。
    - ChannelOutboundHandlerAdapter 用于处理出站 I/O 操作。
    - ChannelDuplexHandler 用于处理入站和出站事件。
 

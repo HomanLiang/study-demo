@@ -18,7 +18,7 @@ Echo第一行代码就是 ：`EventLoopGroup bossGroup = new NioEventLoopGroup(1
 
    - ScheduledExecutorService 接口表示是一个定时任务接口，EventLoop 接收定时任务
    - EventLoop 接口：Netty 接口文档说明该接口作用：一旦 Channel 注册了，就处理该 Channel 对应得所有 I/O 操作
-   - SingleThreadEventExecutor 表示这是一个单个线程得线程池
+   - SingleThreadEventExecutor 表示这是一个单个线程的线程池
    - EventLoop 是一个单例的线程池，里面含有一个死循环的线程不断的做着 3 件事：监听端口、处理端口事件、处理队列事件。每个 EventLoop都可以绑定多个 Channel，而每个 Channel 始终只能由一个 EventLoop 来处理 
 
 
