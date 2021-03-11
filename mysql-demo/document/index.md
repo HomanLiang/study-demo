@@ -7,8 +7,8 @@
 5. [MySQL 日志](https://github.com/HomanLiang/study-demo/blob/main/mysql-demo/document/chapter05.md)
 6. [MySQL 事务](https://github.com/HomanLiang/study-demo/blob/main/mysql-demo/document/chapter06.md)
 7. [MySQL 锁](https://github.com/HomanLiang/study-demo/blob/main/mysql-demo/document/chapter07.md)
-8. MySQL 索引
-9. MySQL 性能优化
+8. [MySQL 索引](https://github.com/HomanLiang/study-demo/blob/main/mysql-demo/document/chapter08.md)
+9. [MySQL 性能优化](https://github.com/HomanLiang/study-demo/blob/main/mysql-demo/document/chapter09.md)
 10. MySQL 高可用
 11. MySQL 读写分离、分表分库
 12. MySQL 常见问题
