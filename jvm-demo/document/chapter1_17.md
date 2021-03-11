@@ -55,6 +55,8 @@
   - 吞吐量
   - 暂停时间
 
+
+
 ### 评估 GC 的性能指标：吞吐量（throughput）
 
 - 吞吐量就是 CPU 用于运行用户代码的时间与 CPU 总消耗时间的比值，即吞吐量 = 运行用户代码时间 / (运行用户代码时间 + 垃圾收集时间)
@@ -64,6 +66,8 @@
 
 ![image-20210213163442623](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/jvm-demo/image-20210213163442623.png)
 
+
+
 ### 评估 GC 的性能指标：暂停时间（pause time）
 
 - “暂停时间”是指一个时间段内应用程序线程暂停，让 GC 线程执行的状态
@@ -71,6 +75,8 @@
 - 暂停时间优先，意味着尽可能让单次 STW 的时间最短：0.1 + 0.1 + 0.1 + 0.1 + 0.1 = 0.5
 
 ![image-20210213170651624](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/jvm-demo/image-20210213170651624.png)
+
+
 
 ### 评估 GC 的性能指标：吞吐量 vs 暂停时间
 

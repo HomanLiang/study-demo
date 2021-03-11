@@ -225,7 +225,7 @@ JVM 在进行 GC 时，并非每次都对上面三个内存（新生代、老年
 
 ## 为对象分配内存：TLAB
 
-为什么有TLAB(Thread Local Allocation Buffer)
+**为什么有TLAB(Thread Local Allocation Buffer)**
 
 - 堆区是线程共享区域，任何线程都可以访问到堆区中的共享数据
 - 由于对象实例的创建在 JVM 中非常频繁，因此在并发环境中从堆区中划分内存空间是线程不安全的
@@ -233,17 +233,17 @@ JVM 在进行 GC 时，并非每次都对上面三个内存（新生代、老年
 
 
 
-什么是 TLAB?
+**什么是 TLAB?**
 
 - 从内存模型而不是垃圾收集的角度，对 Eden 区域继续进行划分，JVM 为每个线程分配了一个私有缓存区域，它包含在 Eden 空间内
 - 多线程同时分配内存时，使用 TLAB 可以避免一系列的非线程安全问题，同时还能够提升内存分配的吞吐量，因此我们可以将这种内存分配方式称为快速分配策略
 - 据我所知所有 OpenJDK 衍生出来的 JVM 都提供了 TLAB 的设计
 
-![image-20210109214022405](C:\Users\hmliang\AppData\Roaming\Typora\typora-user-images\image-20210109214022405.png)
+![image-20210311130131788](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/jvm-demo/image-20210311130131788.png)
 
 
 
-TLAB的再说明：
+**TLAB的再说明：**
 
 - 尽管不是所有的对象实例都能够在 TLAB 中成功分配内存，但 JVM 确实是将 TLAB 作为内存分配的首选
 - 在程序中，开发人员可以通过选项 `-XX:UseTLAB` 设置是否开启 TLAB 空间

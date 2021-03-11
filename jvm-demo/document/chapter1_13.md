@@ -178,9 +178,9 @@ Java 语言规范里要求完全相同的字符串字面量，应该包含同样
   - 如果查找失败，char 数组会被插入到 Hashtable，这样以后的时候就可以共享这个数组了。
 
 - 命令行选项
-  - UseStringDeduplication(bool): 开启 String 去重，默认是不开启的，需要手动开启。
-  - PrintStringDeduplicationStatistics(bool):打印详细的去重统计信息
-  - StringDeduplicationAgeThreshold(uintx): 达到这个年龄的String对象被认为是去重的候选对象
+  - `UseStringDeduplication(bool)`: 开启 String 去重，默认是不开启的，需要手动开启。
+  - `PrintStringDeduplicationStatistics(bool)`:打印详细的去重统计信息
+  - `StringDeduplicationAgeThreshold(uintx)`: 达到这个年龄的String对象被认为是去重的候选对象
 
 
 

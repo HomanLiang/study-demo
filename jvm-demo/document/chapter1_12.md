@@ -244,9 +244,9 @@ JVM 设计者们的初衷仅仅只是单纯地为了满足 Java 程序实现跨�
 
 在 HotSpot VM 中内嵌有两个 JIT 编译器，分别为 Client Compiler 和 Server Compiler，但大多数情况下我们简称为 C1 编译器和 C2 编译器。开发人员可以通过如下命令显式指定 Java 虚拟机在运行时到底使用哪一种即时编译器，如下所示：
 
-- -client：指定 Java 虚拟机运行在 Client 模式下，并使用 C1 编译器
+- `-client`：指定 Java 虚拟机运行在 Client 模式下，并使用 C1 编译器
   - C1 编译器会对字节码进行简单和可靠的优化，耗时短。以达到更快的编译速度。
-- -server：指定 Java 虚拟机运行在 Server 模式下，并使用 C2 编译器
+- `-server`：指定 Java 虚拟机运行在 Server 模式下，并使用 C2 编译器
   - C2 进行耗时较长的优化，以及激进优化。但优化的代码执行效率更高
 
 
