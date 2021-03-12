@@ -18,7 +18,7 @@ ES 是基于 Java 语言开发的，因此，要安装 ES，首先需要有 Java
 
 我这里选择的是 Windows 版本，下载好压缩包后，将其解压。解压后的目录如下所示：
 
-![image-20210227123613722](C:\Users\hmliang\AppData\Roaming\Typora\typora-user-images\image-20210227123613722.png)
+![image-20210312211108710](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/elastic-search-demo/20210312211108.png)
 
 来看下每个目录的作用：
 

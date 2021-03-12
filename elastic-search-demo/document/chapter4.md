@@ -354,7 +354,7 @@ IK分词器示例：
    }
    ```
 
-   ![image-20210221190812724](C:\Users\hmliang\AppData\Roaming\Typora\typora-user-images\image-20210221190812724.png)
+   ![image-20210221190812724](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/elastic-search-demo/20210312211148.png)
 
 2. ik_max_word:会将文本做最细粒度的拆分
 
@@ -366,7 +366,7 @@ IK分词器示例：
    }
    ```
 
-   ![image-20210221190902406](C:\Users\hmliang\AppData\Roaming\Typora\typora-user-images\image-20210221190902406.png)
+   ![image-20210221190902406](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/elastic-search-demo/20210312211158.png)
 
 
 
