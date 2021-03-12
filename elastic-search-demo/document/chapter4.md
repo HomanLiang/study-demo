@@ -14,10 +14,10 @@
 
 ES 中有 **精确值**（Exact Values）与 **全文本**（Full Text）之分：
 
-- 精确值：包括数字，日期，一个具体字符串（例如"Hello World"）。
+- **精确值**：包括数字，日期，一个具体字符串（例如"Hello World"）。
   - 在 ES 中用 [keyword](https://www.elastic.co/guide/en/elasticsearch/reference/current/keyword.html) 数据类型表示。
   - 精确值不需要做分词处理。
-- 全文本：非结构化的文本数据
+- **全文本**：非结构化的文本数据
   - 在 ES 中用 [text](https://www.elastic.co/guide/en/elasticsearch/reference/current/text.html) 数据类型表示。
   - 全文本需要做分词处理。
 
@@ -41,9 +41,9 @@ ES 使用分词器（Analyzer）对文档进行分词，ES 中内置了很多分
 
 一个分词器有 3 个组成部分，分词过程会依次经过这些部分：
 
-1. Character Filters：字符过滤，用于删去某些字符。该组件可以有 0 或多个。
-1. Tokenizer：分词过程，按照某个规则将文档切分为单词，比如用空格来切分。该组件有且只能有一个。
-1. Token Filter：对切分好的单词进一步加工，比如大小写转换，删除停用词等。该组件可以有 0 或多个。
+1. **Character Filters**：字符过滤，用于删去某些字符。该组件可以有 0 或多个。
+1. **Tokenizer**：分词过程，按照某个规则将文档切分为单词，比如用空格来切分。该组件有且只能有一个。
+1. **Token Filter**：对切分好的单词进一步加工，比如大小写转换，删除停用词等。该组件可以有 0 或多个。
 
 
 
@@ -99,7 +99,7 @@ GET _analyze
 
 
 
-### 内置分词器组件
+### 1、内置分词器组件
 
 ES 对这 3 部分都有内置：
 
@@ -170,7 +170,7 @@ POST _analyze
 
 
 
-### 自定义分词器
+### 2、自定义分词器
 
 [自定义分词器](https://www.elastic.co/guide/en/elasticsearch/reference/current/analysis-custom-analyzer.html)需要使用 **settings** 配置，示例：
 
@@ -288,7 +288,7 @@ elasticsearch-plugin install analysis-icu
 
 ## IK分词器
 
-### IK分词器的安装
+### 1、IK分词器的安装
 
 **下载地址：**https://github.com/medcl/elasticsearch-analysis-ik/releases在这上面有elasticsearch所对应版本的IK分词器以编译的包，可以在上面找到对应版本进行下载使用
 
@@ -312,7 +312,7 @@ elasticsearch-plugin install analysis-icu
 
 
 
-### 使用ik分词器
+### 2、使用ik分词器
 
 创建索引时指定分词器：
 
@@ -370,7 +370,7 @@ IK分词器示例：
 
 
 
-### 扩展词典
+### 3、扩展词典
 
 在`$ES_HOME/plugins/ik/elasticsearch-analysis-ik-7.5.1/config/IKAnalyzer.cfg.xml` 配置文件下
 
