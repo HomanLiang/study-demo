@@ -421,11 +421,15 @@ InnoDB 表只会把自增主键的最大 id 记录在内存中，所以重启之
 
 ### 一、面试官考点之索引是什么？
 
+![20210312125203](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mysql-demo/20210312125203.png)
+
 - 索引是一种能提高数据库查询效率的数据结构。它可以比作一本字典的目录，可以帮你快速找到对应的记录。
 - 索引一般存储在磁盘的文件中，它是占用物理空间的。
 - 正所谓水能载舟，也能覆舟。适当的索引能提高查询效率，过多的索引会影响数据库表的插入和更新功能。
 
 ### 二、索引有哪些类型类型
+
+![图片](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mysql-demo/20210312125233.png)
 
 **数据结构维度**
 
@@ -471,9 +475,23 @@ select * from employee where age between 18 and 28;
 
 如果二叉树特殊化为一个链表，相当于全表扫描。那么还要索引干嘛呀？因此，一般二叉树不适合作为索引结构。
 
+我们脑海中，很容易就浮现出这种二叉树结构图：
+
+![图片](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mysql-demo/20210312125321.webp)
+
+但是呢，有些特殊二叉树，它可能这样的哦：
+
+![图片](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mysql-demo/20210312125338.png)
+
+如果二叉树特殊化为一个链表，相当于全表扫描。那么还要索引干嘛呀？因此，一般二叉树不适合作为索引结构。
+
+
+
 #### 为什么不使用平衡二叉树呢？
 
 平衡二叉树特点：它也是一颗二叉查找树，任何节点的两个子树高度最大差为1。所以就不会出现特殊化一个链表的情况啦。
+
+![图片](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mysql-demo/20210312125356.webp)
 
 但是呢：
 
@@ -483,6 +501,8 @@ select * from employee where age between 18 and 28;
 #### 为什么不使用B树呢？
 
 数据量大的话，平衡二叉树的高度会很高，会增加IO嘛。那为什么不选择同样数据量，**高度更矮的B树**呢？
+
+![图片](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mysql-demo/20210312125418.png)
 
 B树相对于平衡二叉树，就可以存储更多的数据，高度更低。但是最后为甚选择B+树呢？因为B+树是B树的升级版：
 
@@ -521,11 +541,39 @@ select * from Temployee where age=32;
 
 **解析：** 其实这个，面试官就是考察候选人是否熟悉B+树索引结构图。可以像酱紫回答~
 
+- 先画出`idx_age`索引的索引结构图，大概如下：
+
+![图片](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mysql-demo/20210312130204.png)
+
+- 再画出id主键索引，我们先画出聚族索引结构图，如下：
+
+![图片](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mysql-demo/20210312125509.png)
+
+因此，这条 SQL 查询语句执行大概流程就是酱紫：
+
+1. 搜索`idx_age`索引树，将磁盘块1加载到内存，由于32<37,搜索左路分支，到磁盘寻址磁盘块2。
+   
+2. 将磁盘块2加载到内存中，在内存继续遍历，找到age=32的记录，取得id = 400.
+  
+3. 拿到id=400后，回到id主键索引树。
+  
+4. 搜索`id主键`索引树，将磁盘块1加载内存，在内存遍历，找到了400，但是B+树索引非叶子节点是不保存数据的。索引会继续搜索400的右分支，到磁盘寻址磁盘块3.
+   
+5. 将磁盘块3加载内存，在内存遍历，找到id=400的记录，拿到R4这一行的数据，好的，大功告成。
+
+因此，这个SQL查询，执行了几次树的搜索操作，是不是一步了然了呀。**「特别的」**，在`idx_age`二级索引树找到主键`id`后，回到id主键索引搜索的过程,就称为回表。
+
+> ❝
+>
+> 什么是回表？拿到主键再回到主键索引查询的过程，就叫做**「回表」**
+
 ### 五、面试官考点之覆盖索引
 
 **面试官：** 如果不用`select *`, 而是使用`select id,age`，以上的题目执行了几次树搜索操作呢？
 
 **解析：** 这个问题，主要考察候选人的覆盖索引知识点。回到`idx_age`索引树，你可以发现查询选项id和age都在叶子节点上了。因此，可以直接提供查询结果啦，根本就不需要再回表了~
+
+![图片](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mysql-demo/20210312125642.png)
 
 > 覆盖索引：在查询的数据列里面，不需要回表去查，直接从索引列就能取到想要的结果。换句话说，你SQL用到的索引列数据，覆盖了查询结果的列，就算上覆盖索引了。
 
@@ -540,6 +588,8 @@ select * from employee where name like '%杰伦%';
 ```
 
 **解析：** 这里考察的知识点就是，like是否会导致不走索引，看先该SQL的explain执行计划吧。其实like 模糊搜索，会导致不走索引的，如下:
+
+![图片](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mysql-demo/20210312125659.png)
 
 因此，这条SQL最后就全表扫描啦~日常开发中，这几种骚操作都可能会导致索引失效，如下：
 
@@ -562,7 +612,18 @@ select * from employee where name like '%杰伦%';
 select * from employee where name like '小%' order by age desc;
 ```
 
+**「解析：」** 这里考察联合索引的最左前缀原则以及like是否中索引的知识点。组合索引树示意图大概如下：
 
+![图片](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mysql-demo/20210312125719.png)
+
+联合索引项是先按姓名name从小到大排序，如果名字name相同，则按年龄age从小到大排序。面试官要求查所有名字第一个字是“小”的人，SQL的like '小%'是可以用上`idx_name_age`联合索引的。
+
+![图片](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mysql-demo/20210312125758.png)
+
+该查询会沿着idx_name_age索引树，找到第一个字是小的索引值，因此依次找到`小军、小伦、小燕、`，分别拿到Id=`600、100、700`，然后回三次表，去找对应的记录。这里面的最左前缀`小`，就是字符串索引的最左M个字符。实际上，
+
+- 这个最左前缀可以是联合索引的最左N个字段。比如组合索引（a,b,c）可以相当于建了（a），（a,b）,(a,b,c)三个索引，大大提高了索引复用能力。
+- 最左前缀也可以是字符串索引的最左M个字符。
 
 ### 八、面试官考点之索引下推
 
@@ -572,16 +633,29 @@ select * from employee where name like '小%' order by age desc;
 select * from employee where name like '小%' and age=28 and sex='0';
 ```
 
+**「解析：」** 这里考察索引下推的知识点，如果是**「Mysql5.6之前」**，在idx_name_age索引树，找出所有名字第一个字是“小”的人，拿到它们的主键id，然后回表找出数据行，再去对比年龄和性别等其他字段。如图：
+
+![图片](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mysql-demo/20210312125908.png)
+
+有些朋友可能觉得奇怪，（name,age)不是联合索引嘛？为什么选出包含“小”字后，不再顺便看下年龄age再回表呢，不是更高效嘛？所以呀，MySQL 5.6 就引入了**「索引下推优化」**，可以在索引遍历过程中，对索引中包含的字段先做判断，直接过滤掉不满足条件的记录，减少回表次数。
+
+因此，MySQL5.6版本之后，选出包含“小”字后，顺表过滤age=28，,所以就只需一次回表。
+
+![图片](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mysql-demo/20210312125915.png)
+
 ### 九、 面试官考点之大表添加索引
 
 **面试官：** 如果一张表数据量级是千万级别以上的，那么，给这张表添加索引，你需要怎么做呢？
 
 **解析：** 我们需要知道一点，给表添加索引的时候，是会对表加锁的。如果不谨慎操作，有可能出现生产事故的。可以参考以下方法：
 
-- 1.先创建一张跟原表A数据结构相同的新表B。
-- 2.在新表B添加需要加上的新索引。
-- 3.把原表A数据导到新表B
-- 4.rename新表B为原表的表名A，原表A换别的表名；
+1. 先创建一张跟原表A数据结构相同的新表B。
+
+2. 在新表B添加需要加上的新索引。
+
+3. 把原表A数据导到新表B
+
+4. rename新表B为原表的表名A，原表A换别的表名；
 
 ### 十、聚集索引和非聚集索引的区别
 
