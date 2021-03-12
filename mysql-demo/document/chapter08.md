@@ -4,8 +4,9 @@
 
 > 声明：如果没有说明具体的数据库和存储引擎，默认指的是MySQL中的InnoDB存储引擎
 
+## 数据页
 
-## Mysql的基本存储结构是页(记录都存在页里边)
+### Mysql的基本存储结构是页(记录都存在页里边)
 
 ![Image](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mysql-demo/20210307111301.png)
 ![Image [2]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mysql-demo/20210307111305.png)
@@ -25,12 +26,60 @@
 
 很明显，在数据量很大的情况下这样查找会很慢！
 
+### 数据页长啥样？
+
+数据页长下面这样：
+
+![image-20210313005635837](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mysql-demo/20210313005635.png)
+
+### 什么是数据区？
+
+在MySQL的设定中，同一个表空间内的一组连续的数据页为一个extent（区），默认区的大小为1MB，页的大小为16KB。16*64=1024，也就是说一个区里面会有64个连续的数据页。连续的256个数据区为一组数据区。
+
+于是我们可以画出这张图：
+
+![image-20210313005700047](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mysql-demo/20210313005700.png)
+
+从直观上看，其实不用纳闷为啥MySQL按照这样的方式组织存储在磁盘上的数据。
+
+这就好比你搞了个Java的封装类描述一类东西，然后再相应的给它加上一些功能方法，或者用golang封装struct去描述一类对象。最终的目的都是为了方便、管理、控制。
+
+约定好了数据的组织方式，那MySQL的作用不就是：按照约定数据规则将数据文件中的数据加载进内存，然后展示给用户看，以及提供其他能力吗？
+
+### 数据页分裂问题
+
+假设你现在已经有两个数据页了。并且你正在往第二个数据页中写数据。
+
+关于B+Tree，你肯定知道B+Tree中的叶子结点之间是通过双向链表关联起来的。
+
+在InnoDB索引的设定中，要求主键索引是递增的，这样在构建索引树的时候才更加方便。你可以脑补一下。如果按1、2、3...递增的顺序给你这些数。是不是很方便的构建一棵树。然后你可以自由自在的在这棵树上玩二分查找。
+
+那假设你自定义了主键索引，而且你自定义的这个主键索引并不一定是自增的。
+
+那就有可能出现下面这种情况 如下图：
+
+![image-20210313005725929](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mysql-demo/20210313005726.png)
+
+> 假设上图中的id就是你自定义的不会自增的主键
+
+然后随着你将数据写入。就导致后一个数据页中的所有行并不一定比前一个数据页中的行的id大。
+
+这时就会触发页分裂的逻辑。
+
+页分裂的目的就是保证：后一个数据页中的所有行主键值比前一个数据页中主键值大。
+
+经过分裂调整，可以得到下面的这张图。
+
+![image-20210313005751602](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mysql-demo/20210313005751.png)
+
+
+
 ## B树和B+树
 
 ### B树
 
 B-Tree，即B树或者B-树。
-![image-20210310211359381](C:\Users\hmliang\AppData\Roaming\Typora\typora-user-images\image-20210310211359381.png)
+![image-20210310211359381](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mysql-demo/20210312211453.png)
 **一棵 m 阶的 B 树，需要满足下列条件：**
 
 1. 定义任意非叶子结点最多只有M个儿子，且M>2；
@@ -1099,3 +1148,97 @@ CREATE TABLE `t_people`(
 - 全索引扫描
 - 索引过滤性不好
 - 频繁回表的开销
+
+
+
+### 三、mysql 索引过长1071-max key length is 767 byte
+
+问题：create table: Specified key was too long; max key length is 767 bytes
+原因：数据库表采用utf8编码，其中varchar(255)的column进行了唯一键索引，而mysql默认情况下单个列的索引不能超过767位(不同版本可能存在差异)，于是utf8字符编码下，255*3 byte 超过限制
+解决：
+
+1. 使用innodb引擎；
+2. 启用innodb_large_prefix选项，将约束项扩展至3072byte；
+3. 重新创建数据库；
+   my.cnf配置：
+
+```
+default-storage-engine=INNODB
+innodb_large_prefix=on
+```
+
+一般情况下不建议使用这么长的索引，对性能有一定影响；
+
+
+
+### 四、长字段的索引调优
+
+`selelct * from  employees where first_name = ' Facello'`  假设 `first_name` 的字段长度很长，如大于200个字符，那么索引占用的空间也会很大，作用在超长字段的索引查询效率也不高。
+
+**解决方法**： 额外创建个字段，比如`first_name_hash int default 0 not null`. first_name的hashcode 
+
+```sql
+insert into employees value (999999, now(), 'zhangsan...','zhang','M',now(), CRC32('zhangsan...'));
+```
+
+first_name_hash的值应该具备以下要求
+
+- 字段的长度应该比较小，SHA1和MD5是不合适的
+
+- 应当尽量避免hash冲突，就目前来说，流行使用CRC32(),或者FNV64()
+
+修改后的SQL `selelct * from  employees where first_name_hash = CRC32(zhangsan...) and first_name = 'Facello' `
+
+并且给 first_name_hash设置所有，并带上 `first_name = ' Facello'` 为了解决hash冲突也能返回正确的结果。
+
+ 
+
+但是，`selelct * from  employees where first_name like ' Facello%' `，如果是like，就不能使用上面的调优方法。
+
+**解决方法**： 前缀索引`alter table employees add key (first_name(5))`  **这里的5是如何确定的，能不能其它数字呢？**
+
+索引选择性 = 不重复的索引值/数据表的总记录数
+
+数值越大，表示选择性越高，性能越好。
+
+`select count(distince first_name)/count(*) from employees;`  -- 返回的值为0。0043 完整列的选择性 0.0043 【这个字段的最大选择性】
+
+```
+select count(distinct left(first_name,5)) / count(*) from employees; -- 返回结果 0.0038
+select count(distinct left(first_name,6)) / count(*) from employees; -- 返回结果 0.0041
+select count(distinct left(first_name,7)) / count(*) from employees; -- 返回结果 0.0042
+select count(distinct left(first_name,8)) / count(*) from employees; -- 返回结果 0.0042
+select count(distinct left(first_name,9)) / count(*) from employees; -- 返回结果 0.0042
+select count(distinct left(first_name,10)) / count(*) from employees; -- 返回结果 0.0042
+select count(distinct left(first_name,11)) / count(*) from employees; -- 返回结果 0.0043，说明 为大于等于11时，返回 0.0043
+select count(distinct left(first_name,``12``)) / count(*) from employees; -- 返回结果 0.0043
+```
+
+说明 为大于等于11时，返回 0.0043
+
+**结论**： 前缀索引的长度设置为11 
+
+`alter table employees add key (first_name(11)) `
+
+**优点**： 前缀索引可以让索引更小，更加高效，而且对上层应用是透明的。应用不需要做任何改造，使用成本较低。
+
+这是一种比较容易落地的优化方案。
+
+**局限性**： 无法做order by、group by； 无法使用覆盖索引。
+
+ 
+
+**使用场景**： 后缀索引，MySql是没有后缀索引的
+
+额外创建一个字段，比如说first_name_reverse, 在存储的时候，把first_name的值翻转过来再存储。
+
+比方Facello 变成 ollecaF存储到first_name_reverse
+
+
+
+
+
+
+
+
+

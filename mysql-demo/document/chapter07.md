@@ -876,11 +876,452 @@ RECORD LOCKS space id 300 page no 5480 n bits 552 index `order_id_un` of table `
 
 
 
+### 四、并发insert操作导致的dead lock
+
+**1. 说明**
+
+线上某业务最近经常会出现dead lock，相关信息如下：
+
+```
+2016-06-15 20:28:25 7f72c0043700InnoDB: transactions deadlock detected, dumping detailed information.
+
+2016-06-15 20:28:25 7f72c0043700
+*** (1) TRANSACTION:
+TRANSACTION 151506716, ACTIVE 30 sec inserting
+mysql tables in use 1, locked 1
+LOCK WAIT 4 lock struct(s), heap size 1184, 2 row lock(s), undo log entries 1
+MySQL thread id 1467337, OS thread handle 0x7f72a84d6700, query id 308125831 IP地址1 fold-sys update
+insert into t ( a,b,c, addtime )
+        values
+         (63, 27451092,120609109,now())
+*** (1) WAITING FOR THIS LOCK TO BE GRANTED:
+RECORD LOCKS space id 46 page no 693076 n bits 664 index `unq_fk_key` of table `dbname`.`t` trx id 151506716 lock_mode X locks gap before rec insert intention waiting
+*** (2) TRANSACTION:
+TRANSACTION 151506715, ACTIVE 30 sec inserting, thread declared inside InnoDB 1
+mysql tables in use 1, locked 1
+4 lock struct(s), heap size 1184, 2 row lock(s), undo log entries 1
+MySQL thread id 1477334, OS thread handle 0x7f72c0043700, query id 308125813 IP地址2 fold-sys update
+insert into t ( a,b,c, addtime )
+        values
+         (63, 27451092,120609109,now())
+*** (2) HOLDS THE LOCK(S):
+RECORD LOCKS space id 46 page no 693076 n bits 664 index `unq_fk_folder_fk_video_seq` of table `folder`.`t_mapping_folder_video` trx id 151506715 lock mode S locks gap before rec
+*** (2) WAITING FOR THIS LOCK TO BE GRANTED:
+RECORD LOCKS space id 46 page no 693076 n bits 664 index`unq_fk_key` of table `dbname`.`t` trx  id 151506715 lock_mode X locks gap before rec insert intention waiting
+*** WE ROLL BACK TRANSACTION (2)
+```
+
+**2. 初步分析**
+
+1. 122和120 在同一时刻发起了相同的insert 操作  数据一模一样 而 a,b,c 刚好是uniq key
+
+2. 咱们是RC 级别  出现了 GAP lock 这个有点疑问？查阅了下文档 
+
+```
+Gap locking can be disabled explicitly. This occurs if you change the transaction isolation level to READ COMMITTED or enable theinnodb_locks_unsafe_for_binlog system variable (which is now deprecated). Under these circumstances, gap locking is disabled for searches and index scans and is used only for foreign-key constraint checking and duplicate-key checking.
+```
+
+设置innodb_locks_unsafe_for_binlog或者RC级别来关闭gap  
+
+后面部分 可以理解为 RC级别下的 外键和重复检查的时候也会产生GAP呢
+
+**3. 重现此deadlock**
+
+```
+5.5.19-55-log Percona Server (GPL), Release rel24.0, Revision 204
+
+tx_isolation=READ-COMMITTED 
+
+innodb_locks_unsafe_for_binlog=OFF
+```
+
+**4. 创建实验表**
+
+```
+CREATE TABLE `deadlock` (
+
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+
+  `a` smallint(5) unsigned NOT NULL DEFAULT '0',
+
+  `b` int(11) NOT NULL DEFAULT '0',
+
+  `c` int(11) NOT NULL DEFAULT '0',
+
+  `d` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+
+  PRIMARY KEY (`id`),
+
+  UNIQUE KEY `unq_b_c_a` (`b`,`c`,`a`)
+
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+```
+
+**5. 事务T1**
+
+```
+mysql> begin;
+
+Query OK, 0 rows affected (0.00 sec)
+
+ 
+
+mysql>insert into deadlock(a,b,c) values(1,2,3);
+
+Query OK, 1 row affected (0.00 sec)
+
+Records: 1  Duplicates: 0  Warnings: 0
+```
+
+事务和锁
+#此时表deadlock上被加了一把意向排它锁（IX）
+
+```
+---TRANSACTION 4F23D, ACTIVE 20 sec
+
+1 lock struct(s), heap size 376, 0 row lock(s), undo log entries 1
+
+MySQL thread id 10, OS thread handle 0x41441940, query id 237 localhost root
+
+TABLE LOCK table `yujx`.`deadlock` trx id 4F236 lock mode IX
+```
+
+**6. 事务T2**
+
+```
+mysql> begin;
+
+Query OK, 0 rows affected (0.00 sec)
+
+mysql> insert into deadlock(a,b,c) select 1,2,3;
+
+#此处会处于等待
+```
+
+事务和锁
+
+```
+---TRANSACTION 4F23E, ACTIVE 3 sec inserting
+
+mysql tables in use 1, locked 1
+
+LOCK WAIT 2 lock struct(s), heap size 376, 1 row lock(s), undo log entries 1
+
+MySQL thread id 7, OS thread handle 0x408d8940, query id 243 localhost root update
+
+insert into deadlock(a,b,c) values(1,2,3)
+
+#事务T2对表deadlock加了一把意向排它锁（IX），而对unq_b_c_a唯一约束检查时需要获取对应的共享锁，但是对应记录被T1加了X锁，此处等待获取S锁（#注意，insert进行的是当前读，所以读会被X锁阻塞。如果是快照读的话，不需要等待X锁）
+
+------- TRX HAS BEEN WAITING 3 SEC FOR THIS LOCK TO BE GRANTED:
+
+RECORD LOCKS space id 0 page no 101724 n bits 72 index `unq_b_c_a` of table `yujx`.`deadlock` trx id 4F237 lock mode S waiting
+
+------------------
+
+TABLE LOCK table `yujx`.`deadlock` trx id 4F237 lock mode IX
+
+RECORD LOCKS space id 0 page no 101724 n bits 72 index `unq_b_c_a` of table `yujx`.`deadlock` trx id 4F237 lock mode S waiting
+
+---TRANSACTION 4F23D, ACTIVE 37 sec
+
+#事务T1对表deadlock加了一把意向排它锁（IX）和记录锁（X）
+
+2 lock struct(s), heap size 376, 1 row lock(s), undo log entries 1
+
+MySQL thread id 10, OS thread handle 0x41441940, query id 237 localhost root
+
+TABLE LOCK table `yujx`.`deadlock` trx id 4F236 lock mode IX
+
+RECORD LOCKS space id 0 page no 101724 n bits 72 index `unq_b_c_a` of table `yujx`.`deadlock` trx id 4F236 lock_mode X locks rec but not gap
+
+----------------------------
+```
+
+**7. 事务T3**
+
+```
+mysql> begin;
+
+Query OK, 0 rows affected (0.00 sec)
+
+ 
+
+mysql> insert into deadlock(a,b,c) values(1,2,3);
+
+#此处会处于等待
+```
+
+事务和锁
+
+```
+---TRANSACTION 4F23F, ACTIVE 3 sec inserting
+
+mysql tables in use 1, locked 1
+
+LOCK WAIT 2 lock struct(s), heap size 376, 1 row lock(s), undo log entries 1
+
+MySQL thread id 8, OS thread handle 0x41976940, query id 245 localhost root update
+
+insert into deadlock(a,b,c) values(1,2,3)
+
+------- TRX HAS BEEN WAITING 3 SEC FOR THIS LOCK TO BE GRANTED:
+
+#同样，事务T3与上面的事务T2的事务和锁等待一样，事务T1造成了T2和T3的等待
+
+RECORD LOCKS space id 0 page no 101724 n bits 72 index `unq_b_c_a` of table `yujx`.`deadlock` trx id 4F238 lock mode S waiting
+
+------------------
+
+TABLE LOCK table `yujx`.`deadlock` trx id 4F238 lock mode IX
+
+RECORD LOCKS space id 0 page no 101724 n bits 72 index `unq_b_c_a` of table `yujx`.`deadlock` trx id 4F238 lock mode S waiting
+
+---TRANSACTION 4F23E, ACTIVE 31 sec inserting
+
+mysql tables in use 1, locked 1
+
+LOCK WAIT 2 lock struct(s), heap size 376, 1 row lock(s), undo log entries 1
+
+MySQL thread id 7, OS thread handle 0x408d8940, query id 243 localhost root update
+
+insert into deadlock(a,b,c) values(1,2,3)
+
+------- TRX HAS BEEN WAITING 31 SEC FOR THIS LOCK TO BE GRANTED:
+
+RECORD LOCKS space id 0 page no 101724 n bits 72 index `unq_b_c_a` of table `yujx`.`deadlock` trx id 4F237 lock mode S waiting
+
+------------------
+
+TABLE LOCK table `yujx`.`deadlock` trx id 4F237 lock mode IX
+
+RECORD LOCKS space id 0 page no 101724 n bits 72 index `unq_b_c_a` of table `yujx`.`deadlock` trx id 4F237 lock mode S waiting
+
+---TRANSACTION 4F23D, ACTIVE 65 sec
+
+2 lock struct(s), heap size 376, 1 row lock(s), undo log entries 1
+
+MySQL thread id 10, OS thread handle 0x41441940, query id 237 localhost root
+
+TABLE LOCK table `yujx`.`deadlock` trx id 4F236 lock mode IX
+
+RECORD LOCKS space id 0 page no 101724 n bits 72 index `unq_b_c_a` of table `yujx`.`deadlock` trx id 4F236 lock_mode X locks rec but not gap
+```
+
+**8. 事务T1进行rollback**
+
+```
+#事务T1进行rollback;
+
+mysql> rollback;
+
+Query OK, 0 rows affected (0.00 sec)
+
+#事务T2的insert成功
+
+mysql> insert into deadlock(a,b,c) values(1,2,3);
+
+Query OK, 1 row affected (10.30 sec)
+
+#事务T3返回deadlock错误
+
+mysql> insert into deadlock(a,b,c) values(1,2,3);
+
+ERROR 1213 (40001): Deadlock found when trying to get lock; try restarting transaction
+```
+
+**9. DEADLOCK信息**
+
+```
+------------------------
+
+LATEST DETECTED DEADLOCK
+
+------------------------
+
+160620 11:38:14
+
+*** (1) TRANSACTION:
+
+TRANSACTION 4F23E, ACTIVE 48 sec inserting
+
+mysql tables in use 1, locked 1
+
+LOCK WAIT 4 lock struct(s), heap size 1248, 2 row lock(s), undo log entries 1
+
+MySQL thread id 7, OS thread handle 0x408d8940, query id 297 localhost root update
+
+insert into deadlock(a,b,c) values(1,2,3)
+
+*** (1) WAITING FOR THIS LOCK TO BE GRANTED:
+
+RECORD LOCKS space id 0 page no 101724 n bits 72 index `unq_b_c_a` of table `yujx`.`deadlock` trx id 4F23E lock_mode X insert intention waiting
+
+*** (2) TRANSACTION:
+
+TRANSACTION 4F23F, ACTIVE 30 sec inserting
+
+mysql tables in use 1, locked 1
+
+4 lock struct(s), heap size 1248, 2 row lock(s), undo log entries 1
+
+MySQL thread id 8, OS thread handle 0x41976940, query id 300 localhost root update
+
+insert into deadlock(a,b,c) values(1,2,3)
+
+*** (2) HOLDS THE LOCK(S):
+
+RECORD LOCKS space id 0 page no 101724 n bits 72 index `unq_b_c_a` of table `yujx`.`deadlock` trx id 4F23F lock mode S
+
+*** (2) WAITING FOR THIS LOCK TO BE GRANTED:
+
+RECORD LOCKS space id 0 page no 101724 n bits 72 index `unq_b_c_a` of table `yujx`.`deadlock` trx id 4F23F lock_mode X insert intention waiting
+
+*** WE ROLL BACK TRANSACTION (2)
+```
+
+如上，只能看到事务T2和事务T3最终导致了deadlock；T2等待获取unq_b_c_a唯一key对应的记录锁（X lock）,T3在`unq_b_c_a`对应的记录上持有S锁，并且T3也在等待获取对应的X锁。最终T3被ROLL BACK了，并且发回了DEAD LOCK的提示信息
+
+**10. 综上**
+
+1. SHOW ENGINE INNODB STATUS\G 看到的DEADLOCK相关信息，只会返回最后的2个事务的信息，而其实有可能有更多的事务才最终导致的死锁
+2. 当有3个（或以上）事务对相同的表进行insert操作，如果insert对应的字段上有uniq key约束并且第一个事务rollback了，那其中一个将返回死锁错误信息。
+3. 死锁的原因
+   - T1 获得 X 锁并 insert 成功
+   - T2 试图 insert, 检查重复键需要获得 S 锁, 但试图获得 S 锁失败, 加入等待队列, 等待 T1
+   - T3 试图 insert, 检查重复键需要获得 S 锁, 但试图获得 S 锁失败, 加入等待队列, 等待 T1
+   - T1 rollback, T1 释放锁, 此后 T2, T3 获得 S 锁成功, 检查 duplicate-key, 之后 INSERT 试图获得 X 锁, 但 T2, T3 都已经获得 S 锁, 导致 T2, T3 死锁
+4. 避免此DEADLOCK；我们都知道死锁的问题通常都是业务处理的逻辑造成的，既然是uniq key，同时多台不同服务器上的相同程序对其insert一模一样的value，这本身逻辑就不太完美。故解决此问题：
+   - 保证业务程序别再同一时间点并发的插入相同的值到相同的uniq key的表中
+   - 上述实验可知，是由于第一个事务rollback了才产生的deadlock，查明rollback的原因
+   - 尽量减少完成事务的时间
+
+**11. 最终结论**
+
+当有3个（或以上）事务对相同的表进行insert操作，如果insert对应的字段上有uniq key约束并且第一个事务rollback了，那其中一个将返回死锁错误信息。
 
 
 
+### 五、一次MySQL死锁的排查记录
+
+前几天线上收到一条告警邮件，生产环境MySQL操作发生了死锁，邮件告警的提炼出来的SQL大致如下。
+
+```
+update pe_order_product_info_test
+        set  end_time = '2021-04-30 23:59:59'
+        where order_no = '111111111'
+        and product_id = 123456
+        and status in (1,2);
+update pe_order_product_info_test
+        set  end_time = '2021-04-30 23:59:59'
+        where order_no = '222222222'
+        and product_id = 123456
+        and status in (1,2);      
+```
+
+是一条Update语句，定位了它的调用情况，发现Update的调用方只有一处，并且在Cat中看到一个小时的调用次数只有700多次，这个调用量基本与并发Update引起死锁无关了。
+
+当时猜测了几种情况，这里Update进行操作时有其他业务方调用Select相关的接口，但是排查了那个时间点发生死锁应用的调用链，发现好像并没有其他会影响到Update的调用。
+
+看了死锁日志，看到了问题要害——`index_merge`索引合并。
+
+#### 1. 什么是索引合并
+
+这是MySQL在5.1引入的优化技术，再此之前，一个表仅仅只能使用一个索引，但索引合并的引入，可以对同一张表使用多个索引分别进行条件扫描。
+
+如果要拿索引合并index_merge与只使用一个索引做比较，那么拿上面那个update语句来做演示。
+
+```
+update pe_order_product_info_test
+        set end_time = '2021-04-30 23:59:59'
+        where order_no = '111111111'
+        and product_id = 123456
+        and status in (1,2);
+```
+
+只是用一个索引时，MySQL会选择一个最优的索引来使用，比如使用index_order_no，拿它来找出所有order_no为111111111的索引记录，从该索引上找到它的`PRIMARY`索引的`id`，然后回表找到对应的行数据，最后在内存中根据剩下的product_id和status条件来进行过滤。
+
+但如果MySQL优化器觉得你如果只是用一个索引，拿出大量记录，然后再在内存中使用product_id和status过滤（并且符合该条件的记录值很少），这个第二步效率可能不高时，他就会使用索引合并进行优化。
+
+如果使用索引合并去判断where条件时，那么它就会先通过index_order_no索引去找到`PRIMARY`索引的`id`，再通过index_product_id索引去找到`PRIMARY`索引的`id`，最后将两个id集合求交集，再回表找到行数据。(索引合并使用索引的顺序是不确定的)
+
+#### 2. 场景复现
+
+在MySQL的Bug反馈文档中也有记录一个**Bug #77209**的记录，标注了索引合并引发死锁的情况。但是我按照它给出的repeat并不能重现索引合并的场景，在它的实例中早了600万随机数，我猜测可能是MySQL调高了索引合并的条件，将数据量增加到了1000万。
+
+先来带大家复现一下当时的情况。
+
+环境：MySQL 5.6.24
+
+1. 创建一张测试表
+
+   ```
+   CREATE TABLE `a` (
+     `ID` int  AUTO_INCREMENT PRIMARY KEY,
+     `NAME` varchar(21),
+     `STATUS` int,
+     KEY `NAME` (`NAME`),
+     KEY `STATUS` (`STATUS`)
+   ) engine = innodb;
+   ```
+
+2. 导入数据，为了方便导入一些随机数据，需要先开启一个兼容性配置。
+
+   ```SQL
+   set global show_compatibility_56=on;  
+   ```
+
+   开始导入随机数据。
+
+   ```
+   set @N=0;
+   insert into a(ID,NAME,STATUS)
+   select
+   	@N:=@N+1,
+   	@N%1600000, 
+   	floor(rand()*4)
+    from information_schema.global_variables a, information_schema.global_variables b, information_schema.global_variables c 
+   LIMIT 10000000;
+   ```
+
+3. 测试
+
+   ```
+   update a set status=5 where rand() < 0.005 limit 1;
+   explain UPDATE a SET STATUS = 2 WHERE NAME =  '1000000' AND STATUS = 5;
+   ```
+
+![image-20210313003040573](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mysql-demo/20210313003040.png)
 
 
+
+#### 3. 为什么发生了死锁
+
+直接上一副图，以及两个update事务的加锁流程。
+
+![image-20210313003103060](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mysql-demo/20210313003103.png)
+
+可以看到在订单与产品这个模型中，Update事务一和Update事物二在product_id索引和primary索引上都存在交叉重合，这就导致了死锁的发生。
+
+| 步数 | 事务一                                                       | 事务二                                                       |
+| ---- | ------------------------------------------------------------ | ------------------------------------------------------------ |
+| 1    | 锁住`index_order_no`索引树上order_no为2222的索引项           |                                                              |
+| 2    |                                                              | 锁住`index_order_no`索引树上order_no为3333的索引项           |
+| 3    | 回表锁住 `PRIMARY` 索引中 id 为 11 的索引项                  |                                                              |
+| 4    |                                                              | 回表锁住 `PRIMARY` 索引中 id 为 12 的索引项                  |
+| 5    | 锁住`index_product_id`索引树上product_id为2000的四个索引项   |                                                              |
+| 6    |                                                              | 尝试去锁住`index_product_id`索引树上product_id为2000的四个索引项，但是已经被事务一锁住，`等待事务一释放`在`index_product_id`上的锁 |
+| 7    | 试图回表锁住 `PRIMARY` 索引中 id 为10，11，12，13的索引项，发现id为12的索引项在`第4步`已经被事务二锁住，`等待事务二释放`在 |                                                              |
+
+这就是本次死锁发生的原因所在了，解决方案有很多种，可以根据具体场景选择。
+
+1. 删除某一个索引，这当然不是一个好办法
+2. 关闭index_merge优化
+3. 为查询条件增加联合索引，在本例中是product_id和order_no。
+
+#### 4. 最后
+
+当然最后这些都是我个人的分析，DBA老师给的建议是直接上联合索引
 
 
 

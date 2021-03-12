@@ -9,11 +9,11 @@
 7. [MySQL 锁](https://github.com/HomanLiang/study-demo/blob/main/mysql-demo/document/chapter07.md)
 8. [MySQL 索引](https://github.com/HomanLiang/study-demo/blob/main/mysql-demo/document/chapter08.md)
 9. [MySQL 性能优化](https://github.com/HomanLiang/study-demo/blob/main/mysql-demo/document/chapter09.md)
-10. MySQL 高可用
-11. MySQL 读写分离、分表分库
-12. MySQL 常见问题
-13. MySQL 规范
-14. MySQL 面试题 
+10. [MySQL 高可用](https://github.com/HomanLiang/study-demo/blob/main/mysql-demo/document/chapter10.md)
+11. [MySQL 读写分离、分表分库](https://github.com/HomanLiang/study-demo/blob/main/mysql-demo/document/chapter11.md)
+12. [MySQL 常见问题排查](https://github.com/HomanLiang/study-demo/blob/main/mysql-demo/document/chapter12.md)
+13. [MySQL 规范](https://github.com/HomanLiang/study-demo/blob/main/mysql-demo/document/chapter13.md)
+14. [MySQL 面试题 ](https://github.com/HomanLiang/study-demo/blob/main/mysql-demo/document/chapter14.md)
 
 
 
