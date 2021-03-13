@@ -1236,9 +1236,9 @@ select count(distinct left(first_name,``12``)) / count(*) from employees; -- 返
 
 
 
+### 五、亿级大表在线不锁表变更字段与索引
 
+https://www.cnblogs.com/huaweiyun/p/14291566.html
 
-
-
-
+[pt-osc官网](https://www.percona.com/doc/percona-toolkit/3.0/pt-online-schema-change.html)
 
