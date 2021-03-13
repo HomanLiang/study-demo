@@ -36,3 +36,9 @@
 
 [MySQL 学习笔记](https://github.com/HomanLiang/study-demo/blob/main/mysql-demo/document/index.md)
 
+
+
+## ZooKeeper
+
+[ZooKeeper 学习笔记](https://github.com/HomanLiang/study-demo/blob/main/zookeeper-demo/document/index.md)
+
