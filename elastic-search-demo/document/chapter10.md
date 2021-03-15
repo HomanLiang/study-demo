@@ -525,36 +525,16 @@ Pipeline 聚合用于对其它聚合的结果进行再聚合。
 
 根据 **Pipeline 聚合**与**原聚合**的位置区别，分为两类：
 
-- Pipeline 聚合
-
-  与
-
-  原聚合
-
-  同级，称为
-
-   
-
-  Sibling 聚合
+- Pipeline 聚合与原聚合同级，称为 Sibling 聚合
 
   - `Max_bucket`，`Min_bucket`，`Avg_bucket`，`Sum_bucket`
-  - `Stats_bucket`，`Extended-Status_bucket`
+- `Stats_bucket`，`Extended-Status_bucket`
   - `Percentiles_bucket`
 
-- Pipeline 聚合
-
-  内嵌在
-
-  原聚合
-
-  之内，称为
-
-   
-
-  Parent 聚合
+- Pipeline 聚合内嵌在原聚合之内，称为 Parent 聚合
 
   - `Derivative`：求导
-  - `Cumulative-sum`：累计求和
+- `Cumulative-sum`：累计求和
   - `Moving-function`：滑动窗口
 
 
@@ -884,7 +864,7 @@ POST employees/_search
 - **近似计算**：可以同时满足**大数据量和实时性**。
 - **有限数据计算**：可以同时满足**精准度和实时性**。
 
-![image-20210224225849514](C:\Users\hmliang\AppData\Roaming\Typora\typora-user-images\image-20210224225849514.png)
+![在这里插入图片描述](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/elastic-search-demo/20210315111404.png)
 
 ES 属于**近似计算**，具备了**数据量**和**实时性**的特点，失去了**精准度**。
 

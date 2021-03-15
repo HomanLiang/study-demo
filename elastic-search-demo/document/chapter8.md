@@ -34,7 +34,7 @@ ES 是一个分布式系统，数据保存在多个分片中，那么查询时�
 
 比如一个查询 `from = 990; size = 10`，那么 ES 需要在每个分片上都获取 1000 个文档：
 
-![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/elastic-search-demo/20210117172328528.png)
+![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/elastic-search-demo/20210315103542.png)
 
 然后通过 **Coordinating** 节点汇总结果，最后再通过排序获取前 1000 个文档。
 
@@ -79,7 +79,7 @@ POST index_name/_search
 
 **Search After** 的原理：
 
-![在这里插入图片描述](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/elastic-search-demo/20210117172328528.png)
+![在这里插入图片描述](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/elastic-search-demo/20210315103535.png)
 
 示例：
 
@@ -1009,7 +1009,7 @@ POST /blogs/_search
 
 **平滑函数**有下面这些：
 
-![在这里插入图片描述](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/elastic-search-demo/20210117172328528.png)
+
 
 查询示例3，引入 **factor** ：
 
@@ -1038,7 +1038,7 @@ POST /blogs/_search
 
 引入 **factor** 之后的算分曲线：
 
-![在这里插入图片描述](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/elastic-search-demo/20210117172328528.png)
+![在这里插入图片描述](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/elastic-search-demo/20210315103503.png)
 
 
 

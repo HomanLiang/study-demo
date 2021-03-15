@@ -442,7 +442,7 @@ Join 数据类型可以维护一个父/子关系，从而分离两个对象，�
 
 **Nested** 类型与 **Join**（Parent/Child） 类型的**优缺点对比**：
 
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20210123114200494.png)
+![在这里插入图片描述](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/elastic-search-demo/20210315112116.png)
 
 
 
@@ -655,7 +655,7 @@ ES 中的[动态 Mapping](https://www.elastic.co/guide/en/elasticsearch/referenc
 
 ES 类型的[自动识别规则](https://www.elastic.co/guide/en/elasticsearch/reference/7.1/dynamic-field-mapping.html)如下：
 
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20210116113223866.png?)
+![在这里插入图片描述](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/elastic-search-demo/20210315112125.png)
 
 
 
