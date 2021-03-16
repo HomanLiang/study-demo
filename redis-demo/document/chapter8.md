@@ -61,7 +61,7 @@ unlink 指令，它能对删除操作进行懒处理，丢给后台线程来异�
 OK
 ```
 
-##### flush
+#### flush
 
 flushdb 和 flushall 指令，用来清空数据库，这也是极其缓慢的操作。Redis 4.0 同样给这两个指令也带来了异步化，在指令后面增加 async 参数就可以将整棵大树连根拔起，扔给后台线程慢慢焚烧。
 
@@ -268,7 +268,7 @@ public class LRUCache<k, v> {
 
 1. **近似LRU算法**: Redis使用的是近似LRU算法，它跟常规的LRU算法还不太一样。近似LRU算法通过随机采样法淘汰数据，每次随机出5（默认）个key，从里面淘汰掉最近最少使用的key。
 
-   可以通过maxmemory-samples参数修改采样数量：例：maxmemory-samples 10 maxmenory-samples配置的越大，淘汰的结果越接近于严格的LRU算法
+   可以通过`maxmemory-samples`参数修改采样数量：例：`maxmemory-samples` 10 `maxmenory-samples`配置的越大，淘汰的结果越接近于严格的LRU算法
 
    Redis为了实现近似LRU算法，给每个key增加了一个额外增加了一个24bit的字段，用来存储该key最后一次被访问的时间。
 

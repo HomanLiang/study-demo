@@ -96,15 +96,13 @@ Redis事务不像DB的事务这么“安全”，也不支持回滚，所以不�
 
 ### 建议操作
 
-- 使用连接池，并配置合理的连接池参数
-
-  每次使用都新建连接会有几个问题：
+- 使用连接池，并配置合理的连接池参数。每次使用都新建连接会有几个问题：
 
   - 造成redis的负担增加
-  - 浪费网络资源，避免短连接，TCP三次握手和四次挥手的耗时也很高
+- 浪费网络资源，避免短连接，TCP三次握手和四次挥手的耗时也很高
   - 影响执行效率
   - 难以维护
-
+  
 - 熔断：Redis本质也是一个“服务”，所以熔断机制不可少
 
 - 鉴权：避免无关服务的滥用或导致数据出错
@@ -145,24 +143,18 @@ Redis事务不像DB的事务这么“安全”，也不支持回滚，所以不�
 - 线上扫描整个实例数时，记得设置休眠时间，避免扫描时QPS突增对Redis产生性能抖动
 - 做好Redis的运行时监控，尤其是expired_keys、evicted_keys、latest_fork_usec指标，短时间内这些指标值突增可能会阻塞整个实例，引发性能问题
 
+- 选择合适的**淘汰策略**
 
+  根据⾃⾝业务类型，选好maxmemory-policy(最⼤内存淘汰策略)，设置好过期时间 默认策略是volatile-lru，即超过最⼤内存后，在过期键中使⽤lru算法进⾏key的剔除，保证不过期数据不被 删除，但是可能会出现OOM问题
 
-### 避免操作
-
-
-
-### 淘汰策略
-
-根据⾃⾝业务类型，选好maxmemory-policy(最⼤内存淘汰策略)，设置好过期时间 默认策略是volatile-lru，即超过最⼤内存后，在过期键中使⽤lru算法进⾏key的剔除，保证不过期数据不被 删除，但是可能会出现OOM问题
-
-- `allkeys-lru`：根据LRU算法删除键，不管数据有没有设置超时属性，直到腾出⾜够空间为⽌
-- `allkeys-random`：随机删除所有键，直到腾出⾜够空间为⽌。
-- `volatile-random`:随机删除过期键，直到腾出⾜够空间为⽌
-- `volatile-ttl`：根据键值对象的ttl属性，删除最近将要过期数据。如果没有，回退到noeviction策略
-- `noeviction`：不会剔除任何数据，拒绝所有写⼊操作并返回客⼾端错误信息"(error) OOM command not allowed when used memory"，此时Redis只响应读操作
-- 4.0后推出的 `allkey-lfu` 和 `volatile-lfu`
-  - 可以认为这是对于lru算法的进一步改进
-  - `allkey-lfu`：从所有键中驱逐使用频率最少的键
-  - `volatile-lfu`：从所有配置了过期时间的键中驱逐使用频率最少的键
+  - `allkeys-lru`：根据LRU算法删除键，不管数据有没有设置超时属性，直到腾出⾜够空间为⽌
+  - `allkeys-random`：随机删除所有键，直到腾出⾜够空间为⽌。
+	- `volatile-random`:随机删除过期键，直到腾出⾜够空间为⽌
+	- `volatile-ttl`：根据键值对象的ttl属性，删除最近将要过期数据。如果没有，回退到noeviction策略
+	- `noeviction`：不会剔除任何数据，拒绝所有写⼊操作并返回客⼾端错误信息"(error) OOM command not allowed when used memory"，此时Redis只响应读操作
+	- 4.0后推出的 `allkey-lfu` 和 `volatile-lfu`
+	  - 可以认为这是对于lru算法的进一步改进
+	  - `allkey-lfu`：从所有键中驱逐使用频率最少的键
+	  - `volatile-lfu`：从所有配置了过期时间的键中驱逐使用频率最少的键
 
 

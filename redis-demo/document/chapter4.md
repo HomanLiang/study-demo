@@ -593,7 +593,3 @@ slowlog subcommand [argument]     , Redis 用来记录查询执行时间的日�
 参考文章：
 
 [【Redis】Redis常用命令](https://segmentfault.com/a/1190000010999677)
-
-```
-
-```

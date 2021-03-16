@@ -15,33 +15,35 @@ key对应的数据在数据源并不存在，每次针对此key的请求从缓�
 ### 解决缓存穿透也有两种方案：
 - 由于请求的参数是不合法的(每次都请求不存在的参数)，于是我们可以使用布隆过滤器(BloomFilter)或者压缩filter提前拦截，不合法就不让这个请求到数据库层！
 - 当我们从数据库找不到的时候，我们也将这个空对象设置到缓存里边去。下次再请求的时候，就可以从缓存里边获取了。
-这种情况我们一般会将空对象设置一个较短的过期时间。
-```
-//伪代码
-public object GetProductListNew() {
-    int cacheTime = 30;
-    String cacheKey = "product_list";
 
-    String cacheValue = CacheHelper.Get(cacheKey);
-    if (cacheValue != null) {
-        return cacheValue;
-    }
+	这种情况我们一般会将空对象设置一个较短的过期时间。
+	
+    ```
+    //伪代码
+    public object GetProductListNew() {
+        int cacheTime = 30;
+        String cacheKey = "product_list";
 
-    cacheValue = CacheHelper.Get(cacheKey);
-    if (cacheValue != null) {
-        return cacheValue;
-    } else {
-        //数据库查询不到，为空
-        cacheValue = GetProductListFromDB();
-        if (cacheValue == null) {
-            //如果发现为空，设置个默认值，也缓存起来
-            cacheValue = string.Empty;
+        String cacheValue = CacheHelper.Get(cacheKey);
+        if (cacheValue != null) {
+            return cacheValue;
         }
-        CacheHelper.Add(cacheKey, cacheValue, cacheTime);
-        return cacheValue;
+
+        cacheValue = CacheHelper.Get(cacheKey);
+        if (cacheValue != null) {
+            return cacheValue;
+        } else {
+            //数据库查询不到，为空
+            cacheValue = GetProductListFromDB();
+            if (cacheValue == null) {
+                //如果发现为空，设置个默认值，也缓存起来
+                cacheValue = string.Empty;
+            }
+            CacheHelper.Add(cacheKey, cacheValue, cacheTime);
+            return cacheValue;
+        }
     }
-}
-```
+    ```
 
 
 
@@ -55,9 +57,11 @@ key可能会在某些时间点被超高并发地访问，是一种非常“热�
 
 - 若缓存的数据更新不频繁，且缓存刷新的整个流程耗时较少的情况下，则可以采用基于 redis、zookeeper 等分布式中间件的分布式互斥锁，或者本地互斥锁以保证仅少量的请求能请求数据库并重新构建缓存，其余线程则在锁释放后能访问到新缓存。
   
+
 **例如：使用互斥锁(mutex key)**
-  业界比较常用的做法，是使用mutex。简单地来说，就是在缓存失效的时候（判断拿出来的值为空），不是立即去load db，而是先使用缓存工具的某些带成功操作返回值的操作（比如Redis的SETNX或者Memcache的ADD）去set一个mutex key，当操作返回成功时，再进行load db的操作并回设缓存；否则，就重试整个get缓存的方法。SETNX，是「SET if Not eXists」的缩写，也就是只有不存在的时候才设置，可以利用它来实现锁的效果。
-  
+
+业界比较常用的做法，是使用mutex。简单地来说，就是在缓存失效的时候（判断拿出来的值为空），不是立即去load db，而是先使用缓存工具的某些带成功操作返回值的操作（比如Redis的SETNX或者Memcache的ADD）去set一个mutex key，当操作返回成功时，再进行load db的操作并回设缓存；否则，就重试整个get缓存的方法。SETNX，是「SET if Not eXists」的缩写，也就是只有不存在的时候才设置，可以利用它来实现锁的效果。
+
   ```
     public String get(key) {
           String value = redis.get(key);

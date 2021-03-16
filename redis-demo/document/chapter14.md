@@ -8,7 +8,7 @@
 
 
 
-## Redis分布式锁
+## 一、Redis分布式锁
 
 ### 相关文章
 
@@ -155,10 +155,6 @@ if (redis.call('exists', KEYS[1]) == 0) then
          redis.call('hset', KEYS[1], ARGV[2], 1);
          redis.call('pexpire', KEYS[1], ARGV[1]);
          return nil;
-         end;if (redis.call('exists', KEYS[1]) == 0) then
-         redis.call('hset', KEYS[1], ARGV[2], 1);
-         redis.call('pexpire', KEYS[1], ARGV[1]);
-         return nil;
          end;
 ```
 
@@ -166,7 +162,9 @@ if (redis.call('exists', KEYS[1]) == 0) then
 
 `then redis.call(‘hset’, KEYS[1], ARGV[2],1)` 则向redis中添加一个key为test_lock的set，并且向set中添加一个field为线程id，值=1的键值对，表示此线程的重入次数为1
 
-`redis.call(‘pexpire’, KEYS[1], ARGV[1])` 设置set的过期时间，防止当前服务器出问题后导致死锁，return nil; end;返回nil 结束
+`redis.call(‘pexpire’, KEYS[1], ARGV[1])` 设置set的过期时间，防止当前服务器出问题后导致死锁，`return nil; end;` 返回 `nil`  结束
+
+
 
 ```lua
 if (redis.call('hexists', KEYS[1], ARGV[2]) == 1) then
@@ -183,6 +181,8 @@ if (redis.call('hexists', KEYS[1], ARGV[2]) == 1) then
 `redis.call(‘pexpire’, KEYS[1], ARGV[1])` 并且重新设置该锁的有效时间
 
 `return nil; end;`返回nil，结束
+
+
 
 ```lua
 return redis.call('pttl', KEYS[1]);
@@ -247,6 +247,8 @@ if (redis.call('exists', KEYS[1]) == 0) then
 
 `return 1; end` 返回1结束
 
+
+
 ```
 if (redis.call('hexists', KEYS[1], ARGV[3]) == 0) then
          return nil;
@@ -256,6 +258,8 @@ if (redis.call('hexists', KEYS[1], ARGV[3]) == 0) then
 `if (redis.call(‘hexists’, KEYS[1], ARGV[3]) == 0)` 如果锁存在，但是若果当前线程不是加锁的线
 
 `then return nil;end`则直接返回nil 结束
+
+
 
 ```
 local counter = redis.call('hincrby', KEYS[1], ARGV[3], -1);
@@ -283,11 +287,15 @@ end;
 
 `return 1; end;`返回1结束
 
+
+
 ```
 return nil;
 ```
 
 其他情况返回nil并结束
+
+
 
 ```
 if (opStatus == null) {
@@ -330,17 +338,7 @@ if (opStatus == null) {
 
 
 
-
-
-
-
-
-
-
-
-
-
-## Redis分布式限流器
+## 二、Redis分布式限流器
 
 ### 什么是限流？为什么要限流？
 
@@ -809,7 +807,7 @@ public class LimiterController {
 
 
 
-## 计数器（string）
+## 三、计数器（string）
 如知乎每个问题的被浏览器次数
 ![Image](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/redis-demo/20210305212201.png)
 
@@ -821,7 +819,7 @@ get key // get readcount::{帖子id} 获取阅读量
 
 
 
-## 分布式全局唯一id（string）
+## 四、分布式全局唯一id（string）
 
 分布式全局唯一id的实现方式有很多，这里只介绍用redis实现
 ![Image [2]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/redis-demo/20210305212302.png)
@@ -837,7 +835,7 @@ incrby userId 1000 //返回10001
 
 
 
-## 消息队列（list）
+## 五、消息队列（list）
 
 在list里面一边进，一边出即可
 ```
@@ -855,7 +853,7 @@ blpop key value 10
 
 
 
-## 新浪/Twitter用户消息列表（list）
+## 六、新浪/Twitter用户消息列表（list）
 
 ![Image [5]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/redis-demo/20210305212402.png)
 假如说小编li关注了2个微博a和b，a发了一条微博（编号为100）就执行如下命令
@@ -875,7 +873,7 @@ lrange msg::li 0 9
 
 
 
-## 抽奖活动（set）
+## 七、抽奖活动（set）
 
 ```
 # 参加抽奖活动
@@ -893,7 +891,7 @@ srandmember key count
 
 
 
-## 实现点赞，签到，like等功能(set)
+## 八、实现点赞，签到，like等功能(set)
 
 ![Image [6]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/redis-demo/20210305212503.png)
 ```
@@ -915,7 +913,7 @@ scard like::8001
 
 
 
-## 实现关注模型，可能认识的人（set）
+## 九、实现关注模型，可能认识的人（set）
 
 ![Image [7]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/redis-demo/20210305212506.png)
 ```
@@ -942,7 +940,7 @@ sdiffstore sevenMayKnow qingSub sevenSub -> {seven,jack}
 
 
 
-## 电商商品筛选（set）
+## 十、电商商品筛选（set）
 
 ![Image [8]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/redis-demo/20210305212507.png)
 ```
@@ -958,7 +956,7 @@ sinter brand::lenovo screenSize::15.6 processor::i7 -> 拯救者y700P-001
 
 
 
-## 排行版（zset）
+## 十一、排行版（zset）
 
 redis的zset天生是用来做排行榜的、好友列表, 去重, 历史记录等业务需求
 ![Image [9]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/redis-demo/20210305212601.png)

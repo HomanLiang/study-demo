@@ -106,7 +106,7 @@
     > info server
     ```
 
-## 1. 性能监控
+### 1. 性能监控
 
 ```
 redis-cli info | grep ops # 每秒操作数
@@ -131,7 +131,7 @@ instantaneous_input_kbps:1.20
 instantaneous_output_kbps:2.62
 ```
 
-## 2. 内存监控
+### 2. 内存监控
 
 ```
 [root@CombCloud-2020110836 src]# ./redis-cli info | grep used | grep human       
@@ -196,7 +196,7 @@ mem_allocator:libc
 需要注意的是，如果我们没有配置 `maxmemory`（可以通过 `config get/set maxmemory` 查询并在不重启Redis实例的前提下设置），那么Redis可能会耗尽服务器所有可用内存，从而可能导致swap甚至被系统kill掉。
 所以建议方案是配置 `maxmemory`，并且配置 `maxmemory-policy`（不要是默认的 `noviction`）。即使这样还不够，因为如果并发比较大的话，缓存逐除策略可能会忙不过来，从而依然会有无法操作Redis的错误。所以强烈建议：在配置 `maxmemory-policy` 和    `maxmemory` 双策略的前提下，对 `used_memory` 进行监控，建议是 `maxmemory` 的90%。例如 `maxmemory` 为10G，那么当 `used_memory` 达到9G的时候，进行相关预警，从而准备扩容。
 
-## 3. 基本活动指标
+### 3. 基本活动指标
 
 redis连接了多少客户端 通过观察其数量可以确认是否存在意料之外的连接。如果发现数量不对劲，就可以使用lcient list指令列出所有的客户端链接地址来确定源头。
 
@@ -210,7 +210,7 @@ connected_slaves:1   # slave连接数量
 
 这个值可以通过`info clients`中的字段`connected_clients`获取，它会受到操作系统`ulimit`和redis的`maxclients`配置的限制。如果Rdis客户端中报出获取不到连接数的错误（异常信息：`ERR max number of clients reached`），需要排查这两个地方是否限制了客户端连接数。当然，也可能还有其他其他原因，比如客户端BUG导致连接没有释放等。
 
-## 4. 持久性指标
+### 4. 持久性指标
 
 ```
 [root@CombCloud-2020110836 src]# ./redis-cli info | grep rdb_last_save_time
@@ -219,7 +219,7 @@ rdb_last_save_time:1591876204  # 最后一次持久化保存磁盘的时间戳
 rdb_changes_since_last_save:0   # 自最后一次持久化以来数据库的更改数
 ```
 
-## 5. 错误指标
+### 5. 错误指标
 
 由于超出最大连接数限制而被拒绝的客户端连接次数，如果这个数字很大，则意味着服务器的最大连接数设置得过低，需要调整maxclients
 
@@ -256,7 +256,7 @@ repl_backlog_size:1048576
 sync_partial_err:1
 ```
 
-## redis性能测试命令
+### 6. redis性能测试命令
 
 ```
 ./redis-benchmark -c 100 -n 5000
@@ -268,9 +268,7 @@ sync_partial_err:1
 
 
 
-
-
-## 命令统计
+### 7. 命令统计
 
 由于 Redis 没有非常详细的日志，要想知道在 Redis 实例内部都做了些什么是非常困难的。幸运的是 Redis 提供了一个下面这样的命令统计工具：
 
@@ -288,9 +286,7 @@ cmdstat_info:calls=10,usec=1931,usec_per_call=193.10
 
 
 
-
-
-## 缓存命中率
+### 8. 缓存命中率
 
 缓存命中率表示缓存的使用效率，很明显，它通过公式：`HitRate = keyspace_hits / (keyspace_hits + keyspace_misses)` 计算得到。在`info stats`中恰好有这些数据：
 
@@ -305,7 +301,7 @@ keyspace_misses:1
 
 
 
-## 慢日志
+### 9. 慢日志
 
 Redis和其他关系型数据库一样，也有命令执行的慢日志。慢日志收集的阈值可通过`config set slowlog-log-slower-than`配置，单位是微妙。默认是10000微秒，即10ms，笔者认为这个默认值设置的太大，建议将其调整到1ms。因为这个慢日志统计的时间只是命令执行的时间，不包括客户端到服务端的时间，以及命令在服务端队列中的等待时间。以Redis的性能来说，正常的执行时间一般在10微秒级别（单实例OPS可以达到10W）。所以，设置`slowlog-log-slower-than`为`1000`，即1毫秒已经绰绰有余：
 ```
@@ -321,7 +317,7 @@ redis> slowlog get
 
 
 
-## 延迟监控
+### 10. 延迟监控
 
 任何环境都会存在延迟，关键是看延迟是否在我们能接受的范围内。一些影响会比较大的高延迟，可能会有很多的原因，例如：网络原因、计算密集型命令、时间复杂度为O(n)的命令、系统内存不够发生SWAP等。
 Redis提供了非常多的工具来定位这些延迟问题。
