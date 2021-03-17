@@ -64,7 +64,7 @@ struct sdshdr{
 
    ![640 (2)](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/redis-demo/20210228182501.webp)
 
-3. 减少修改字符串时带来的内存重分配次数
+3. **减少修改字符串时带来的内存重分配次数**
 
    C语言字符串底层也是一个数组，每次创建的时候就创建一个N+1长度的字符，多的那个1，就是为了保存空字符的，这个空字符也是个坑，但是不是这个环节探讨的内容。
 
@@ -74,7 +74,7 @@ struct sdshdr{
 
    Redis为了避免C字符串这样的缺陷，就分别采用了两种解决方案，去达到性能最大化，空间利用最大化：
 
-   - 空间预分配：当我们对SDS进行扩展操作的时候，Redis会为SDS分配好内存，并且根据特定的公式，分配多余的free空间，还有多余的1byte空间（这1byte也是为了存空字符），这样就可以避免我们连续执行字符串添加所带来的内存分配消耗。
+   - **空间预分配**：当我们对SDS进行扩展操作的时候，Redis会为SDS分配好内存，并且根据特定的公式，分配多余的free空间，还有多余的1byte空间（这1byte也是为了存空字符），这样就可以避免我们连续执行字符串添加所带来的内存分配消耗。
 
      比如现在有这样的一个字符：
 
@@ -88,7 +88,7 @@ struct sdshdr{
 
      ![image-20210228182753421](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/redis-demo/image-20210228182753421.png)
 
-   - 惰性空间释放：刚才提到了会预分配多余的空间，很多小伙伴会担心带来内存的泄露或者浪费，别担心，Redis大佬一样帮我们想到了，当我们执行完一个字符串缩减的操作，redis并不会马上收回我们的空间，因为可以预防你继续添加的操作，这样可以减少分配空间带来的消耗，但是当你再次操作还是没用到多余空间的时候，Redis也还是会收回对于的空间，防止内存的浪费的。
+   - **惰性空间释放**：刚才提到了会预分配多余的空间，很多小伙伴会担心带来内存的泄露或者浪费，别担心，Redis大佬一样帮我们想到了，当我们执行完一个字符串缩减的操作，redis并不会马上收回我们的空间，因为可以预防你继续添加的操作，这样可以减少分配空间带来的消耗，但是当你再次操作还是没用到多余空间的时候，Redis也还是会收回对于的空间，防止内存的浪费的。
 
      还是一样的字符串：
 
@@ -102,7 +102,7 @@ struct sdshdr{
 
      ![image-20210228182924321](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/redis-demo/image-20210228182924321.png)
 
-4. 二进制安全
+4. **二进制安全**
 
    仔细看的仔肯定看到上面我不止一次提到了空字符也就是’\0‘，C语言是判断空字符去判断一个字符的长度的，但是有很多数据结构经常会穿插空字符在中间，比如图片，音频，视频，压缩文件的二进制数据，就比如下面这个单词，他只能识别前面的 不能识别后面的字符，那对于我们开发者而言，这样的结果显然不是我们想要的对不对。
 
@@ -864,8 +864,6 @@ AOF为了保证文件写入磁盘的安全性，提供了3种刷盘机制：
 
 
 
-
-
 ## 你遇到 Redis 线上连接超时一般如何处理？
 
 一封报警邮件，大量服务节点 redis 响应超时。
@@ -963,7 +961,7 @@ redis配置：tcp_backlog 默认511
 
 查看因为队列溢出导致的连接绝句：`netstat -s | grep overflowed`
 
-#### ![image-20210306140510768](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/redis-demo/image-20210306140510768.png)
+![image-20210306140510768](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/redis-demo/image-20210306140510768.png)
 
 **3.4 网络延迟**
 
@@ -979,7 +977,7 @@ redis配置：tcp_backlog 默认511
 
 图形线上测试结果：`redis-cli -h {host} -p {port} --latency-dist`
 
-#### ![image-20210306140618127](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/redis-demo/image-20210306140618127.png)
+![image-20210306140618127](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/redis-demo/image-20210306140618127.png)
 
 **3.5 网卡软中断**
 
