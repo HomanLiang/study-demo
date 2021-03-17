@@ -96,6 +96,18 @@ Producer发送消息到broker时，会根据Paritition机制选择将其存储�
 
 
 
+## zookeeper
+
+- Zookeeper的作用：协调控制
+  - 管理broker与consumer的动态加入和离开。（Producer不需要管理，随便一台计算机都可以作为Producer向Kafka Broker发消息）
+  - 管理broker与consumer的动态加入和离开。（Producer不需要管理，随便一台计算机都可以作为Producer向Kafka Broker发消息）
+  - 维护消费关系及每个partition的消费信息
+- zookeeper的细节
+  - 每个broker启动后会在zookeeper上注册一个临时的broker registry，包含broker的IP地址和端口号，所存储的topics和partitions信息
+  - 每个consumer启动后会在zookeeper上注册一个临时的consumer registry：包含consumer所属的consumer group 以及订阅的topics
+
+
+
 ## Push vs Pull
 
 作为一个消息系统，Kafka遵循了传统的方式，选择由Producer向broker push消息并由Consumer从broker pull消息。一些logging-centric system，比如Facebook的Scribe和Cloudera的Flume，采用push模式。事实上，push模式和pull模式各有优劣。
