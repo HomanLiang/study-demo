@@ -4,9 +4,9 @@
 
 # Kafka 简介
 
-[Kafka官网主页](https://www.oschina.net/action/GoToLink?url=http%3A%2F%2Fkafka.apache.org%2F)
-
-[Kafka官方文档](https://www.oschina.net/action/GoToLink?url=http%3A%2F%2Fkafka.apache.org%2Fdocumentation%2F)
+## 相关网站
+ [官网](https://kafka.apache.org/)
+ [Kafka中文文档](http://kafka.apachecn.org/intro.html)
 
 
 
