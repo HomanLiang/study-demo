@@ -61,13 +61,13 @@ show engines;
 
 **2、更改数据库引擎**
 
-2.1、更改方式1：修改配置文件my.ini
+2.1、更改方式1：修改配置文件`my.ini`
 
-　　将my-small.ini另存为my.ini，在[mysqld]后面添加default-storage-engine=InnoDB，重启服务，数据库默认的引擎修改为InnoDB
+将 `my-small.ini` 另存为 `my.ini`，在`[mysqld]`后面添加 `default-storage-engine=InnoDB`，重启服务，数据库默认的引擎修改为 `InnoDB`
 
 2.2、更改方式2:在建表的时候指定
 
-   建表时指定：
+建表时指定：
 
 ```
 create table mytbl(   
@@ -78,17 +78,19 @@ create table mytbl(
 
 2.3、更改方式3：建表后更改
 
-　　alter table mytbl2 type = InnoDB;
+```
+alter table mytbl2 type = InnoDB;
+```
 
 **3、查看修改结果**
 
-　　方式1：
+方式1：
 
 ```
 show table status from mytest; 
 ```
 
-　　方式2：
+方式2：
 
 ```
 show create table table_name
@@ -100,7 +102,7 @@ show create table table_name
 
 ### Innodb引擎
 
-Innodb引擎提供了对数据库ACID**事务**的支持，并且实现了SQL标准的四种隔离级别，关于数据库事务与其隔离级别的内容请见数据库事务与其隔离级别这篇文章。该引擎还提供了行级锁和外键约束，它的设计目标是处理大容量数据库系统，它本身其实就是基于MySQL后台的完整数据库系统，MySQL运行时Innodb会在内存中建立缓冲池，用于缓冲数据和索引。但是该引擎不支持FULLTEXT类型的索引，而且它没有保存表的行数，当SELECT COUNT(*) FROM TABLE时需要扫描全表。当需要使用数据库事务时，该引擎当然是首选。由于锁的粒度更小，写操作不会锁定全表，所以在并发较高时，使用Innodb引擎会提升效率。但是使用行级锁也不是绝对的，如果在执行一个SQL语句时MySQL不能确定要扫描的范围，InnoDB表同样会锁全表。
+Innodb引擎提供了对数据库ACID**事务**的支持，并且实现了SQL标准的四种隔离级别，关于数据库事务与其隔离级别的内容请见数据库事务与其隔离级别这篇文章。该引擎还提供了行级锁和外键约束，它的设计目标是处理大容量数据库系统，它本身其实就是基于MySQL后台的完整数据库系统，MySQL运行时Innodb会在内存中建立缓冲池，用于缓冲数据和索引。但是它没有保存表的行数，当SELECT COUNT(*) FROM TABLE时需要扫描全表。当需要使用数据库事务时，该引擎当然是首选。由于锁的粒度更小，写操作不会锁定全表，所以在并发较高时，使用Innodb引擎会提升效率。但是使用行级锁也不是绝对的，如果在执行一个SQL语句时MySQL不能确定要扫描的范围，InnoDB表同样会锁全表。
 
 名词解析：**ACID**
 
@@ -121,23 +123,33 @@ MyIASM是MySQL默认的引擎，但是它没有提供对数据库事务的支持
 
 **1、 存储结构**
 
-MyISAM：每个MyISAM在磁盘上存储成三个文件。第一个文件的名字以表的名字开始，扩展名指出文件类型。.frm文件存储表定义。数据文件的扩展名为.MYD (MYData)。索引文件的扩展名是.MYI (MYIndex)。 InnoDB：所有的表都保存在同一个数据文件中（也可能是多个文件，或者是独立的表空间文件），InnoDB表的大小只受限于操作系统文件的大小，一般为2GB。
+**MyISAM**：每个MyISAM在磁盘上存储成三个文件。第一个文件的名字以表的名字开始，扩展名指出文件类型。.frm文件存储表定义。数据文件的扩展名为.MYD (MYData)。索引文件的扩展名是.MYI (MYIndex)。 
+
+**InnoDB**：所有的表都保存在同一个数据文件中（也可能是多个文件，或者是独立的表空间文件），InnoDB表的大小只受限于操作系统文件的大小，一般为2GB。
 
 **2、 存储空间**
 
-MyISAM：可被压缩，存储空间较小。支持三种不同的存储格式：静态表(默认，但是注意数据末尾不能有空格，会被去掉)、动态表、压缩表。 InnoDB：需要更多的内存和存储，它会在主内存中建立其专用的缓冲池用于高速缓冲数据和索引。
+**MyISAM**：可被压缩，存储空间较小。支持三种不同的存储格式：静态表(默认，但是注意数据末尾不能有空格，会被去掉)、动态表、压缩表。
+
+ **InnoDB**：需要更多的内存和存储，它会在主内存中建立其专用的缓冲池用于高速缓冲数据和索引。
 
 **3、 事务支持**
 
-MyISAM：强调的是性能，每次查询具有原子性,其执行数度比InnoDB类型更快，但是不提供事务支持。 InnoDB：提供事务支持事务，外部键等高级数据库功能。 具有事务(commit)、回滚(rollback)和崩溃修复能力(crash recovery capabilities)的事务安全(transaction-safe (ACID compliant))型表。
+**MyISAM**：强调的是性能，每次查询具有原子性,其执行数度比InnoDB类型更快，但是不提供事务支持。 
+
+**InnoDB**：提供事务支持事务，外部键等高级数据库功能。 具有事务(commit)、回滚(rollback)和崩溃修复能力(crash recovery capabilities)的事务安全(transaction-safe (ACID compliant))型表。
 
 **4、 CURD操作**
 
-MyISAM：如果执行大量的SELECT，MyISAM是更好的选择。(因为没有支持行级锁)，在增删的时候需要锁定整个表格，效率会低一些。相关的是innodb支持行级锁，删除插入的时候只需要锁定改行就行，效率较高 InnoDB：如果你的数据执行大量的INSERT或UPDATE，出于性能方面的考虑，应该使用InnoDB表。DELETE 从性能上InnoDB更优，但DELETE FROM table时，InnoDB不会重新建立表，而是一行一行的删除，在innodb上如果要清空保存有大量数据的表，最好使用truncate table这个命令。
+**MyISAM**：如果执行大量的SELECT，MyISAM是更好的选择。(因为没有支持行级锁)，在增删的时候需要锁定整个表格，效率会低一些。相关的是innodb支持行级锁，删除插入的时候只需要锁定改行就行，效率较高 
+
+**InnoDB**：如果你的数据执行大量的INSERT或UPDATE，出于性能方面的考虑，应该使用InnoDB表。DELETE 从性能上InnoDB更优，但DELETE FROM table时，InnoDB不会重新建立表，而是一行一行的删除，在innodb上如果要清空保存有大量数据的表，最好使用truncate table这个命令。
 
 **5、 外键**
 
-MyISAM：不支持 InnoDB：支持
+**MyISAM**：不支持 
+
+**InnoDB**：支持
 
 **6、索引结构不同**
 

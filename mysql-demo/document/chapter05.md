@@ -685,17 +685,17 @@ Copymysql> show binlog events in 'mysql-bin.000002';
 
 - `STATMENT`：基于`SQL` 语句的复制( `statement-based replication, SBR` )，每一条会修改数据的sql语句会记录到`binlog` 中  。
 
-- - 优点：不需要记录每一行的变化，减少了 binlog 日志量，节约了 IO  , 从而提高了性能；
-  - 缺点：在某些情况下会导致主从数据不一致，比如执行sysdate() 、  slepp()  等 。
+	- 优点：不需要记录每一行的变化，减少了 binlog 日志量，节约了 IO  , 从而提高了性能；
+	- 缺点：在某些情况下会导致主从数据不一致，比如执行sysdate() 、  slepp()  等 。
 
 - `ROW`：基于行的复制(`row-based replication, RBR` )，不记录每条sql语句的上下文信息，仅需记录哪条数据被修改了 。
 
-- - 优点：不会出现某些特定情况下的存储过程、或function、或trigger的调用和触发无法被正确复制的问题 ；
-  - 缺点：会产生大量的日志，尤其是` alter table ` 的时候会让日志暴涨
+	- 优点：不会出现某些特定情况下的存储过程、或function、或trigger的调用和触发无法被正确复制的问题 ；
+	- 缺点：会产生大量的日志，尤其是` alter table ` 的时候会让日志暴涨
 
 - `MIXED`：基于`STATMENT` 和 `ROW` 两种模式的混合复制(`mixed-based replication, MBR` )，一般的复制使用`STATEMENT` 模式保存 `binlog` ，对于 `STATEMENT` 模式无法复制的操作使用 `ROW` 模式保存 `binlog`
 
-![image-20210308221010353](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mysql-demo/image-20210308221010353.png)
+  ![image-20210308221010353](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mysql-demo/image-20210308221010353.png)
 
 ### 如何通过 `mysqlbinlog` 命令手动恢复数据
 
@@ -958,7 +958,7 @@ Copymysql> show binlog events in 'binlog.000008';
 
 ![image-20210308220256532](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mysql-demo/image-20210308220256532.png)
 
-同时我们很容易得知， 在innodb中，既有`redo log` 需要刷盘，还有 `数据页` 也需要刷盘， `redo log`存在的意义主要就是降低对 `数据页` 刷盘的要求 ** 。
+同时我们很容易得知， 在innodb中，既有`redo log` 需要刷盘，还有 `数据页` 也需要刷盘， `redo log`存在的意义主要就是降低对 `数据页` 刷盘的需求 。
 
 在上图中， `write pos` 表示 `redo log` 当前记录的 `LSN` (逻辑序列号)位置， `check point` 表示 **数据页更改记录** 刷盘后对应 `redo log` 所处的 `LSN`(逻辑序列号)位置。
 
@@ -982,7 +982,7 @@ Copymysql> show binlog events in 'binlog.000008';
 
 ## undo log
 
-### 1、 undo是啥
+### 1、undo是啥
 
 undo日志用于存放数据修改被修改前的值，假设修改 tba 表中 id=2的行数据，把Name='B' 修改为Name = 'B2' ，那么undo日志就会用来存放Name='B'的记录，如果这个修改出现异常，可以使用undo日志来实现回滚操作，保证事务的一致性。
 

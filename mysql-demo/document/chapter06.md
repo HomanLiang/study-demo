@@ -151,14 +151,14 @@ InnoDB为插入一行新记录，保存当前事务编号作为行版本号，�
 
 - **insert undo log：**
 
-insert 操作中产生的undo log，因为insert操作记录只对当前事务本身课件，对于其他事务此记录不可见，所以 insert undo log 可以在事务提交后直接删除而不需要进行purge操作。
+  insert 操作中产生的undo log，因为insert操作记录只对当前事务本身课件，对于其他事务此记录不可见，所以 insert undo log 可以在事务提交后直接删除而不需要进行purge操作。
 
-> purge的主要任务是将数据库中已经 mark del 的数据删除，另外也会批量回收undo pages
-
-数据库 Insert时的数据初始状态：
-
-![image-20210307222614003](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mysql-demo/image-20210307222614003.png)
-
+	> purge的主要任务是将数据库中已经 mark del 的数据删除，另外也会批量回收undo pages
+	
+	数据库 Insert时的数据初始状态：
+	
+	![image-20210307222614003](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mysql-demo/image-20210307222614003.png)
+	
 - **update undo log：**
 
   update 或 delete 操作中产生的 undo log。因为会对已经存在的记录产生影响，为了提供 MVCC机制，因此update undo log 不能在事务提交时就进行删除，而是将事务提交时放到入 history list 上，等待 purge 线程进行最后的删除操作。
@@ -167,11 +167,11 @@ insert 操作中产生的undo log，因为insert操作记录只对当前事务�
 
   ![image-20210307222707241](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mysql-demo/image-20210307222707241.png)
 
-**当另一个事务第二次修改当前数据：**
+  **当另一个事务第二次修改当前数据：**
 
-![image-20210307222806163](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mysql-demo/image-20210307222806163.png)
+  ![image-20210307222806163](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mysql-demo/image-20210307222806163.png)
 
-为了保证事务并发操作时，在写各自的undo log时不产生冲突，InnoDB采用回滚段的方式来维护undo log的并发写入和持久化。回滚段实际上是一种 Undo 文件组织方式。
+  为了保证事务并发操作时，在写各自的undo log时不产生冲突，InnoDB采用回滚段的方式来维护undo log的并发写入和持久化。回滚段实际上是一种 Undo 文件组织方式。
 
 #### 3、ReadView
 
@@ -187,7 +187,7 @@ insert 操作中产生的undo log，因为insert操作记录只对当前事务�
 
 **举个例子：**
 
-#### 4、READ COMMITTED 隔离级别下的ReadView
+##### 3.1、READ COMMITTED 隔离级别下的ReadView
 
 **每次读取数据前都生成一个ReadView (m_ids列表)**
 
@@ -233,7 +233,7 @@ insert 操作中产生的undo log，因为insert操作记录只对当前事务�
 
 **总结：** **使用READ COMMITTED隔离级别的事务在每次查询开始时都会生成一个独立的 ReadView。**
 
-#### 5、REPEATABLE READ 隔离级别下的ReadView
+##### 3.2、REPEATABLE READ 隔离级别下的ReadView
 
 **在事务开始后第一次读取数据时生成一个ReadView（m_ids列表）**
 
@@ -279,7 +279,7 @@ insert 操作中产生的undo log，因为insert操作记录只对当前事务�
 
 ### MVCC总结：
 
-所谓的MVCC（Multi-Version Concurrency Control ，多版本并发控制）指的就是在使用 **READ COMMITTD** 、**REPEATABLE READ** 这两种隔离级别的事务在执行普通的 SEELCT 操作时访问记录的版本链的过程，这样子可以使不同事务的 `读-写` 、 `写-读` 操作并发执行，从而提升系统性能。
+所谓的MVCC（Multi-Version Concurrency Control ，多版本并发控制）指的就是在使用 **READ COMMITTD** 、**REPEATABLE READ** 这两种隔离级别的事务在执行普通的 SELECT 操作时访问记录的版本链的过程，这样子可以使不同事务的 `读-写` 、 `写-读` 操作并发执行，从而提升系统性能。
 
 在 MySQL 中， READ COMMITTED 和 REPEATABLE READ 隔离级别的的一个非常大的区别就是它们生成 ReadView 的时机不同。在 READ COMMITTED 中每次查询都会生成一个实时的 ReadView，做到保证每次提交后的数据是处于当前的可见状态。而 REPEATABLE READ 中，在当前事务第一次查询时生成当前的 ReadView，并且当前的 ReadView 会一直沿用到当前事务提交，以此来保证可重复读（REPEATABLE READ）。
 
