@@ -13,7 +13,6 @@
 12. [Kafka 性能调优](https://github.com/HomanLiang/study-demo/blob/main/kafka-demo/document/chapter11.md)
 12. [Kafka 实际问题解决](https://github.com/HomanLiang/study-demo/blob/main/kafka-demo/document/chapter12.md)
 13. [Kafka 面试题](https://github.com/HomanLiang/study-demo/blob/main/kafka-demo/document/chapter13.md)
-14. 数据日志分离
 
 
 
