@@ -513,7 +513,7 @@ Oh, My God! 是死锁问题。尽管报错不多，对性能目前看来也无�
 
  **图1 应用日志**
 
-#### 1 死锁是怎么被发现的？
+#### 1、 死锁是怎么被发现的？
 
 ##### 1.1 死锁成因&&检测方法
 
@@ -525,9 +525,9 @@ Oh, My God! 是死锁问题。尽管报错不多，对性能目前看来也无�
 
 我们mysql用的存储引擎是innodb，从日志来看，innodb主动探知到死锁，并回滚了某一苦苦等待的事务。问题来了，innodb是怎么探知死锁的？
 
-直观方法是在两个事务相互等待时，当一个等待时间超过设置的某一阀值时，对其中一个事务进行回滚，另一个事务就能继续执行。这种方法简单有效，在innodb中，参数innodb_lock_wait_timeout用来设置超时时间。
+直观方法是在两个事务相互等待时，当一个等待时间超过设置的某一阀值时，对其中一个事务进行回滚，另一个事务就能继续执行。这种方法简单有效，在innodb中，参数 `innodb_lock_wait_timeout` 用来设置超时时间。
 
-仅用上述方法来检测死锁太过被动，innodb还提供了wait-for graph算法来主动进行死锁检测，每当加锁请求无法立即满足需要并进入等待时，wait-for graph算法都会被触发。
+仅用上述方法来检测死锁太过被动，innodb还提供了 `wait-for graph` 算法来主动进行死锁检测，每当加锁请求无法立即满足需要并进入等待时，`wait-for graph` 算法都会被触发。
 
 ##### 1.2 wait-for graph原理
 
@@ -538,7 +538,7 @@ Oh, My God! 是死锁问题。尽管报错不多，对性能目前看来也无�
 
 innodb将各个事务看为一个个节点，资源就是各个事务占用的锁，当事务1需要等待事务2的锁时，就生成一条有向边从1指向2，最后行成一个有向图。
 
-#### 2 innodb隔离级别、索引与锁 
+#### 2、 innodb隔离级别、索引与锁 
 
 死锁检测是死锁发生时innodb给我们的救命稻草，我们需要它，但我们更需要的是避免死锁发生的能力，如何尽可能避免？这需要了解innodb中的锁。
 
@@ -557,19 +557,19 @@ innodb将各个事务看为一个个节点，资源就是各个事务占用的�
 
 下面分析下索引和锁的关系。
 
-1）delete from msg where id=2；
+1）`delete from msg where id=2;`
 
 由于id是主键，因此直接锁住整行记录即可。
 
 ![image-20210309221525678](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mysql-demo/image-20210309221525678.png)                                        
 
-2）delete from msg where token=’ cvs’;
+2）`delete from msg where token=’ cvs’;`
 
 由于token是二级索引，因此首先锁住二级索引（两行），接着会锁住相应主键所对应的记录；
 
 ![image-20210309221602592](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mysql-demo/image-20210309221602592.png)                                    
 
-3）delete from msg where message=订单号是多少’；
+3）`delete from msg where message=订单号是多少’;`
 
 message没有索引，所以走的是全表扫描过滤。这时表上的各个记录都将添加上X锁。
 
@@ -579,13 +579,10 @@ message没有索引，所以走的是全表扫描过滤。这时表上的各个�
 
 大学数据库原理都学过，为了保证并发操作数据的正确性，数据库都会有事务隔离级别的概念：
 
-1）未提交读（Read uncommitted）；
-
-2）已提交读（Read committed（RC））；
-
-3）可重复读（Repeatable read（RR））；
-
-4）可串行化（Serializable）。我们较常使用的是RC和RR。
+- 未提交读（Read uncommitted）
+- 已提交读（Read committed（RC））
+- 可重复读（Repeatable read（RR）
+- 可串行化（Serializable）。我们较常使用的是RC和RR。
 
 提交读(RC)：只能读取到已经提交的数据。
 
@@ -608,7 +605,7 @@ innodb首先会和RC级别一样，给索引上的记录添加上X锁，此外�
 这样，当事务B在执行 `insert into msg values (null,‘asd',’hello’); commit;` 时，会首先检查这个区间是否被锁上，如果被锁上，则不能立即执行，需要等待该gap锁被释放。这样就能避免幻读问题。
 ![image-20210309222041969](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mysql-demo/image-20210309222041969.png)                                      
 
-#### 3 死锁成因
+#### 3、 死锁成因
 
 了解了innodb锁的基本原理后，下面分析下死锁的成因。如前面所说，死锁一般是事务相互等待对方资源，最后形成环路造成的。下面简单讲下造成相互等待最后形成环路的例子。
 
@@ -1205,7 +1202,7 @@ RECORD LOCKS space id 0 page no 101724 n bits 72 index `unq_b_c_a` of table `yuj
 
 **10. 综上**
 
-1. SHOW ENGINE INNODB STATUS\G 看到的DEADLOCK相关信息，只会返回最后的2个事务的信息，而其实有可能有更多的事务才最终导致的死锁
+1. `SHOW ENGINE INNODB STATUS` 看到的DEADLOCK相关信息，只会返回最后的2个事务的信息，而其实有可能有更多的事务才最终导致的死锁
 2. 当有3个（或以上）事务对相同的表进行insert操作，如果insert对应的字段上有uniq key约束并且第一个事务rollback了，那其中一个将返回死锁错误信息。
 3. 死锁的原因
    - T1 获得 X 锁并 insert 成功
