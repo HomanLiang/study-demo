@@ -17,12 +17,21 @@
 
 ## Java 高级
 
-1. 位运算
-2. 
-
-
+1. [位运算](https://github.com/HomanLiang/study-demo/blob/main/java-core-demo/document/chapter2_1.md)
+2. [Java 正则从入门到精通](https://github.com/HomanLiang/study-demo/blob/main/java-core-demo/document/chapter2_2.md)
+3. [Java 编码和加密](https://github.com/HomanLiang/study-demo/blob/main/java-core-demo/document/chapter2_3.md)
+4. [Java 本地化](https://github.com/HomanLiang/study-demo/blob/main/java-core-demo/document/chapter2_4.md)
+5. [JDK8 入门指南](https://github.com/HomanLiang/study-demo/blob/main/java-core-demo/document/chapter2_4.md)
 
 ## Java 容器
+
+1. [Java 容器简介](https://github.com/HomanLiang/study-demo/blob/main/java-core-demo/document/chapter3_1.md)
+2. [Java 容器之 List](https://github.com/HomanLiang/study-demo/blob/main/java-core-demo/document/chapter3_2.md)
+3. [Java 容器之 Map](https://github.com/HomanLiang/study-demo/blob/main/java-core-demo/document/chapter3_3.md)
+4. [Java 容器之 Set](https://github.com/HomanLiang/study-demo/blob/main/java-core-demo/document/chapter3_4.md)
+5. [Java 容器之 Queue](https://github.com/HomanLiang/study-demo/blob/main/java-core-demo/document/chapter3_5.md)
+6. [Java 容器面试题](https://github.com/HomanLiang/study-demo/blob/main/java-core-demo/document/chapter3_6.md)
+7. [Java 容器最佳实践](https://github.com/HomanLiang/study-demo/blob/main/java-core-demo/document/chapter3_7.md)
 
 ## Java 并发
 
