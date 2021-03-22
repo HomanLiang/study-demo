@@ -35,17 +35,17 @@
 
 ## Java 并发
 
-1. Java 并发简介 
-2. Java 线程基础
-3. Java 并发核心机制
-4. Java 并发锁
-5. Java 原子类
-6. Java 并发容器
-7. Java 线程池
-8. Java 并发工具类
-9. Java 内存模型
-10. Java Fork Join
-11. Java 并发面试题
+1. [Java 并发简介](https://github.com/HomanLiang/study-demo/blob/main/java-core-demo/document/chapter4_1.md)
+2. [Java 线程基础](https://github.com/HomanLiang/study-demo/blob/main/java-core-demo/document/chapter4_2.md)
+3. [Java 并发核心机制](https://github.com/HomanLiang/study-demo/blob/main/java-core-demo/document/chapter4_3.md)
+4. [Java 并发锁](https://github.com/HomanLiang/study-demo/blob/main/java-core-demo/document/chapter4_4.md)
+5. [Java 原子类](https://github.com/HomanLiang/study-demo/blob/main/java-core-demo/document/chapter4_5.md)
+6. [Java 并发容器](https://github.com/HomanLiang/study-demo/blob/main/java-core-demo/document/chapter4_6.md)
+7. [Java 线程池](https://github.com/HomanLiang/study-demo/blob/main/java-core-demo/document/chapter4_7.md)
+8. [Java 并发工具类](https://github.com/HomanLiang/study-demo/blob/main/java-core-demo/document/chapter4_8.md)
+9. [Java 内存模型](https://github.com/HomanLiang/study-demo/blob/main/java-core-demo/document/chapter4_9.md)
+10. [Java Fork Join](https://github.com/HomanLiang/study-demo/blob/main/java-core-demo/document/chapter4_10.md)
+11. [Java 并发面试题](https://github.com/HomanLiang/study-demo/blob/main/java-core-demo/document/chapter4_11.md)
 
 ## Java IO
 
