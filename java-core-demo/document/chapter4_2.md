@@ -735,6 +735,265 @@ public class Piped {
 }
 ```
 
+### 4.4 sleep
+
+sleep方法的作用是让当前线程暂停指定的时间（毫秒），sleep方法是最简单的方法。唯一需要注意的是其与wait方法的区别。最简单的区别是，wait方法依赖于同步，而sleep方法可以直接调用。而更深层次的区别在于sleep方法只是暂时让出CPU的执行权，并不释放锁。而wait方法则需要释放锁。
+
+**示例**
+
+```java
+public class SleepTest {
+    public synchronized void sleepMethod(){
+        System.out.println("Sleep start-----");
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        System.out.println("Sleep end-----");
+    }
+
+    public synchronized void waitMethod(){
+        System.out.println("Wait start-----");
+        synchronized (this){
+            try {
+                wait(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+        System.out.println("Wait end-----");
+    }
+
+    public static void main(String[] args) {
+        final SleepTest test1 = new SleepTest();
+
+        for(int i = 0;i<3;i++){
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    test1.sleepMethod();
+                }
+            }).start();
+        }
+
+
+        try {
+            Thread.sleep(10000);//暂停十秒，等上面程序执行完成
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        System.out.println("-----分割线-----");
+
+        final SleepTest test2 = new SleepTest();
+
+        for(int i = 0;i<3;i++){
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    test2.waitMethod();
+                }
+            }).start();
+        }
+    }
+}
+```
+
+**执行结果**：
+
+```
+Sleep start-----
+Sleep end-----
+Sleep start-----
+Sleep end-----
+Sleep start-----
+Sleep end-----
+-----分割线-----
+Wait start-----
+Wait start-----
+Wait start-----
+Wait end-----
+Wait end-----
+Wait end-----
+```
+
+这个结果的区别很明显，通过sleep方法实现的暂停，程序是顺序进入同步块的，只有当上一个线程执行完成的时候，下一个线程才能进入同步方法，sleep暂停期间一直持有monitor对象锁，其他线程是不能进入的。而wait方法则不同，当调用wait方法后，当前线程会释放持有的monitor对象锁，因此，其他线程还可以进入到同步方法，线程被唤醒后，需要竞争锁，获取到锁之后再继续执行。
+
+### 4.5 yield方法
+
+yield方法的作用是暂停当前线程，以便其他线程有机会执行，不过不能指定暂停的时间，并且也不能保证当前线程马上停止。yield方法只是将Running状态转变为Runnable状态。我们还是通过一个例子来演示其使用：
+
+```java
+public class YieldTest implements Runnable {
+    @Override
+    public void run() {
+        try {
+            Thread.sleep(100);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        for(int i=0;i<5;i++){
+            System.out.println(Thread.currentThread().getName() + ": " + i);
+            Thread.yield();
+        }
+    }
+
+    public static void main(String[] args) {	
+        YieldTest runn = new YieldTest();
+        Thread t1 = new Thread(runn,"FirstThread");
+        Thread t2 = new Thread(runn,"SecondThread");
+
+        t1.start();
+        t2.start();
+
+    }
+}
+```
+
+运行结果如下：
+
+```
+FirstThread: 0
+SecondThread: 0
+FirstThread: 1
+SecondThread: 1
+FirstThread: 2
+SecondThread: 2
+FirstThread: 3
+SecondThread: 3
+FirstThread: 4
+SecondThread: 4
+```
+
+这个例子就是通过yield方法来实现两个线程的交替执行。不过请注意：这种交替并不一定能得到保证：
+
+- 调度器可能会忽略该方法。
+- 使用的时候要仔细分析和测试，确保能达到预期的效果。
+- 很少有场景要用到该方法，主要使用的地方是调试和测试。
+
+### 4.6 Condition
+
+Condition是在java 1.5中出现的，它用来替代传统的Object的wait()/notify()实现线程间的协作，它的使用依赖于 Lock，Condition、Lock 和 Thread 三者之间的关系如下图所示。相比使用Object的wait()/notify()，使用Condition的await()/signal()这种方式能够更加安全和高效地实现线程间协作。Condition是个接口，基本的方法就是await()和signal()方法。Condition依赖于Lock接口，生成一个Condition的基本代码是lock.newCondition() 。 必须要注意的是，Condition 的 await()/signal() 使用都必须在lock保护之内，也就是说，必须在lock.lock()和lock.unlock之间才可以使用。事实上，Conditon的await()/signal() 与 Object的wait()/notify() 有着天然的对应关系：
+
+- Conditon中的await()对应Object的wait()；
+- Condition中的signal()对应Object的notify()；
+- Condition中的signalAll()对应Object的notifyAll()。
+
+![20170519154927256](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/java-core-demo/20210323220507.png)
+
+使用Condition往往比使用传统的通知等待机制(Object的wait()/notify())要更灵活、高效，例如，我们可以使用多个Condition实现通知部分线程：
+
+```
+// 线程 A
+class ThreadA extends Thread {
+	private MyService service;
+	public ThreadA(MyService service) {
+		super();
+		this.service = service;
+	}
+	@Override
+	public void run() {
+		service.awaitA();
+	}
+}
+// 线程 B
+class ThreadB extends Thread {
+	public ThreadB(MyService service) {
+		super();
+		this.service = service;
+	}
+	@Override
+	public void run() {
+		service.awaitB();
+	}
+}
+
+class MyService {
+	private Lock lock = new ReentrantLock();
+	// 使用多个Condition实现通知部分线程
+	public Condition conditionA = lock.newCondition();
+	public Condition conditionB = lock.newCondition();
+
+	public void awaitA() {
+	    lock.lock();
+	    try {
+		    System.out.println("begin awaitA时间为" + System.currentTimeMillis()
+			    	+ " ThreadName=" + Thread.currentThread().getName());
+		    conditionA.await();
+		    System.out.println("  end awaitA时间为" + System.currentTimeMillis()
+			    	+ " ThreadName=" + Thread.currentThread().getName());
+	    } catch (InterruptedException e) {
+		    e.printStackTrace();
+	    } finally {
+		    lock.unlock();
+	    }
+    }
+
+	public void awaitB() {
+	    lock.lock();
+		try {
+			System.out.println("begin awaitB时间为" + System.currentTimeMillis()
+					+ " ThreadName=" + Thread.currentThread().getName());
+			conditionB.await();
+			System.out.println("  end awaitB时间为" + System.currentTimeMillis()
+					+ " ThreadName=" + Thread.currentThread().getName());
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		} finally {
+			lock.unlock();
+		}
+	}
+
+	public void signalAll_A() {
+		try {
+			lock.lock();
+			System.out.println("  signalAll_A时间为" + System.currentTimeMillis()
+					+ " ThreadName=" + Thread.currentThread().getName());
+			conditionA.signalAll();
+		} finally {
+			lock.unlock();
+		}
+	}
+
+	public void signalAll_B() {
+		try {
+			lock.lock();
+			System.out.println("  signalAll_B时间为" + System.currentTimeMillis()
+					+ " ThreadName=" + Thread.currentThread().getName());
+			conditionB.signalAll();
+		} finally {
+			lock.unlock();
+		}
+	}
+}
+
+// 测试
+public class Run {
+	public static void main(String[] args) throws InterruptedException {
+	    MyService service = new MyService();
+
+	    ThreadA a = new ThreadA(service);
+	    a.setName("A");
+	    a.start();
+
+    	ThreadB b = new ThreadB(service);
+	    b.setName("B");
+    	b.start();
+
+	    Thread.sleep(3000);
+	    service.signalAll_A();
+    }
+}
+```
+
+输出结果如下图所示，我们可以看到只有线程A被唤醒，线程B仍然阻塞。
+
+![多个Condition通知部分线程](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/java-core-demo/20210323220605.png)
+
+实际上，**Condition 实现了一种分组机制，将所有对临界资源进行访问的线程进行分组，以便实现线程间更精细化的协作，例如通知部分线程。**我们可以从上面例子的输出结果看出，只有conditionA范围内的线程A被唤醒，而conditionB范围内的线程B仍然阻塞。
+
+
+
 ## 5. 线程生命周期
 
 ![20210102103928](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/java-core-demo/20210322210003.png)
@@ -1548,6 +1807,511 @@ Time: 1467072288503
 **不过还是建议使用“抛异常”的方法来实现线程的停止，因为在catch块中还可以将异常向上抛，使线程停止事件得以传播。**
 
 
+
+### 6.8 线程协作问题
+
+最近在网上看到一个面试题目，感觉挺有意思的，大意如下：
+
+![519126-20200926203742890-403133210](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/java-core-demo/20210323220915.png)
+
+ok，大家看到这个题，可以先理解下，这里启动了两个线程，a和b，但是虽然说a在b之前start，不一定就可以保证线程a的逻辑，可以先于线程b执行，所以，这里的意思是，线程a和b，执行顺序互不干扰，我们不应该假定其中一个线程可以先于另外一个执行。
+
+另外，既然是面试题，那常规做法自然是不用上了，比如让b先sleep几秒钟之类的，如果真这么答，那可能面试就结束了吧。
+
+ok，我们下面开始分析解法。
+
+#### 可见性保证
+
+程序里定义了一个全局变量，var = 1；线程a会修改这个变量为2，线程b则在变量为2时，执行自己的业务逻辑。
+
+那么，这里首先，我们要做的是，先讲var使用volatile修饰，保证多线程操作时的可见性。
+
+```
+public static volatile int var = 1;
+```
+
+#### 解法分析
+
+经过前面的可见性保证的分析，我们知道，要想达到目的，其实就是要保证：
+
+**a中的对var+1的操作，需要先于b执行。**
+
+但是，现在的问题是，两个线程同时启动，不知道谁先谁后，怎么保证a先执行，b后执行呢？
+
+让线程b先不执行，大概有两种思路，一种是阻塞该线程，一种是不阻塞该线程，阻塞的话，我们可以想想，怎么阻塞一个线程。
+
+大概有：
+
+- synchronized，取不到锁时，阻塞
+- java.util.concurrent.locks.ReentrantLock#lock，取不到锁时，阻塞
+- object.wait，取到synchronized了，但是因为一些条件不满足，执行不下去，调用wait，将释放锁，并进入等待队列，线程暂停运行
+- java.util.concurrent.locks.Condition.await，和object.wait类似，只不过object.wait在jvm层面，使用c++实现，Condition.await在jdk层面使用java语言实现
+- threadA.join()，等待对应的线程threadA执行完成后，本线程再继续运行；threadA没结束，则当前线程阻塞；
+- CountDownLatch#await，在对应的state不为0时，阻塞
+- Semaphore#acquire()，在state为0时（即剩余令牌为0时），阻塞
+- 其他阻塞队列、FutureTask等等
+
+如果不让线程进入阻塞，则一般可以让线程进入一个while循环，循环的退出条件，可以由线程a来修改，线程a修改后，线程b跳出循环。
+
+比如：
+
+```
+volatile boolean stop = false;
+while (!stop){
+    ...
+}
+```
+
+上面也说了这么多了，我们实际上手写一写吧。
+
+**错误解法1--基于wait**
+
+下面的思路是基于wait、notify；线程b直接wait，线程a在修改了变量后，进行notify。
+
+```java
+public class Global1 {
+    public static volatile int var = 1;
+    public static final Object monitor = new Object();
+
+    public static void main(String[] args) {
+        Thread a = new Thread(() -> {
+            // 1
+            Global1.var++;
+            // 2
+            synchronized (monitor) {
+                monitor.notify();
+            }
+        });
+        Thread b = new Thread(() -> {
+            // 3
+            synchronized (monitor) {
+                try {
+                    monitor.wait();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+            // 4
+            if (Global1.var == 2) {
+                //do something;
+                System.out.println(Thread.currentThread().getName() + " good job");
+            }
+        });
+        a.start();
+        b.start();
+    }
+}
+```
+
+大家觉得这个代码能行吗？实际是不行的。因为实际的顺序可能是：
+
+```
+线程a--1
+线程a--2
+线程b--1
+线程b--2
+```
+
+在线程a-2时，线程a去notify，但是此时线程b还没开始wait，所以此时的notify是没有任何效果的：没人在等，notify个锤子。
+
+怎么修改，本方案才行得通呢？
+
+那就是，修改线程a的代码，不要急着notify，先等等。
+
+```
+        Thread a = new Thread(() -> {
+            Global1.var++;
+            try {
+                TimeUnit.SECONDS.sleep(2);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            synchronized (monitor) {
+                monitor.notify();
+            }
+        });
+```
+
+但是这样的话，明显不合适，有作弊嫌疑，也不优雅。
+
+**错误解法2--基于condition的signal**
+
+```
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.ReentrantLock;
+
+public class Global1 {
+    public static volatile int var = 1;
+    public static final ReentrantLock reentrantLock = new ReentrantLock();
+    public static final Condition condition = reentrantLock.newCondition();
+
+    public static void main(String[] args) {
+        Thread a = new Thread(() -> {
+            Global1.var++;
+            final ReentrantLock lock = reentrantLock;
+            lock.lock();
+            try {
+                condition.signal();
+            } finally {
+                lock.unlock();
+            }
+        });
+        Thread b = new Thread(() -> {
+            final ReentrantLock lock = reentrantLock;
+            lock.lock();
+            try {
+                condition.await();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            } finally {
+                lock.unlock();
+            }
+
+            if (Global1.var == 2) {
+                //do something;
+                System.out.println(Thread.currentThread().getName() + " good job");
+            }
+        });
+        a.start();
+        b.start();
+    }
+}
+```
+
+这个方案使用了Condition对象来实现object的notify、wait效果。当然，这个也有同样的问题。
+
+**正确解法1--基于错误解法2进行改进**
+
+我们看看，前面问题的根源在于，我们线程a，在去通知线程b的时候，有可能线程b还没开始wait，所以此时通知失效。
+
+那么，我们是不是可以先等等，等线程b开始wait了，再去通知呢？
+
+```
+        Thread a = new Thread(() -> {
+            Global1.var++;
+            final ReentrantLock lock = reentrantLock;
+            lock.lock();
+            try {
+                // 1
+                while (!reentrantLock.hasWaiters(condition)) {
+                    Thread.yield();
+                }
+                condition.signal();
+            } finally {
+                lock.unlock();
+            }
+        });
+```
+
+1处代码，就是这个思想，在signal之前，判断当前condition上是否有waiter线程，如果没有，就死循环；如果有，才去执行signal。
+
+这个方法实测是可行的。
+
+**正确解法2**
+
+对正确解法1，换一个api，就变成了正确解法2.
+
+```
+Thread a = new Thread(() -> {
+    Global1.var++;
+    final ReentrantLock lock = reentrantLock;
+    lock.lock();
+    try {
+        // 1
+        while (reentrantLock.getWaitQueueLength(condition) == 0) {
+            Thread.yield();
+        }
+        condition.signal();
+    } finally {
+        lock.unlock();
+    }
+});
+```
+
+1这里，获取condition上等待队列的长度，如果为0，说明没有等待者，则死循环。
+
+**正确解法3--基于Semaphore**
+
+刚开始，我们初始化一个信号量，state为0. 线程b去获取信号量的时候，就会阻塞。
+
+然后我们线程a再去释放一个信号量，此时线程b就可以继续执行。
+
+```
+public class Global1 {
+    public static volatile int var = 1;
+    public static final Semaphore semaphore = new Semaphore(0);
+
+    public static void main(String[] args) {
+        Thread a = new Thread(() -> {
+            Global1.var++;
+            semaphore.release();
+        });
+        a.setName("thread a");
+        Thread b = new Thread(() -> {
+            try {
+                semaphore.acquire();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
+            if (Global1.var == 2) {
+                //do something;
+                System.out.println(Thread.currentThread().getName() + " good job");
+            }
+        });
+        b.setName("thread b");
+        a.start();
+        b.start();
+    }
+}
+```
+
+**正确解法4--基于CountDownLatch**
+
+```
+public class Global1 {
+    public static volatile int var = 1;
+    public static final CountDownLatch countDownLatch = new CountDownLatch(1);
+
+    public static void main(String[] args) {
+        Thread a = new Thread(() -> {
+            Global1.var++;
+            countDownLatch.countDown();
+        });
+        a.setName("thread a");
+        Thread b = new Thread(() -> {
+            try {
+                countDownLatch.await();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
+            if (Global1.var == 2) {
+                //do something;
+                System.out.println(Thread.currentThread().getName() + " good job");
+            }
+        });
+        b.setName("thread b");
+        a.start();
+        b.start();
+    }
+}
+```
+
+**正确解法5--基于BlockingQueue**
+
+这里使用了ArrayBlockingQueue，其他的阻塞队列也是可以的。
+
+```
+import countdown.CountdownTest;
+
+
+public class Global1 {
+    public static volatile int var = 1;
+    public static final ArrayBlockingQueue arrayBlockingQueue = new ArrayBlockingQueue<Object>(1);
+
+    public static void main(String[] args) {
+        Thread a = new Thread(() -> {
+            Global1.var++;
+            arrayBlockingQueue.offer(new Object());
+        });
+        a.setName("thread a");
+        Thread b = new Thread(() -> {
+            try {
+                arrayBlockingQueue.take();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
+            if (Global1.var == 2) {
+                //do something;
+                System.out.println(Thread.currentThread().getName() + " good job");
+            }
+        });
+        b.setName("thread b");
+        a.start();
+        b.start();
+    }
+}
+```
+
+**正确解法6--基于FutureTask**
+
+我们也可以让线程b等待一个task的执行结果；而线程a在执行完修改var为2后，执行该任务，任务执行完成后，线程b就会被通知继续执行。
+
+```
+public class Global1 {
+    public static volatile int var = 1;
+    public static final FutureTask futureTask = new FutureTask<Object>(new Callable<Object>() {
+        @Override
+        public Object call() throws Exception {
+            System.out.println("callable task ");
+            return null;
+        }
+    });
+
+    public static void main(String[] args) {
+        Thread a = new Thread(() -> {
+            Global1.var++;
+            futureTask.run();
+        });
+        a.setName("thread a");
+        Thread b = new Thread(() -> {
+            try {
+                futureTask.get();
+            } catch (InterruptedException | ExecutionException e) {
+                e.printStackTrace();
+            }
+
+            if (Global1.var == 2) {
+                //do something;
+                System.out.println(Thread.currentThread().getName() + " good job");
+            }
+        });
+        b.setName("thread b");
+        a.start();
+        b.start();
+    }
+}
+```
+
+**正确解法7--基于join**
+
+这个可能是最简洁直观的，哈哈。也是群里同学们提供的解法，真的有才！
+
+```
+public class Global1 {
+    public static volatile int var = 1;
+
+    public static void main(String[] args) {
+        Thread a = new Thread(() -> {
+            Global1.var++;
+        });
+        a.setName("thread a");
+        Thread b = new Thread(() -> {
+            try {
+                a.join();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
+            if (Global1.var == 2) {
+                //do something;
+                System.out.println(Thread.currentThread().getName() + " good job");
+            }
+        });
+        b.setName("thread b");
+        a.start();
+        b.start();
+    }
+}
+```
+
+**正确解法8--基于CompletableFuture**
+
+这个和第6种类似。都是基于future。
+
+```
+public class Global1 {
+    public static volatile int var = 1;
+    public static final CompletableFuture<Object> completableFuture =
+            new CompletableFuture<Object>();
+
+    public static void main(String[] args) {
+        Thread a = new Thread(() -> {
+            Global1.var++;
+            completableFuture.complete(new Object());
+        });
+        a.setName("thread a");
+        Thread b = new Thread(() -> {
+            try {
+                completableFuture.get();
+            } catch (InterruptedException | ExecutionException e) {
+                e.printStackTrace();
+            }
+
+            if (Global1.var == 2) {
+                //do something;
+                System.out.println(Thread.currentThread().getName() + " good job");
+            }
+        });
+        b.setName("thread b");
+        a.start();
+        b.start();
+    }
+}
+```
+
+**非阻塞--正确解法9--忙等待**
+
+这种代码量也少，只要线程b在变量为1时，死循环就行了。
+
+```
+public class Global1 {
+    public static volatile int var = 1;
+
+    public static void main(String[] args) {
+        Thread a = new Thread(() -> {
+            Global1.var++;
+        });
+        a.setName("thread a");
+        Thread b = new Thread(() -> {
+            while (var == 1) {
+                Thread.yield();
+            }
+
+            if (Global1.var == 2) {
+                //do something;
+                System.out.println(Thread.currentThread().getName() + " good job");
+            }
+        });
+        b.setName("thread b");
+        a.start();
+        b.start();
+    }
+}
+```
+
+**非阻塞--正确解法10--忙等待**
+
+忙等待的方案很多，反正就是某个条件不满足时，不阻塞自己，阻塞了会释放cpu，我们就是不希望释放cpu的。
+
+比如像下面这样也可以。
+
+```
+public class Global1 {
+    public static volatile int var = 1;
+    public static final AtomicInteger atomicInteger =
+            new AtomicInteger(1);
+
+    public static void main(String[] args) {
+        Thread a = new Thread(() -> {
+            Global1.var++;
+            atomicInteger.set(2);
+        });
+        a.setName("thread a");
+        Thread b = new Thread(() -> {
+            while (true) {
+                boolean success = atomicInteger.compareAndSet(2, 1);
+                if (success) {
+                    break;
+                } else {
+                    Thread.yield();
+                }
+            }
+
+            if (Global1.var == 2) {
+                //do something;
+                System.out.println(Thread.currentThread().getName() + " good job");
+            }
+        });
+        b.setName("thread b");
+        a.start();
+        b.start();
+    }
+}
+```
 
 
 

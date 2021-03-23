@@ -658,11 +658,109 @@ class Singleton {
 
 ### 3.3. volatile 的原理
 
-观察加入 volatile 关键字和没有加入 volatile 关键字时所生成的汇编代码发现，**加入 `volatile` 关键字时，会多出一个 `lock` 前缀指令**。**`lock`前缀指令实际上相当于一个内存屏障**（也成内存栅栏），内存屏障会提供 3 个功能：
+#### 3.3.1. 重排序
 
-- 它确保指令重排序时不会把其后面的指令排到内存屏障之前的位置，也不会把前面的指令排到内存屏障的后面；即在执行到内存屏障这句指令时，在它前面的操作已经全部完成；
-- 它会强制将对缓存的修改操作立即写入主存；
-- 如果是写操作，它会导致其他 CPU 中对应的缓存行无效。
+重排序是指编译器和处理器为了优化程序性能而对指令序列进行排序的一种手段。但是重排序也需要遵守一定规则：
+
+1. 重排序操作不会对存在数据依赖关系的操作进行重排序。
+
+   比如：a=1;b=a; 这个指令序列，由于第二个操作依赖于第一个操作，所以在编译时和处理器运行时这两个操作不会被重排序。
+
+2. 重排序是为了优化性能，但不管怎么重排序，单线程下程序的执行结果不能被改变
+
+   比如：a=1;b=2;c=a+b这三个操作，第一步（a=1)和第二步(b=2)由于不存在数据依赖关系，所以可能会发生重排序，但是c=a+b这个操作是不会被重排序的，因为需要保证最终的结果一定是c=a+b=3。
+
+重排序在单线程模式下是一定会保证最终结果的正确性，但是在多线程环境下，问题就不能保证了。
+
+#### 3.3.2. 如何保证可见性和禁止指令重排序的？
+
+假设flag变量的初始值false，现在有两条线程t1和t2要访问它，就可以简化为以下图：
+
+![7ddbe230c8dc4501a77ffbe0587b5ba6_tplv-k3u1fbpfcp-zoom-1.image](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/java-core-demo/20210324001343.jpg)
+
+如果线程t1执行以下代码语句，并且flag没有volatile修饰的话；t1刚修改完flag的值，还没来得及刷新到主内存，t2又跑过来读取了，很容易就数据flag不一致了，如下：
+
+```
+flag=true;
+```
+
+![cc065cf75803496aa1efafd6d68ba968_tplv-k3u1fbpfcp-zoom-1](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/java-core-demo/20210324001429.jpg)
+
+如果flag变量是由volatile修饰的话，就不一样了，如果线程t1修改了flag值，volatile能保证修饰的flag变量后，可以**「立即同步回主内存」**。如图：
+
+![27e9e195810a4a71bdeb38dd128b27e4_tplv-k3u1fbpfcp-zoom-1](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/java-core-demo/20210324001559.jpg)
+
+细心的朋友会发现，线程t2不还是flag旧的值吗，这不还有问题嘛？其实volatile还有一个保证，就是**「每次使用前立即先从主内存刷新最新的值」**，线程t1修改完后，线程t2的变量副本会过期了，如图：
+
+![7e67dcdfe9d9412dab89961bf92b5b53_tplv-k3u1fbpfcp-zoom-1](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/java-core-demo/20210324001630.jpg)
+
+显然，这里还不是底层，实际上volatile保证可见性和禁止指令重排都跟**「内存屏障」**有关，我们编译volatile相关代码看看~
+
+**DCL单例模式（volatile）&编译对比**
+
+DCL单例模式（Double Check Lock，双重检查锁）比较常用，它是需要volatile修饰的，所以就拿这段代码编译吧
+
+```
+public class Singleton {  
+    private volatile static Singleton instance;  
+    private Singleton (){}  
+    public static Singleton getInstance() {  
+    if (instance == null) {  
+        synchronized (Singleton.class) {  
+        if (instance == null) {  
+            instance = new Singleton();  
+        }  
+        }  
+    }  
+    return instance;  
+    }  
+}  
+```
+
+编译这段代码后，观察有volatile关键字和没有volatile关键字时的instance所生成的汇编代码发现，有volatile关键字修饰时，会多出一个lock addl $0x0,(%esp)，即多出一个lock前缀指令
+
+```
+0x01a3de0f: mov    $0x3375cdb0,%esi   ;...beb0cd75 33  
+                                        ;   {oop('Singleton')}  
+0x01a3de14: mov    %eax,0x150(%esi)   ;...89865001 0000  
+0x01a3de1a: shr    $0x9,%esi          ;...c1ee09  
+0x01a3de1d: movb   $0x0,0x1104800(%esi)  ;...c6860048 100100  
+0x01a3de24: lock addl $0x0,(%esp)     ;...f0830424 00  
+                                        ;*putstatic instance  
+                                        ; - Singleton::getInstance@24 
+```
+
+ock指令相当于一个**「内存屏障」**，它保证以下这几点：
+
+- 1.重排序时不能把后面的指令重排序到内存屏障之前的位置
+- 2.将本处理器的缓存写入内存
+- 3.如果是写入动作，会导致其他处理器中对应的缓存无效。
+
+显然，第2、3点不就是volatile保证可见性的体现嘛，第1点就是禁止指令重排列的体现。
+
+**内存屏障**
+
+内存屏障四大分类：（Load 代表读取指令，Store代表写入指令）
+
+| 内存屏障类型   | 抽象场景                   | 描述                                                         |
+| :------------- | :------------------------- | :----------------------------------------------------------- |
+| LoadLoad屏障   | Load1; LoadLoad; Load2     | 在Load2要读取的数据被访问前，保证Load1要读取的数据被读取完毕。 |
+| StoreStore屏障 | Store1; StoreStore; Store2 | 在Store2写入执行前，保证Store1的写入操作对其它处理器可见     |
+| LoadStore屏障  | Load1; LoadStore; Store2   | 在Store2被写入前，保证Load1要读取的数据被读取完毕。          |
+| StoreLoad屏障  | Store1; StoreLoad; Load2   | 在Load2读取操作执行前，保证Store1的写入对所有处理器可见。    |
+
+为了实现volatile的内存语义，Java内存模型采取以下的保守策略
+
+- 在每个volatile写操作的前面插入一个StoreStore屏障。
+- 在每个volatile写操作的后面插入一个StoreLoad屏障。
+- 在每个volatile读操作的前面插入一个LoadLoad屏障。
+- 在每个volatile读操作的后面插入一个LoadStore屏障。
+
+有些小伙伴，可能对这个还是有点疑惑，内存屏障这玩意太抽象了。我们照着代码看下吧：
+
+![a3097b7467304540b6a552d897d46997_tplv-k3u1fbpfcp-zoom-1](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/java-core-demo/20210324001903.jpg)
+
+内存屏障保证前面的指令先执行，所以这就保证了禁止了指令重排啦，同时内存屏障保证缓存写入内存和其他处理器缓存失效，这也就保证了可见性
 
 ### 3.4. volatile 的问题
 
@@ -672,6 +770,8 @@ class Singleton {
 
 - `volatile` + `synchronized` - 可以参考：【示例】双重锁实现线程安全的单例模式
 - 使用原子类替代 `volatile`
+
+
 
 ## 4. CAS
 

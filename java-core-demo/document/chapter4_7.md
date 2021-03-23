@@ -20,6 +20,30 @@
 - **提高响应速度** - 当任务到达时，任务可以不需要等到线程创建就能立即执行。
 - **提高线程的可管理性** - 线程是稀缺资源，如果无限制的创建，不仅会消耗系统资源，还会降低系统的稳定性，使用线程池可以进行统一的分配，调优和监控。但是要做到合理的利用线程池，必须对其原理了如指掌。
 
+### 1.3. 使用线程池的风险
+
+虽然线程池是构建多线程应用程序的强大机制，但使用它并不是没有风险的。用线程池构建的应用程序容易遭受任何其它多线程应用程序容易遭受的所有并发风险，诸如同步错误和死锁，它还容易遭受特定于线程池的少数其它风险，诸如与池有关的**死锁、资源不足和线程泄漏。**
+
+**1.3.1 死锁**
+
+任何多线程应用程序都有死锁风险。当一组进程或线程中的每一个都在等待一个只有该组中另一个进程才能引起的事件时，我们就说这组进程或线程 死锁了。
+
+> 死锁的最简单情形是：线程 A 持有对象 X 的独占锁，并且在等待对象 Y 的锁，而线程 B 持有对象 Y 的独占锁，却在等待对象 X 的锁。除非有某种方法来打破对锁的等待（Java 锁定不支持这种方法），否则死锁的线程将永远等下去。
+
+虽然任何多线程程序中都有死锁的风险，但线程池却引入了另一种死锁可能，在那种情况下，所有池线程都在执行已阻塞的等待队列中另一任务的执行结果的任务，但这一任务却因为没有未被占用的线程而不能运行。当线程池被用来实现涉及许多交互对象的模拟，被模拟的对象可以相互发送查询，这些查询接下来作为排队的任务执行，查询对象又同步等待着响应时，会发生这种情况。
+
+**1.3.2 资源不足**
+
+线程池的一个优点在于：相对于其它替代调度机制（有些我们已经讨论过）而言，它们通常执行得很好。**但只有恰当地调整了线程池大小时才是这样的。**线程消耗包括内存和其它系统资源在内的大量资源。除了 Thread 对象所需的内存之外，每个线程都需要两个可能很大的执行调用堆栈。除此以外，JVM 可能会为每个 Java 线程创建一个本机线程，这些本机线程将消耗额外的系统资源。最后，虽然线程之间切换的调度开销很小，但如果有很多线程，环境切换也可能严重地影响程序的性能。
+
+如果线程池太大，那么被那些线程消耗的资源可能严重地影响系统性能。在线程之间进行切换将会浪费时间，而且使用超出比您实际需要的线程可能会引起资源匮乏问题，因为池线程正在消耗一些资源，而这些资源可能会被其它任务更有效地利用。除了线程自身所使用的资源以外，服务请求时所做的工作可能需要其它资源，例如 JDBC 连接、套接字或文件。这些也都是有限资源，有太多的并发请求也可能引起失效，例如不能分配 JDBC 连接。
+
+**1.3.3 线程泄漏**
+
+各种类型的线程池中一个严重的风险是线程泄漏，当从池中除去一个线程以执行一项任务，而在任务完成后该线程却没有返回池时，会发生这种情况。发生线程泄漏的一种情形出现在任务抛出一个 RuntimeException 或一个 Error 时。如果池类没有捕捉到它们，那么线程只会退出而线程池的大小将会永久减少一个。当这种情况发生的次数足够多时，线程池最终就为空，而且系统将停止，因为没有可用的线程来处理任务。
+
+有些任务可能会永远等待某些资源或来自用户的输入，而这些资源又不能保证变得可用，用户可能也已经回家了，诸如此类的任务会永久停止，而这些停止的任务也会引起和线程泄漏同样的问题。如果某个线程被这样一个任务永久地消耗着，那么它实际上就被从池除去了。对于这样的任务，应该要么只给予它们自己的线程，要么只让它们等待有限的时间。
+
 ## 2. Executor 框架
 
 > Executor 框架是一个根据一组执行策略调用，调度，执行和控制的异步任务的框架，目的是提供一种将”任务提交”与”任务如何运行”分离开来的机制。
@@ -339,6 +363,50 @@ public class ThreadPoolExecutorDemo {
 }
 ```
 
+### 3.6 源码分析
+
+**1、先看一下线程池的executor方法**
+
+![640](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/java-core-demo/20210323231250.webp)
+
+- 判断当前活跃线程数是否小于corePoolSize,如果小于，则调用addWorker创建线程执行任务
+- 如果不小于corePoolSize，则将任务添加到workQueue队列。
+- 如果放入workQueue失败，则创建线程执行任务，如果这时创建线程失败(当前线程数不小于maximumPoolSize时)，就会调用reject(内部调用handler)拒绝接受任务。
+
+**2、再看下addWorker的方法实现**
+
+![640](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/java-core-demo/20210323231312.jpg)
+
+这块代码是在创建非核心线程时，即core等于false。判断当前线程数是否大于等于maximumPoolSize，如果大于等于则返回false，即上边说到的③中创建线程失败的情况。
+
+addWorker方法的下半部分：
+
+![640 (1)](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/java-core-demo/20210323231324.webp)
+
+- 创建Worker对象，同时也会实例化一个Thread对象。
+- 启动启动这个线程
+
+**3、再到Worker里看看其实现**
+
+![640](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/java-core-demo/20210323231332.png)
+
+可以看到在创建Worker时会调用threadFactory来创建一个线程。上边的②中启动一个线程就会触发Worker的run方法被线程调用。
+
+**4、接下来咱们看看runWorker方法的逻辑**
+
+![640 (1)](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/java-core-demo/20210323231342.jpg)
+
+线程调用runWoker，会while循环调用getTask方法从workerQueue里读取任务，然后执行任务。只要getTask方法不返回null,此线程就不会退出。
+
+**5、最后在看看getTask方法实现**
+
+![640 (2)](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/java-core-demo/20210323231358.webp)
+
+- 咱们先不管allowCoreThreadTimeOut，这个变量默认值是false。wc>corePoolSize则是判断当前线程数是否大于corePoolSize。
+- 如果当前线程数大于corePoolSize，则会调用workQueue的poll方法获取任务，超时时间是keepAliveTime。如果超过keepAliveTime时长，poll返回了null，上边提到的while循序就会退出，线程也就执行完了。
+
+如果当前线程数小于corePoolSize，则会调用workQueue的take方法阻塞在当前。
+
 ## 4. Executors
 
 JDK 的 `Executors` 类中提供了几种具有代表性的线程池，这些线程池 **都是基于 `ThreadPoolExecutor` 的定制化实现**。
@@ -545,3 +613,382 @@ threadPool.awaitTermination(1, TimeUnit.HOURS);
 ### 5.3. 重要任务应该自定义拒绝策略
 
 使用有界队列，当任务过多时，线程池会触发执行拒绝策略，线程池默认的拒绝策略会 throw `RejectedExecutionException` 这是个运行时异常，对于运行时异常编译器并不强制 `catch` 它，所以开发人员很容易忽略。因此**默认拒绝策略要慎重使用**。如果线程池处理的任务非常重要，建议自定义自己的拒绝策略；并且在实际工作中，自定义的拒绝策略往往和降级策略配合使用。
+
+### 5.4. 不要对那些同步等待其它任务结果的任务排队
+
+这可能会导致上面所描述的那种形式的死锁，在那种死锁中，所有线程都被一些任务所占用，这些任务依次等待排队任务的结果，而这些任务又无法执行，因为所有的线程都很忙。
+
+### 5.5. 在为时间可能很长的操作使用合用的线程时要小心
+
+如果程序必须等待诸如 I/O 完成这样的某个资源，那么请指定最长的等待时间，以及随后是失效还是将任务重新排队以便稍后执行。这样做保证了：通过将某个线程释放给某个可能成功完成的任务，从而将最终取得某些进展。
+
+### 5.6. 理解任务
+
+要有效地调整线程池大小，您需要理解正在排队的任务以及它们正在做什么。它们是 CPU 限制的（CPU-bound）吗？它们是 I/O 限制的（I/O-bound）吗？您的答案将影响您如何调整应用程序。如果您有不同的任务类，这些类有着截然不同的特征，那么为不同任务类设置多个工作队列可能会有意义，这样可以相应地调整每个池。
+
+
+
+## 6.线程池自定义异常处理方法
+
+**深入探究线程池的异常处理**
+
+工作上的问题到这里就找到原因了，之后的解决过程也十分简单，这里就不提了。
+
+但是疑问又来了，为什么使用线程池的时候，线程因异常被中断却没有抛出任何信息呢？还有平时如果是在 main 函数里面的异常也会被抛出来，而不是像线程池这样被吞掉。
+
+如果子线程抛出了异常，线程池会如何进行处理呢？
+
+> 我提交任务到线程池的方式是: `threadPoolExecutor.submit(Runnbale task);` ，后面了解到使用 execute() 方式提交任务会把异常日志给打出来，这里研究一下为什么使用 submit 提交任务，在任务中的异常会被“吞掉”。
+
+对于 submit() 形式提交的任务，我们直接看源码：
+
+```
+public Future<?> submit(Runnable task) {
+    if (task == null) throw new NullPointerException();
+    // 被包装成 RunnableFuture 对象，然后准备添加到工作队列
+    RunnableFuture<Void> ftask = newTaskFor(task, null);
+    execute(ftask);
+    return ftask;
+}
+```
+
+它会被线程池包装成 RunnableFuture 对象，而最终它其实是一个 FutureTask 对象，在被添加到线程池的工作队列，然后调用 start() 方法后， FutureTask 对象的 run() 方法开始运行，即本任务开始执行。
+
+```
+public void run() {
+    if (state != NEW || !UNSAFE.compareAndSwapObject(this,runnerOffset,null, Thread.currentThread()))
+        return;
+    try {
+        Callable<V> c = callable;
+        if (c != null && state == NEW) {
+            V result;
+            boolean ran;
+            try {
+                result = c.call();
+                ran = true;
+            } catch (Throwable ex) {
+                // 捕获子任务中的异常
+                result = null;
+                ran = false;
+                setException(ex);
+            }
+            if (ran)
+                set(result);
+        }
+    } finally {
+        runner = null;
+        int s = state;
+        if (s >= INTERRUPTING)
+            handlePossibleCancellationInterrupt(s);
+    }
+}
+```
+
+在 FutureTask 对象的 run() 方法中，该任务抛出的异常被捕获，然后在setException(ex); 方法中，抛出的异常会被放到 outcome 对象中，这个对象就是 submit() 方法会返回的 FutureTask 对象执行 get() 方法得到的结果。
+
+但是在线程池中，并没有获取执行子线程的结果，所以异常也就没有被抛出来，即被“吞掉”了。
+
+这就是线程池的 submit() 方法提交任务没有异常抛出的原因。
+
+**线程池自定义异常处理方法**
+
+在定义 ThreadFactory 的时候调用`setUncaughtExceptionHandler`方法，自定义异常处理方法。例如：
+
+```
+ThreadFactory namedThreadFactory = new ThreadFactoryBuilder()
+                .setNameFormat("judge-pool-%d")
+                .setUncaughtExceptionHandler((thread, throwable)-> logger.error("ThreadPool {} got exception", thread,throwable))
+                .build();
+```
+
+这样，对于线程池中每条线程抛出的异常都会打下 error 日志，就不会看不到了。
+
+## 7.CompletionService
+
+### ExecutorService VS CompletionService
+
+假设我们有 4 个任务(A, B, C, D)用来执行复杂的计算，每个任务的执行时间随着输入参数的不同而不同，如果将任务提交到 ExecutorService， 相信你已经可以“信手拈来”
+
+```java
+ExecutorService executorService = Executors.newFixedThreadPool(4);
+List<Future> futures = new ArrayList<Future<Integer>>();
+futures.add(executorService.submit(A));
+futures.add(executorService.submit(B));
+futures.add(executorService.submit(C));
+futures.add(executorService.submit(D));
+
+// 遍历 Future list，通过 get() 方法获取每个 future 结果
+for (Future future:futures) {
+    Integer result = future.get();
+    // 其他业务逻辑
+}
+```
+
+先直入主题，用 CompletionService 实现同样的场景
+
+```java
+ExecutorService executorService = Executors.newFixedThreadPool(4);
+
+// ExecutorCompletionService 是 CompletionService 唯一实现类
+CompletionService executorCompletionService= new ExecutorCompletionService<>(executorService );
+
+List<Future> futures = new ArrayList<Future<Integer>>();
+futures.add(executorCompletionService.submit(A));
+futures.add(executorCompletionService.submit(B));
+futures.add(executorCompletionService.submit(C));
+futures.add(executorCompletionService.submit(D));
+
+// 遍历 Future list，通过 get() 方法获取每个 future 结果
+for (int i=0; i<futures.size(); i++) {
+    Integer result = executorCompletionService.take().get();
+    // 其他业务逻辑
+}
+```
+
+两种方式在代码实现上几乎一毛一样，我们曾经说过 JDK 中不会重复造轮子，如果要造一个新轮子，必定是原有的轮子在某些场景的使用上有致命缺陷
+
+既然新轮子出来了，二者到底有啥不同呢？ 但是 `Future get()` 方法的致命缺陷:
+
+> 如果 Future 结果没有完成，调用 get() 方法，程序会**阻塞**在那里，直至获取返回结果
+
+先来看第一种实现方式，假设任务 A 由于参数原因，执行时间相对任务 B,C,D 都要长很多，但是按照程序的执行顺序，程序在 get() 任务 A 的执行结果会阻塞在那里，导致任务 B,C,D 的后续任务没办法执行。又因为每个任务执行时间是不固定的，**所以无论怎样调整将任务放到 List 的顺序，都不合适，这就是致命弊端**
+
+新轮子自然要解决这个问题，它的设计理念就是哪个任务先执行完成，get() 方法就会获取到相应的任务结果，这么做的好处是什么呢？来看个图你就瞬间理解了
+
+![1583165-20200812090855367-1588324368](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/java-core-demo/20210323235146.png)
+
+![1583165-20200812090857332-985732104](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/java-core-demo/20210323235158.png)
+
+两张图一对比，执行时长高下立判了，在当今高并发的时代，这点时间差，在吞吐量上起到的效果可能不是一点半点了
+
+> 那 CompletionService 是怎么做到获取最先执行完的任务结果的呢？
+
+### 远看CompletionService 轮廓
+
+如果你使用过消息队列，你应该秒懂我要说什么了，CompletionService 实现原理很简单
+
+> 就是一个将异步任务的生产和任务完成结果的消费解耦的服务
+
+用人话解释一下上面的抽象概念我只能再画一张图了
+
+![1583165-20200812090858396-1312267284](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/java-core-demo/20210323235209.png)
+
+说白了，哪个任务执行的完，就直接将执行结果放到队列中，这样消费者拿到的结果自然就是最早拿到的那个了
+
+从上图中看到，有**任务**，有**结果队列**，那 `CompletionService` 自然也要围绕着几个关键字做文章了
+
+- 既然是异步任务，那自然可能用到 Runnable 或 Callable
+- 既然能获取到结果，自然也会用到 Future 了
+
+带着这些线索，我们走进 **CompletionService** 源码看一看
+
+### 近看 CompletionService 源码
+
+`CompletionService` 是一个接口，它简单的只有 5 个方法：
+
+```java
+Future<V> submit(Callable<V> task);
+Future<V> submit(Runnable task, V result);
+Future<V> take() throws InterruptedException;
+Future<V> poll();
+Future<V> poll(long timeout, TimeUnit unit) throws InterruptedException;
+```
+
+![1583165-20200812090859234-208312168](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/java-core-demo/20210323235233.png)
+
+另外 3 个方法都是从阻塞队列中获取并移除阻塞队列第一个元素，只不过他们的功能略有不同
+
+- Take: 如果**队列为空**，那么调用 **take()** 方法的线程会**被阻塞**
+- Poll: 如果**队列为空**，那么调用 **poll()** 方法的线程会**返回 null**
+- Poll-timeout: 以**超时的方式**获取并移除阻塞队列中的第一个元素，如果超时时间到，队列还是空，那么该方法会返回 null
+
+所以说，按大类划分上面5个方法，其实就是两个功能
+
+- 提交异步任务 （submit）
+- 从队列中拿取并移除第一个元素 (take/poll)
+
+`CompletionService` 只是接口，`ExecutorCompletionService` 是该接口的唯一实现类
+
+#### ExecutorCompletionService 源码分析
+
+先来看一下类结构, 实现类里面并没有多少内容
+
+![1583165-20200812090859766-766495257](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/java-core-demo/20210323235246.png)
+
+`ExecutorCompletionService` 有两种构造函数：
+
+```java
+private final Executor executor;
+private final AbstractExecutorService aes;
+private final BlockingQueue<Future<V>> completionQueue;
+
+public ExecutorCompletionService(Executor executor) {
+    if (executor == null)
+        throw new NullPointerException();
+    this.executor = executor;
+    this.aes = (executor instanceof AbstractExecutorService) ?
+        (AbstractExecutorService) executor : null;
+    this.completionQueue = new LinkedBlockingQueue<Future<V>>();
+}
+public ExecutorCompletionService(Executor executor,
+                                 BlockingQueue<Future<V>> completionQueue) {
+    if (executor == null || completionQueue == null)
+        throw new NullPointerException();
+    this.executor = executor;
+    this.aes = (executor instanceof AbstractExecutorService) ?
+        (AbstractExecutorService) executor : null;
+    this.completionQueue = completionQueue;
+}
+```
+
+两个构造函数都需要传入一个 Executor 线程池，**因为是处理异步任务的，我们是不被允许手动创建线程的**，所以这里要使用线程池也就很好理解了
+
+另外一个参数是 BlockingQueue，如果不传该参数，就会默认队列为 `LinkedBlockingQueue`，任务执行结果就是加入到这个阻塞队列中的
+
+所以要彻底理解 `ExecutorCompletionService` ，我们只需要知道一个问题的答案就可以了：
+
+> 它是如何将异步任务结果放到这个阻塞队列中的？
+
+想知道这个问题的答案，那只需要看它提交任务之后都做了些什么？
+
+```java
+public Future<V> submit(Callable<V> task) {
+    if (task == null) throw new NullPointerException();
+    RunnableFuture<V> f = newTaskFor(task);
+    executor.execute(new QueueingFuture(f));
+    return f;
+}
+```
+
+我们前面也分析过，execute 是提交 Runnable 类型的任务，本身得不到返回值，但又可以将执行结果放到阻塞队列里面，所以肯定是在 QueueingFuture 里面做了文章
+
+![1583165-20200812090900125-888416735](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/java-core-demo/20210323235258.png)
+
+从上图中看一看出，QueueingFuture 实现的接口非常多，所以说也就具备了相应的接口能力。
+
+重中之重是，它继承了 FutureTask ，FutureTask 重写了 Runnable 的 run() 方法，无论是set() 正常结果，还是setException() 结果，都会调用 `finishCompletion()` 方法:
+
+```java
+private void finishCompletion() {
+    // assert state > COMPLETING;
+    for (WaitNode q; (q = waiters) != null;) {
+        if (UNSAFE.compareAndSwapObject(this, waitersOffset, q, null)) {
+            for (;;) {
+                Thread t = q.thread;
+                if (t != null) {
+                    q.thread = null;
+                    LockSupport.unpark(t);
+                }
+                WaitNode next = q.next;
+                if (next == null)
+                    break;
+                q.next = null; // unlink to help gc
+                q = next;
+            }
+            break;
+        }
+    }
+
+  	// 重点 重点 重点
+    done();
+
+    callable = null;        // to reduce footprint
+}
+```
+
+上述方法会执行 done() 方法，而 QueueingFuture 恰巧重写了 FutureTask 的 done() 方法：
+
+![1583165-20200812090900299-142620864](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/java-core-demo/20210323235342.png)
+
+方法实现很简单，就是将 task 放到阻塞队列中
+
+```java
+protected void done() { 
+  completionQueue.add(task); 
+}
+```
+
+执行到此的 task 已经是前序步骤 set 过结果的 task，所以就可以通过消费阻塞队列获取相应的结果了
+
+相信到这里，CompletionService 在你面前应该没什么秘密可言了
+
+### CompletionService 的主要用途
+
+在 JDK docs 上明确给了两个例子来说明 CompletionService 的用途：
+
+> 假设你有一组针对某个问题的solvers，每个都返回一个类型为Result的值，并且想要并发地运行它们，处理每个返回一个非空值的结果，在某些方法使用(Result r)
+
+其实就是文中开头的使用方式
+
+```java
+ void solve(Executor e,
+            Collection<Callable<Result>> solvers)
+     throws InterruptedException, ExecutionException {
+     CompletionService<Result> ecs
+         = new ExecutorCompletionService<Result>(e);
+     for (Callable<Result> s : solvers)
+         ecs.submit(s);
+     int n = solvers.size();
+     for (int i = 0; i < n; ++i) {
+         Result r = ecs.take().get();
+         if (r != null)
+             use(r);
+     }
+ }
+```
+
+> 假设你想使用任务集的第一个非空结果，忽略任何遇到异常的任务，并在第一个任务准备好时取消所有其他任务
+
+```java
+void solve(Executor e,
+            Collection<Callable<Result>> solvers)
+     throws InterruptedException {
+     CompletionService<Result> ecs
+         = new ExecutorCompletionService<Result>(e);
+     int n = solvers.size();
+     List<Future<Result>> futures
+         = new ArrayList<Future<Result>>(n);
+     Result result = null;
+     try {
+         for (Callable<Result> s : solvers)
+             futures.add(ecs.submit(s));
+         for (int i = 0; i < n; ++i) {
+             try {
+                 Result r = ecs.take().get();
+                 if (r != null) {
+                     result = r;
+                     break;
+                 }
+             } catch (ExecutionException ignore) {}
+         }
+     }
+     finally {
+         for (Future<Result> f : futures)
+           	// 注意这里的参数给的是 true，详解同样在前序 Future 源码分析文章中
+             f.cancel(true);
+     }
+
+     if (result != null)
+         use(result);
+ }
+```
+
+这两种方式都是非常经典的 CompletionService 使用 **范式** ，请大家仔细品味每一行代码的用意
+
+范式没有说明 Executor 的使用，使用 ExecutorCompletionService，需要自己创建线程池，看上去虽然有些麻烦，但好处是你可以让多个 ExecutorCompletionService 的线程池隔离，这种隔离性能避免几个特别耗时的任务拖垮整个应用的风险 （这也是我们反复说过多次的，**不要所有业务共用一个线程池**）
+
+### 总结
+
+CompletionService 的应用场景还是非常多的，比如
+
+- Dubbo 中的 Forking Cluster
+- 多仓库文件/镜像下载（从最近的服务中心下载后终止其他下载过程）
+- 多服务调用（天气预报服务，最先获取到的结果）
+
+CompletionService 不但能满足获取最快结果，还能起到一定 "load balancer" 作用，获取可用服务的结果，使用也非常简单， 只需要遵循范式即可
+
+
+
+## 技术文章
+
+[Java线程池实现原理及其在美团业务中的实践](https://tech.meituan.com/2020/04/02/java-pooling-pratice-in-meituan.html)
