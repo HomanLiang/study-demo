@@ -128,8 +128,7 @@ public class SynchronizedDemo implements Runnable {
 class Account {
   private int balance;
   // 转账
-  synchronized void transfer(
-      Account target, int amt){
+  synchronized void transfer(Account target, int amt){
     if (this.balance > amt) {
       this.balance -= amt;
       target.balance += amt;
@@ -1018,6 +1017,33 @@ J.U.C 包提供了一个带有标记的**原子引用类 `AtomicStampedReference
 > - **可重入代码** - 也叫纯代码。如果一个方法，它的 **返回结果是可以预测的**，即只要输入了相同的数据，就能返回相同的结果，那它就满足可重入性，当然也是线程安全的。
 > - **线程本地存储** - 使用 **`ThreadLocal` 为共享变量在每个线程中都创建了一个本地副本**，这个副本只能被当前线程访问，其他线程无法访问，那么自然是线程安全的。
 
+**理解误区**
+
+> ThreadLocal为解决多线程程序的并发问题提供了一种新的思路；
+>
+> ThreadLocal的目的是为了解决多线程访问资源时的共享问题。
+
+结论：ThreadLocal 并不是像上面所说为了解决多线程 **共享**变量的问题。
+
+**正确理解**
+
+ThreadLoal 变量，它的基本原理是，同一个 ThreadLocal 所包含的对象（对ThreadLocal< StringBuilder >而言即为 StringBuilder 类型变量），在不同的 Thread 中有不同的副本（实际上是不同的实例）:
+
+- 因为每个 Thread 内有自己的实例副本，且该副本只能由当前 Thread 使用；
+- 既然其它 Thread 不可访问，那就不存在多线程间共享的问题。
+
+官方文档是这样描述的：
+
+![16f0756eb974cc8f](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/java-core-demo/20210324210853.jpg)
+
+我看完之后，得出这样的结论
+
+> ThreadLocal 提供了线程本地的实例。它与普通变量的区别在于，每个使用该变量的线程都会初始化一个完全独立的实例副本。ThreadLocal 变量通常被`private static`修饰。当一个线程结束时，它所使用的所有 ThreadLocal 相对的实例副本都会被回收。
+
+因此**ThreadLocal 非常适用于这样的场景：每个线程需要自己独立的实例且该实例需要在多个方法中使用**。当然，使用其它方式也可以实现同样的效果，但是看完这篇文章，你会发现 ThreadLocal 会让实现更简洁、更优雅！
+
+
+
 ### 5.1. ThreadLocal 的应用
 
 `ThreadLocal` 的方法：
@@ -1121,7 +1147,29 @@ public class ThreadLocalDemo {
 
 ### 5.2. ThreadLocal 的原理
 
-#### 存储结构
+#### 5.2.1 存储结构
+**方案一**
+
+我们大胆猜想一下，既然每个访问 ThreadLocal 变量的线程都有自己的一个“本地”实例副本。一个可能的方案是 ThreadLocal 维护一个 Map，Key 是当前线程，Value是ThreadLocal在当前线程内的实例。这样，线程通过该 ThreadLocal 的 get() 方案获取实例时，只需要以线程为键，从 Map 中找出对应的实例即可。该方案如下图所示
+
+![VarMap](https://user-gold-cdn.xitu.io/2019/12/15/16f0756f7c2e9912?imageView2/0/w/1280/h/960/format/webp/ignore-error/1)
+
+这个方案可以满足上文提到的每个线程内部都有一个ThreadLocal 实例备份的要求。每个新线程访问该 ThreadLocal 时，都会向 Map 中添加一个新的映射，而当每个线程结束时再清除该线程对应的映射。But，这样就存在两个问题：
+
+- 开启线程与结束线程时我们都需要及时更新 Map，因此必需保证 Map 的线程安全。
+- 当线程结束时，需要保证它所访问的所有 ThreadLocal 中对应的映射均删除，否则可能会引起内存泄漏。
+
+线程安全问题是JDK 未采用该方案的一个主要原因。
+
+**方案二**
+
+上面这个方案，存在多线程访问同一个 Map时可能会出现的同步问题。如果该 Map 由 Thread 维护，从而使得每个 Thread 只访问自己的 Map，就不存在这个问题。该方案如下图所示。
+
+![ThreadMap](https://user-gold-cdn.xitu.io/2019/12/15/16f0756fbeacc1d2?imageView2/0/w/1280/h/960/format/webp/ignore-error/1)
+
+该方案虽然没有锁的问题，但是由于每个线程在访问ThreadLocal 变量后，都会在自己的 Map 内维护该 ThreadLocal 变量与具体实例的映射，如果不删除这些引用（映射），就有可能会造成内存泄漏的问题。我们一起来看一下Jdk8是如何解决这个问题的。
+
+
 
 **`Thread` 类中维护着一个 `ThreadLocal.ThreadLocalMap` 类型的成员** `threadLocals`。这个成员就是用来存储当前线程独占的变量副本。
 
@@ -1152,30 +1200,148 @@ static class ThreadLocalMap {
 }
 ```
 
-#### 如何解决 Hash 冲突
+#### 5.2.2 如何解决 Hash 冲突
 
 `ThreadLocalMap` 虽然是类似 `Map` 结构的数据结构，但它并没有实现 `Map` 接口。它不支持 `Map` 接口中的 `next` 方法，这意味着 `ThreadLocalMap` 中解决 Hash 冲突的方式并非 **拉链表** 方式。
 
 实际上，**`ThreadLocalMap` 采用线性探测的方式来解决 Hash 冲突**。所谓线性探测，就是根据初始 key 的 hashcode 值确定元素在 table 数组中的位置，如果发现这个位置上已经被其他的 key 值占用，则利用固定的算法寻找一定步长的下个位置，依次判断，直至找到能够存放的位置。
 
-#### 内存泄漏问题
+#### 5.2.3 ThreadLocal 在 JDK 8 中的实现
 
-`ThreadLocalMap` 的 `Entry` 继承了 `WeakReference`，所以它的 **key （`ThreadLocal` 对象）是弱引用，而 value （变量副本）是强引用**。
+##### 5.2.3.1 ThreadLocalMap与内存泄漏
 
-- 如果 `ThreadLocal` 对象没有外部强引用来引用它，那么 `ThreadLocal` 对象会在下次 GC 时被回收。
-- 此时，`Entry` 中的 key 已经被回收，但是 value 由于是强引用不会被垃圾收集器回收。如果创建 `ThreadLocal` 的线程一直持续运行，那么 value 就会一直得不到回收，产生**内存泄露**。
-
-那么如何避免内存泄漏呢？方法就是：**使用 `ThreadLocal` 的 `set` 方法后，显示的调用 `remove` 方法** 。
+在该方案中，Map 由 ThreadLocal 类的静态内部类 ThreadLocalMap 提供。该类的实例维护某个 ThreadLocal 与具体实例的映射。与 HashMap 不同的是，ThreadLocalMap 的每个 **Entry** 都是一个对 **Key** 的弱引用，这一点我们可以从`super(k)`可看出。另外，每个 Entry 中都包含了一个对 **Value** 的强引用。
 
 ```
-ThreadLocal<String> threadLocal = new ThreadLocal();
-try {
-    threadLocal.set("xxx");
-    // ...
-} finally {
-    threadLocal.remove();
+static class Entry extends WeakReference<ThreadLocal<?>> {
+  /** The value associated with this ThreadLocal. */
+  Object value;
+
+  Entry(ThreadLocal<?> k, Object v) {
+    super(k);
+    value = v;
+  }
 }
 ```
+
+之所以使用弱引用，是因为当没有强引用指向 ThreadLocal 变量时，这个变量就可以被回收，就避免ThreadLocal 因为不能被回收而造成的内存泄漏的问题。
+
+但是，这里又可能出现另外一种内存泄漏的问题。ThreadLocalMap 维护 ThreadLocal 变量与具体实例的映射，当 ThreadLocal 变量被回收后，该映射的键变为 null，该 Entry 无法被移除。从而使得实例被该 Entry 引用而无法被回收造成内存泄漏。
+
+![1824337-20200829092808143-824603771](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/java-core-demo/20210324212220.png)
+
+**注意：**Entry是对 ThreadLocal 类型的弱引用，并不是具体实例的弱引用，因此还存在具体实例相关的内存泄漏的问题。
+
+##### 5.2.3.2 读取实例
+
+我们来看一下ThreadLocal获取实例的方法
+
+```
+public T get() {
+  Thread t = Thread.currentThread();
+  ThreadLocalMap map = getMap(t);
+  if (map != null) {
+    ThreadLocalMap.Entry e = map.getEntry(this);
+    if (e != null) {
+      @SuppressWarnings("unchecked")
+      T result = (T)e.value;
+      return result;
+    }
+  }
+  return setInitialValue();
+}
+```
+
+当线程获取实例时，首先会通过`getMap(t)`方法获取自身的 ThreadLocalMap。从如下该方法的定义可见，该 ThreadLocalMap 的实例是 Thread 类的一个字段，即由 Thread 维护 ThreadLocal 对象与具体实例的映射，这一点与上文分析一致。
+
+```
+ThreadLocalMap getMap(Thread t) {
+  return t.threadLocals;
+}
+```
+
+获取到 ThreadLocalMap 后，通过`map.getEntry(this)`方法获取该 ThreadLocal 在当前线程的 ThreadLocalMap 中对应的 Entry。该方法中的 this 即当前访问的 ThreadLocal 对象。
+
+如果获取到的 Entry 不为 null，从 Entry 中取出值即为所需访问的本线程对应的实例。如果获取到的 Entry 为 null，则通过`setInitialValue()`方法设置该 ThreadLocal 变量在该线程中对应的具体实例的初始值。
+
+##### 5.2.3.3 设置初始值
+
+设置初始值方法如下
+
+```
+private T setInitialValue() {
+  T value = initialValue();
+  Thread t = Thread.currentThread();
+  ThreadLocalMap map = getMap(t);
+  if (map != null)
+    map.set(this, value);
+  else
+    createMap(t, value);
+  return value;
+}
+```
+
+该方法为 private 方法，无法被重载。
+
+首先，通过`initialValue()`方法获取初始值。该方法为 public 方法，且默认返回 null。所以典型用法中常常重载该方法。上例中即在内部匿名类中将其重载。
+
+然后拿到该线程对应的 ThreadLocalMap 对象，若该对象不为 null，则直接将该 ThreadLocal 对象与对应实例初始值的映射添加进该线程的 ThreadLocalMap中。若为 null，则先创建该 ThreadLocalMap 对象再将映射添加其中。
+
+这里并不需要考虑 ThreadLocalMap 的线程安全问题。因为每个线程有且只有一个 ThreadLocalMap 对象，并且只有该线程自己可以访问它，其它线程不会访问该 ThreadLocalMap，也即该对象不会在多个线程中共享，也就不存在线程安全的问题。
+
+##### 5.2.3.4 设置实例
+
+除了通过`initialValue()`方法设置实例的初始值，还可通过 set 方法设置线程内实例的值，如下所示。
+
+```
+public void set(T value) {
+  Thread t = Thread.currentThread();
+  ThreadLocalMap map = getMap(t);
+  if (map != null)
+    map.set(this, value);
+  else
+    createMap(t, value);
+}
+```
+
+该方法先获取该线程的 ThreadLocalMap 对象，然后直接将 ThreadLocal 对象（即代码中的 this）与目标实例的映射添加进 ThreadLocalMap 中。当然，如果映射已经存在，就直接覆盖。另外，如果获取到的 ThreadLocalMap 为 null，则先创建该 ThreadLocalMap 对象。
+
+##### 5.2.3.5 防止内存泄漏
+
+对于已经不再被使用且已被回收的 ThreadLocal 对象，它在每个线程内对应的实例由于被线程的 ThreadLocalMap 的 Entry 强引用，无法被回收，可能会造成内存泄漏。
+
+针对该问题，ThreadLocalMap 的 set 方法中，通过 replaceStaleEntry 方法将所有键为 null 的 Entry 的值设置为 null，从而使得该值可被回收。另外，会在 rehash 方法中通过 expungeStaleEntry 方法将键和值为 null 的 Entry 设置为 null 从而使得该 Entry 可被回收。
+
+```
+private void set(ThreadLocal<?> key, Object value) {
+  Entry[] tab = table;
+  int len = tab.length;
+  int i = key.threadLocalHashCode & (len-1);
+
+  for (Entry e = tab[i]; e != null; e = tab[i = nextIndex(i, len)]) {
+    ThreadLocal<?> k = e.get();
+    if (k == key) {
+      e.value = value;
+      return;
+    }
+    if (k == null) {
+      replaceStaleEntry(key, value, i);
+      return;
+    }
+  }
+  tab[i] = new Entry(key, value);
+  int sz = ++size;
+  if (!cleanSomeSlots(i, sz) && sz >= threshold)
+    rehash();
+}
+```
+
+##### 5.2.3.6 ThreadLocal正确的使用方法
+
+- 每次使用完ThreadLocal都调用它的remove()方法清除数据
+- 将ThreadLocal变量定义成private static，这样就一直存在ThreadLocal的强引用，也就能保证任何时候都能通过ThreadLocal的弱引用访问到Entry的value值，进而清除掉 。
+
+
 
 ### 5.3. ThreadLocal 的误区
 
@@ -1224,8 +1390,6 @@ server.tomcat.max-threads=1
 
 当访问 id = 2 时，before 的应答不是 null，而是 1，不符合预期。
 
-
-
 【分析】实际情况和预期存在偏差。Spring Boot 程序运行在 Tomcat 中，执行程序的线程是 Tomcat 的工作线程，而 Tomcat 的工作线程是基于线程池的。**线程池会重用固定的几个线程，一旦线程重用，那么很可能首次从** **ThreadLocal 获取的值是之前其他用户的请求遗留的值。这时，ThreadLocal 中的用户信息就是其他用户的信息**。
 
 **并不能认为没有显式开启多线程就不会有线程安全问题**。使用类似 ThreadLocal 工具来存放一些数据时，需要特别注意在代码运行完后，显式地去清空设置的数据。
@@ -1257,3 +1421,197 @@ server.tomcat.max-threads=1
 `ThreadLocal` 中每个线程拥有它自己独占的数据。与 `ThreadLocal` 不同的是，`InheritableThreadLocal` 允许一个线程以及该线程创建的所有子线程都可以访问它保存的数据。
 
 > 原理参考：[Java 多线程：InheritableThreadLocal 实现原理](https://blog.csdn.net/ni357103403/article/details/51970748)
+
+### 5.5.总结
+
+- ThreadLocal 并不解决线程间共享数据的问题
+- ThreadLocal 通过隐式的在不同线程内创建独立实例副本避免了实例线程安全的问题
+- 每个线程持有一个 Map 并维护了 ThreadLocal 对象与具体实例的映射，该 Map 由于只被持有它的线程访问，故不存在线程安全以及锁的问题
+- ThreadLocalMap 的 Entry 对 ThreadLocal 的引用为弱引用，避免了 ThreadLocal 对象无法被回收的问题
+- ThreadLocalMap 的 set 方法通过调用 replaceStaleEntry 方法回收键为 null 的 Entry 对象的值（即为具体实例）以及 Entry 对象本身从而防止内存泄漏
+- ThreadLocal 适用于变量在线程间隔离且在方法间共享的场景
+
+## 6.TimeUnit枚举
+
+TimeUnit是java.util.concurrent包下面的一个枚举类，TimeUnit提供了可读性更好的线程暂停操作。
+
+在JDK5之前，一般我们暂停线程是这样写的：
+
+```
+Thread.sleep（2400000）//可读性差
+```
+
+可读性相当的差，一眼看去，不知道睡了多久；
+
+在JDK5之后，我们可以这样写：
+
+```
+ TimeUnit.SECONDS.sleep(4);
+ TimeUnit.MINUTES.sleep(4);
+ TimeUnit.HOURS.sleep(1);
+ TimeUnit.DAYS.sleep(1);
+```
+
+清晰明了；
+
+另外，TimeUnit还提供了便捷方法用于把时间转换成不同单位，例如，如果你想把秒转换成毫秒，你可以使用下面代码
+
+```
+TimeUnit.SECONDS.toMillis(44);// 44,000
+```
+
+
+
+
+## 面试题
+
+### Java中提供了synchronized，为什么还要提供Lock呢？
+
+**再造轮子？**
+
+既然JVM中提供了synchronized关键字来保证只有一个线程能够访问同步代码块，为何还要提供Lock接口呢？这是在重复造轮子吗？Java的设计者们为何要这样做呢？让我们一起带着疑问往下看。
+
+**为何提供Lock接口？**
+
+很多小伙伴可能会听说过，在Java 1.5版本中，synchronized的性能不如Lock，但在Java 1.6版本之后，synchronized做了很多优化，性能提升了不少。那既然synchronized关键字的性能已经提升了，那为何还要使用Lock呢？
+
+如果我们向更深层次思考的话，就不难想到了：我们使用synchronized加锁是无法主动释放锁的，这就会涉及到死锁的问题。
+
+**死锁问题**
+
+如果要发生死锁，则必须存在以下四个必要条件，四者缺一不可。
+
+![20200916002614352](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/java-core-demo/20210324214505.jpg)
+
+- **互斥条件**
+
+  在一段时间内某资源仅为一个线程所占有。此时若有其他线程请求该资源，则请求线程只能等待。
+
+- **不可剥夺条件**
+
+  线程所获得的资源在未使用完毕之前，不能被其他线程强行夺走，即只能由获得该资源的线程自己来释放（只能是主动释放)。
+
+- **请求与保持条件**
+
+  线程已经保持了至少一个资源，但又提出了新的资源请求，而该资源已被其他线程占有，此时请求线程被阻塞，但对自己已获得的资源保持不放。
+
+- **循环等待条件**
+
+  在发生死锁时必然存在一个进程等待队列{P1,P2,…,Pn},其中P1等待P2占有的资源，P2等待P3占有的资源，…，Pn等待P1占有的资源，形成一个进程等待环路，环路中每一个进程所占有的资源同时被另一个申请，也就是前一个进程占有后一个进程所深情地资源。
+
+**synchronized的局限性**
+
+如果我们的程序使用synchronized关键字发生了死锁时，synchronized关键是是无法破坏“不可剥夺”这个死锁的条件的。这是因为synchronized申请资源的时候， 如果申请不到， 线程直接进入阻塞状态了， 而线程进入阻塞状态， 啥都干不了， 也释放不了线程已经占有的资源。
+
+然而，在大部分场景下，我们都是希望“不可剥夺”这个条件能够被破坏。也就是说对于“不可剥夺”这个条件，占用部分资源的线程进一步申请其他资源时， 如果申请不到， 可以主动释放它占有的资源， 这样不可剥夺这个条件就破坏掉了。
+
+如果我们自己重新设计锁来解决synchronized的问题，我们该如何设计呢？
+
+**解决问题**
+
+了解了synchronized的局限性之后，如果是让我们自己实现一把同步锁，我们该如何设计呢？也就是说，我们在设计锁的时候，要如何解决synchronized的局限性问题呢？这里，我觉得可以从三个方面来思考这个问题。
+
+![20200916002629808](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/java-core-demo/20210324214538.jpg)
+
+1. **能够响应中断**
+
+   synchronized的问题是， 持有锁A后， 如果尝试获取锁B失败， 那么线程就进入阻塞状态， 一旦发生死锁， 就没有任何机会来唤醒阻塞的线程。 但如果阻塞状态的线程能够响应中断信号， 也就是说当我们给阻塞的线程发送中断信号的时候， 能够唤醒它， 那它就有机会释放曾经持有的锁A。 这样就破坏了不可剥夺条件了。
+
+2. **支持超时**
+
+    如果线程在一段时间之内没有获取到锁， 不是进入阻塞状态， 而是返回一个错误， 那这个线程也有机会释放曾经持有的锁。 这样也能破坏不可剥夺条件。
+
+3. **非阻塞地获取锁**
+
+    如果尝试获取锁失败， 并不进入阻塞状态， 而是直接返回， 那这个线程也有机会释放曾经持有的锁。 这样也能破坏不可剥夺条件。
+
+体现在Lock接口上，就是Lock接口提供的三个方法，如下所示。
+
+```java
+// 支持中断的API
+void lockInterruptibly() throws InterruptedException;
+// 支持超时的API
+boolean tryLock(long time, TimeUnit unit) throws InterruptedException;
+// 支持非阻塞获取锁的API
+boolean tryLock();
+```
+
+- lockInterruptibly()
+
+  支持中断。
+
+- tryLock()
+
+  tryLock()方法是有返回值的，它表示用来尝试获取锁，如果获取成功，则返回true，如果获取失败（即锁已被其他线程获取），则返回false，也就说这个方法无论如何都会立即返回。在拿不到锁时不会一直在那等待。
+
+- tryLock(long time, TimeUnit unit)
+
+  tryLock(long time, TimeUnit unit)方法和tryLock()方法是类似的，只不过区别在于这个方法在拿不到锁时会等待一定的时间，在时间期限之内如果还拿不到锁，就返回false。如果一开始拿到锁或者在等待期间内拿到了锁，则返回true。
+
+也就是说，对于死锁问题，Lock能够破坏不可剥夺的条件，例如，我们下面的程序代码就破坏了死锁的不可剥夺的条件。
+
+```java
+public class TansferAccount{
+    private Lock thisLock = new ReentrantLock();
+    private Lock targetLock = new ReentrantLock();
+    //账户的余额
+    private Integer balance;
+    //转账操作
+    public void transfer(TansferAccount target, Integer transferMoney){
+        boolean isThisLock = thisLock.tryLock();
+        if(isThisLock){
+            try{
+                boolean isTargetLock = targetLock.tryLock();
+                if(isTargetLock){
+                    try{
+                         if(this.balance >= transferMoney){
+                            this.balance -= transferMoney;
+                            target.balance += transferMoney;
+                        }   
+                    }finally{
+                        targetLock.unlock
+                    }
+                }
+            }finally{
+                thisLock.unlock();
+            }
+        }
+    }
+}
+```
+
+例外，Lock下面有一个ReentrantLock，而ReentrantLock支持公平锁和非公平锁。
+
+在使用ReentrantLock的时候， ReentrantLock中有两个构造函数， 一个是无参构造函数， 一个是传入fair参数的构造函数。 fair参数代表的是锁的公平策略， 如果传入true就表示需要构造一个公平锁， 反之则表示要构造一个非公平锁。如下代码片段所示。
+
+```java
+//无参构造函数： 默认非公平锁
+public ReentrantLock() {
+	sync = new NonfairSync();
+} 
+//根据公平策略参数创建锁
+public ReentrantLock(boolean fair){
+	sync = fair ? new FairSync() : new NonfairSync();
+}
+```
+
+锁的实现在本质上都对应着一个入口等待队列， 如果一个线程没有获得锁， 就会进入等待队列， 当有线程释放锁的时候， 就需要从等待队列中唤醒一个等待的线程。 如果是公平锁， 唤醒的策略就是谁等待的时间长， 就唤醒谁， 很公平； 如果是非公平锁， 则不提供这个公平保证， 有可能等待时间短的线程反而先被唤醒。 而Lock是支持公平锁的，synchronized不支持公平锁。
+
+最后，值得注意的是，在使用Lock加锁时，一定要在finally{}代码块中释放锁，例如，下面的代码片段所示。
+
+```java
+try{
+    lock.lock();
+}finally{
+    lock.unlock();
+}
+```
+
+
+
+
+
+
+
+
+

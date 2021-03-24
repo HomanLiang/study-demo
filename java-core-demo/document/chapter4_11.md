@@ -6,7 +6,7 @@
 
 ## 一、Java 并发简介
 
-
+### 1.如果你这样回答“什么是线程安全”，面试官都会对你刮目相看
 
 
 
@@ -103,13 +103,15 @@ public class Test {
 - volatile不会造成线程阻塞，synchronized可能会造成线程的阻塞，所以后面才有锁优化那么多故事~
 - 哈哈，你还有补充嘛~
 
+### 10.Java中提供了synchronized，为什么还要提供Lock呢？
+
 
 
 ## 四、Java 并发锁
 
-1.读写锁可以用于什么应用场景？
+### 1.读写锁可以用于什么应用场景？
 
-
+### 2.说说Java锁有哪些种类，以及区别
 
 
 
@@ -141,7 +143,7 @@ public class Test {
 
 ## 八、Java 并发工具类
 
-
+### 1.你真的理解CountDownLatch与CyclicBarrier使用场景吗？
 
 ## 九、Java 内存模型
 

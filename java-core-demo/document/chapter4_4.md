@@ -955,6 +955,8 @@ public static class WriteLock implements Lock, java.io.Serializable {
 
 ## 5. StampedLock
 
+### 5.1 简介
+
 ReadWriteLock 支持两种模式：一种是读锁，一种是写锁。而 StampedLock 支持三种模式，分别是：**写锁**、**悲观读锁**和**乐观读**。其中，写锁、悲观读锁的语义和 ReadWriteLock 的写锁、读锁的语义非常类似，允许多个线程同时获取悲观读锁，但是只允许一个线程获取写锁，写锁和悲观读锁是互斥的。不同的是：StampedLock 里的写锁和悲观读锁加锁成功之后，都会返回一个 stamp；然后解锁的时候，需要传入这个 stamp。
 
 > 注意这里，用的是“乐观读”这个词，而不是“乐观读锁”，是要提醒你，**乐观读这个操作是无锁的**，所以相比较 ReadWriteLock 的读锁，乐观读的性能更好一些。
@@ -969,6 +971,8 @@ StampedLock 的性能之所以比 ReadWriteLock 还要好，其关键是 **Stamp
 - **StampedLock 不支持重入**
 - StampedLock 的悲观读锁、写锁都不支持条件变量。
 - 如果线程阻塞在 StampedLock 的 readLock() 或者 writeLock() 上时，此时调用该阻塞线程的 interrupt() 方法，会导致 CPU 飙升。**使用 StampedLock 一定不要调用中断操作，如果需要支持中断功能，一定使用可中断的悲观读锁 readLockInterruptibly() 和写锁 writeLockInterruptibly()**。
+
+### 5.2 示例
 
 【示例】StampedLock 阻塞时，调用 interrupt() 导致 CPU 飙升
 
@@ -1035,6 +1039,123 @@ try {
   sl.unlockWrite(stamp);
 }
 ```
+
+### 5.3 使用场景和注意事项
+
+对于读多写少的高并发场景 `StampedLock `的性能很好，通过乐观读模式很好的解决了写线程“饥饿”的问题，我们可以使用`StampedLock `来代替`ReentrantReadWriteLock` ，但是需要注意的是 **StampedLock 的功能仅仅是 ReadWriteLock 的子集**，在使用的时候，还是有几个地方需要注意一下。
+
+1. `StampedLock `是不可重入锁，使用过程中一定要注意；
+2. 悲观读、写锁都不支持条件变量 `Conditon` ，当需要这个特性的时候需要注意；
+3. 如果线程阻塞在 StampedLock 的 readLock() 或者 writeLock() 上时，此时调用该阻塞线程的 interrupt() 方法，会导致 CPU 飙升。所以，**使用 StampedLock 一定不要调用中断操作，如果需要支持中断功能，一定使用可中断的悲观读锁 readLockInterruptibly() 和写锁 writeLockInterruptibly()**。这个规则一定要记清楚。
+
+### 5.4 原理分析
+
+![3715140683-346ed056f18c3bb1_fix732](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/java-core-demo/20210324224708.png)
+
+我们发现它并不像其他锁一样通过定义内部类继承 `AbstractQueuedSynchronizer`抽象类然后子类实现模板方法实现同步逻辑。但是实现思路还是有类似，依然使用了 CLH 队列来管理线程，通过同步状态值 state 来标识锁的状态。
+
+其内部定义了很多变量，这些变量的目的还是跟 `ReentrantReadWriteLock` 一样，将状态为按位切分，通过位运算对 state 变量操作用来区分同步状态。
+
+比如写锁使用的是第八位为 1 则表示写锁，读锁使用 0-7 位，所以一般情况下获取读锁的线程数量为 1-126，超过以后，会使用 readerOverflow int 变量保存超出的线程数。
+
+**自旋优化**
+
+对多核 CPU 也进行一定优化，NCPU 获取核数，当核数目超过 1 的时候，线程获取锁的重试、入队钱的重试都有自旋操作。主要就是通过内部定义的一些变量来判断，如图所示。
+
+#### 5.4.1 等待队列
+
+队列的节点通过 WNode 定义，如上图所示。等待队列的节点相比 AQS 更简单，只有三种状态分别是：
+
+- 0：初始状态；
+- -1：等待中；
+- 取消；
+
+另外还有一个字段 cowait ，通过该字段指向一个栈，保存读线程。结构如图所示
+
+![814893817-b02b66feef7df3ee_fix732](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/java-core-demo/20210324224824.png)
+
+同时定义了两个变量分别指向头结点与尾节点。
+
+```
+/** Head of CLH queue */
+private transient volatile WNode whead;
+/** Tail (last) of CLH queue */
+private transient volatile WNode wtail;
+```
+
+另外有一个需要注意点就是 cowait， 保存所有的读节点数据，使用的是头插法。
+
+当读写线程竞争形成等待队列的数据如下图所示：
+
+![3543527026-55b4ba58fa4594ac_fix732](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/java-core-demo/20210324224833.png)
+
+#### 5.4.2 获取写锁
+
+```
+public long writeLock() {
+    long s, next;  // bypass acquireWrite in fully unlocked case only
+    return ((((s = state) & ABITS) == 0L &&
+             U.compareAndSwapLong(this, STATE, s, next = s + WBIT)) ?
+            next : acquireWrite(false, 0L));
+}
+```
+
+获取写锁，如果获取失败则构建节点放入队列，同时阻塞线程，需要注意的时候该方法不响应中断，如需中断需要调用 `writeLockInterruptibly()`。否则会造成高 CPU 占用的问题。
+
+`(s = state) & ABITS` 标识读锁和写锁未被使用，那么久直接执行 `U.compareAndSwapLong(this, STATE, s, next = s + WBIT))` CAS 操作将第八位设置 1，标识写锁占用成功。CAS失败的话则调用 `acquireWrite(false, 0L)`加入等待队列，同时将线程阻塞。
+
+另外`acquireWrite(false, 0L)` 方法很复杂，运用大量自旋操作，比如自旋入队列。
+
+#### 5.4.3 获取读锁
+
+```
+public long readLock() {
+    long s = state, next;  // bypass acquireRead on common uncontended case
+    return ((whead == wtail && (s & ABITS) < RFULL &&
+             U.compareAndSwapLong(this, STATE, s, next = s + RUNIT)) ?
+            next : acquireRead(false, 0L));
+}
+```
+
+**获取读锁关键步骤**
+
+`(whead == wtail && (s & ABITS) < RFULL`如果队列为空并且读锁线程数未超过限制，则通过 `U.compareAndSwapLong(this, STATE, s, next = s + RUNIT))`CAS 方式修改 state 标识获取读锁成功。
+
+否则调用 `acquireRead(false, 0L)` 尝试使用自旋获取读锁，获取不到则进入等待队列。
+
+**acquireRead**
+
+当 A 线程获取了写锁，B 线程去获取读锁的时候，调用 acquireRead 方法，则会加入阻塞队列，并阻塞 B 线程。方法内部依然很复杂，大致流程梳理后如下：
+
+1. 如果写锁未被占用，则立即尝试获取读锁，通过CAS修改状态为标志成功则直接返回。
+2. 如果写锁被占用，则将当前线程包装成 WNode 读节点，并插入等待队列。**如果是写线程节点则直接放入队尾，否则放入队尾专门存放读线程的 WNode cowait 指向的栈**。栈结构是头插法的方式插入数据，最终唤醒读节点，从栈顶开始。
+
+#### 5.4.4 释放锁
+
+无论是 `unlockRead` 释放读锁还是 `unlockWrite`释放写锁，总体流程基本都是通过 CAS 操作，修改 state 成功后调用 release 方法唤醒等待队列的头结点的后继节点线程。
+
+1. 想将头结点等待状态设置为 0 ，标识即将唤醒后继节点。
+2. 唤醒后继节点通过CAS方式获取锁，如果是读节点则会唤醒 cowait 锁指向的栈所有读节点。
+
+**释放读锁**
+
+`unlockRead(long stamp)` 如果传入的 stamp 与锁持有的 stamp 一致，则释放非排它锁，内部主要是通过自旋 + CAS 修改 state 成功，在修改 state 之前做了判断是否超过读线程数限制，若是小于限制才通过CAS 修改 state 同步状态，接着调用 release 方法唤醒 whead 的后继节点。
+
+**释放写锁**
+
+`unlockWrite(long stamp)` 如果传入的 stamp 与锁持有的 stamp 一致，则释放写锁，whead 不为空，且当前节点状态 status ！= 0 则调用 release 方法唤醒头结点的后继节点线程。
+
+### 5.5 总结
+
+StampedLock 并不能完全代替`ReentrantReadWriteLock` ，在读多写少的场景下因为乐观读的模式，允许一个写线程获取写锁，解决了写线程饥饿问题，大大提高吞吐量。
+
+在使用乐观读的时候需要注意按照编程模型模板方式去编写，否则很容易造成死锁或者意想不到的线程安全问题。
+
+它不是可重入锁，且不支持条件变量 `Conditon`。并且线程阻塞在 readLock() 或者 writeLock() 上时，此时调用该阻塞线程的 interrupt() 方法，会导致 CPU 飙升。如果需要中断线程的场景，一定要注意调用**悲观读锁 readLockInterruptibly() 和写锁 writeLockInterruptibly()**。
+
+另外唤醒线程的规则和 AQS 类似，先唤醒头结点，不同的是 `StampedLock `唤醒的节点是读节点的时候，会唤醒此读节点的 cowait 锁指向的栈的所有读节点，但是唤醒与插入的顺序相反。
+
+
 
 ## 6. AQS
 
@@ -1284,9 +1405,94 @@ ReadWriteLock 对程序性能的提高主要受制于如下几个因素：
 3. 有多少线程竞争
 4. 是否在多处理机器上运行
 
+### 2.说说Java锁有哪些种类，以及区别
 
+#### 公平锁/非公平锁
 
+- 公平锁是指多个线程按照申请锁的顺序来获取锁。
+- 非公平锁是指多个线程获取锁的顺序并不是按照申请锁的顺序，有可能后申请的线程比先申请的线程优先获取锁。有可能，会造成优先级反转或者饥饿现象。
 
+对于Java ReentrantLock而言，通过构造函数指定该锁是否是公平锁，默认是非公平锁。非公平锁的优点在于吞吐量比公平锁大。
+
+对于Synchronized而言，也是一种非公平锁。由于其并不像ReentrantLock是通过AQS的来实现线程调度，所以并没有任何办法使其变成公平锁。
+
+#### 可重入锁
+
+可重入锁又名递归锁，是指在同一个线程在外层方法获取锁的时候，在进入内层方法会自动获取锁。说的有点抽象，下面会有一个代码的示例。
+
+- 对于Java ReentrantLock而言, 他的名字就可以看出是一个可重入锁，其名字是Re entrant Lock重新进入锁。
+
+- 对于Synchronized而言，也是一个可重入锁。可重入锁的一个好处是可一定程度避免死锁。
+
+  
+
+```
+synchronized void setA() throws Exception{
+    Thread.sleep(1000);
+    setB();
+}
+
+synchronized void setB() throws Exception{
+    Thread.sleep(1000);
+}
+```
+
+上面的代码就是一个可重入锁的一个特点，如果不是可重入锁的话，setB可能不会被当前线程执行，可能造成死锁。
+
+#### 独享锁/共享锁
+
+- 独享锁是指该锁一次只能被一个线程所持有。
+- 共享锁是指该锁可被多个线程所持有。
+
+对于Java ReentrantLock而言，其是独享锁。但是对于Lock的另一个实现类ReadWriteLock，其读锁是共享锁，其写锁是独享锁。
+
+- 读锁的共享锁可保证并发读是非常高效的，读写，写读 ，写写的过程是互斥的。
+- 独享锁与共享锁也是通过AQS来实现的，通过实现不同的方法，来实现独享或者共享。
+
+对于Synchronized而言，当然是独享锁。
+
+#### 互斥锁/读写锁
+
+上面讲的独享锁/共享锁就是一种广义的说法，互斥锁/读写锁就是具体的实现。
+
+- 互斥锁在Java中的具体实现就是ReentrantLock
+- 读写锁在Java中的具体实现就是ReadWriteLock
+
+#### 乐观锁/悲观锁
+
+乐观锁与悲观锁不是指具体的什么类型的锁，而是指看待并发同步的角度。
+
+- **悲观锁认为对于同一个数据的并发操作**，一定是会发生修改的，哪怕没有修改，也会认为修改。因此对于同一个数据的并发操作，悲观锁采取加锁的形式。悲观的认为，不加锁的并发操作一定会出问题。
+- **乐观锁则认为对于同一个数据的并发操作**，是不会发生修改的。在更新数据的时候，会采用尝试更新，不断重新的方式更新数据。乐观的认为，不加锁的并发操作是没有事情的。
+
+从上面的描述我们可以看出，悲观锁适合写操作非常多的场景，乐观锁适合读操作非常多的场景，不加锁会带来大量的性能提升。
+
+- **悲观锁在Java中的使用，就是利用各种锁。**
+- **乐观锁在Java中的使用，是无锁编程**，常常采用的是CAS算法，典型的例子就是原子类，通过CAS自旋实现原子操作的更新。
+
+#### 分段锁
+
+分段锁其实是一种锁的设计，并不是具体的一种锁，对于ConcurrentHashMap而言，其并发的实现就是通过分段锁的形式来实现高效的并发操作。
+
+我们以ConcurrentHashMap来说一下分段锁的含义以及设计思想，**ConcurrentHashMap中的分段锁称为Segment，它即类似于HashMap（JDK7与JDK8中HashMap的实现）的结构，即内部拥有一个Entry数组，数组中的每个元素又是一个链表；****同时又是一个ReentrantLock（Segment继承了ReentrantLock)。**
+
+当需要put元素的时候，并不是对整个hashmap进行加锁，而是先通过hashcode来知道他要放在那一个分段中，然后对这个分段进行加锁，所以当多线程put的时候，只要不是放在一个分段中，就实现了真正的并行的插入。
+
+但是，在统计size的时候，可就是获取hashmap全局信息的时候，就需要获取所有的分段锁才能统计。
+
+分段锁的设计目的是细化锁的粒度，当操作不需要更新整个数组的时候，就仅仅针对数组中的一项进行加锁操作。
+
+#### 偏向锁/轻量级锁/重量级锁
+
+这三种锁是指锁的状态，并且是针对Synchronized。在Java 5通过引入锁升级的机制来实现高效Synchronized。这三种锁的状态是通过对象监视器在对象头中的字段来表明的。
+
+- 偏向锁是指一段同步代码一直被一个线程所访问，那么该线程会自动获取锁。降低获取锁的代价。
+- 轻量级锁是指当锁是偏向锁的时候，被另一个线程所访问，偏向锁就会升级为轻量级锁，其他线程会通过自旋的形式尝试获取锁，不会阻塞，提高性能。
+- 重量级锁是指当锁为轻量级锁的时候，另一个线程虽然是自旋，但自旋不会一直持续下去，当自旋一定次数的时候，还没有获取到锁，就会进入阻塞，该锁膨胀为重量级锁。重量级锁会让其他申请的线程进入阻塞，性能降低。
+
+#### 自旋锁
+
+在Java中，自旋锁是指尝试获取锁的线程不会立即阻塞，而是采用循环的方式去尝试获取锁，这样的好处是减少线程上下文切换的消耗，缺点是循环会消耗CPU。
 
 
 
