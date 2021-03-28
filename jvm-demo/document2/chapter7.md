@@ -36,7 +36,7 @@ jps [-help]
 常用参数：
 
 - `option` - 选项参数
-- `-m` - 输出 JVM 启动时传递给 main() 的参数。
+	- `-m` - 输出 JVM 启动时传递给 main() 的参数。
   - `-l` - 输出主类的全名，如果进程执行的是 jar 包，输出 jar 路径。
   - `-v` - 显示传递给 JVM 的参数。
   - `-q` - 仅输出本地 JVM 进程 ID。
@@ -89,7 +89,7 @@ jstat [option] VMID [interval] [count]
 常用参数：
 
 - `option` - 选项参数，用于指定用户需要查询的虚拟机信息
-- `-class` - 监视类装载、卸载数量、总空间以及类装载所耗费的时间
+	- `-class` - 监视类装载、卸载数量、总空间以及类装载所耗费的时间
   - `-compiler`：显示 JIT 编译的相关信息；
   - `-gc`：监视 Java 堆状况，包括 Eden 区、两个 survivor 区、老年代、永久代等区的容量、已用空间、GC 时间合计等信息。
   - `-gccapacity`：显示各个代的容量以及使用情况；
@@ -225,7 +225,7 @@ jmap [option] pid
 - `-permstat` - to print permanent generation statistics
 - `-F` - 当-dump 没有响应时，强制生成 dump 快照
 
-### 3.2. jstat 使用示例
+### 3.2. jmap 使用示例
 
 #### 生成 heapdump 快照
 

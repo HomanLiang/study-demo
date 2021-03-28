@@ -879,4 +879,61 @@ JVM 规范中运行时数据区域中的**方法区**，在 HotSpot 虚拟机中
 
 ## 面试题
 
-- 
+### 1.守护线程是什么？守护线程和非守护线程的区别是？守护线程的作用是？
+
+**「守护线程」**是区别于用户线程哈，**「用户线程」**即我们手动创建的线程，而守护线程是程序运行的时候在后台提供一种**「通用服务的线程」**。垃圾回收线程就是典型的守护线程。
+
+**「守护线程和非守护线程的区别是？」** 我们通过例子来看吧~
+
+```
+
+    public static void main(String[] args) throws InterruptedException {
+        Thread t1 = new Thread(()-> {
+                while (true) {
+                    try {
+                        Thread.sleep(1000);
+                        System.out.println("我是子线程(用户线程.I am running");
+                    } catch (Exception e) {
+                    }
+                }
+        });
+        //标记为守护线程
+        t1.setDaemon(true);
+        //启动线程
+        t1.start();
+
+        Thread.sleep(3000);
+        System.out.println("主线程执行完毕...");
+    }
+```
+
+运行结果：
+
+![图片](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/jvm-demo/20210328114000.webp)
+
+可以发现标记为守护线程后，**「主线程销毁停止，守护线程一起销毁」**。我们再看下，去掉 t1.setDaemon(true)守护标记的效果：
+
+```
+    public static void main(String[] args) throws InterruptedException {
+        Thread t1 = new Thread(()-> {
+                while (true) {
+                    try {
+                        Thread.sleep(1000);
+                        System.out.println("我是子线程(用户线程.I am running");
+                    } catch (Exception e) {
+                    }
+                }
+        });
+        //启动线程
+        t1.start();
+
+        Thread.sleep(3000);
+        System.out.println("主线程执行完毕...");
+    }
+```
+
+![图片](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/jvm-demo/20210328114007.png)
+
+所以，当主线程退出时，JVM 也跟着退出运行，守护线程同时也会被回收，即使是死循环。如果是用户线程，它会一直停在死循环跑。这就是**「守护线程和非守护线程的区别」**啦。
+
+守护线程拥有**「自动结束自己生命周期的特性」**，非守护线程却没有。如果垃圾回收线程是非守护线程，当JVM 要退出时，由于垃圾回收线程还在运行着，导致程序无法退出，这就很尴尬。这就是**「为什么垃圾回收线程需要是守护线程啦」**。

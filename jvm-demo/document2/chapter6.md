@@ -25,7 +25,7 @@ GC 优化的两个目标：
 
 GC 优化的基本原则是：将不同的 GC 参数应用到两个及以上的服务器上然后比较它们的性能，然后将那些被证明可以提高性能或减少 GC 执行时间的参数应用于最终的工作服务器上。
 
-#### 降低 Minor GC 频率
+#### 1.2.1.降低 Minor GC 频率
 
 如果新生代空间较小，Eden 区很快被填满，就会导致频繁 Minor GC，因此我们可以通过增大新生代空间来降低 Minor GC 的频率。
 
@@ -39,7 +39,7 @@ GC 优化的基本原则是：将不同的 GC 参数应用到两个及以上的�
 
 如果在堆内存中存在较多的长期存活的对象，此时增加年轻代空间，反而会增加 Minor GC 的时间。如果堆中的短期对象很多，那么扩容新生代，单次 Minor GC 时间不会显著增加。因此，单次 Minor GC 时间更多取决于 GC 后存活对象的数量，而非 Eden 区的大小。
 
-#### 降低 Full GC 的频率
+#### 1.2.2.降低 Full GC 的频率
 
 Full GC 相对来说会比 Minor GC 更耗时。减少进入老年代的对象数量可以显著降低 Full GC 的频率。
 
@@ -49,7 +49,7 @@ Full GC 相对来说会比 Minor GC 更耗时。减少进入老年代的对象�
 
 **增大堆内存空间：**在堆内存不足的情况下，增大堆内存空间，且设置初始化堆内存为最大堆内存，也可以降低 Full GC 的频率。
 
-#### 降低 Full GC 的时间
+#### 1.2.3.降低 Full GC 的时间
 
 Full GC 的执行时间比 Minor GC 要长很多，因此，如果在 Full GC 上花费过多的时间（超过 1s），将可能出现超时错误。
 
@@ -58,19 +58,7 @@ Full GC 的执行时间比 Minor GC 要长很多，因此，如果在 Full GC �
 
 因此，你**需要把老年代的大小设置成一个“合适”的值**。
 
-**GC 优化需要考虑的 JVM 参数**
 
-| **类型**       | **参数**            | **描述**                      |
-| -------------- | ------------------- | ----------------------------- |
-| 堆内存大小     | `-Xms`              | 启动 JVM 时堆内存的大小       |
-|                | `-Xmx`              | 堆内存最大限制                |
-| 新生代空间大小 | `-XX:NewRatio`      | 新生代和老年代的内存比        |
-|                | `-XX:NewSize`       | 新生代内存大小                |
-|                | `-XX:SurvivorRatio` | Eden 区和 Survivor 区的内存比 |
-
-GC 优化时最常用的参数是`-Xms`,`-Xmx`和`-XX:NewRatio`。`-Xms`和`-Xmx`参数通常是必须的，所以`NewRatio`的值将对 GC 性能产生重要的影响。
-
-有些人可能会问**如何设置永久代内存大小**，你可以用`-XX:PermSize`和`-XX:MaxPermSize`参数来进行设置，但是要记住，只有当出现`OutOfMemoryError`错误时你才需要去设置永久代内存。
 
 ### 1.3. GC 优化的过程
 
@@ -408,3 +396,301 @@ address 即为远程 debug 的监听端口。
 | `-Xloggc:<filename>`              | 指定 GC 日志文件名       |
 | `-XX:+HeapDumpOnOutOfMemoryError` | 内存溢出时输出堆快照文件 |
 
+
+
+## 4.常用参数设置
+
+### 4.1.虚拟机参数
+
+| **参数名称**                | **含义**                                                   | **默认值**           | 解释说明                                                     |
+| :-------------------------- | :--------------------------------------------------------- | :------------------- | :----------------------------------------------------------- |
+| -Xms                        | 初始堆大小                                                 | 物理内存的1/64(<1GB) | 默认(MinHeapFreeRatio参数可以调整)空余堆内存小于40%时，JVM就会增大堆直到-Xmx的最大限制. |
+| -Xmx                        | 最大堆大小                                                 | 物理内存的1/4(<1GB)  | 默认(MaxHeapFreeRatio参数可以调整)空余堆内存大于70%时，JVM会减少堆直到 -Xms的最小限制 |
+| -Xmn                        | 年轻代大小(1.4or lator)                                    |                      | **注意**：此处的大小是（eden+ 2 survivor space).与jmap -heap中显示的New gen是不同的。 整个堆大小=年轻代大小 + 年老代大小 + 持久代大小. 增大年轻代后,将会减小年老代大小.此值对系统性能影响较大,Sun官方推荐配置为整个堆的3/8 |
+| -XX:NewSize                 | 设置年轻代大小(for 1.3/1.4)                                |                      |                                                              |
+| -XX:MaxNewSize              | 年轻代最大值(for 1.3/1.4)                                  |                      |                                                              |
+| -XX:PermSize                | 设置持久代(perm gen)初始值                                 | 物理内存的1/64       |                                                              |
+| -XX:MaxPermSize             | 设置持久代最大值                                           | 物理内存的1/4        |                                                              |
+| -Xss                        | 每个线程的堆栈大小                                         |                      | JDK5.0以后每个线程堆栈大小为1M,以前每个线程堆栈大小为256K.更具应用的线程所需内存大小进行 调整.在相同物理内存下,减小这个值能生成更多的线程.但是操作系统对一个进程内的线程数还是有限制的,不能无限生成,经验值在3000~5000左右 一般小的应用， 如果栈不是很深， 应该是128k够用的 大的应用建议使用256k。这个选项对性能影响比较大，需要严格的测试。 和threadstacksize选项解释很类似,官方文档似乎没有解释,在论坛中有这样一句话:"” -Xss is translated in a VM flag named ThreadStackSize” 一般设置这个值就可以了。 |
+| -*XX:ThreadStackSize*       | Thread Stack Size                                          |                      | (0 means use default stack size) [Sparc: 512; Solaris x86: 320 (was 256 prior in 5.0 and earlier); Sparc 64 bit: 1024; Linux amd64: 1024 (was 0 in 5.0 and earlier); all others 0.] |
+| -XX:NewRatio                | 年轻代(包括Eden和两个Survivor区)与年老代的比值(除去持久代) |                      | -XX:NewRatio=4表示年轻代与年老代所占比值为1:4,年轻代占整个堆栈的1/5 Xms=Xmx并且设置了Xmn的情况下，该参数不需要进行设置。 |
+| -XX:SurvivorRatio           | Eden区与Survivor区的大小比值                               |                      | 设置为8,则两个Survivor区与一个Eden区的比值为2:8,一个Survivor区占整个年轻代的1/10 |
+| -XX:LargePageSizeInBytes    | 内存页的大小不可设置过大， 会影响Perm的大小                |                      | =128m                                                        |
+| -XX:+UseFastAccessorMethods | 原始类型的快速优化                                         |                      |                                                              |
+| -XX:+DisableExplicitGC      | 关闭System.gc()                                            |                      | 这个参数需要严格的测试                                       |
+| -XX:MaxTenuringThreshold    | 垃圾最大年龄                                               |                      | 如果设置为0的话,则年轻代对象不经过Survivor区,直接进入年老代. 对于年老代比较多的应用,可以提高效率.如果将此值设置为一个较大值,则年轻代对象会在Survivor区进行多次复制,这样可以增加对象再年轻代的存活 时间,增加在年轻代即被回收的概率 该参数只有在串行GC时才有效. |
+| -XX:+AggressiveOpts         | 加快编译                                                   |                      |                                                              |
+| -XX:+UseBiasedLocking       | 锁机制的性能改善                                           |                      |                                                              |
+| -Xnoclassgc                 | 禁用垃圾回收                                               |                      |                                                              |
+| -XX:SoftRefLRUPolicyMSPerMB | 每兆堆空闲空间中SoftReference的存活时间                    | 1s                   | softly reachable objects will remain alive for some amount of time after the last time they were referenced. The default value is one second of lifetime per free megabyte in the heap |
+| -XX:PretenureSizeThreshold  | 对象超过多大是直接在旧生代分配                             | 0                    | 单位字节 新生代采用Parallel Scavenge GC时无效 另一种直接在旧生代分配的情况是大的数组对象,且数组中无外部引用对象. |
+| -XX:TLABWasteTargetPercent  | TLAB占eden区的百分比                                       | 1%                   |                                                              |
+| -XX:+*CollectGen0First*     | FullGC时是否先YGC                                          | false                |                                                              |
+
+### 4.2.并行收集器相关参数
+
+| **参数名称**                | **含义**                                          | **默认值** | 解释说明                                                     |
+| :-------------------------- | :------------------------------------------------ | :--------- | :----------------------------------------------------------- |
+| -XX:+UseParallelGC          | Full GC采用parallel MSC (此项待验证)              |            | 选择垃圾收集器为并行收集器.此配置仅对年轻代有效.即上述配置下,年轻代使用并发收集,而年老代仍旧使用串行收集.(此项待验证) |
+| -XX:+UseParNewGC            | 设置年轻代为并行收集                              |            | 可与CMS收集同时使用 JDK5.0以上,JVM会根据系统配置自行设置,所以无需再设置此值 |
+| -XX:ParallelGCThreads       | 并行收集器的线程数                                |            | 此值最好配置与处理器数目相等 同样适用于CMS                   |
+| -XX:+UseParallelOldGC       | 年老代垃圾收集方式为并行收集(Parallel Compacting) |            | 这个是JAVA 6出现的参数选项                                   |
+| -XX:MaxGCPauseMillis        | 每次年轻代垃圾回收的最长时间(最大暂停时间)        |            | 如果无法满足此时间,JVM会自动调整年轻代大小,以满足此值.       |
+| -XX:+UseAdaptiveSizePolicy  | 自动选择年轻代区大小和相应的Survivor区比例        |            | 设置此选项后,并行收集器会自动选择年轻代区大小和相应的Survivor区比例,以达到目标系统规定的最低相应时间或者收集频率等,此值建议使用并行收集器时,一直打开. |
+| -XX:GCTimeRatio             | 设置垃圾回收时间占程序运行时间的百分比            |            | 公式为1/(1+n)                                                |
+| -XX:+*ScavengeBeforeFullGC* | Full GC前调用YGC                                  | true       | Do young generation GC prior to a full GC. (Introduced in 1.4.1.) |
+
+### 4.3.CMS处理器参数设置
+
+| **参数名称**                           | **含义**                                  | **默认值** | 解释说明                                                     |
+| :------------------------------------- | :---------------------------------------- | :--------- | :----------------------------------------------------------- |
+| -XX:+UseConcMarkSweepGC                | 使用CMS内存收集                           |            | 测试中配置这个以后,-XX:NewRatio=4的配置失效了,原因不明.所以,此时年轻代大小最好用-Xmn设置.??? |
+| -XX:+AggressiveHeap                    |                                           |            | 试图是使用大量的物理内存 长时间大内存使用的优化，能检查计算资源（内存， 处理器数量） 至少需要256MB内存 大量的CPU／内存， （在1.4.1在4CPU的机器上已经显示有提升） |
+| -XX:CMSFullGCsBeforeCompaction         | 多少次后进行内存压缩                      |            | 由于并发收集器不对内存空间进行压缩,整理,所以运行一段时间以后会产生"碎片",使得运行效率降低.此值设置运行多少次GC以后对内存空间进行压缩,整理. |
+| -XX:+CMSParallelRemarkEnabled          | 降低标记停顿                              |            |                                                              |
+| -XX+UseCMSCompactAtFullCollection      | 在FULL GC的时候， 对年老代的压缩          |            | CMS是不会移动内存的， 因此， 这个非常容易产生碎片， 导致内存不够用， 因此， 内存的压缩这个时候就会被启用。 增加这个参数是个好习惯。 可能会影响性能,但是可以消除碎片 |
+| -XX:+UseCMSInitiatingOccupancyOnly     | 使用手动定义初始化定义开始CMS收集         |            | 禁止hostspot自行触发CMS GC                                   |
+| -XX:CMSInitiatingOccupancyFraction=70  | 使用cms作为垃圾回收 使用70％后开始CMS收集 | 92         | 为了保证不出现promotion failed(见下面介绍)错误,该值的设置需要满足以下公式**[CMSInitiatingOccupancyFraction计算公式](http://www.cnblogs.com/redcreen/archive/2011/05/04/2037057.html#CMSInitiatingOccupancyFraction_value)** |
+| -XX:CMSInitiatingPermOccupancyFraction | 设置Perm Gen使用到达多少比率时触发        | 92         |                                                              |
+| -XX:+CMSIncrementalMode                | 设置为增量模式                            |            | 用于单CPU情况                                                |
+| -XX:+CMSClassUnloadingEnabled          |                                           |            |                                                              |
+
+### 4.4.JVM辅助信息参数设置
+
+| **参数名称**                          | **含义**                                                 | **默认值** | 解释说明                                                     |
+| :------------------------------------ | :------------------------------------------------------- | :--------- | :----------------------------------------------------------- |
+| -XX:+PrintGC                          |                                                          |            | 输出形式:[GC 118250K->113543K(130112K), 0.0094143 secs] [Full GC 121376K->10414K(130112K), 0.0650971 secs] |
+| -XX:+PrintGCDetails                   |                                                          |            | 输出形式:[GC [DefNew: 8614K->781K(9088K), 0.0123035 secs] 118250K->113543K(130112K), 0.0124633 secs] [GC [DefNew: 8614K->8614K(9088K), 0.0000665 secs][Tenured: 112761K->10414K(121024K), 0.0433488 secs] 121376K->10414K(130112K), 0.0436268 secs] |
+| -XX:+PrintGCTimeStamps                |                                                          |            |                                                              |
+| -XX:+PrintGC:PrintGCTimeStamps        |                                                          |            | 可与-XX:+PrintGC -XX:+PrintGCDetails混合使用 输出形式:11.851: [GC 98328K->93620K(130112K), 0.0082960 secs] |
+| -XX:+PrintGCApplicationStoppedTime    | 打印垃圾回收期间程序暂停的时间.可与上面混合使用          |            | 输出形式:Total time for which application threads were stopped: 0.0468229 seconds |
+| -XX:+PrintGCApplicationConcurrentTime | 打印每次垃圾回收前,程序未中断的执行时间.可与上面混合使用 |            | 输出形式:Application time: 0.5291524 seconds                 |
+| -XX:+PrintHeapAtGC                    | 打印GC前后的详细堆栈信息                                 |            |                                                              |
+| -Xloggc:filename                      | 把相关日志信息记录到文件以便分析. 与上面几个配合使用     |            |                                                              |
+| -XX:+PrintClassHistogram              | garbage collects before printing the histogram.          |            |                                                              |
+| -XX:+PrintTLAB                        | 查看TLAB空间的使用情况                                   |            |                                                              |
+| XX:+PrintTenuringDistribution         | 查看每次minor GC后新的存活周期的阈值                     |            | Desired survivor size 1048576 bytes, new threshold 7 (max 15) new threshold 7即标识新的存活周期的阈值为7。 |
+
+### 4.5.JVM GC垃圾回收器参数设置
+
+JVM给出了3种选择：**串行收集器**、**并行收集器**、**并发收集器**。串行收集器只适用于小数据量的情况，所以生产环境的选择主要是并行收集器和并发收集器。默认情况下JDK5.0以前都是使用串行收集器，如果想使用其他收集器需要在启动时加入相应参数。JDK5.0以后，JVM会根据当前系统配置进行智能判断。
+
+**串行收集器**
+-XX:+UseSerialGC：设置串行收集器。
+
+**并行收集器（吞吐量优先）**
+-XX:+UseParallelGC：设置为并行收集器。此配置仅对年轻代有效。即年轻代使用并行收集，而年老代仍使用串行收集。
+
+-XX:ParallelGCThreads=20：配置并行收集器的线程数，即：同时有多少个线程一起进行垃圾回收。此值建议配置与CPU数目相等。
+
+-XX:+UseParallelOldGC：配置年老代垃圾收集方式为并行收集。JDK6.0开始支持对年老代并行收集。
+
+-XX:MaxGCPauseMillis=100：设置每次年轻代垃圾回收的最长时间（单位毫秒）。如果无法满足此时间，JVM会自动调整年轻代大小，以满足此时间。
+
+-XX:+UseAdaptiveSizePolicy：设置此选项后，并行收集器会自动调整年轻代Eden区大小和Survivor区大小的比例，以达成目标系统规定的最低响应时间或者收集频率等指标。此参数建议在使用并行收集器时，一直打开。
+并发收集器（响应时间优先）
+
+**并行收集器**
+
+-XX:+UseConcMarkSweepGC：即CMS收集，设置年老代为并发收集。CMS收集是JDK1.4后期版本开始引入的新GC算法。它的主要适合场景是对响应时间的重要性需求大于对吞吐量的需求，能够承受垃圾回收线程和应用线程共享CPU资源，并且应用中存在比较多的长生命周期对象。CMS收集的目标是尽量减少应用的暂停时间，减少Full GC发生的几率，利用和应用程序线程并发的垃圾回收线程来标记清除年老代内存。
+
+-XX:+UseParNewGC：设置年轻代为并发收集。可与CMS收集同时使用。JDK5.0以上，JVM会根据系统配置自行设置，所以无需再设置此参数。
+
+-XX:CMSFullGCsBeforeCompaction=0：由于并发收集器不对内存空间进行压缩和整理，所以运行一段时间并行收集以后会产生内存碎片，内存使用效率降低。此参数设置运行0次Full GC后对内存空间进行压缩和整理，即每次Full GC后立刻开始压缩和整理内存。
+
+-XX:+UseCMSCompactAtFullCollection：打开内存空间的压缩和整理，在Full GC后执行。可能会影响性能，但可以消除内存碎片。
+
+-XX:+CMSIncrementalMode：设置为增量收集模式。一般适用于单CPU情况。
+
+-XX:CMSInitiatingOccupancyFraction=70：表示年老代内存空间使用到70%时就开始执行CMS收集，以确保年老代有足够的空间接纳来自年轻代的对象，避免Full GC的发生。
+
+**其它垃圾回收参数**
+
+-XX:+ScavengeBeforeFullGC：年轻代GC优于Full GC执行。
+
+-XX:-DisableExplicitGC：不响应 System.gc() 代码。
+
+-XX:+UseThreadPriorities：启用本地线程优先级API。即使 java.lang.Thread.setPriority() 生效，不启用则无效。
+
+-XX:SoftRefLRUPolicyMSPerMB=0：软引用对象在最后一次被访问后能存活0毫秒（JVM默认为1000毫秒）。
+
+-XX:TargetSurvivorRatio=90：允许90%的Survivor区被占用（JVM默认为50%）。提高对于Survivor区的使用率。
+
+### 4.6.JVM参数优先级
+
+-Xmn，-XX:NewSize/-XX:MaxNewSize，-XX:NewRatio 3组参数都可以影响年轻代的大小，混合使用的情况下，优先级是什么？
+
+答案如下：
+
+> 高优先级：-XX:NewSize/-XX:MaxNewSize
+> 中优先级：-Xmn（默认等效 -Xmn=-XX:NewSize=-XX:MaxNewSize=?）
+> 低优先级：-XX:NewRatio
+>
+> 推荐使用-Xmn参数，原因是这个参数简洁，相当于一次设定 NewSize/MaxNewSIze，而且两者相等，适用于生产环境。-Xmn 配合 -Xms/-Xmx，即可将堆内存布局完成。
+>
+> -Xmn参数是在JDK 1.4 开始支持。
+
+下面用一些小案例加深理解:
+
+HelloGC是java代码编译后的一个class文件,代码:
+
+```
+public class T01_HelloGC {
+    public static void main(String[] args) {
+
+        for(int i=0; i<10000; i++) {
+            byte[] b = new byte[1024 * 1024];
+        }
+    }
+}
+```
+
+1.java -XX:+PrintCommandLineFlags HelloGC
+
+```
+[root@localhost courage]# java -XX:+PrintCommandLineFlags T01_HelloGC
+-XX:InitialHeapSize=61780800 -XX:MaxHeapSize=988492800 -XX:+PrintCommandLineFlags -XX
+:+UseCompressedClassPointers -XX:+UseCompressedOops -XX:+UseParallelGC 
+```
+
+2.
+
+```
+java -Xmn10M -Xms40M -Xmx60M -XX:+PrintCommandLineFlags -XX:+PrintGC  HelloGC
+PrintGCDetails PrintGCTimeStamps PrintGCCauses
+```
+
+结果:
+
+```
+-XX:InitialHeapSize=41943040 -XX:MaxHeapSize=62914560 -XX:MaxNewSize=10485760 -XX:NewSize=10485760 -XX:+PrintCommandLineFlags -XX:+PrintGC -XX:+UseCompressedClassPointers -XX:+UseCompressedOops 
+-XX:+UseParallelGC[GC (Allocation Failure)  7839K->392K(39936K), 0.0015452 secs]
+[GC (Allocation Failure)  7720K->336K(39936K), 0.0005439 secs]
+[GC (Allocation Failure)  7656K->336K(39936K), 0.0005749 secs]
+[GC (Allocation Failure)  7659K->368K(39936K), 0.0005095 secs]
+[GC (Allocation Failure)  7693K->336K(39936K), 0.0004385 secs]
+[GC (Allocation Failure)  7662K->304K(40448K), 0.0028468 secs]
+......
+```
+
+命令解释:
+
+> java:表示使用java执行器执行
+> -Xmn10M :表示设置年轻代值为10M
+> -Xms40M :表示设置堆内存的最小Heap值为40M
+> -Xmx60M :表示设置堆内存的最大Heap值为60M
+> -XX:+PrintCommandLineFlags:打印显式隐式参数,就是结果前三行
+> -XX:+PrintGC : 打印垃圾回收有关信息
+> HelloGC :这是需要执行的启动类
+> PrintGCDetails :打印GC详细信息
+> PrintGCTimeStamps :打印GC时间戳
+> PrintGCCauses	:打印GC产生的原因
+
+结果解释:
+
+[![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/jvm-demo/20210328155751.png)](https://img2020.cnblogs.com/blog/2002319/202102/2002319-20210208103357164-1086413610.png)
+
+3.`java -XX:+UseConcMarkSweepGC -XX:+PrintCommandLineFlags HelloGC`
+
+表示使用CMS垃圾收集器,同时打印参数
+打印结果:
+
+```
+-XX:InitialHeapSize=61780800 
+-XX:MaxHeapSize=988492800 
+-XX:MaxNewSize=329252864 
+-XX:MaxTenuringThreshold=6 
+-XX:OldPLABSize=16 
+-XX:+PrintCommandLineFlags 
+-XX:+UseCompressedClassPointers 
+-XX:+UseCompressedOops 
+-XX:+UseConcMarkSweepGC 
+-XX:+UseParNewGC
+```
+
+1. java -XX:+PrintFlagsInitial 默认参数值
+2. java -XX:+PrintFlagsFinal 最终参数值
+3. java -XX:+PrintFlagsFinal | grep xxx 找到对应的参数
+4. java -XX:+PrintFlagsFinal -version |grep GC
+
+
+
+## JVM调优流程
+
+JVM调优,设计到三个大的方面,在服务器出现问题之前要先根据业务场景选择合适的垃圾处理器,设置不同的虚拟机参数,运行中观察GC日志,分析性能,分析问题定位问题,虚拟机排错等内容,如果服务器挂掉了,要及时生成日志文件便于找到问题所在。
+
+### 调优前的基础概念
+
+目前的垃圾处理器中,一类是以吞吐量优先,一类是以响应时间优先:
+
+吞吐量=用户代码执行时间用户代码执行时间+垃圾回收执行时间吞吐量=用户代码执行时间用户代码执行时间+垃圾回收执行时间
+
+响应时间：STW越短，响应时间越好
+
+对吞吐量、响应时间、QPS、并发数相关概念可以参考:[吞吐量（TPS）、QPS、并发数、响应时间（RT）概念](https://www.cnblogs.com/Courage129/p/14386511.html)
+
+所谓调优，首先确定追求什么,是吞吐量? 还是追求响应时间？还是在满足一定的响应时间的情况下，要求达到多大的吞吐量,等等。一般情况下追求吞吐量的有以下领域:科学计算、数据挖掘等。吞吐量优先的垃圾处理器组合一般为：Parallel Scavenge + Parallel Old （PS + PO）。
+
+而追求响应时间的业务有：网站相关 （JDK 1.8之后 G1,之前可以ParNew + CMS + Serial Old）
+
+### 什么是调优？
+
+1. 根据需求进行JVM规划和预调优
+2. 优化运行JVM运行环境（慢，卡顿）
+3. 解决JVM运行过程中出现的各种问题(OOM)
+
+### 调优之前的规划
+
+- 调优，从业务场景开始，没有业务场景的调优都是耍流氓
+
+- 无监控（压力测试，能看到结果），不调优
+
+- 步骤：
+
+  1. 熟悉业务场景（没有最好的垃圾回收器，只有最合适的垃圾回收器）
+
+     1. 响应时间、停顿时间 [CMS G1 ZGC] （需要给用户作响应）
+     2. 吞吐量 = 用户时间 /( 用户时间 + GC时间) [PS+PO]
+
+  2. 选择回收器组合
+
+  3. 计算内存需求（经验值 1.5G 16G）
+
+  4. 选定CPU（越高越好）
+
+  5. 设定年代大小、升级年龄
+
+  6. 设定日志参数
+
+     1. 
+
+        ```
+        -Xloggc:/opt/xxx/logs/xxx-xxx-gc-%t.log 
+        -XX:+UseGCLogFileRotation 
+        -XX:NumberOfGCLogFiles=5 
+        -XX:GCLogFileSize=20M 
+        -XX:+PrintGCDetails 
+        -XX:+PrintGCDateStamps 
+        -XX:+PrintGCCause
+        ```
+
+        日志参数解释说明:
+
+        > /opt/xxx/logs/xxx-xxx-gc-%t.log 中XXX表示路径,%t表示时间戳,意思是给日志文件添加一个时间标记,如果不添加的话,也就意味着每次虚拟机启动都会使用原来的日志名,那么会被重写。
+        >
+        > Rotation中文意思是循环、轮流,意味着这个GC日志会循环写
+        >
+        > GCLogFileSize=20M 指定一个日志大小为20M,太大了不利于分析,太小又会产生过多的日志文件
+        >
+        > NumberOfGCLogFiles=5 : 指定生成的日志数目
+        >
+        > PrintGCDateStamps :PrintGCDateStamps会打印具体的时间，而PrintGCTimeStamps
+        >
+        > ​	主要打印针对JVM启动的时候的相对时间，相对来说前者更消耗内存。
+
+     2. 或者每天产生一个日志文件
+
+  7. 观察日志情况
+     日志有分析工具,可视化分析工具有[GCeasy](https://gceasy.io/)和[GCViewer](https://github.com/chewiebug/GCViewer)。
+
+     ### 
