@@ -147,6 +147,7 @@ B+树是一颗`多路平衡查找树`，所有节点称为`页`，页就是一�
 - B 树中的叶子节点并不需要链表来串联。
 
 从定义上来说，B+树叶节点两两相连可大大增加区间访问性，可使用在范围查询等，而B-树每个节点 key 和 data 在一起，无法区间查找。
+
 事实上，例如oracle、MongoDB这样使用B树的数据，肯定是可以范围查询的，因为他们使用的B树也是在叶子节点存储行的位置信息，数据在逻辑上是连续的。其实，B+树就是 B树的改进版。
 
 
@@ -157,9 +158,9 @@ B+树是一颗`多路平衡查找树`，所有节点称为`页`，页就是一�
 **数据结构维度**
 
 - B+树索引：所有数据存储在叶子节点，复杂度为O(logn)，适合范围查询。
-- 哈希索引: 适合等值查询，检索效率高，一次到位。
+- 哈希索引：适合等值查询，检索效率高，一次到位。
 - 全文索引：MyISAM和InnoDB中都支持使用全文索引，一般在文本类型char,text,varchar类型上创建。
-- R-Tree索引: 用来对GIS数据类型创建SPATIAL索引
+- R-Tree索引：用来对GIS数据类型创建SPATIAL索引
 
 **物理存储维度**
 
@@ -257,9 +258,11 @@ Innodb是索引组织表。在InnoDB中，表数据文件本身就是按B+树组
 除了B+树之外，还有一种常见的是哈希索引。
 
 哈希索引就是采用一定的哈希算法，把键值换算成新的哈希值，检索时不需要类似B+树那样从根节点到叶子节点逐级查找，只需一次哈希算法即可立刻定位到相应的位置，速度非常快。
-- 本质上就是把键值换算成新的哈希值，根据这个哈希值来定位
+
+本质上就是把键值换算成新的哈希值，根据这个哈希值来定位
 ![Image [6]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mysql-demo/20210307111703.png)
 看起来哈希索引很牛逼啊，但其实哈希索引有好几个局限(根据他本质的原理可得)：
+
 - 哈希索引也没办法利用索引完成排序
 - 不支持最左匹配原则
 - 在有大量重复键值情况下，哈希索引的效率也是极低的---->哈希碰撞问题。
@@ -507,8 +510,11 @@ c的索引不包含b列，所以当c列索引查b列时就需要回表了
 
 其实就是将无序的数据变成有序(相对)：
 ![Image [3]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mysql-demo/20210307111501.png)
+
 要找到id为8的记录简要步骤：
+
 ![Image [4]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mysql-demo/20210307111602.png)
+
 很明显的是：没有用索引我们是需要遍历双向链表来定位对应的页，现在通过“目录”就可以很快地定位到对应的页上了！
 
 其实底层结构就是B+树，B+树作为树的一种实现，能够让我们很快地查找出对应的记录。
@@ -602,9 +608,13 @@ ALTER TABLE employees.titles DROP INDEX emp_no;
 这样就可以专心分析索引PRIMARY的行为了。
 
 **① 全列匹配**
+
 ![image-20210311000511100](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mysql-demo/image-20210311000511100.png)
+
 很明显，当按照索引中所有列进行精确匹配（这里精确匹配指“=”或“IN”匹配）时，索引可以被用到。这里有一点需要注意，理论上索引对顺序是敏感的，但是由于MySQL的查询优化器会自动调整where子句的条件顺序以使用适合的索引，例如我们将where中的条件顺序颠倒：
+
 ![image-20210311000534857](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mysql-demo/image-20210311000534857.png)
+
 会发现效果是一样的。
 
 ------
@@ -612,6 +622,7 @@ ALTER TABLE employees.titles DROP INDEX emp_no;
 **② 最左前缀匹配**
 
 ![image-20210311000553071](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mysql-demo/image-20210311000553071.png)
+
 当查询条件精确匹配索引的左边连续一个或几个列时，如`<emp_no>或<emp_no, title>`，索引可以被用到，但是只能用到一部分，即条件所组成的最左前缀。上面的查询从分析结果看用到了PRIMARY索引，但是key_len为4，说明只用到了索引的第一列前缀。
 
 **③ 查询条件用到了索引中列的精确匹配，但是中间某个条件未提供**
@@ -621,11 +632,17 @@ ALTER TABLE employees.titles DROP INDEX emp_no;
 此时索引使用情况和情况二相同，因为title未提供，所以查询只用到了索引的第一列，而后面的`from_date`虽然也在索引中，但是由于title不存在而无法和左前缀连接，因此需要对结果进行扫描过滤`from_date`（这里由于emp_no唯一，所以不存在扫描）。如果想让`from_date`也使用索引而不是where过滤，可以增加一个辅助索引`<emp_no, from_date>`，此时上面的查询会使用这个索引。
 
 除此之外，还可以使用一种称之为`“隔离列”`的优化方法，将`emp_no与from_date之间的“坑”`填上。首先我们看下title一共有几种不同的值：
+
 ![image-20210311000701410](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mysql-demo/image-20210311000701410.png)
+
 只有7种。在这种成为“坑”的列值比较少的情况下，可以考虑用“IN”来填补这个“坑”从而形成最左前缀：
+
 ![image-20210311000724130](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mysql-demo/image-20210311000724130.png)
+
 这次key_len为59，说明索引被用全了，但是从type和rows看出IN实际上执行了一个range查询，这里检查了7个key。看下两种查询的性能比较：
+
 ![image-20210311000743166](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mysql-demo/image-20210311000743166.png)
+
 `“填坑”`后性能提升了一点。如果经过emp_no筛选后余下很多数据，则后者性能优势会更加明显。当然，如果title的值很多，用填坑就不合适了，必须建立辅助索引。
 
 ------
@@ -662,8 +679,11 @@ ALTER TABLE employees.titles DROP INDEX emp_no;
 很不幸，如果查询条件中含有函数或表达式，则MySQL不会为这列使用索引（虽然某些在数学意义上可以使用）。例如：
 
 ![image-20210311001057019](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mysql-demo/image-20210311001057019.png)
+
 虽然这个查询和情况五中功能相同，但是由于使用了函数left，则无法为title列应用索引，而情况五中用LIKE则可以。再如：
+
 ![image-20210311001113208](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mysql-demo/image-20210311001113208.png)
+
 显然这个查询等价于查询emp_no为10001的函数，但是由于查询条件是一个表达式，MySQL无法为其使用索引。看来MySQL还没有智能到自动优化常量表达式的程度，因此在写查询语句时尽量避免表达式出现在查询中，而是先手工私下代数运算，转换为无表达式的查询语句。
 
 ------
@@ -728,7 +748,9 @@ ADD INDEX `first_name_last_name4` (first_name, last_name(4));
 上文讨论过InnoDB的索引实现，InnoDB使用聚集索引，数据记录本身被存于主索引（一颗B+Tree）的叶子节点上。这就要求同一个叶子节点内（大小为一个内存页或磁盘页）的各条数据记录按主键顺序存放，因此每当有一条新的记录插入时，MySQL会根据其主键将其插入适当的节点和位置，如果页面达到装载因子（InnoDB默认为15/16），则开辟一个新的页（节点）。
 
 如果表使用自增主键，那么每次插入新的记录，记录就会顺序添加到当前索引节点的后续位置，当一页写满，就会自动开辟一个新的页。如下图所示：
+
 ![image-20210311001455283](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mysql-demo/image-20210311001455283.png)
+
 这样就会形成一个紧凑的索引结构，近似顺序填满。由于每次插入时也不需要移动已有数据，因此效率很高，也不会增加很多开销在维护索引上。
 
 如果使用非自增主键（如果身份证号或学号等），由于每次插入主键的值近似于随机，因此每次新纪录都要被插到现有索引页得中间某个位置：
@@ -808,7 +830,7 @@ ADD INDEX `first_name_last_name4` (first_name, last_name(4));
 
 ## Cardinality
 
-使用`show index from 表名`时， 可以看到有一个Cardinality列，这个列是衡量我们`索引有效性`的方式。他的含义是索引列中不重复的行数，Cardinality除以表行数称为`索引的选择性`，`选择性越高越好`，选择性小于30%通常认为这个索引建的不好。
+使用 `show index from 表名` 时， 可以看到有一个Cardinality列，这个列是衡量我们`索引有效性`的方式。他的含义是索引列中不重复的行数，Cardinality除以表行数称为`索引的选择性`，`选择性越高越好`，选择性小于30%通常认为这个索引建的不好。
 
 Cardinality是一个`采样估计值`，会随机选择若干页计算平均不同记录的个数，然后乘上页数量。所以可能你每次查到的值不一样，即使你的表没有更新。
 
@@ -839,8 +861,10 @@ SELECT COUNT(1) FROM SomeTable
 EXPLAIN SELECT COUNT(*) FROM SomeTable
 ```
 结果如下
+
 ![Image [9]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mysql-demo/20210307112005.png)
-如图所示: 发现确实此条语句在此例中用到的并不是主键索引，而是辅助索引，实际上在此例中我试验了，不管是 COUNT(1)，还是 COUNT(*)，MySQL 都会用成本最小的辅助索引查询方式来计数，也就是使用 COUNT(*) 由于 MySQL 的优化已经保证了它的查询性能是最好的！随带提一句，COUNT(*)是 SQL92 定义的标准统计行数的语法，并且效率高，所以请直接使用COUNT(*)查询表的行数！
+
+如图所示: 发现确实此条语句在此例中用到的并不是主键索引，而是辅助索引，实际上在此例中我试验了，不管是 COUNT(1)，还是 `COUNT(*)`，MySQL 都会用成本最小的辅助索引查询方式来计数，也就是使用 COUNT(*) 由于 MySQL 的优化已经保证了它的查询性能是最好的！随带提一句，COUNT(*)是 SQL92 定义的标准统计行数的语法，并且效率高，所以请直接使用 `COUNT(*)` 查询表的行数！
 
 所以这位读者的说法确实是对的。但有个前提，在 MySQL 5.6 之后的版本中才有这种优化。
 
@@ -887,6 +911,7 @@ end
 EXPLAIN SELECT COUNT(*) FROM person
 ```
 ![Image [10]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mysql-demo/20210307112101.png)
+
 从结果上看它选择了 create_time 辅助索引，显然 MySQL 认为使用此索引进行查询成本最小，这也是符合我们的预期，使用辅助索引来查询确实是性能最高的！
 
 我们再来看以下 SQL 会使用哪个索引
@@ -894,6 +919,7 @@ EXPLAIN SELECT COUNT(*) FROM person
 SELECT * FROM person WHERE NAME >'name84059' AND create_time>'2020-05-23 14:39:18' 
 ```
 ![Image [11]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mysql-demo/20210307112202.png)
+
 用了全表扫描！理论上应该用 name_score 或者 create_time 索引才对，从 WHERE 的查询条件来看确实都能命中索引，那是否是使用 SELECT * 造成的回表代价太大所致呢，我们改成覆盖索引的形式试一下
 
 ```
@@ -914,6 +940,7 @@ SELECT create_time FROM person force index(create_time) WHERE NAME >'name84059' 
 SHOW TABLE STATUS LIKE 'person'
 ```
 ![Image [12]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mysql-demo/20210307112205.png)
+
 可以发现
 
 1. 行数是 100264，我们不是插入了 10 w 行的数据了吗，怎么算出的数据反而多了，其实这里的计算是估算，也有可能这里的行数统计出来比 10 w 少了，估算方式有兴趣大家去网上查找，这里不是本文重点，就不展开了。得知行数，那我们知道 CPU 成本是 100264 * 0.2 = 20052.8。
@@ -1103,7 +1130,7 @@ t_people表上有一个索引是姓名和年龄的联合索引，那这个联合
 
 你可以看到这个执行过程，它的回表次数特别多，性能不够好，有没有优化的方法呢？
 
-在MySQL5.6版本，引入了index condition pushdown的优化。我们来看看这个优化的执行流程：
+在MySQL5.6版本，引入了 `index condition pushdown` 的优化。我们来看看这个优化的执行流程：
 
 ![image-20210310235724015](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mysql-demo/image-20210310235724015.png)
 
@@ -1134,7 +1161,7 @@ CREATE TABLE `t_people`(
 
 首先他在people上创建一个字段叫name_first的虚拟列，然后给name_first和age上创建一个联合索引，并且，让这个虚拟列的值总是等于name字段的前两个字节，虚拟列在插入数据的时候不能指定值，在更新的时候也不能主动修改，它的值会根据定义自动生成，在name字段修改的时候也会自动修改。
 
-有了这个新的联合索引，我们在找名字的第1个字是张，并且年龄为8的小朋友的时候，这个SQL语句就可以这么写：select * from t_people where name_first='张' and age=8。
+有了这个新的联合索引，我们在找名字的第1个字是张，并且年龄为8的小朋友的时候，这个SQL语句就可以这么写：`select * from t_people where name_first='张' and age=8`
 
 这样这个语句的执行过程，就只需要扫描联合索引的100万行，并回表100万次，这个优化的本质是我们创建了一个更紧凑的索引，来加速了查询的过程。
 
@@ -1190,8 +1217,6 @@ first_name_hash的值应该具备以下要求
 修改后的SQL `selelct * from  employees where first_name_hash = CRC32(zhangsan...) and first_name = 'Facello' `
 
 并且给 first_name_hash设置所有，并带上 `first_name = ' Facello'` 为了解决hash冲突也能返回正确的结果。
-
- 
 
 但是，`selelct * from  employees where first_name like ' Facello%' `，如果是like，就不能使用上面的调优方法。
 

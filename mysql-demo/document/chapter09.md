@@ -4,7 +4,7 @@
 
 
 
-## 性能优化原则和分类
+## 1.性能优化原则和分类
 
 **性能优化一般可以分为：**
 
@@ -17,15 +17,14 @@
   而被动优化刚好与主动优化相反，它是指在发现了服务器卡顿、服务异常或者物理指标异常的情况下，才去优化的这种行为。
 
 **性能优化原则**
+
 无论是主动优化还是被动优化都要符合以下性能优化的原则：
 
 1. 优化不能改变服务运行的逻辑，要保证服务的**正确性**；
 2. 优化的过程和结果都要保证服务的**安全性**；
 3. 要保证服务的**稳定性**，不能为了追求性能牺牲程序的稳定性。比如不能为了提高 Redis 的运行速度，而关闭持久化的功能，因为这样在 Redis 服务器重启或者掉电之后会丢失存储的数据。
 
-
-
-以上原则看似都是些废话，但却给了我们一个启发，那就是我们**性能优化手段应该是：预防性能问题为主+被动优化为辅**。
+以上原则看似都是些废话，但却给了我们一个启发，那就是我们**性能优化手段应该是：预防性能问题为主 + 被动优化为辅**。
 
 也就是说，我们应该**以预防性能问题为主**，在开发阶段尽可能的规避性能问题，而**在正常情况下，应尽量避免主动优化，以防止未知的风险**（除非是为了 KPI，或者是闲的没事），尤其对生产环境而言更是如此，最后才是考虑**被动优化**。
 
@@ -33,31 +32,35 @@
 
 
 
-
-
-## 什么影响了数据库查询速度
-### 影响数据库查询速度的四个因素
+## 2.什么影响了数据库查询速度
+### 2.1.影响数据库查询速度的四个因素
 ![Image](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mysql-demo/20210307113301.png)
-### 风险分析
+### 2.2.风险分析
 > QPS： QueriesPerSecond意思是“每秒查询率”，是一台服务器每秒能够相应的查询次数，是对一个特定的查询服务器在规定时间内所处理流量多少的衡量标准。
 >
 > TPS： 是 TransactionsPerSecond的缩写，也就是事务数/秒。它是软件测试结果的测量单位。客户机在发送请求时开始计时，收到服务器响应后结束计时，以此来计算使用的时间和完成的事务个数。
 
 Tips： 最好不要在主库上数据库备份，大型活动前取消这样的计划。
 
-1. 效率低下的 sql：超高的 QPS与 TPS。
-2. 大量的并发：数据连接数被占满（ max_connection默认 100，一般把连接数设置得大一些）。 并发量:同一时刻数据库服务器处理的请求数量
+1. 效率低下的 sql：超低的 QPS与 TPS。
+
+2. 大量的并发：数据连接数被占满（ `max_connection` 默认 100，一般把连接数设置得大一些）。 
+
+   并发量:同一时刻数据库服务器处理的请求数量
+
 3. 超高的 CPU使用率： CPU资源耗尽出现宕机。
+
 4. 磁盘 IO：磁盘 IO性能突然下降、大量消耗磁盘性能的计划任务。解决：更快磁盘设备、调整计划任务、做好磁盘维护。
-### 网卡流量：如何避免无法连接数据库的情况
-减少从服务器的数量（从服务器会从主服务器复制日志）
+### 2.3.网卡流量：如何避免无法连接数据库的情况
+- 减少从服务器的数量（从服务器会从主服务器复制日志）
 
-进行分级缓存（避免前端大量缓存失效）
+- 进行分级缓存（避免前端大量缓存失效）
 
-避免使用 select* 进行查询
+- 避免使用 select* 进行查询
 
-分离业务网络和服务器网络
-### 大表带来的问题
+- 分离业务网络和服务器网络
+
+### 2.4.大表带来的问题
 **大表的特点**
 
 - 记录行数巨大，单表超千万
@@ -65,7 +68,10 @@ Tips： 最好不要在主库上数据库备份，大型活动前取消这样的
 
 **大表的危害**
 
-- 慢查询：很难在短时间内过滤出需要的数据 查询字区分度低 -> 要在大数据量的表中筛选出来其中一部分数据会产生大量的磁盘 io -> 降低磁盘效率
+- 慢查询：很难在短时间内过滤出需要的数据
+
+  查询字段区分度低 -> 要在大数据量的表中筛选出来其中一部分数据会产生大量的磁盘 io -> 降低磁盘效率
+
 - 对 DDL影响：
   - 建立索引需要很长时间：
   MySQL-v<5.5 建立索引会锁表
@@ -80,7 +86,7 @@ Tips： 最好不要在主库上数据库备份，大型活动前取消这样的
 1. 分表主键的选择
 2. 分表后跨分区数据的查询和统计
 
-### 大事务带来的问题
+### 2.5.大事务带来的问题
 **什么是事务**
 
 ![Image [2]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mysql-demo/20210307113302.png)
@@ -100,23 +106,26 @@ Tips： 最好不要在主库上数据库备份，大型活动前取消这样的
 
 
 
-## 什么影响了MySQL性能
+## 3.什么影响了MySQL性能
 
-### 影响性能的几个方面
+### 3.1.影响性能的几个方面
 1. 服务器硬件。
 2. 服务器系统（系统参数优化）。
 3. 存储引擎。 MyISAM： 不支持事务，表级锁。 InnoDB: 支持事务，支持行级锁，事务 ACID。
 4. 数据库参数配置。
 5. 数据库结构设计和SQL语句。（重点优化）
 
-### MySQL体系结构
+### 3.2.MySQL体系结构
 分三层：客户端->服务层->存储引擎  
+
 ![Image [3]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mysql-demo/20210307113403.png)
 
-1. MySQL是 插件式的存储引擎，其中存储引擎分很多种。只要实现符合mysql存储引擎的接口，可以开发自己的存储引擎!
+
+
+1. MySQL是插件式的存储引擎，其中存储引擎分很多种。只要实现符合mysql存储引擎的接口，可以开发自己的存储引擎!
 2. 所有跨存储引擎的功能都是在服务层实现的。
 3. MySQL的存储引擎是针对表的，不是针对库的。也就是说在一个数据库中可以使用不同的存储引擎。但是不建议这样做。
-### 如何选择正确的存储引擎
+### 3.3.如何选择正确的存储引擎
 参考条件：
 1. 事务
 2. 备份( Innobd免费在线备份)
@@ -127,12 +136,12 @@ Tips： 最好不要在主库上数据库备份，大型活动前取消这样的
 
 注意: 尽量别使用混合存储引擎，比如回滚会出问题在线热备问题。
 
-### 配置参数
+### 3.4.配置参数
 **内存配置相关参数**
 
 - 确定可以使用的内存上限。
 - 内存的使用上限不能超过物理内存，否则容易造成内存溢出；（对于32位操作系统，MySQL只能试用3G以下的内存。）
-- 确定MySQL的 每个连接 单独 使用的内存。
+- 确定MySQL的每个连接单独使用的内存。
 
 ```
 sort_buffer_size #定义了每个线程排序缓存区的大小，MySQL在有查询、需要做排序操作时才会为每个缓冲区分配内存（直接分配该参数的全部内存）；
@@ -141,7 +150,9 @@ read_buffer_size #定义了当对一张MyISAM进行全表扫描时所分配读�
 read_rnd_buffer_size #索引缓冲区大小，MySQL有查询需要时会为其分配内存，只会分配需要的大小。
 ```
 注意： 以上四个参数是为一个线程分配的，如果有100个连接，那么需要×100。
+
 MySQL数据库实例：
+
 - MySQL是 单进程多线程（而oracle是多进程），也就是说 MySQL实例在系统上表现就是一个服务进程，即进程；
 - MySQL实例是线程和内存组成，实例才是真正用于操作数据库文件的；
 
@@ -149,28 +160,31 @@ MySQL数据库实例：
 
 **如何为缓存池分配内存：**
 
-Innodb_buffer_pool_size，定义了Innodb所使用缓存池的大小，对其性能十分重要，必须足够大，但是过大时，使得Innodb 关闭时候需要更多时间把脏页从缓冲池中刷新到磁盘中；
-```
-总内存-（每个线程所需要的内存*连接数）-系统保留内存
-```
-key_buffer_size，定义了MyISAM所使用的缓存池的大小，由于数据是依赖存储操作系统缓存的，所以要为操作系统预留更大的内存空间；
-```
-select sum(index_length) from information_schema.talbes where engine='myisam'
-```
-注意： 即使开发使用的表全部是Innodb表，也要为MyISAM预留内存，因为MySQL系统使用的表仍然是MyISAM表。
+- `Innodb_buffer_pool_size`，定义了Innodb所使用缓存池的大小，对其性能十分重要，必须足够大，但是过大时，使得Innodb 关闭时候需要更多时间把脏页从缓冲池中刷新到磁盘中；
 
-max_connections 控制允许的最大连接数， 一般2000更大。
+    ```
+    总内存-（每个线程所需要的内存*连接数）-系统保留内存
+    ```
 
-不要使用外键约束保证数据的完整性。
-### 性能优化顺序
+- `key_buffer_size`，定义了MyISAM所使用的缓存池的大小，由于数据是依赖存储操作系统缓存的，所以要为操作系统预留更大的内存空间；
+
+    ```
+    select sum(index_length) from information_schema.talbes where engine='myisam'
+    ```
+    
+    注意： 即使开发使用的表全部是Innodb表，也要为MyISAM预留内存，因为MySQL系统使用的表仍然是MyISAM表。
+
+- `max_connections` 控制允许的最大连接数， 一般2000更大。
+
+### 3.5.性能优化顺序
 从上到下：
 ![Image [4]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mysql-demo/20210307113404.png)
 
 
 
-## 待优化SQL定位步骤
+## 4.待优化SQL定位步骤
 
-### 1、 查看SQL语句的执行次数
+### 4.1. 查看SQL语句的执行次数
 
 在MySQL中可以通过命令查看服务器该表状态信息
 
@@ -205,9 +219,9 @@ show status like 'Innodb_rows_%';
 
 ------
 
-### 2、 定位执行效率较低的SQL语句
+### 4.2.定位执行效率较低的SQL语句
 
-- 通过慢查询日志定位那些执行效率较低的 SQL 语句，用--log-slow-queries[=file_name]选 项启动时，mysqld 写一个包含所有执行时间超过 long_query_time 秒的 SQL 语句的日志 文件。
+- 通过慢查询日志定位那些执行效率较低的 SQL 语句，用 `--log-slow-queries[=file_name]` 选 项启动时，mysqld 写一个包含所有执行时间超过 `long_query_time` 秒的 SQL 语句的日志 文件。
 
 - 慢查询日志在查询结束以后才纪录，所以在应用反映执行效率出现问题的时候查询慢查 询日志并不能定位问题，可以使用show processlist命令查看当前MySQL在进行的线程， 包括线程的状态、是否锁表等，可以实时地查看 SQL 的执行情况，同时对一些锁表操 作进行优化。
 
@@ -215,20 +229,20 @@ show status like 'Innodb_rows_%';
 
   ![image-20210311224108052](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mysql-demo/20210311224108.png)
 
-  - Id：数据库连接id
-  - User：显示当前用户
-  - Host：从哪个ip的哪个端口上发的
-  - db:数据库
-  - Command：连接的状态，休眠（sleep），查询（query），连接（connect）
+  - **Id**：数据库连接id
+  - **User**：显示当前用户
+  - **Host**：从哪个ip的哪个端口上发的
+  - **db**：数据库
+  - **Command**：连接的状态，休眠（sleep），查询（query），连接（connect）
 
-  - Time：秒
-  - State：SQL语句执行状态，可能需要经过copying to tmp table、sorting result、sending data等状态才可以完成
+  - **Time**：秒
+  - **State**：SQL语句执行状态，可能需要经过 `copying to tmp table`、`sorting result`、`sending data` 等状态才可以完成
 
-  - Info：SQL语句
+  - **Info**：SQL语句
 
 ------
 
-### 3、 通过 EXPLAIN 分析低效SQL的执行计划
+### 4.3.通过 EXPLAIN 分析低效SQL的执行计划
 
 找到相应的SQL语句之后，可以EXPLALIN获取MySQL的执行信息。
 
@@ -236,16 +250,15 @@ show status like 'Innodb_rows_%';
 
 其中每个列的解释：
 
-- **id：**id相同表示加载表的执行顺序从上到下，id越大加载的优先级越高
+- **id**：id相同表示加载表的执行顺序从上到下，id越大加载的优先级越高
 
-- **select_type**:表示 SELECT 的类型，常见的取值有
-
-	- SIMPLE（简单表，即不使用表连接 或者子查询）
+- **select_type**：表示 SELECT 的类型，常见的取值有
+- SIMPLE（简单表，即不使用表连接 或者子查询）
 	- PRIMARY（主查询，即外层的查询）
 	- UNION（UNION 中的第二个或 者后面的查询语句）
 	- SUBQUERY（子查询中的第一个 SELECT）
-
-- **table**:输出结果集的表
+	
+- **table**：输出结果集的表
 
 - **type**：表示表的连接类型，性能好到坏的结果
 
@@ -257,7 +270,7 @@ show status like 'Innodb_rows_%';
 	- index_merge（索引合并优化）
 	- unique_subquery（in 的后面是一个查询主键字段的子查询）
 	- index_subquery（与 unique_subquery 类似， 区别在于 in 的后面是查询非唯一索引字段的子查询）
-	- range（单表中的范围查询）、
+	- range（单表中的范围查询）
 	- index（对于前面的每一行，都通过查询索引来得到数据）
 	- all（对于前面的每一行， 207 都通过全表扫描来得到数据）
 
@@ -270,8 +283,6 @@ show status like 'Innodb_rows_%';
 - **rows：**扫描行的数量
 
 - **Extra：**执行情况的说明和描述
-
-
 
 根据以上内容创建 `Teacher`、 `Student`表，通过ClassID关联
 
@@ -299,7 +310,7 @@ INSERT into Student(ClassId,StudentName) VALUES(204,"张三"),(205,"李四"),(20
 
 ------
 
-#### explain-id
+#### 4.3.1.explain-id
 
 （1）、**Id相同表示执行顺序从上到下**
 
@@ -321,7 +332,7 @@ explain  select *from Teacher where ClassId =( select ClassId from Student where
 
 ------
 
-#### explain select_type
+#### 4.3.2.explain select_type
 
 （1）、**SIMLPLE简单的select查询，不包含子查询或者UNION**
 
@@ -368,7 +379,7 @@ UNION指的是后面那个Select，UNION RESULT 将前面的select语句和后�
 
 ------
 
-#### explain-type
+#### 4.3.3.explain-type
 
 （1）、**NULL直接返回结果，不访问任何表索引**
 
@@ -445,7 +456,7 @@ NULL > system > const > eq_ref > ref > fulltext > ref_or_null > index_merge > un
 system > const > eq_ref > ref > range > index > ALL
 ```
 
-#### explain-key
+#### 4.3.4.explain-key
 
 ![image-20210311230422244](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mysql-demo/20210311230422.png)
 
@@ -455,11 +466,11 @@ system > const > eq_ref > ref > range > index > ALL
 
 （3）key_len：key的长度，越短越好
 
-#### explain-rows
+#### 4.3.5.explain-rows
 
 sql语句执行扫描的行数
 
-#### explain-extra
+#### 4.3.6.explain-extra
 
 （1）**using filesort** ：会对进行文件排序即内容，而不是按索引排序，效率慢
 
@@ -498,7 +509,7 @@ EXPLAIN select * from Teacher t GROUP BY teacherName;
 
 sql_mode=NO_ENGINE_SUBSTITUTION,STRICT_TRANS_TABLES
 
-### 4、 show profile分析SQL
+### 4.4.show profile分析SQL
 
 show profile可以分析sql运行的时间，通过 `have_profiling`可以查看MySQL是否支持profile
 
@@ -538,7 +549,7 @@ show profile cpu for query 2;
 
 ![image-20210311230714594](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mysql-demo/20210311230714.png)
 
-### 5、 trace分析优化器执行计划
+### 4.5.trace分析优化器执行计划
 
 Mysql有一个优化器按照规则对SQL进行优化处理，trace就是用来分析优化器的执行计划
 
@@ -761,9 +772,9 @@ select * from information_schema.optimizer_trace\G;
 
 
 
-## 性能优化方法
+## 5.性能优化方法
 
-### 单表优化
+### 5.1.单表优化
 
 除非单表数据未来会一直不断上涨，否则不要一开始就考虑拆分，拆分会带来逻辑、部署、运维的各种复杂度，一般以整型值为主的表在千万级以下，字符串为主的表在五百万以下是没有太大问题的。而事实上很多时候MySQL单表的性能依然有不少优化空间，甚至能正常支撑千万级以上的数据量：
 
@@ -800,8 +811,8 @@ ps: 据说innodb已经在mysql 5.6.4支持全文索引了
 
 #### Schema与数据类型优化
 
-1. 整数通常是标识列最好的选择，因为它们很快并且可以使用AUTO_INCREMENT
-1. 完全“随机”的字符串（如：MD5()、SHA1()或者UUID()等产生的字符串）会任意分布在很大的空间内，会导致INSERT以及一些SELECT语句变的很慢
+1. 整数通常是标识列最好的选择，因为它们很快并且可以使用 `AUTO_INCREMENT`
+1. 完全“随机”的字符串（如：`MD5()`、`SHA1()` 或者 `UUID()` 等产生的字符串）会任意分布在很大的空间内，会导致INSERT以及一些SELECT语句变的很慢
 1. 如果希望查询执行得快速且并发性好，单个查询最好不要做太多的关联查询（互联网公司非常忌讳关联查询），利用程序来完成关联操作
 1. 如果需要对一张比较大的表做表结构变更（ALTER TABLE操作增加一列），建议先拷贝一张与原表结构一样的表，再将数据复制进去，最后通过重命名将新表的表名称修改为原表的表名称。因为在变更表结构的时候很有可能会锁住整个表，并且可能会有长时间的不可用
 1. 避免多表关联的时候可以适当考虑一些反范式的建表方案，增加一些冗余字段
@@ -820,8 +831,8 @@ ps: 据说innodb已经在mysql 5.6.4支持全文索引了
 
 #### 索引
 
-- 索引并不是越多越好，要根据查询有针对性的创建，考虑在WHERE和ORDER BY命令上涉及的列建立索引，可根据EXPLAIN来查看是否用了索引还是全表扫描
-- 值分布很稀少的字段不适合建索引，例如"性别"这种只有两三个值的字段
+- 索引并不是越多越好，要根据查询有针对性的创建，考虑在 `WHERE` 和 `ORDER BY` 命令上涉及的列建立索引，可根据EXPLAIN来查看是否用了索引还是全表扫描
+- 值分布很稀少的字段不适合建索引，例如"性别"这种只有两三个值的字段--数据越不集中，并且回表数据多，速度就慢
 - 字符字段只建前缀索引
 - 字符字段最好不要做主键
 - 使用多列索引时主意顺序和查询条件保持一致，同时删除不必要的单列索引
@@ -847,13 +858,13 @@ ps: 据说innodb已经在mysql 5.6.4支持全文索引了
 
 - 使用覆盖索引（只访问索引的查询），避免使用select *
 
-	在查询的时候将*号改成需要查询的字段或者索引，减少不必要的开销，使用索引查询，`using index condition` 会将需要的字段查询出来
+	在查询的时候将 `*` 号改成需要查询的字段或者索引，减少不必要的开销，使用索引查询，`using index condition` 会将需要的字段查询出来
 
     ```
-    using index ：使用覆盖索引的时候就会出现
-    using where：在查找使用索引的情况下，需要回表去查询所需的数据
-    using index condition：查找使用了索引，但是需要回表查询数据
-    using index ; using where：查找使用了索引，但是需要的数据都在索引列中能找到，所以不需要回表查询数据
+  using index ：使用覆盖索引的时候就会出现
+  using where：在查找使用索引的情况下，需要回表去查询所需的数据
+  using index condition：查找使用了索引，但是需要回表查询数据
+  using index ; using where：查找使用了索引，但是需要的数据都在索引列中能找到，所以不需要回表查询数据
     ```
 
 - 如果有 `or`后面的字段没有索引，则整个索引失效
@@ -907,8 +918,8 @@ ps: 据说innodb已经在mysql 5.6.4支持全文索引了
 	如果一个字段中所有数据都不为空，那么查询该字段时会走索引，是少量的就会走索引，大多数不会走索引。
 
     ```mysql
-    EXPLAIN  select * from Student  where StudentName is NULL;
-    EXPLAIN  select * from Student  where StudentName is NOT NULL;
+  EXPLAIN  select * from Student  where StudentName is NULL;
+  EXPLAIN  select * from Student  where StudentName is NOT NULL;
     ```
 
 	![image-20210311231053721](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mysql-demo/20210311231053.png)
@@ -916,10 +927,11 @@ ps: 据说innodb已经在mysql 5.6.4支持全文索引了
 - in走索引、not in 不走索引，但也不是绝对的
 
 - 对于联合索引来说，要遵守最左前缀法则
-    举列来说索引含有字段id、name、school，可以直接用id字段，也可以id、name这样的顺序，但是name;school都无法使用这个索引。所以在创建联合索引的时候一定要注意索引字段顺序，常用的查询字段放在最前面。
-
-    如果不是按照索引的最左列开始查找，则无法使用索引
-
+    
+举列来说索引含有字段id、name、school，可以直接用id字段，也可以id、name这样的顺序，但是name;school都无法使用这个索引。所以在创建联合索引的时候一定要注意索引字段顺序，常用的查询字段放在最前面。
+    
+如果不是按照索引的最左列开始查找，则无法使用索引
+    
 - 所有的非聚簇索引都需要先通过索引定位到对应的主键，然后在到聚簇索引查找数据，所以在定义主键索引的时候一定要谨慎
 
 - 只有当索引的列顺序和ORDER BY子句的顺序完全一致，并且所有列的排序方向（倒序或者正序）都一样时，MySQL才能够使用索引来对结果做排序。有一种情况下ORDER BY子句可以不满足索引的最左前缀的要求，就是前导列为常量的时候。
@@ -930,7 +942,7 @@ ps: 据说innodb已经在mysql 5.6.4支持全文索引了
 
 - 对于如何选择索引的列顺序有一个经验法则：将选择性最高的列放到索引最前列
 
-- 尽可能多的使用覆盖索引（如果一个索引包含或者说覆盖所有需要查询的字段的值，我们就称之为覆盖索引），通过EXPLAIN的Extra列可以看到“Using index”信息
+- 尽可能多的使用覆盖索引（如果一个索引包含或者说覆盖所有需要查询的字段的值，我们就称之为覆盖索引），通过 `EXPLAIN` 的 `Extra` 列可以看到 `Using index` 信息
 
 - 当ID为主键时，创建索引(A)，相当于创建了(A)和(A, ID)两个索引
 
@@ -965,20 +977,35 @@ ps: 据说innodb已经在mysql 5.6.4支持全文索引了
 #### SQL优化
 
 - 可通过开启慢查询日志来找出较慢的SQL
+
 - sql语句尽可能简单：一条sql只能在一个cpu运算；大语句拆小语句，减少锁时间；一条大sql可以堵死整个库
+
 - 不用SELECT *
+
 - OR改写成IN：OR的效率是n级别，IN的效率是log(n)级别，in的个数建议控制在200以内
+
 - 不用函数和触发器，在应用程序实现
+
 - 少用JOIN
+
 - 对于连续数值，使用BETWEEN不用IN：SELECT id FROM t WHERE num BETWEEN 1 AND 5
+
 - 列表数据不要拿全表，要使用LIMIT来分页，每页数量也不要太大
+
 - SQL语句中IN包含的值不应过多
+  
   MySQL对于IN做了相应的优化，即将IN中的常量全部存储在一个数组里面，而且这个数组是排好序的。但是如果数值较多，产生的消耗也是比较大的。再例如：select id from t where num in(1,2,3) 对于连续的数值，能用between就不要用in了；再或者使用连接来替换。
+  
 - 当只需要一条数据的时候，使用limit 1
+  
   这是为了使EXPLAIN中type列达到const类型五、如果排序字段没有用到索引
+  
 - 如果排序字段没有用到索引，就尽量少排序
+
 - 尽量用union all代替union
+  
   union和union all的差异主要是前者需要将结果集合并后再进行唯一性过滤操作，这就会涉及到排序，增加大量的CPU运算，加大资源消耗及延迟。当然，union all的前提条件是两个结果集没有重复数据。
+  
 - 不使用ORDER BY RAND()
 
     ```
@@ -1125,9 +1152,9 @@ Scale up，这个不多说了，根据MySQL是CPU密集型还是I/O密集型，�
 
 
 
-## 案例分析
+## 6.案例分析
 
-### 为啥阿里巴巴不建议MySQL使用Text类型？
+### 6.1.为啥阿里巴巴不建议MySQL使用Text类型？
 
 众所周知，MySQL广泛应用于互联网的OLTP（联机事务处理过程）业务系统中，在大厂开发规范中，经常会看到一条"不建议使用text大字段类型”。
 
@@ -1473,7 +1500,7 @@ mysql.slow_log记录的是执行超过long_query_time的所有SQL，如果遵循
 
 
 
-### MySQL分页查询优化
+### 6.2.MySQL分页查询优化
 
 当需要从数据库查询的表有上万条记录的时候，一次性查询所有结果会变得很慢，特别是随着数据量的增加特别明显，这时需要使用分页查询。对于数据库分页查询，也有很多种方法和优化的点。下面简单说一下我知道的一些方法。
 

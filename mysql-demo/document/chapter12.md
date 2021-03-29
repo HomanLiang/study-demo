@@ -8,7 +8,7 @@
 
 **1. 前言**
 
-Insert into select请慎用。这天xxx接到一个需求，需要将表A的数据迁移到表B中去做一个备份。本想通过程序先查询查出来然后批量插入。但xxx觉得这样有点慢，需要耗费大量的网络I/O，决定采取别的方法进行实现。通过在Baidu的海洋里遨游，他发现了可以使用insert into select实现，这样就可以避免使用网络I/O，直接使用SQL依靠数据库I/O完成，这样简直不要太棒了。然后他就被开除了。
+`Insert into select` 请慎用。这天xxx接到一个需求，需要将表A的数据迁移到表B中去做一个备份。本想通过程序先查询查出来然后批量插入。但xxx觉得这样有点慢，需要耗费大量的网络I/O，决定采取别的方法进行实现。通过在Baidu的海洋里遨游，他发现了可以使用 `insert into select` 实现，这样就可以避免使用网络I/O，直接使用SQL依靠数据库I/O完成，这样简直不要太棒了。然后他就被开除了。
 
 **2. 事故发生的经过**
 
@@ -67,15 +67,18 @@ WHERE
 ![Image [3]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mysql-demo/20210307135902.png)
 ![Image [4]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mysql-demo/20210307140003.png)
 ![Image [5]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mysql-demo/20210307140005.png)
+
 从上面可以发现一开始能正常插入，但是后面突然就卡住了，并且耗费了23s才成功，然后才能继续插入。这个时候已经迁移成功了，所以能正常插入了。
 
 **6. 出现的原因**
 
-在默认的事务隔离级别下：insert into order_record select * from order_today 加锁规则是：order_record表锁，order_today逐步锁（扫描一个锁一个）。
+在默认的事务隔离级别下：`insert into order_record select * from order_today` 加锁规则是：order_record表锁，order_today逐步锁（扫描一个锁一个）。
 
 分析执行过程。
+
 ![Image [6]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mysql-demo/20210307140006.png)
-通过观察迁移sql的执行情况你会发现order_today是全表扫描，也就意味着在执行insert into select from 语句时，mysql会从上到下扫描order_today内的记录并且加锁，这样一来不就和直接锁表是一样了。
+
+通过观察迁移sql的执行情况你会发现order_today是全表扫描，也就意味着在执行 `insert into select from` 语句时，mysql会从上到下扫描order_today内的记录并且加锁，这样一来不就和直接锁表是一样了。
 
 这也就可以解释，为什么一开始只有少量用户出现支付失败，后续大量用户出现支付失败，初始化订单失败等情况，因为一开始只锁定了少部分数据，没有被锁定的数据还是可以正常被修改为正常状态。由于锁定的数据越来越多，就导致出现了大量支付失败。最后全部锁住，导致无法插入订单，而出现初始化订单失败。
 
@@ -338,7 +341,7 @@ sudo vim /etc/my.cnf
 对于提高MySQL的并发，很大程度取决于内存，官方提供了一个关于`innodb`的内存[计算方式](https://dev.mysql.com/doc/refman/8.0/en/innodb-init-startup-configuration.html)：
 
 ```
-innodb_buffer_pool_size``+ key_buffer_size``+ max_connections * (sort_buffer_size + read_buffer_size + binlog_cache_size)``+ max_connections * 2MB
+innodb_buffer_pool_size+ key_buffer_size+ max_connections * (sort_buffer_size + read_buffer_size + binlog_cache_size)+ max_connections * 2MB
 ```
 
 **方式二**
@@ -358,7 +361,16 @@ max_used_connections / max_connections * 100% = [85, 90]%
 **1、线程**
 
 ```
-SHOW STATUS ``LIKE` `'Threads%'``;``+``-------------------+--------+``| Variable_name   | Value |``+``-------------------+--------+``| Threads_cached  | 1   |``| Threads_connected | 217  |``| Threads_created  | 29   |``| Threads_running  | 88   |``+``-------------------+--------+` `SHOW VARIABLES ``LIKE` `'thread_cache_size'``;``+``-------------------+-------+``| Variable_name   | Value |``+``-------------------+-------+``| thread_cache_size | 10   |``+``-------------------+-------+
+SHOW STATUS ``LIKE` `'Threads%'``;
+``+``-------------------+--------+``
+| Variable_name   | Value |``+``-------------------+--------+``
+| Threads_cached  | 1   |``|
+Threads_connected | 217  |``
+| Threads_created  | 29   |``
+| Threads_running  | 88   |``+``-------------------+--------+` 
+`SHOW VARIABLES ``LIKE` `'thread_cache_size'``;``+``-------------------+-------+``
+| Variable_name   | Value |``+``-------------------+-------+``
+| thread_cache_size | 10   |``+``-------------------+-------+
 ```
 
 - Threads_cached 线程在缓存中的数量
@@ -371,7 +383,12 @@ SHOW STATUS ``LIKE` `'Threads%'``;``+``-------------------+--------+``| Variable
 **2、查看表锁情况**
 
 ```
-SHOW ``GLOBAL` `STATUS ``LIKE` `'table_locks%'``;``+``-----------------------+-------+``| Variable_name     | Value |``+``-----------------------+-------+``| Table_locks_immediate | 90  |``| Table_locks_waited  | 0   |``+``-----------------------+-------+
+SHOW ``GLOBAL` `STATUS ``LIKE` `'table_locks%'``;
+``+``-----------------------+-------+``
+| Variable_name     | Value |``+``-----------------------+-------+``
+| Table_locks_immediate | 90  |``
+| Table_locks_waited  | 0   |
+``+``-----------------------+-------+
 ```
 
 - Table_locks_immediate 立即获得表锁请求的次数
@@ -380,13 +397,28 @@ SHOW ``GLOBAL` `STATUS ``LIKE` `'table_locks%'``;``+``-----------------------+--
 **3、慢查询**
 
 ```
-show variables ``like` `'%slow%'``;` `+``---------------------------+----------------------------------------------+``| Variable_name       | Value                    |``+``---------------------------+----------------------------------------------+``| slow_launch_time     | 2                      |``| slow_query_log      | ``On`                      `|``+``---------------------------+----------------------------------------------+
+show variables ``like` `'%slow%'``;
+` `+``---------------------------+----------------------------------------------+``
+| Variable_name       | Value                    |
+``+``---------------------------+----------------------------------------------+``
+| slow_launch_time     | 2                      |``
+| slow_query_log      | ``On`                      `
+|``+``---------------------------+----------------------------------------------+
 ```
 
 **4、线程详情**
 
 ```
-## 查看每个线程的详细信息``SHOW PROCESSLIST;``+``--------+----------+------------------+--------------+---------+-------+-------------+------------------+``| Id   | ``User`   `| Host       | db      | Command | ``Time` `| State    | Info       |``+``--------+----------+------------------+--------------+---------+-------+-------------+------------------+``|   3 | xxxadmin | localhost    | ``NULL`     `| Sleep  |   1 | cleaning up | ``NULL`       `|``|   4 | xxxadmin | localhost    | ``NULL`     `| Sleep  |   0 | cleaning up | ``NULL`       `|``|   5 | xxxadmin | localhost    | ``NULL`     `| Sleep  |   6 | cleaning up | ``NULL`       `|``+``--------+----------+------------------+--------------+---------+-------+-------------+------------------+
+## 查看每个线程的详细信息``SHOW PROCESSLIST;
+``+``--------+----------+------------------+--------------+---------+-------+-------------+------------------+``
+| Id   | ``User`   `| Host       | db      | Command | ``Time` `| State    | Info       |``+``--------+----------+------------------+--------------+---------+-------+-------------+------------------+``
+|   3 | xxxadmin | localhost    | ``NULL`     `| Sleep  
+|   1 | cleaning up | ``NULL`       `|``
+|   4 | xxxadmin | localhost    | ``NULL`     `| Sleep  
+|   0 | cleaning up | ``NULL`       `|``
+|   5 | xxxadmin | localhost    | ``NULL`     `| Sleep  
+|   6 | cleaning up | ``NULL`       `
+|``+``--------+----------+------------------+--------------+---------+-------+-------------+------------------+
 ```
 
 ### 总结
