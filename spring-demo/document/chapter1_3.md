@@ -10,6 +10,181 @@ spring容器可以理解为生产对象（OBJECT）的地方，在这里容器�
 
 
 
+## IOC
+
+### 依赖倒置
+
+假设我们设计一辆汽车：先设计轮子，然后根据轮子大小设计底盘，接着根据底盘设计车身，最后根据车身设计好整个汽车。这里就出现了一个“依赖”关系：汽车依赖车身，车身依赖底盘，底盘依赖轮子。
+
+![图片](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/spring-demo/20210329205726.webp)
+
+这样的设计看起来没问题，但是可维护性却很低。
+
+假设设计完工之后，上司却突然说根据市场需求的变动，要我们把车子的轮子设计都改大一码。这下我们就蛋疼了：因为我们是根据轮子的尺寸设计的底盘，轮子的尺寸一改，底盘的设计就得修改；同样因为我们是根据底盘设计的车身，那么车身也得改，同理汽车设计也得改——整个设计几乎都得改！
+
+我们现在换一种思路。我们先设计汽车的大概样子，然后根据汽车的样子来设计车身，根据车身来设计底盘，最后根据底盘来设计轮子。这时候，依赖关系就倒置过来了：轮子依赖底盘， 底盘依赖车身， 车身依赖汽车。
+
+![图片](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/spring-demo/20210329205847.webp)
+
+这时候，上司再说要改动轮子的设计，我们就只需要改动轮子的设计，而不需要动底盘，车身，汽车的设计了。这就是依赖倒置原则——把原本的高层建筑依赖底层建筑“倒置”过来，变成底层建筑依赖高层建筑。**高层建筑决定需要什么，底层去实现这样的需求，但是高层并不用管底层是怎么实现的。**这样就不会出现前面的“牵一发动全身”的情况。
+
+### 控制反转（Inversion of Control）
+
+就是依赖倒置原则的一种代码设计的思路。具体采用的方法就是所谓的依赖注入（Dependency Injection）。其实这些概念初次接触都会感到云里雾里的。说穿了，这几种概念的关系大概如下：
+
+![图片](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/spring-demo/20210329205927.webp)
+
+为了理解这几个概念，我们还是用上面汽车的例子。只不过这次换成代码。我们先定义四个Class，车，车身，底盘，轮胎。然后初始化这辆车，最后跑这辆车。代码结构如下：
+
+![图片](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/spring-demo/20210329205952.webp)
+
+这样，就相当于上面第一个例子，上层建筑依赖下层建筑——每一个类的构造函数都直接调用了底层代码的构造函数。假设我们需要改动一下轮胎（Tire）类，把它的尺寸变成动态的，而不是一直都是30。我们需要这样改：
+
+![图片](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/spring-demo/20210329210032.webp)
+
+由于我们修改了轮胎的定义，为了让整个程序正常运行，我们需要做以下改动：
+
+![图片](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/spring-demo/20210329210038.webp)
+
+由此我们可以看到，仅仅是为了修改轮胎的构造函数，这种设计却需要修改整个上层所有类的构造函数！在软件工程中，这样的设计几乎是不可维护的——在实际工程项目中，有的类可能会是几千个类的底层，如果每次修改这个类，我们都要修改所有以它作为依赖的类，那软件的维护成本就太高了。
+
+所以我们需要进行控制反转（IoC），即上层控制下层，而不是下层控制着上层。我们用依赖注入（Dependency Injection）这种方式来实现控制反转。所谓依赖注入，就是把底层类作为参数传入上层类，实现上层类对下层类的“控制”。这里我们用构造方法传递的依赖注入方式重新写车类的定义：
+
+![图片](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/spring-demo/20210329210047.webp)
+
+这里我们再把轮胎尺寸变成动态的，同样为了让整个系统顺利运行，我们需要做如下修改：
+
+![图片](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/spring-demo/20210329210118.webp)
+
+看到没？这里我只需要修改轮胎类就行了，不用修改其他任何上层类。这显然是更容易维护的代码。不仅如此，在实际的工程中，这种设计模式还有利于不同组的协同合作和单元测试：比如开发这四个类的分别是四个不同的组，那么只要定义好了接口，四个不同的组可以同时进行开发而不相互受限制；而对于单元测试，如果我们要写Car类的单元测试，就只需要Mock一下Framework类传入Car就行了，而不用把Framework, Bottom, Tire全部new一遍再来构造Car。
+
+这里我们是采用的构造函数传入的方式进行的依赖注入。其实还有另外两种方法：Setter传递和接口传递。这里就不多讲了，核心思路都是一样的，都是为了实现控制反转。
+
+![图片](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/spring-demo/20210329210130.webp)
+
+### 控制反转容器(IoC Container)
+
+其实上面的例子中，对车类进行初始化的那段代码发生的地方，就是控制反转容器。
+
+![图片](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/spring-demo/20210329210141.webp)
+
+显然你也应该观察到了，因为采用了依赖注入，在初始化的过程中就不可避免的会写大量的new。这里IoC容器就解决了这个问题。这个容器可以自动对你的代码进行初始化，你只需要维护一个Configuration（可以是xml可以是一段代码），而不用每次初始化一辆车都要亲手去写那一大段初始化的代码。
+
+这是引入IoC Container的第一个好处。IoC Container的第二个好处是：我们在创建实例的时候不需要了解其中的细节。在上面的例子中，我们自己手动创建一个车instance时候，是从底层往上层new的：
+
+![图片](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/spring-demo/20210329210220.webp)
+
+这个过程中，我们需要了解整个Car/Framework/Bottom/Tire类构造函数是怎么定义的，才能一步一步new/注入。而IoC Container在进行这个工作的时候是反过来的，它先从最上层开始往下找依赖关系，到达最底层之后再往上一步一步new（有点像深度优先遍历）：
+
+![图片](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/spring-demo/20210329210225.webp)
+
+IoC Container可以直接隐藏具体的创建实例的细节。
+
+
+
+## DI（依赖注入）
+
+依赖注入（Dependency Injection，DI）和控制反转含义相同，它们是从两个角度描述的同一个概念。
+
+当某个 Java实例需要另一个 Java 实例时，传统的方法是由调用者创建被调用者的实例（例如，使用 new 关键字获得被调用者实例），而使用 Spring 框架后，被调用者的实例不再由调用者创建，而是由 Spring 容器创建，这称为控制反转。
+
+Spring 容器在创建被调用者的实例时，会自动将调用者需要的对象实例注入给调用者，这样，调用者通过 Spring 容器获得被调用者实例，这称为依赖注入。
+
+依赖注入主要有两种实现方式，分别是属性 setter 注入和构造方法注入。具体介绍如下。
+
+- **属性 setter 注入**
+
+  指 IoC 容器使用 setter 方法注入被依赖的实例。通过调用无参构造器或无参 static 工厂方法实例化 bean 后，调用该 bean 的 setter 方法，即可实现基于 setter 的 DI。
+
+- **构造方法注入**
+
+  指 IoC 容器使用构造方法注入被依赖的实例。基于构造器的 DI 通过调用带参数的构造方法实现，每个参数代表一个依赖。
+
+下面通过属性 setter 注入的案例演示 Spring 容器是如何实现依赖注入的。具体步骤如下。
+
+1. **创建 PersonService 接口**
+
+   在 springDemo01 项目的 com.mengma.ioc 包下创建一个名为 PersonService 的接口，该接口中包含一个 addPerson() 方法，如下所示。
+
+    ```
+    package com.mengma.ioc;
+
+    public interface PersonService {
+        public void addPerson();
+    }
+    ```
+
+2. **创建接口实现类 PersonServiceImpl**
+
+   在 com.mengma.ioc 包下创建一个名为 PersonServiceImpl 的类，该类实现了 PersonService 接口，如下所示。
+
+    ```
+   package com.mengma.ioc;
+   
+   public class PersonServiceImpl implements PersonService {
+   
+       // 定义接口声明
+       private PersonDao personDao;
+   
+       // 提供set()方法，用于依赖注入
+       public void setPersonDao(PersonDao personDao) {
+           this.personDao = personDao;
+       }
+   
+       // 实现PersonService接口的方法
+       @Override
+       public void addPerson() {
+           personDao.add(); // 调用PersonDao中的add()方法
+           System.out.println("addPerson()执行了...");
+       }
+   
+   }
+    ```
+   
+   上述代码中，首先声明了 personDao 对象，并为其添加 setter 方法，用于依赖注入，然后实现了 PersonDao 接口的 addPerson() 方法，并在方法中调用 save() 方法和输出一条语句。
+
+3. **在 applicationContext.xml 中添加配置信息**
+
+   在 applicationContext.xml 配置文件中添加一个 `<bean>` 元素，用于实例化 PersonServiceImpl 类，并将 personDao 的实例注入到 personService 中，其实现代码如下所示：
+
+    ```
+   <bean id="personService" class="com.mengma.ioc.PersonServiceImpl">
+       <!-- 将personDao实例注入personService实例中 -->
+       <property name="personDao" ref="personDao"/>
+   </bean>
+    ```
+
+4. **编写测试方法**
+
+   在 FirstTest 类中创建一个名为 test2() 的方法，编辑后如下所示：
+
+    ```
+   @Test
+   public void test2() {
+       // 定义Spring配置文件的路径
+       String xmlPath = "applicationContext.xml";
+       // 初始化Spring容器，加载配置文件
+       ApplicationContext applicationContext = new ClassPathXmlApplicationContext(
+               xmlPath);
+       // 通过容器获取personService实例
+       PersonService personService = (PersonService) applicationContext
+               .getBean("personService");
+       // 调用personService的addPerson()方法
+       personService.addPerson();
+   }
+    ```
+
+5. **运行项目并查看结果**
+
+   使用 JUnit 测试运行 test2() 方法，运行成功后，控制台的输出结果如下图所示。
+
+   ![运行结果](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/spring-demo/20210329210321.png)
+   
+   
+   从上图的输出结果中可以看出，使用 Spring 容器获取 userService 的实例后，调用了该实例的 addPerson() 方法，在该方法中又调用了 PersonDao 实现类中的 add() 方法，并输出了结果。这就是 Spring 容器属性 setter 注入的方式，也是实际开发中较为常用的一种方式。
+
+
+
 ## Spring容器创建对象的三种方式
 
 ```javascript

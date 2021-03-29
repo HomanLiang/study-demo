@@ -4,6 +4,110 @@
 
 # Spring 核心容器 - Bean
 
+## Bean的基础知识
+
+1. 在xml配置文件中，bean的标识（id 和 name）
+
+    id:指定在benafactory中管理该bean的唯一的标识。name可用来唯一标识bean 或给bean起别名。
+
+   ```
+    <bean id="helloWorld" class="com.name.HelloWorld">
+   ........
+    </bean>
+   ```
+
+2. bean的class
+
+   class属性指定了bean的来源，即bean的实际路径。注意要指定全路径，而不可只写类名。
+
+3. Singleton的使用
+
+   在spring中，bean可被定义为2中部署模式中的一种。singleton和prototype模式。
+
+   singloeton:只有一个共享的实例存在，所有对这个bean的请求都会返回这个唯一实例。
+
+   prototype:对这个bean的每次请求都会都会创建一个新的bean实例。根据已经存在的bean而clone出来的bean。默认为singleton模式。
+
+    改写成prototype模式写法如下：
+
+   ```
+   <bean id="student3" class="com.mucfc.beanfactory.Student" scope="prototype">
+   	.......
+   </bean>
+   ```
+
+4. bean的属性
+
+   spring中，bean的属性值有2种注入方式。setter注入和构造函数注入。
+
+   setter注入是在调用无参的构造函数或无参的静态工厂方法实例化配置文档中定义的bean之后，通过调用bean上的setter方法实现的。
+
+   构造函数的依赖注入是通过调用带有很多参数的构造方法实现的，每个参数表示一个对象或者属性。
+
+5. 对属性null值的处理
+
+    ```
+    <bean id="student5" class="com.mucfc.beanfactory.Student">
+        <property name="std_name">
+            <value></value>
+        </property>
+        <property name="std_id">
+            <value>2005</value>
+        </property>
+    </bean>
+    ```
+    
+    或者
+
+    ```
+    <bean id="student5" class="com.mucfc.beanfactory.Student">
+        <property name="std_name">
+            <value/>
+        </property>
+        <property name="std_id">
+            <value>2005</value>
+        </property>
+    </bean>
+    ```
+    
+    以上等同于this.std_name=null
+
+6. 使用依赖depends-on
+
+   此属性可在使用该bean之前，强制初始化一个或多个bean的初始化。例如
+
+    ```
+    <bean id="school" class="com.mucfc.beanfactory.School"
+        depends-on="student6">
+        <property name="student" ref="student6" />
+    </bean>
+    ```
+   
+   其中student6如下：
+
+    ```
+    <bean id="student6" class="com.mucfc.beanfactory.Student">
+        <property name="std_name" value="水水" />
+        <property name="std_id" value="3009" />
+    </bean>
+    ```
+
+7. 指定bean引用
+
+    ```
+    <property name=" xxx" ref="yyyy "/>
+    ```
+
+	或者
+
+    ```
+    <property name="xxxx">
+        <ref bean="yyt"/>
+    <property/>
+    ```
+
+8. ref local指定同一个xml文件中的引用 
+
 ## Bean的生命周期
 
 **首先简单说一下**
@@ -29,6 +133,8 @@
 9、当Bean不再需要时，会经过清理阶段，如果Bean实现了DisposableBean这个接口，会调用那个其实现的destroy()方法；
 
 10、最后，如果这个Bean的Spring配置中配置了destroy-method属性，会自动调用其配置的销毁方法。
+
+![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/spring-demo/20210329212437.jpeg)
 
 **结合代码理解一下**
 
