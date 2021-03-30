@@ -342,3 +342,7 @@ public final ConfigurableListableBeanFactory getBeanFactory() {
    }
 }
 ```
+
+### 总结
+
+**Spring容器和SpringMVC容器虽然是父容器与子容器的关系，但二者之间具有一定的独立性。具体来说，两个容器基于各自的配置文件分别进行初始化，只有在子容器找不到对应的Bean时，才回去父容器中去找并加载。**
