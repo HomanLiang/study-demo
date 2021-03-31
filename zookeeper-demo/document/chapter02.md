@@ -62,15 +62,15 @@ Zookeeper搭建均以Linux环境为例
    ```
 
    输出以下提是信息表示关闭成功
-
-
+   
+   
    ![image-20210313132317335](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/zookeeper-demo/20210313132317.png)
+   
+      查看状态输入命令
 
-   查看状态输入命令
-
-   ```
+    ```
    ./zkServer.sh status
-   ```
+    ```
 
 
 

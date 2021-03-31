@@ -33,8 +33,6 @@ ZkClient是GitHub上的一个开源zookeeper客户端，再Zookeeper原生API接
   }
   ```
 
-  
-
 - **创建节点**
 
   ```
@@ -49,8 +47,6 @@ ZkClient是GitHub上的一个开源zookeeper客户端，再Zookeeper原生API接
   	 }
   }
   ```
-
-  
 
 - **删除节点**
 
@@ -67,8 +63,6 @@ ZkClient是GitHub上的一个开源zookeeper客户端，再Zookeeper原生API接
   	 }
   }
   ```
-
-  
 
 - **获取子节点**
 
@@ -100,8 +94,6 @@ ZkClient是GitHub上的一个开源zookeeper客户端，再Zookeeper原生API接
   	 }
   }
   ```
-
-  
 
 - **获取数据（节点是否存在、更新、删除）**
 

@@ -32,7 +32,7 @@
   #创建一个zk-temp的临时节点，节点内容为123
   
   create /zk-permanent 123
-  #创建一个zk-permanent的持节节点
+  #创建一个zk-permanent的持久节点
   ```
 
   退出使用`quit`命令

@@ -27,8 +27,8 @@ ZooKeeper 的目标是将这些不同服务的精华提炼为一个非常简单�
 ![image-20210313155801209](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/zookeeper-demo/20210313155801.png)
 
 1. ZooKeeper：一个领导者（leader），多个跟随者（follower）组成的集群。
-2. Leader 负责进行投票的发起和决议，更新系统状态。
-3. Follower 用于接收客户请求并向客户端返回结果，在选举 Leader 过程中参与投票。
+2. Leader：负责进行投票的发起和决议，更新系统状态。
+3. Follower：用于接收客户请求并向客户端返回结果，在选举 Leader 过程中参与投票。
 4. 集群中只要有半数以上节点存活，Zookeeper 集群就能正常服务。
 5. **全局数据一致**（单一视图）：每个 Server 保存一份相同的数据副本，Client 无论连接到哪个 Server，数据都是一致的。
 6. **顺序一致性：** 从同一客户端发起的事务请求，最终将会严格地按照顺序被应用到 ZooKeeper 中去。
@@ -66,11 +66,9 @@ Session 作为会话实体，用来代表客户端会话，其包括 4 个属性
 - **TickTime**，下次会话超时时间点；
 - **isClosing**，当服务端如果检测到会话超时失效了，会通过设置这个属性将会话关闭。
 
-
-
 ### 数据节点（ZNode）
 
-通常‘节点’指的是组成集群的每一台机器，然而在Zookeeper中，“节点”分为两类，第一类同样指的是组成集群的机器，我们称之为机器节点；第二类则指的是数据模型中数据单元，我们称之为数据节点–ZNode。在Zookeeper中会将所有的数据存储在内存中，数据模型是一棵树也成为ZNode Tree，又斜杠（/）进行分割的路径，就是一个ZNode，例如/znode/path1。每个ZNode上都会保存自己的数据内容以及一系列看ii的属性信息。
+通常 `节点` 指的是组成集群的每一台机器，然而在Zookeeper中，“节点”分为两类，第一类同样指的是组成集群的机器，我们称之为机器节点；第二类则指的是数据模型中数据单元，我们称之为数据节点–ZNode。在Zookeeper中会将所有的数据存储在内存中，数据模型是一棵树也成为ZNode Tree，又斜杠（/）进行分割的路径，就是一个ZNode，例如/znode/path1。每个ZNode上都会保存自己的数据内容以及一系列看ii的属性信息。
 
 ### 版本
 
@@ -85,14 +83,23 @@ Watcher事件监听器是在Zookeeper中很重要的特性，Zookeeper允许用�
 Zookeeper采用ACL（Access Control Lists）策略来进行权限控制，其中定义了五种权限
 
 - CREATE
+  
   创建子节点的权限
+  
 - READ
+  
   获取节点数据和子节点列表的权限
+  
 - WRITE
+  
   更新节点数据的权限
+  
 - DELETE
+  
   删除子节点的权限
+  
 - ADMIN
+  
   设置节点的ACL权限的权限
 
 
@@ -118,7 +125,7 @@ Zookeeper采用ACL（Access Control Lists）策略来进行权限控制，其中
 - FOLLOWING：跟随者状态，表明当前服务器角色是 Follower
 - OBSERVING：观察者状态，表明当前服务器角色是 Observer
 
-Zookeeper的核心是原子广播，这个机制保证了各个Server之间的同步。实现这个机制的协议叫做Zab协议。Zab协议有两种模式，它们分别是恢复模式（选主）和广播模式（同步）。当服务启动或者在领导者崩溃后，Zab就进入了恢复模式，当领导者被选举出来，且大多数Server完成了和leader的状态同步以后，恢复模式就结束了。状态同步保证了leader和Server具有相同的系统状态。
+Zookeeper的核心是原子广播，这个机制保证了各个Server之间的同步。实现这个机制的协议叫做Zab协议。Zab协议有两种模式，它们分别是**恢复模式（选主）**和**广播模式（同步）**。当服务启动或者在领导者崩溃后，Zab就进入了恢复模式，当领导者被选举出来，且大多数Server完成了和leader的状态同步以后，恢复模式就结束了。状态同步保证了leader和Server具有相同的系统状态。
 
 为了保证事务的顺序一致性，zookeeper采用了递增的事务id号（zxid）来标识事务。所有的提议（proposal）都在被提出的时候加上了zxid。实现中zxid是一个64位的数字，它高32位是epoch用来标识leader关系是否改变，每次一个leader被选出来，它都会有一个新的epoch，标识当前属于那个leader的统治时期。低32位用于递增计数。
 

@@ -2,7 +2,7 @@
 
 
 
-# Zookeeper的api使用
+# Zookeeper的API使用
 
 Zookeeper作为一个分布式框架，主要用于解决分布一致性问题，它提供了多种编程语言API，以下为java客户端的API使用方式
 
@@ -16,8 +16,6 @@ Zookeeper API共包含5个包：
 
 其中org.apache.zookeeper，包含Zookeeper类，是我们最常用的类文件。如果使用Zookeeper服务，必须先创建一个Zookeeper实例，一旦客户端和Zookeeper服务端建立起来连接，Zookeeper系统将会给本次会话分配一个ID指，并且客户端会周期性的向服务端发送心跳来维持会话连接。只要连接有效，客户端就可以使用Zookeeper API进行处理了。
 
-
-
 1. **准备工作：导入依赖**
 
    ```
@@ -27,8 +25,6 @@ Zookeeper API共包含5个包：
    		 <version>3.4.14</version>
     	</dependency>
    ```
-
-   
 
 2. **建立会话**
 
@@ -63,8 +59,6 @@ Zookeeper API共包含5个包：
    }
    ```
 
-   
-
 3. **创建节点**
 
    ```
@@ -72,6 +66,7 @@ Zookeeper API共包含5个包：
    	 //countDownLatch这个类使⼀个线程等待,主要不让main⽅法结束
    	 private static CountDownLatch countDownLatch = new CountDownLatch(1);
    	 private static ZooKeeper zooKeeper;
+   	 
    	 public static void main(String[] args) throws Exception {
    		 zooKeeper = new ZooKeeper("127.0.0.1:2181", 5000, new CreateNote());
    		 countDownLatch.await();
@@ -126,9 +121,8 @@ Zookeeper API共包含5个包：
    	 private static ZooKeeper zooKeeper;
    	 
    	 public static void main(String[] args) throws Exception {
-   	 zooKeeper = new ZooKeeper("127.0.0.1:2181", 10000, new GetNoteDate());
-   	 Thread.sleep(Integer.MAX_VALUE);
-   	
+            zooKeeper = new ZooKeeper("127.0.0.1:2181", 10000, new GetNoteDate());
+            Thread.sleep(Integer.MAX_VALUE);
    	 }
    	 public void process(WatchedEvent watchedEvent) {
    		 //⼦节点列表发⽣变化时，服务器会发出NodeChildrenChanged通知，但不会把变化情况告诉给客户端
@@ -182,7 +176,7 @@ Zookeeper API共包含5个包：
    	 }
    }
    ```
-
+   
 5. **修改节点**
 
    ```
@@ -218,13 +212,8 @@ Zookeeper API共包含5个包：
    		 System.out.println("修改后的值:"+new String(data2));
    	 }
    }
-   ————————————————
-   版权声明：本文为CSDN博主「洋小洋咩咩咩」的原创文章，遵循CC 4.0 BY-SA版权协议，转载请附上原文出处链接及本声明。
-   原文链接：https://blog.csdn.net/wlhack/article/details/108169866
    ```
-
    
-
 6. **删除节点数据**
 
    ```
