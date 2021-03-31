@@ -227,6 +227,7 @@ public class testHelloWorld {
         HelloWorld helloWorld=(HelloWorld)context.getBean("helloWorld3");
         helloWorld.sayHello();
     }
+}
 ```
 
 ```javascript
