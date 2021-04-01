@@ -36,8 +36,10 @@ Producer 生产的数据会被不断追加到该log 文件末端，且每条数�
 ### 2、数据文件存储结构
 
 在每个partition中，包含了很多个LogSegment，LogSegment是由一个**日志文件**和**两个索引文件**组成。每个LogSegment的大小相等（大小可以在**config/server.properties**中通过 `og.segment.bytes` 属性配置，默认为1073741824字节，即1GB）。
+
 LogSegment命名规则：第一个segment从0开始，后续每个segment文件名为上一个segment文件最后一条消息的offset, offset的数值最大为64位（long类型），20位数字字符长度，没有数字用0填充。
-下面这张图很直观的表明了每个partition中的数据存储方式（[图片出处](https://www.jianshu.com/p/3e54a5a39683)）：
+
+下面这张图很直观的表明了每个partition中的数据存储方式：
 
 ![1722808db5b26de6](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/kafka-demo/20210318223259.jpg)
 
@@ -77,6 +79,7 @@ kafka的.log数据文件大小1G，如果没有索引，每次读取数据时都
 ### 4、消息结构
 
 kafka的消息结构经过了多次版本的调整，关于这部分最好还是参考[官方文档](https://kafka.apache.org/documentation/#messageformat)，这里只简单说一下，列一些关键属性。
+
 为了保证传输效率，生产者会将多条消息压缩到一起批量发送到broker，在broker中存储的消息也是压缩后的，最终消息会在消费端解压消费。最新版本的kafka中，被压缩在一起的一批消息被称为 Record Batch ，在 Record Batch中包含了多条 Record，大概的组织方式就像上图我们dump出来的.log文件一样。
 
 这里简要的列举一下关键属性：

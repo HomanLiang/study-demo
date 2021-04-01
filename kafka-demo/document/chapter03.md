@@ -72,7 +72,7 @@ Follower跟随Leader，所有写请求都通过Leader路由，数据变更会广
 
 
 ## Producer消息路由
-Producer发送消息到broker时，会根据Paritition机制选择将其存储到哪一个Partition。如果Partition机制设置合理，所有消息可以均匀分布到不同的Partition里，这样就实现了负载均衡。如果一个Topic对应一个文件，那这个文件所在的机器I/O将会成为这个Topic的性能瓶颈，而有了Partition后，不同的消息可以并行写入不同broker的不同Partition里，极大的提高了吞吐率。可以在$KAFKA_HOME/config/server.properties中通过配置项num.partitions来指定新建Topic的默认Partition数量，也可在创建Topic时通过参数指定，同时也可以在Topic创建之后通过Kafka提供的工具修改。
+Producer发送消息到broker时，会根据Paritition机制选择将其存储到哪一个Partition。如果Partition机制设置合理，所有消息可以均匀分布到不同的Partition里，这样就实现了负载均衡。如果一个Topic对应一个文件，那这个文件所在的机器I/O将会成为这个Topic的性能瓶颈，而有了Partition后，不同的消息可以并行写入不同broker的不同Partition里，极大的提高了吞吐率。可以在 `$KAFKA_HOME/config/server.properties` 中通过配置项`num.partitions` 来指定新建Topic的默认Partition数量，也可在创建Topic时通过参数指定，同时也可以在Topic创建之后通过Kafka提供的工具修改。
 
 在发送一条消息时，可以指定这条消息的key，Producer根据这个key和Partition机制来判断应该将这条消息发送到哪个Parition。Paritition机制可以通过指定Producer的paritition. class这一参数来指定，该class必须实现kafka.producer.Partitioner接口。
 
@@ -99,12 +99,16 @@ Producer发送消息到broker时，会根据Paritition机制选择将其存储�
 ## zookeeper
 
 - Zookeeper的作用：协调控制
-  - 管理broker与consumer的动态加入和离开。（Producer不需要管理，随便一台计算机都可以作为Producer向Kafka Broker发消息）
-  - 管理broker与consumer的动态加入和离开。（Producer不需要管理，随便一台计算机都可以作为Producer向Kafka Broker发消息）
-  - 维护消费关系及每个partition的消费信息
-- zookeeper的细节
-  - 每个broker启动后会在zookeeper上注册一个临时的broker registry，包含broker的IP地址和端口号，所存储的topics和partitions信息
-  - 每个consumer启动后会在zookeeper上注册一个临时的consumer registry：包含consumer所属的consumer group 以及订阅的topics
+  - Broker注册并监控状态
+    - znode:/brokers/ids，保存了所有 Broker id，实现对 Broker 的动态监控。
+  - Topic注册
+    - znode:/brokers/topics，保存了所有 Topic。
+  - 生产者负载均衡
+    - 每个Broker启动时，都会完成Broker注册过程，生产者会通过该节点的变化来动态地感知到Broker服务器列表的变更
+  - offset维护
+    - Kafka早期版本使用ZooKeeper为每个消费者存储offset，由于ZooKeeper写入性能较差，从0.10版本后，Kafka使用自己的内部主题维护offset
+
+![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/zookeeper-demo/20210331173313.png)
 
 
 
@@ -125,7 +129,7 @@ push模式很难适应消费速率不同的消费者，因为消息发送速率�
 > At least one 　　  消息绝不会丢，但可能会重复传输
 > Exactly once 　　 每条消息肯定会被传输一次且仅传输一次，很多时候这是用户所想要的。
 
-当Producer向broker发送消息时，一旦这条消息被commit，因数replication的存在，它就不会丢。但是如果Producer发送数据给broker后，遇到网络问题而造成通信中断，那Producer就无法判断该条消息是否已经commit。虽然Kafka无法确定网络故障期间发生了什么，但是Producer可以生成一种类似于主键的东西，发生故障时幂等性的重试多次，这样就做到了Exactly once。
+当Producer向broker发送消息时，一旦这条消息被commit，因为replication的存在，它就不会丢。但是如果Producer发送数据给broker后，遇到网络问题而造成通信中断，那Producer就无法判断该条消息是否已经commit。虽然Kafka无法确定网络故障期间发生了什么，但是Producer可以生成一种类似于主键的东西，发生故障时幂等性的重试多次，这样就做到了Exactly once。
 
 接下来讨论的是消息从broker到Consumer的delivery guarantee语义。（仅针对Kafka consumer high level API）。Consumer在从broker读取消息后，可以选择commit，该操作会在Zookeeper中保存该Consumer在该Partition中读取的消息的offset。该Consumer下一次再读该Partition时会从下一条开始读取。如未commit，下一次读取的开始位置会跟上一次commit之后的开始位置相同。当然可以将Consumer设置为autocommit，即Consumer一旦读到数据立即自动commit。如果只讨论这一读取消息的过程，那Kafka是确保了Exactly once。但实际使用中应用程序并非在Consumer读取完数据就结束了，而是要进行进一步处理，而数据处理与commit的顺序在很大程度上决定了消息从broker和consumer的delivery guarantee semantic。
 

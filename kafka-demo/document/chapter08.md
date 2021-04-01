@@ -264,7 +264,7 @@ public class TimeInterceptor implements ProducerInterceptor<String, String> {
 }
 ```
 
-**增加时间戳拦截器**
+**增加计数器拦截器**
 
 统计发送消息成功和发送失败消息数，并在 producer 关闭时打印这两个计数器
 
@@ -631,34 +631,34 @@ dependency>
 ```
 ### Producer
 #### 配置项
-|                     名称                      |                             说明                             |         默认值          |                 有效值                  |  重要性  |
-| :-------------------------------------------: | :----------------------------------------------------------: | :---------------------: | :-------------------------------------: | :------: |
-|               bootstrap.servers               | kafka集群的broker-list，如：<br>hadoop01:9092,hadoop02:9092  |           无            |                                         |   必选   |
-|                     acks                      | 确保生产者可靠性设置，有三个选项：<br>acks=0:不等待成功返回<br>acks=1:等Leader写成功返回<br>acks=all:等Leader和所有ISR中的Follower写成功返回,all也可以用-1代替 |           -1            |               0,1,-1,all                |          |
-|                key.serializer                 |                        key的序列化器                         |                         | ByteArraySerializer<br>StringSerializer |   必选   |
-|               value.serializer                |                       value的序列化器                        |                         | ByteArraySerializer<br>StringSerializer |   必选   |
-|                 buffer.memory                 |                     Producer总体内存大小                     |        33554432         |   不要超过物理内存，根据实际情况调整    | 建议必选 |
-|               compression.type                | 压缩类型<br>压缩最好用于批量处理，批量处理消息越多，压缩性能越好 |           无            |           none、gzip、snappy            |          |
-|                    retries                    |                     发送失败尝试重发次数                     |            0            |                                         |          |
-|                  batch.size                   |                每个partition的未发送消息大小                 |          16384          |            根据实际情况调整             | 建议必选 |
-|                   client.id                   |   附着在每个请求的后面，用于标识请求是从什么地方发送过来的   |                         |                                         |          |
-|          connections.max<br>.idle.ms          |           连接空闲时间超过过久自动关闭（单位毫秒）           |         540000          |                                         |          |
-|                   linger.ms                   | 数据在缓冲区中保留的时长,0表示立即发送<br>为了减少网络耗时，需要设置这个值<br>太大可能容易导致缓冲区满，阻塞消费者<br>太小容易频繁请求服务端 |            0            |                                         |          |
-|                 max.block.ms                  |                         最大阻塞时长                         |          60000          |                                         |          |
-|               max.request.size                | 请求的最大字节数，该值要比batch.size大<br>不建议去更改这个值，如果设置不好会导致程序不报错，但消息又没有发送成功 |         1048576         |                                         |          |
-|               partitioner.class               |        分区类，可以自定义分区类，实现partitioner接口         | 默认是哈希值%partitions |                                         |          |
-|             receive.buffer.bytes              |          socket的接收缓存空间大小,当阅读数据时使用           |          32768          |                                         |          |
-|              request.timeout.ms               |  等待请求响应的最大时间,超时则重发请求,超过重试次数将抛异常  |          3000           |                                         |          |
-|               send.buffer.bytes               |                   发送数据时的缓存空间大小                   |         131072          |                                         |          |
-|                  timeout.ms                   |         控制server等待来自followers的确认的最大时间          |          30000          |                                         |          |
-| max.in.flight.<br>requests.per.<br>connection | kafka可以在一个connection中发送多个请求，叫作一个flight,这样可以减少开销，但是如果产生错误，可能会造成数据的发送顺序改变。 |            5            |                                         |          |
-|         metadata.fetch<br>.timeout.ms         |    从ZK中获取元数据超时时间<br>比如topic\host\partitions     |          60000          |                                         |          |
-|              metadata.max.age.ms              | 即使没有任何partition leader 改变，强制更新metadata的时间间隔 |         300000          |                                         |          |
-|               metric.reporters                | 类的列表，用于衡量指标。实现MetricReporter接口，将允许增加一些类，这些类在新的衡量指标产生时就会改变。JmxReporter总会包含用于注册JMX统计 |          none           |                                         |          |
-|              metrics.num.samples              |                   用于维护metrics的样本数                    |            2            |                                         |          |
-|           metrics.sample.window.ms            | metrics系统维护可配置的样本数量，在一个可修正的window size。这项配置配置了窗口大小，例如。我们可能在30s的期间维护两个样本。当一个窗口推出后，我们会擦除并重写最老的窗口 |          30000          |                                         |          |
-|             reconnect.backoff.ms              | 连接失败时，当我们重新连接时的等待时间。这避免了客户端反复重连 |           10            |                                         |          |
-|               retry.backoff.ms                | 在试图重试失败的produce请求之前的等待时间。避免陷入发送-失败的死循环中 |           100           |                                         |          |
+|                 名称                  |                             说明                             |         默认值          |                有效值                |  重要性  |
+| :-----------------------------------: | :----------------------------------------------------------: | :---------------------: | :----------------------------------: | :------: |
+|           bootstrap.servers           |   kafka集群的broker-list，如：hadoop01:9092,hadoop02:9092    |           无            |                                      |   必选   |
+|                 acks                  | 确保生产者可靠性设置，有三个选项：acks=0:不等待成功返回；acks=1:等Leader写成功返回；acks=all:等Leader和所有ISR中的Follower写成功返回,all也可以用-1代替 |           -1            |              0,1,-1,all              |          |
+|            key.serializer             |                        key的序列化器                         |                         | ByteArraySerializer StringSerializer |   必选   |
+|           value.serializer            |                       value的序列化器                        |                         | ByteArraySerializer StringSerializer |   必选   |
+|             buffer.memory             |                     Producer总体内存大小                     |        33554432         |  不要超过物理内存，根据实际情况调整  | 建议必选 |
+|           compression.type            | 压缩类型：压缩最好用于批量处理，批量处理消息越多，压缩性能越好 |           无            |          none、gzip、snappy          |          |
+|                retries                |                     发送失败尝试重发次数                     |            0            |                                      |          |
+|              batch.size               |                每个partition的未发送消息大小                 |          16384          |           根据实际情况调整           | 建议必选 |
+|               client.id               |   附着在每个请求的后面，用于标识请求是从什么地方发送过来的   |                         |                                      |          |
+|        connections.max.idle.ms        |           连接空闲时间超过过久自动关闭（单位毫秒）           |         540000          |                                      |          |
+|               linger.ms               | 数据在缓冲区中保留的时长,0表示立即发送；为了减少网络耗时，需要设置这个值；太大可能容易导致缓冲区满，阻塞消费者；太小容易频繁请求服务端 |            0            |                                      |          |
+|             max.block.ms              |                         最大阻塞时长                         |          60000          |                                      |          |
+|           max.request.size            | 请求的最大字节数，该值要比batch.size大；不建议去更改这个值，如果设置不好会导致程序不报错，但消息又没有发送成功 |         1048576         |                                      |          |
+|           partitioner.class           |        分区类，可以自定义分区类，实现partitioner接口         | 默认是哈希值%partitions |                                      |          |
+|         receive.buffer.bytes          |          socket的接收缓存空间大小,当阅读数据时使用           |          32768          |                                      |          |
+|          request.timeout.ms           |  等待请求响应的最大时间,超时则重发请求,超过重试次数将抛异常  |          3000           |                                      |          |
+|           send.buffer.bytes           |                   发送数据时的缓存空间大小                   |         131072          |                                      |          |
+|              timeout.ms               |         控制server等待来自followers的确认的最大时间          |          30000          |                                      |          |
+| max.in.flight.requests.per.connection | kafka可以在一个connection中发送多个请求，叫作一个flight,这样可以减少开销，但是如果产生错误，可能会造成数据的发送顺序改变。 |            5            |                                      |          |
+|       metadata.fetch.timeout.ms       |    从ZK中获取元数据超时时间<br>比如topic\host\partitions     |          60000          |                                      |          |
+|          metadata.max.age.ms          | 即使没有任何partition leader 改变，强制更新metadata的时间间隔 |         300000          |                                      |          |
+|           metric.reporters            | 类的列表，用于衡量指标。实现MetricReporter接口，将允许增加一些类，这些类在新的衡量指标产生时就会改变。JmxReporter总会包含用于注册JMX统计 |          none           |                                      |          |
+|          metrics.num.samples          |                   用于维护metrics的样本数                    |            2            |                                      |          |
+|       metrics.sample.window.ms        | metrics系统维护可配置的样本数量，在一个可修正的window size。这项配置配置了窗口大小，例如。我们可能在30s的期间维护两个样本。当一个窗口推出后，我们会擦除并重写最老的窗口 |          30000          |                                      |          |
+|         reconnect.backoff.ms          | 连接失败时，当我们重新连接时的等待时间。这避免了客户端反复重连 |           10            |                                      |          |
+|           retry.backoff.ms            | 在试图重试失败的produce请求之前的等待时间。避免陷入发送-失败的死循环中 |           100           |                                      |          |
 
 #### Producer简单使用
 ```
@@ -801,10 +801,12 @@ producer.close();
 ##### 拦截器原理
 Producer 拦截器(interceptor)是在 Kafka 0.10 版本被引入的，主要用于实现 clients 端的定
 制化控制逻辑。
+
 对于 producer 而言，interceptor 使得用户在消息发送前以及 producer 回调逻辑前有机会
 对消息做一些定制化需求，比如修改消息等。同时，producer 允许用户指定多个 interceptor
 按序作用于同一条消息从而形成一个拦截链(interceptor chain)。Intercetpor 的实现接口是
 org.apache.kafka.clients.producer.ProducerInterceptor，其定义的方法包括：
+
 1. configure(configs)
 获取配置信息和初始化数据时调用。
 2. onSend(ProducerRecord)：

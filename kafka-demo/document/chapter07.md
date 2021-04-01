@@ -46,7 +46,7 @@ kafka-topics.sh --zookeeper zk.server --topic test --describe
 
 ![Image](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/kafka-demo/20210317230203.png)
 
-CURRENT-OFFSET:当前消费偏移量
+CURRENT-OFFSET：当前消费偏移量
 
 LOG-END-OFFSET：末尾偏移量
 ### 删除group
@@ -91,19 +91,3 @@ bin/kafka-console-consumer.sh --zookeeper localhost:2181 --topic middleware --fr
 bin/kafka-console-producer.sh --broker-list localhost:9092 --topic test
 ```
 
-
-
-
-1. 启动kafka
-```
-nohup bin/kafka-server-start.sh config/server.properties > /dev/null 2>&1 &
-```
-2. 查看topic
-3. 控制台消费
-```
-bin/kafka-console-consumer.sh --zookeeper localhost:2181 --topic middleware --from-beginning
-```
-4. 创建生产者
-```
-bin/kafka-console-producer.sh --broker-list localhost:9092 --topic test
-```
