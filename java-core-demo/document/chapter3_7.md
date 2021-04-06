@@ -34,7 +34,9 @@ Map<String, String> map = new HashMap() {{
 这段代码其实是创建了匿名内部类，然后再进行初始化代码块。
 
 这一点我们可以使用命令 javac 将代码编译成字节码之后发现，我们发现之前的一个类被编译成两个字节码（.class）文件，如下图所示：
+
 ![Image](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/java-core-demo/20210321173121.png)
+
 我们使用 Idea 打开 DoubleBracket$1.class 文件发现：
 
 ```
@@ -72,7 +74,7 @@ public class DoubleBracket {
 ```
 从上述代码可以看出在 HashMap 的方法内部，可以直接使用外部类的变量 userName。
 #### 思考 2：它是怎么持有外部类的？
-关于匿名内部类是如何持久外部对象的，我们可以通过查看匿名内部类的字节码得知，我们使用 javap -c DoubleBracket\$1.class 命令进行查看，其中 $1 为以匿名类的字节码，字节码的内容如下；
+关于匿名内部类是如何持久外部对象的，我们可以通过查看匿名内部类的字节码得知，我们使用 `javap -c DoubleBracket\$1.class` 命令进行查看，其中 `$1` 为以匿名类的字节码，字节码的内容如下；
 ```
 javap -c DoubleBracket\$1.class
 Compiled from "DoubleBracket.java"
@@ -224,7 +226,9 @@ List<String> list = new ArrayList() {{
 List<String> list = Stream.of("Java", "Redis").collect(Collectors.toList());
 ```
 替代方案 2：集合工厂
+
 使用集合工厂的 of 方法替代，示例如下。原代码：
+
 ```
 Map map = new HashMap() {{
     put("map1", "value1");
@@ -251,7 +255,7 @@ List<String> list = new ArrayList<String>(){
 ```
 这种写法，是使用匿名内部类，继承自ArrayList，同时菱形运算符里的String不能省略，否则Eclipse会提示错误'<>' cannot be used with anonymous classes。因为这里省略String，编译器无法推测正确的类型。里层的大括号包裹的代码是实例初始化块。 
 
-这种写法编译器会警告The serializable class does not declare a static final serialVersionUID field of type long，跟serialVersionUID这个东西有关。就是说这种写法在序列化上会出现一些问题。
+这种写法编译器会警告 `The serializable class does not declare a static final serialVersionUID field of type long`，跟 `serialVersionUID` 这个东西有关。就是说这种写法在序列化上会出现一些问题。
 ```
 private static final List<String> list = new ArrayList<String>() {
     {
@@ -259,9 +263,12 @@ private static final List<String> list = new ArrayList<String>() {
     }
 };
 ```
-不符合sonar java规范 
-sonar Java规范中上述写法为Noncompliant - ArrayList should be extended only to add behavior, not for initialization. 
+不符合sonar java规范
+
+sonar Java规范中上述写法为 `Noncompliant - ArrayList should be extended only to add behavior, not for initialization. `
+
 静态对象，用标准的静态块初始化,应该如下写：
+
 ```
 private static final List<String> list = new ArrayList<>();
 static {
@@ -284,12 +291,19 @@ for(String str : all) {
 }
 ```
 首先大家看看这段代码有什么问题嘛？
+
 其实在大部分情况下这都是没啥问题，无非就是循环的往 ArrayList 中写入数据而已。
+
 但在特殊情况下，比如这里的 getData() 返回数据非常巨大时后续 temp.add(str) 就会有问题了。
+
 比如我们在 review 代码时发现这里返回的数据有时会高达 2000W，这时 ArrayList 写入的问题就凸显出来了。
+
 **填坑指南**
+
 大家都知道 ArrayList 是由数组实现，而数据的长度有限；需要在合适的时机对数组扩容。
+
 这里以插入到尾部为例 add(E e)。
+
 ![Image](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/java-core-demo/20210321173410.png)
 
 ```
@@ -299,22 +313,39 @@ temp.add("2");
 temp.add("3");
 ```
 当我们初始化一个长度为 2 的 ArrayList ，并往里边写入三条数据时 ArrayList 就得扩容了，也就是将之前的数据复制一份到新的数组长度为 3 的数组中。
+
 ![Image [2]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/java-core-demo/20210321173422.png)
+
 之所以是 3 ，是因为新的长度=原有长度 * 1.5
+
 通过源码我们可以得知 ArrayList 的默认长度为 10.
+
 ![Image [3]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/java-core-demo/20210321173438.png)
+
 ![Image [4]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/java-core-demo/20210321173448.png)
+
 但其实并不是在初始化的时候就创建了 DEFAULT_CAPACITY=10 的数组。
+
 ![Image [5]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/java-core-demo/20210321173500.png)
+
 而是在往里边 add 第一个数据的时候会扩容到 10.
+
 既然知道了默认的长度为 10 ，那说明后续一旦写入到第九个元素的时候就会扩容为 10*1.5=15。这一步为数组复制，也就是要重新开辟一块新的内存空间存放这 15 个数组。
+
 一旦我们频繁且数量巨大的进行写入时就会导致许多的数组复制，这个效率是极低的。
+
 但如果我们提前预知了可能会写入多少条数据时就可以提前避免这个问题。
+
 比如我们往里边写入 1000W 条数据，在初始化的时候就给定数组长度与用默认 10 的长度之间性能是差距巨大的。
+
 这里强烈建议大家：在有大量数据写入 ArrayList 时，一定要初始化指定长度。
+
 再一个是一定要慎用 add(intindex,E element) 向指定位置写入数据。
+
 ![Image [6]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/java-core-demo/20210321173514.png)
+
 通过源码我们可以看出，每一次写入都会将 index 后的数据往后移动一遍，其实本质也是要复制数组；
+
 但区别于往常规的往数组尾部写入数据，它每次都会进行数组复制，效率极低。
 
 
@@ -442,7 +473,7 @@ System.out.println(arrayToList(myArray).getClass());//class java.util.ArrayList
 List list = new ArrayList<>(Arrays.asList("a", "b", "c"))
 ```
 注意：
-1. 这样做生成的list，是定长的。也就是说，如果你对它做add或者remove，都会抛UnsupportedOperationException。
+1. 这样做生成的list，是定长的。也就是说，如果你对它做add或者remove，都会抛`UnsupportedOperationException`。
 2. 如果修改数组的值，list中的对应值也会改变！
 ### 使用 Java8 的Stream(推荐)
 ```
@@ -474,11 +505,17 @@ CollectionUtils.addAll(list, str);
 
 ### 使用 keySet 迭代器迭代 Map，获取对应的 value。
 反例：
+
 ![Image [8]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/java-core-demo/20210321173549.png)
+
 正解：
+
 ![Image [9]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/java-core-demo/20210321173557.png)
+
 解惑：keySet 方式遍历 Map 的性能不如 entrySet 性能好。
+
 ![Image [10]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/java-core-demo/20210321173606.png)
+
 如果采用 keySet 的方式获取 Map 中 key，然后通过 key 获取 Map 对应的 value，如上图 HashMap 源码所示，每次都需要通过 key 去计算对应的 hash 值，然后再通过 hash 值获取对应的 value，效率会低不少。
 
 建议：

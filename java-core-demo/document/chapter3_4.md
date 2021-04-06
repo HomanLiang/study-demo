@@ -8,7 +8,7 @@
 
 ![687474703a2f2f64756e77752e746573742e757063646e2e6e65742f63732f6a6176612f6a617661636f72652f636f6e7461696e65722f5365742d6469616772616d732e706e67](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/java-core-demo/20210321131830.png)
 
-Set 家族成员简介：
+**Set 家族成员简介：**
 
 - `Set` 继承了 `Collection` 的接口。实际上 `Set` 就是 `Collection`，只是行为略有不同：`Set` 集合不允许有重复元素。
 - `SortedSet` 继承了 `Set` 的接口。`SortedSet` 中的内容是排序的唯一值，排序的方法是通过比较器(Comparator)。
@@ -229,11 +229,13 @@ public abstract class EnumSet<E extends Enum<E>> extends AbstractSet<E>
 ## 6. HashSet,TreeSet和LinkedHashSet的区别
 
 **Set接口**
+
 Set不允许包含相同的元素，如果试图把两个相同元素加入同一个集合中，add方法返回false。
 
-Set判断两个对象相同不是使用==运算符，而是根据equals方法。也就是说，只要两个对象用equals方法比较返回true，Set就不 会接受这两个对象。
+Set判断两个对象相同不是使用==运算符，而是根据equals方法。也就是说，只要两个对象用equals方法比较返回true，Set就不会接受这两个对象。
 
 **HashSet**
+
 HashSet有以下特点
 
 - 不能保证元素的排列顺序，顺序有可能发生变化
@@ -245,6 +247,7 @@ HashSet有以下特点
 当向HashSet结合中存入一个元素时，HashSet会调用该对象的hashCode()方法来得到该对象的hashCode值，然后根据 hashCode值来决定该对象在HashSet中存储位置。
 
 简单的说，HashSet集合判断两个元素相等的标准是两个对象通过equals方法比较相等，并且两个对象的hashCode()方法返回值相 等
+
 注意，如果要把一个对象放入HashSet中，重写该对象对应类的equals方法，也应该重写其hashCode()方法。其规则是如果两个对 象通过equals方法比较返回true时，其hashCode也应该相同。另外，对象中用作equals比较标准的属性，都应该用来计算 hashCode的值。
 
 **LinkedHashSet**
@@ -259,7 +262,7 @@ TreeSet是SortedSet接口的唯一实现类，TreeSet可以确保集合元素处
 
 TreeSet判断两个对象不相等的方式是两个对象通过equals方法返回false，或者通过CompareTo方法比较没有返回0
 
-- 自然排序
+- **自然排序**
 
   自然排序使用要排序元素的CompareTo（Object obj）方法来比较元素之间大小关系，然后将元素按照升序排列。
 
@@ -269,7 +272,7 @@ TreeSet判断两个对象不相等的方式是两个对象通过equals方法返�
 
   如果我们将两个对象的equals方法总是返回true，则这两个对象的compareTo方法返回应该返回0
 
-- 定制排序
+- **定制排序**
 
   自然排序是根据集合元素的大小，以升序排列，如果要定制排序，应该使用Comparator接口，实现 int compare(T o1,T o2)方法
 

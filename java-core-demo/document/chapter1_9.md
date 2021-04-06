@@ -40,8 +40,8 @@ public class NoGenericsDemo {
 // at io.github.dunwu.javacore.generics.NoGenericsDemo.main(NoGenericsDemo.java:23)
 ```
 
-> 示例说明：
->
+**示例说明：**
+
 > 在上面的示例中，`List` 容器没有指定存储数据类型，这种情况下，可以向 `List` 添加任意类型数据，编译器不会做类型检查，而是默默的将所有数据都转为 `Object`。
 >
 > 假设，最初我们希望向 `List` 存储的是整形数据，假设，某个家伙不小心存入了其他数据类型。当你试图从容器中取整形数据时，由于 `List` 当成 `Object` 类型来存储，你不得不使用类型强制转换。在运行时，才会发现 `List` 中数据不存储一致的问题，这就为程序运行带来了很大的风险（无形伤害最为致命）。
@@ -52,29 +52,29 @@ public class NoGenericsDemo {
 
 - **编译时的强类型检查**
 
-泛型要求在声明时指定实际数据类型，Java 编译器在编译时会对泛型代码做强类型检查，并在代码违反类型安全时发出告警。早发现，早治理，把隐患扼杀于摇篮，在编译时发现并修复错误所付出的代价远比在运行时小。
+  泛型要求在声明时指定实际数据类型，Java 编译器在编译时会对泛型代码做强类型检查，并在代码违反类型安全时发出告警。早发现，早治理，把隐患扼杀于摇篮，在编译时发现并修复错误所付出的代价远比在运行时小。
 
 - **避免了类型转换**
 
-未使用泛型：
+  未使用泛型：
 
-```
-List list = new ArrayList();
-list.add("hello");
-String s = (String) list.get(0);
-```
+    ```
+  List list = new ArrayList();
+  list.add("hello");
+  String s = (String) list.get(0);
+    ```
 
-使用泛型：
+	使用泛型：
 
-```
-List<String> list = new ArrayList<String>();
-list.add("hello");
-String s = list.get(0);   // no cast
-```
+    ```
+  List<String> list = new ArrayList<String>();
+  list.add("hello");
+  String s = list.get(0);   // no cast
+    ```
 
 - **泛型编程可以实现通用算法**
 
-通过使用泛型，程序员可以实现通用算法，这些算法可以处理不同类型的集合，可以自定义，并且类型安全且易于阅读。
+  通过使用泛型，程序员可以实现通用算法，这些算法可以处理不同类型的集合，可以自定义，并且类型安全且易于阅读。
 
 ## 2. 泛型类型
 
@@ -94,123 +94,121 @@ class name<T1, T2, ..., Tn> { /* ... */ }
 
 - **未应用泛型的类**
 
-在泛型出现之前，如果一个类想持有一个可以为任意类型的数据，只能使用 `Object` 做类型转换。示例如下：
+  在泛型出现之前，如果一个类想持有一个可以为任意类型的数据，只能使用 `Object` 做类型转换。示例如下：
 
-```
-public class Info {
-	private Object value;
+    ```
+    public class Info {
+        private Object value;
 
-	public Object getValue() {
-		return value;
-	}
+        public Object getValue() {
+            return value;
+        }
 
-	public void setValue(Object value) {
-		this.value = value;
-	}
-}
-```
+        public void setValue(Object value) {
+            this.value = value;
+        }
+    }
+    ```
 
 - **单类型参数的泛型类**
 
-```
-public class Info<T> {
-    private T value;
+    ```
+    public class Info<T> {
+        private T value;
 
-    public Info() { }
+        public Info() { }
 
-    public Info(T value) {
-        this.value = value;
+        public Info(T value) {
+            this.value = value;
+        }
+
+        public T getValue() {
+            return value;
+        }
+
+        public void setValue(T value) {
+            this.value = value;
+        }
+
+        @Override
+        public String toString() {
+            return "Info{" + "value=" + value + '}';
+        }
     }
 
-    public T getValue() {
-        return value;
-    }
+    public class GenericsClassDemo01 {
+        public static void main(String[] args) {
+            Info<Integer> info = new Info<>();
+            info.setValue(10);
+            System.out.println(info.getValue());
 
-    public void setValue(T value) {
-        this.value = value;
+            Info<String> info2 = new Info<>();
+            info2.setValue("xyz");
+            System.out.println(info2.getValue());
+        }
     }
+    // Output:
+    // 10
+    // xyz
+    ```
+    
+    在上面的例子中，在初始化一个泛型类时，使用 `<>` 指定了内部具体类型，在编译时就会根据这个类型做强类型检查。
+    
+    实际上，不使用 `<>` 指定内部具体类型，语法上也是支持的（不推荐这么做），如下所示：
 
-    @Override
-    public String toString() {
-        return "Info{" + "value=" + value + '}';
-    }
-}
-
-public class GenericsClassDemo01 {
+    ```
     public static void main(String[] args) {
-        Info<Integer> info = new Info<>();
+        Info info = new Info();
         info.setValue(10);
         System.out.println(info.getValue());
-
-        Info<String> info2 = new Info<>();
-        info2.setValue("xyz");
-        System.out.println(info2.getValue());
+        info.setValue("abc");
+        System.out.println(info.getValue());
     }
-}
-// Output:
-// 10
-// xyz
-```
-
-在上面的例子中，在初始化一个泛型类时，使用 `<>` 指定了内部具体类型，在编译时就会根据这个类型做强类型检查。
-
-实际上，不使用 `<>` 指定内部具体类型，语法上也是支持的（不推荐这么做），如下所示：
-
-```
-public static void main(String[] args) {
-    Info info = new Info();
-    info.setValue(10);
-    System.out.println(info.getValue());
-    info.setValue("abc");
-    System.out.println(info.getValue());
-}
-```
-
-> 示例说明：
->
-> 上面的例子，不会产生编译错误，也能正常运行。但这样的调用就失去泛型类型的优势。
-
+    ```
+    
+    **示例说明**：上面的例子，不会产生编译错误，也能正常运行。但这样的调用就失去泛型类型的优势。
+    
 - **多个类型参数的泛型类**
 
-```
-public class MyMap<K,V> {
-    private K key;
-    private V value;
+    ```
+    public class MyMap<K,V> {
+        private K key;
+        private V value;
 
-    public MyMap(K key, V value) {
-        this.key = key;
-        this.value = value;
+        public MyMap(K key, V value) {
+            this.key = key;
+            this.value = value;
+        }
+
+        @Override
+        public String toString() {
+            return "MyMap{" + "key=" + key + ", value=" + value + '}';
+        }
     }
 
-    @Override
-    public String toString() {
-        return "MyMap{" + "key=" + key + ", value=" + value + '}';
+    public class GenericsClassDemo02 {
+        public static void main(String[] args) {
+            MyMap<Integer, String> map = new MyMap<>(1, "one");
+            System.out.println(map);
+        }
     }
-}
-
-public class GenericsClassDemo02 {
-    public static void main(String[] args) {
-        MyMap<Integer, String> map = new MyMap<>(1, "one");
-        System.out.println(map);
-    }
-}
-// Output:
-// MyMap{key=1, value=one}
-```
+    // Output:
+    // MyMap{key=1, value=one}
+    ```
 
 - **泛型类的类型嵌套**
 
-```
-public class GenericsClassDemo03 {
-    public static void main(String[] args) {
-        Info<String> info = new Info("Hello");
-        MyMap<Integer, Info<String>> map = new MyMap<>(1, info);
-        System.out.println(map);
+    ```
+    public class GenericsClassDemo03 {
+        public static void main(String[] args) {
+            Info<String> info = new Info("Hello");
+            MyMap<Integer, Info<String>> map = new MyMap<>(1, info);
+            System.out.println(map);
+        }
     }
-}
-// Output:
-// MyMap{key=1, value=Info{value=Hello}}
-```
+    // Output:
+    // MyMap{key=1, value=Info{value=Hello}}
+    ```
 
 ### 2.2. 泛型接口
 
@@ -228,47 +226,47 @@ public interface Content<T> {
 
 - **实现接口的子类明确声明泛型类型**
 
-```
-public class GenericsInterfaceDemo01 implements Content<Integer> {
-    private int text;
+    ```
+    public class GenericsInterfaceDemo01 implements Content<Integer> {
+        private int text;
 
-    public GenericsInterfaceDemo01(int text) {
-        this.text = text;
+        public GenericsInterfaceDemo01(int text) {
+            this.text = text;
+        }
+
+        @Override
+        public Integer text() { return text; }
+
+        public static void main(String[] args) {
+            GenericsInterfaceDemo01 demo = new GenericsInterfaceDemo01(10);
+            System.out.print(demo.text());
+        }
     }
-
-    @Override
-    public Integer text() { return text; }
-
-    public static void main(String[] args) {
-        GenericsInterfaceDemo01 demo = new GenericsInterfaceDemo01(10);
-        System.out.print(demo.text());
-    }
-}
-// Output:
-// 10
-```
+    // Output:
+    // 10
+    ```
 
 - **实现接口的子类不明确声明泛型类型**
 
-```
-public class GenericsInterfaceDemo02<T> implements Content<T> {
-    private T text;
+    ```
+    public class GenericsInterfaceDemo02<T> implements Content<T> {
+        private T text;
 
-    public GenericsInterfaceDemo02(T text) {
-        this.text = text;
+        public GenericsInterfaceDemo02(T text) {
+            this.text = text;
+        }
+
+        @Override
+        public T text() { return text; }
+
+        public static void main(String[] args) {
+            GenericsInterfaceDemo02<String> gen = new GenericsInterfaceDemo02<>("ABC");
+            System.out.print(gen.text());
+        }
     }
-
-    @Override
-    public T text() { return text; }
-
-    public static void main(String[] args) {
-        GenericsInterfaceDemo02<String> gen = new GenericsInterfaceDemo02<>("ABC");
-        System.out.print(gen.text());
-    }
-}
-// Output:
-// ABC
-```
+    // Output:
+    // ABC
+    ```
 
 ## 3. 泛型方法
 

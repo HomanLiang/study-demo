@@ -206,8 +206,8 @@ Java 支持的变量类型有：
 
 ### 4.1. 变量修饰符
 
-- 访问级别修饰符 - 如果变量是实例变量或类变量，可以添加访问级别修饰符（public/protected/private）
-- 静态修饰符 - 如果变量是类变量，需要添加 static 修饰
+- 访问级别修饰符 - 如果变量是实例变量或类变量，可以添加访问级别修饰符（`public`/`protected`/`private`）
+- 静态修饰符 - 如果变量是类变量，需要添加 `static` 修饰
 - final - 如果变量使用 fianl 修饰符，就表示这是一个常量，不能被修改。
 
 ### 4.2. 创建对象
@@ -226,7 +226,7 @@ public class Puppy{
    }
    public static void main(String[] args){
       // 下面的语句将创建一个Puppy对象
-      Puppy myPuppy = new Puppy( "tommy" );
+      Puppy myPuppy = new Puppy("tommy");
    }
 }
 ```
@@ -355,8 +355,6 @@ Java 标准库中，比如 `collection` 框架，很多通用部分就被抽取�
 3. 抽象类中的抽象方法只是声明，不包含方法体，就是不给出方法的具体实现也就是方法的具体功能。
 4. 构造方法，类方法（用 static 修饰的方法）不能声明为抽象方法。
 5. 抽象类的子类必须给出抽象类中的抽象方法的具体实现，除非该子类也是抽象类。
-
-
 
 ## 8.this 关键字
 
@@ -524,8 +522,6 @@ public class ThisInnerTest {
 ```
 
 在内部类 InnerClass 的构造方法中，通过外部类.this 可以获取到外部类对象，然后就可以使用外部类的成员变量了，比如说 name。
-
-
 
 ## 8.深克隆和浅克隆
 
@@ -801,14 +797,6 @@ public class test {
 
 
 
-
-
-
-
-
-
-
-
 ## 面试题
 
 ### 一、简单聊一下关于你对`Object`的理解
@@ -940,7 +928,7 @@ public Test clone() throws CloneNotSupportedException{
 
 **案例说明**
 
-***\*①修饰成员变量\****
+**①修饰成员变量**
 
 ```
 package com.ant.param;
@@ -1114,7 +1102,7 @@ final修饰一个引用类型时，则在对其初始化之后便不能再让其
 
 #### 关系
 
-我们以“类的用途”来将“hashCode() 和 equals()的关系”分2种情况来说明。
+我们以“类的用途”来将 `hashCode()`  和 `equals()` 的关系”分2种情况来说明。
 
 **1、不会创建“类对应的散列表”**
 

@@ -50,7 +50,7 @@ public class ArrayList<E> extends AbstractList<E>
 - `ArrayList` 实现了 `RandomAccess` 接口，**支持随机访问**。`RandomAccess` 是一个标志接口，它意味着“只要实现该接口的 `List` 类，都支持快速随机访问”。在 `ArrayList` 中，我们即可以**通过元素的序号快速获取元素对象**；这就是快速随机访问。
 - `ArrayList` 实现了 `Cloneable` 接口，**支持深拷贝**。
 - `ArrayList` 实现了 `Serializable` 接口，**支持序列化**，能通过序列化方式传输。
-- `ArrayList` 是**非线程安全**的。
+- `ArrayList` 是 **非线程安全** 的。
 
 ### 2.2. ArrayList 原理
 
@@ -197,7 +197,7 @@ private void grow(int minCapacity) {
 
 `ArrayList` 的删除方法和添加元素到任意位置方法有些相似。
 
-`ArrayList` 在每一次有效的删除操作后，都要进行数组的重组，并且删除的元素位置越靠前，数组重组的开销就越大。具体来说，`ArrayList`会**调用 `System.arraycopy()` 将 `index+1` 后面的元素都复制到 `index` 位置上。
+`ArrayList` 在每一次有效的删除操作后，都要进行数组的重组，并且删除的元素位置越靠前，数组重组的开销就越大。具体来说，`ArrayList`会调用 `System.arraycopy()` 将 `index+1` 后面的元素都复制到 `index` 位置上。
 
 ```
 public E remove(int index) {
@@ -1001,8 +1001,8 @@ public void remove() {
 - ArrayList大致和Vector相同，除了ArrayList是非同步的。
 - `size` `isEmpty` `get` `set` `iterator` 和 `listIterator` 方法时间复杂度是`O(1)`，常量时间。其他方法是`O(n)`，线性时间。
 - 每一个ArrayList实例都有一个`capacity`（容量）。`capacity`是用于存储列表中元素的数组的大小。`capacity`至少和列表的大小一样大。
-- 如果多个线程同时访问ArrayList的实例，并且至少一个线程会修改，必须在外部保证ArrayList的同步。修改包括添加删除扩容等操作，仅仅设置值不包括。这种场景可以用其他的一些封装好的同步的`list`。如果不存在这样的`Object`，ArrayList应该用`Collections.synchronizedList`包装起来最好在创建的时候就包装起来，来保证同步访问。
-- `iterator()`和`listIterator(int)`方法是`fail-fast`的，如果在迭代器创建之后，列表进行结构化修改，迭代器会抛出`ConcurrentModificationException`。
+- 如果多个线程同时访问ArrayList的实例，并且至少一个线程会修改，必须在外部保证ArrayList的同步。修改包括添加删除扩容等操作，仅仅设置值不包括。这种场景可以用其他的一些封装好的同步的`list`。如果不存在这样的`Object`，ArrayList应该用 `Collections.synchronizedList` 包装起来最好在创建的时候就包装起来，来保证同步访问。
+- `iterator()` 和 `listIterator(int)` 方法是 `fail-fast` 的，如果在迭代器创建之后，列表进行结构化修改，迭代器会抛出`ConcurrentModificationException`。
 - 面对并发修改，迭代器快速失败、清理，而不是在未知的时间不确定的情况下冒险。请注意，快速失败行为不能被保证。通常来讲，不能同步进行的并发修改几乎不可能做任何保证。因此，写依赖这个异常的程序的代码是错误的，快速失败行为应该仅仅用于防止`bug`。
 
 #### 总结
@@ -1343,6 +1343,7 @@ public LinkedList(Collection<? extends E> c) {
 双向链表的灵活处就是**链表中的一个元素结构就可以向左或者向右开始遍历查找需要的元素结构**。因此对于一个有序链表，查询的效率比单链表高一些。因为，我们可以记录上次查找的位置 p，每次查询时，根据要查找的值与 p 的大小关系，决定是往前还是往后查找，所以平均只需要查找一半的数据。
 
 链表查询示意图如下：
+
 ![20200819213217886](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/java-core-demo/20210321140426.gif)
 
 ```java

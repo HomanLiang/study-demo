@@ -443,15 +443,15 @@ public class ExceptionOverrideDemo {
 
 ### 一、ClassNotFoundException 和 NoClassDefFoundError 有什么区别
 
-在写Java程序的时候，当一个类找不到的时候，JVM有时候会抛出ClassNotFoundException异常，而有时候又会抛出NoClassDefFoundError。看两个异常的字面意思，好像都是类找不到，但是JVM为什么要用两个异常去区分类找不到的情况呢？这个两个异常有什么不同的地方呢？
+在写Java程序的时候，当一个类找不到的时候，JVM有时候会抛出 `ClassNotFoundException` 异常，而有时候又会抛出 `NoClassDefFoundError` 。看两个异常的字面意思，好像都是类找不到，但是JVM为什么要用两个异常去区分类找不到的情况呢？这个两个异常有什么不同的地方呢？
 
 #### ClassNotFoundException
 
-ClassNotFoundException是一个运行时异常。从类继承层次上来看，ClassNotFoundException是从Exception继承的，所以ClassNotFoundException是一个检查异常。
+`ClassNotFoundException` 是一个运行时异常。从类继承层次上来看，`ClassNotFoundException` 是从Exception继承的，所以 `ClassNotFoundException` 是一个检查异常。
 
 ![640](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/java-core-demo/20210321002035.webp)
 
-当应用程序运行的过程中尝试使用类加载器去加载Class文件的时候，如果没有在classpath中查找到指定的类，就会抛出ClassNotFoundException。一般情况下，当我们使用Class.forName()或者ClassLoader.loadClass以及使用ClassLoader.findSystemClass()在运行时加载类的时候，如果类没有被找到，那么就会导致JVM抛出ClassNotFoundException。
+当应用程序运行的过程中尝试使用类加载器去加载Class文件的时候，如果没有在classpath中查找到指定的类，就会抛出ClassNotFoundException。一般情况下，当我们使用 `Class.forName()` 或者 `ClassLoader.loadClass` 以及使用 `ClassLoader.findSystemClass()` 在运行时加载类的时候，如果类没有被找到，那么就会导致JVM抛出 `ClassNotFoundException`。
 
 最简单的，当我们使用JDBC去连接数据库的时候，我们一般会使用Class.forName()的方式去加载JDBC的驱动，如果我们没有将驱动放到应用的classpath下，那么会导致运行时找不到类，所以运行Class.forName()会抛出ClassNotFoundException。
 
@@ -542,7 +542,7 @@ Caused by: java.lang.ClassNotFoundException: TempClass
 
    可以清楚的看到i=1；但是返回的确是0？那说明此i非彼i，就是返回的i不是这个i。
 
-   因为这里是值传递，在执行return前，保留了一个i的副本，值为0，然后再去执行finally，finall完后，到return的时候，返回的并不是当前的i，而是保留的那个副本，也就是0.所以返回结果是0.
+   因为这里是值传递，在执行return前，保留了一个i的副本，值为0，然后再去执行finally，finally完后，到return的时候，返回的并不是当前的i，而是保留的那个副本，也就是0.所以返回结果是0.
 
 4. **catch、finally同时return变量，返回结果又该是啥？**
    ![Image [9]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/java-core-demo/20210321005444.png)

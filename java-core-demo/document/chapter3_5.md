@@ -30,9 +30,9 @@ public abstract class AbstractQueue<E>
 
 ### 1.3. Deque 接口
 
-Deque 接口是 double ended queue 的缩写，即**双端队列**。Deque 继承 Queue 接口，并扩展支持**在队列的两端插入和删除元素**。
+Deque 接口是 double ended queue 的缩写，即 **双端队列**。Deque 继承 Queue 接口，并扩展支持**在队列的两端插入和删除元素**。
 
-所以提供了特定的方法，如:
+所以提供了特定的方法，如：
 
 - 尾部插入时需要的 [addLast(e)](https://docs.oracle.com/javase/9/docs/api/java/util/Deque.html#addLast-E-)、[offerLast(e)](https://docs.oracle.com/javase/9/docs/api/java/util/Deque.html#offerLast-E-)。
 - 尾部删除所需要的 [removeLast()](https://docs.oracle.com/javase/9/docs/api/java/util/Deque.html#removeLast--)、[pollLast()](https://docs.oracle.com/javase/9/docs/api/java/util/Deque.html#pollLast--)。
@@ -43,7 +43,7 @@ Deque 接口是 double ended queue 的缩写，即**双端队列**。Deque 继�
 
 ### 2.1 前言
 
-Java里有一个叫做*Stack*的类，却没有叫做*Queue*的类（它是个接口名字）。当需要使用栈时，Java已不推荐使用*Stack*，而是推荐使用更高效的*ArrayDeque*；既然*Queue*只是一个接口，当需要使用队列时也就首选*ArrayDeque*了（次选是*LinkedList*）。
+Java里有一个叫做*Stack*的类，却没有叫做 *Queue* 的类（它是个接口名字）。当需要使用栈时，Java已不推荐使用 *Stack* ，而是推荐使用更高效的 *ArrayDeque*；既然*Queue*只是一个接口，当需要使用队列时也就首选*ArrayDeque* 了（次选是*LinkedList*）。
 
 ### 2.2 总体介绍
 
@@ -102,7 +102,7 @@ public void addFirst(E e) {
 
 上述代码我们看到，**空间问题是在插入之后解决的**，因为`tail`总是指向下一个可插入的空位，也就意味着`elements`数组至少有一个空位，所以插入元素的时候不用考虑空间问题。
 
-下标越界的处理解决起来非常简单，`head = (head - 1) & (elements.length - 1)`就可以了，**这段代码相当于取余，同时解决了`head`为负值的情况**。因为`elements.length`必需是`2`的指数倍，`elements - 1`就是二进制低位全`1`，跟`head - 1`相与之后就起到了取模的作用，如果`head - 1`为负数（其实只可能是-1），则相当于对其取相对于`elements.length`的补码。
+下标越界的处理解决起来非常简单，`head = (head - 1) & (elements.length - 1)`就可以了，**这段代码相当于取余，同时解决了`head`为负值的情况**。因为 `elements.length` 必需是`2`的指数倍，`elements - 1`就是二进制低位全`1`，跟`head - 1`相与之后就起到了取模的作用，如果`head - 1`为负数（其实只可能是-1），则相当于对其取相对于`elements.length`的补码。
 
 下面再说说扩容函数`doubleCapacity()`，其逻辑是申请一个更大的数组（原数组的两倍），然后将原数组复制过去。过程如下图所示：
 

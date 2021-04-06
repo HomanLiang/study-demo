@@ -18,7 +18,7 @@ enum ColorEn { RED, GREEN, BLUE }
 
 ## 2. 枚举的本质
 
-`java.lang.Enum`类声明
+`java.lang.Enum` 类声明
 
 ```java
 public abstract class Enum<E extends Enum<E>>
@@ -80,7 +80,9 @@ public final class io.github.dunwu.javacore.enumeration.ColorEn extends java.lan
 ```
 public class EnumMethodDemo {
     enum Color {RED, GREEN, BLUE;}
+    
     enum Size {BIG, MIDDLE, SMALL;}
+    
     public static void main(String args[]) {
         System.out.println("=========== Print all Color ===========");
         for (Color c : Color.values()) {
@@ -370,7 +372,7 @@ public class ErrorCodeEnumDemo {
 
 可以将类型相近的枚举通过接口或类组织起来，但是一般用接口方式进行组织。
 
-原因是：Java 接口在编译时会自动为 enum 类型加上`public static`修饰符；Java 类在编译时会自动为 `enum` 类型加上 static 修饰符。看出差异了吗？没错，就是说，在类中组织 `enum`，如果你不给它修饰为 `public`，那么只能在本包中进行访问。
+原因是：Java 接口在编译时会自动为 enum 类型加上 `public static` 修饰符；Java 类在编译时会自动为 `enum` 类型加上 static 修饰符。看出差异了吗？没错，就是说，在类中组织 `enum`，如果你不给它修饰为 `public`，那么只能在本包中进行访问。
 
 **例：在接口中组织 enum**
 
@@ -481,9 +483,13 @@ Effective Java 中展示了一种策略枚举。这种枚举通过枚举嵌套�
 
 ```
 enum PayrollDay {
-    MONDAY(PayType.WEEKDAY), TUESDAY(PayType.WEEKDAY), WEDNESDAY(
-            PayType.WEEKDAY), THURSDAY(PayType.WEEKDAY), FRIDAY(PayType.WEEKDAY), SATURDAY(
-            PayType.WEEKEND), SUNDAY(PayType.WEEKEND);
+    MONDAY(PayType.WEEKDAY), 
+    TUESDAY(PayType.WEEKDAY), 
+    WEDNESDAY(PayType.WEEKDAY), 
+    THURSDAY(PayType.WEEKDAY), 
+    FRIDAY(PayType.WEEKDAY), 
+    SATURDAY(PayType.WEEKEND), 
+    SUNDAY(PayType.WEEKEND);
 
     private final PayType payType;
 

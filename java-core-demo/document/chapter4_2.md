@@ -246,13 +246,13 @@ public class CallableDemo {
 
 **劣势是：**
 
-编程稍微复杂，如果要访问当前线程，则必须使用Thread.currentThread()方法。
+编程稍微复杂，如果要访问当前线程，则必须使用 `Thread.currentThread()` 方法。
 
 **2、使用继承Thread类的方式创建多线程时**
 
 **优势是：**
 
-编写简单，如果需要访问当前线程，则无需使用Thread.currentThread()方法，直接使用this即可获得当前线程。
+编写简单，如果需要访问当前线程，则无需使用 `Thread.currentThread()` 方法，直接使用this即可获得当前线程。
 
 **劣势是：**
 
@@ -498,16 +498,16 @@ public class ThreadStopDemo3 {
 
 ### 3.4. 守护线程
 
-什么是守护线程？
+**什么是守护线程？**
 
-- **守护线程（Daemon Thread）是在后台执行并且不会阻止 JVM 终止的线程**。**当所有非守护线程结束时，程序也就终止，同时会杀死所有守护线程**。
+- 守护线程（Daemon Thread）是在后台执行并且不会阻止 JVM 终止的线程。当所有非守护线程结束时，程序也就终止，同时会杀死所有守护线程。
 - 与守护线程（Daemon Thread）相反的，叫用户线程（User Thread），也就是非守护线程。
 
-为什么需要守护线程？
+**为什么需要守护线程？**
 
 - 守护线程的优先级比较低，用于为系统中的其它对象和线程提供服务。典型的应用就是垃圾回收器。
 
-如何使用守护线程？
+**如何使用守护线程？**
 
 - 可以使用 `isDaemon` 方法判断线程是否为守护线程。
 
@@ -873,7 +873,7 @@ SecondThread: 4
 
 ### 4.6 Condition
 
-Condition是在java 1.5中出现的，它用来替代传统的Object的wait()/notify()实现线程间的协作，它的使用依赖于 Lock，Condition、Lock 和 Thread 三者之间的关系如下图所示。相比使用Object的wait()/notify()，使用Condition的await()/signal()这种方式能够更加安全和高效地实现线程间协作。Condition是个接口，基本的方法就是await()和signal()方法。Condition依赖于Lock接口，生成一个Condition的基本代码是lock.newCondition() 。 必须要注意的是，Condition 的 await()/signal() 使用都必须在lock保护之内，也就是说，必须在lock.lock()和lock.unlock之间才可以使用。事实上，Conditon的await()/signal() 与 Object的wait()/notify() 有着天然的对应关系：
+Condition是在java 1.5中出现的，它用来替代传统的Object的 `wait()/notify()` 实现线程间的协作，它的使用依赖于 Lock，Condition、Lock 和 Thread 三者之间的关系如下图所示。相比使用Object的wait()/notify()，使用Condition的await()/signal()这种方式能够更加安全和高效地实现线程间协作。Condition是个接口，基本的方法就是await()和signal()方法。Condition依赖于Lock接口，生成一个Condition的基本代码是lock.newCondition() 。 必须要注意的是，Condition 的 await()/signal() 使用都必须在lock保护之内，也就是说，必须在lock.lock()和lock.unlock之间才可以使用。事实上，Conditon的await()/signal() 与 Object的wait()/notify() 有着天然的对应关系：
 
 - Conditon中的await()对应Object的wait()；
 - Condition中的signal()对应Object的notify()；
@@ -881,7 +881,7 @@ Condition是在java 1.5中出现的，它用来替代传统的Object的wait()/no
 
 ![20170519154927256](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/java-core-demo/20210323220507.png)
 
-使用Condition往往比使用传统的通知等待机制(Object的wait()/notify())要更灵活、高效，例如，我们可以使用多个Condition实现通知部分线程：
+使用Condition往往比使用传统的通知等待机制(Object的 `wait()/notify())` 要更灵活、高效，例如，我们可以使用多个Condition实现通知部分线程：
 
 ```
 // 线程 A
@@ -1044,8 +1044,8 @@ public class Run {
   - 当调用了 `sleep` 方法后，**无论什么优先级的线程都可以得到执行机会**。
   - `sleep` 方法不会释放“锁标志”，也就是说如果有 `synchronized` 同步块，其他线程仍然不能访问共享数据。
 
-- `join`
-- `join` 方法会 **让线程从 `Running` 状态转入 `Waiting` 状态**。
+- `join` 方法
+  - `join` 方法会 **让线程从 `Running` 状态转入 `Waiting` 状态**。
   - 当调用了 `join` 方法后，**当前线程必须等待调用 `join` 方法的线程结束后才能继续执行**。
 
 ### 6.2. 为什么 sleep 和 yield 方法是静态的
@@ -1114,7 +1114,7 @@ public class StartAndRunMethod {
   - 也就是说, 启动一个新线程的本质就是请求 JVM 来运行这个线程。
   - 至于这个线程何时能够运行，并不是简单的由我们能够决定的，而是由线程调度器去决定的。
   - 如果它很忙，即使我们运行了 `start` 方法，也不一定能够立刻的启动线程。
-  - 所以说 `srtart` 方法调用之后，并不意味这个方法已经开始运行了。它可能稍后才会运行，也很有可能很长时间都不会运行，比如说遇到了饥饿的情况。
+  - 所以说 `start` 方法调用之后，并不意味这个方法已经开始运行了。它可能稍后才会运行，也很有可能很长时间都不会运行，比如说遇到了饥饿的情况。
   - 这也就印证了有些情况下，线程 1 先掉用了 `start` 方法，而线程 2 后调用了 `start` 方法，却发现线程 2 先执行线程 1 后执行的情况。
   - 总结: 调用 `start` 方法的顺序并不能决定真正线程执行的顺序。
   - **注意事项**
@@ -1292,7 +1292,7 @@ public void run() {
 
 **1. 停止不了的线程**
 
-interrupt()方法的使用效果并不像for+break语句那样，马上就停止循环。调用interrupt方法是在当前线程中打了一个停止标志，并不是真的停止线程。
+`interrupt()` 方法的使用效果并不像 `for+break` 语句那样，马上就停止循环。调用 `interrupt` 方法是在当前线程中打了一个停止标志，并不是真的停止线程。
 
 ```
 public class MyThread extends Thread {
@@ -1335,12 +1335,12 @@ i=500000
 
 Thread.java类中提供了两种方法：
 
-- this.interrupted(): 测试当前线程是否已经中断；
-- this.isInterrupted(): 测试线程是否已经中断；
+- `this.interrupted()`: 测试当前线程是否已经中断；
+- `this.isInterrupted()`: 测试线程是否已经中断；
 
 **那么这两个方法有什么图区别呢？**
 
-我们先来看看this.interrupted()方法的解释：测试当前线程是否已经中断，当前线程是指运行this.interrupted()方法的线程。
+我们先来看看 `this.interrupted()` 方法的解释：测试当前线程是否已经中断，当前线程是指运行`this.interrupted()` 方法的线程。
 
 ```
 public class MyThread extends Thread {

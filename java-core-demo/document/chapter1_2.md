@@ -1135,22 +1135,22 @@ public class StringTest {
 
 String是我们开发中使用频率最高的类，它有哪些方法，大家一定不会陌生，例如：
 
-- length();//计算字符串的长度
-- charAt();//截取一个字符
-- getChars();//截取多个字符
-- equals();//比较两个字符串
-- equalsIgnoreCase();//比较两个字符串,忽略大小写
-- startsWith();//startsWith()方法决定是否以特定字符串开始
-- endWith();//方法决定是否以特定字符串结束
-- indexOf();//查找字符或者子串第一次出现的地方。
-- lastIndexOf();//查找字符或者子串是后一次出现的地方。
-- substring();//截取字符串
-- concat();//连接两个字符串
-- replace();//替换
-- trim();//去掉起始和结尾的空格
-- valueOf();//转换为字符串
-- toLowerCase();//转换为小写
-- toUpperCase();// 转换为大写
+- `length();`//计算字符串的长度
+- `charAt();`//截取一个字符
+- `getChars();`//截取多个字符
+- `equals();`//比较两个字符串
+- `equalsIgnoreCase();`//比较两个字符串,忽略大小写
+- `startsWith();`//startsWith()方法决定是否以特定字符串开始
+- `endWith();`//方法决定是否以特定字符串结束
+- `indexOf();`//查找字符或者子串第一次出现的地方。
+- `lastIndexOf();`//查找字符或者子串是后一次出现的地方。
+- `substring();`//截取字符串
+- `concat();`//连接两个字符串
+- `replace();`//替换
+- `trim();`//去掉起始和结尾的空格
+- `valueOf();`//转换为字符串
+- `toLowerCase();`//转换为小写
+- `toUpperCase();`// 转换为大写
 
 但是像replace()，substring()，toLowerCase()这三个方法需要注意一下，我们看下下面一段代码：
 
@@ -1249,7 +1249,7 @@ public String substring(int beginIndex)
 public String substring(int beginIndex, int endIndex)
 ```
 
-使用这个方法，"smiles".substring(1, 5) 返回结果 "mile"，"unhappy".substring(2) 返回结果 "happy" 另一种重载就是接受一个开始截取位置和一个结束截取位置的参数的方法``
+使用这个方法，"smiles".substring(1, 5) 返回结果 "mile"，"unhappy".substring(2) 返回结果 "happy" 另一种重载就是接受一个开始截取位置和一个结束截取位置的参数的方法
 
 通过这个介绍我们基本了解了substring的作用，这样便于我们理解下面的内容。
 

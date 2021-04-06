@@ -1420,11 +1420,10 @@ ReadWriteLock 对程序性能的提高主要受制于如下几个因素：
 
 可重入锁又名递归锁，是指在同一个线程在外层方法获取锁的时候，在进入内层方法会自动获取锁。说的有点抽象，下面会有一个代码的示例。
 
-- 对于Java ReentrantLock而言, 他的名字就可以看出是一个可重入锁，其名字是Re entrant Lock重新进入锁。
+- 对于Java ReentrantLock而言, 他的名字就可以看出是一个可重入锁，其名字是Reentrant Lock重新进入锁。
 
 - 对于Synchronized而言，也是一个可重入锁。可重入锁的一个好处是可一定程度避免死锁。
 
-  
 
 ```
 synchronized void setA() throws Exception{
@@ -1474,7 +1473,7 @@ synchronized void setB() throws Exception{
 
 分段锁其实是一种锁的设计，并不是具体的一种锁，对于ConcurrentHashMap而言，其并发的实现就是通过分段锁的形式来实现高效的并发操作。
 
-我们以ConcurrentHashMap来说一下分段锁的含义以及设计思想，**ConcurrentHashMap中的分段锁称为Segment，它即类似于HashMap（JDK7与JDK8中HashMap的实现）的结构，即内部拥有一个Entry数组，数组中的每个元素又是一个链表；****同时又是一个ReentrantLock（Segment继承了ReentrantLock)。**
+我们以ConcurrentHashMap来说一下分段锁的含义以及设计思想，**ConcurrentHashMap中的分段锁称为Segment，它即类似于HashMap（JDK7与JDK8中HashMap的实现）的结构，即内部拥有一个Entry数组，数组中的每个元素又是一个链表；同时又是一个ReentrantLock（Segment继承了ReentrantLock)。**
 
 当需要put元素的时候，并不是对整个hashmap进行加锁，而是先通过hashcode来知道他要放在那一个分段中，然后对这个分段进行加锁，所以当多线程put的时候，只要不是放在一个分段中，就实现了真正的并行的插入。
 

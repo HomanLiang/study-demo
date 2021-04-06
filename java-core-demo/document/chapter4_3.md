@@ -663,11 +663,11 @@ class Singleton {
 
 1. 重排序操作不会对存在数据依赖关系的操作进行重排序。
 
-   比如：a=1;b=a; 这个指令序列，由于第二个操作依赖于第一个操作，所以在编译时和处理器运行时这两个操作不会被重排序。
+   比如：`a=1;b=a; ` 这个指令序列，由于第二个操作依赖于第一个操作，所以在编译时和处理器运行时这两个操作不会被重排序。
 
 2. 重排序是为了优化性能，但不管怎么重排序，单线程下程序的执行结果不能被改变
 
-   比如：a=1;b=2;c=a+b这三个操作，第一步（a=1)和第二步(b=2)由于不存在数据依赖关系，所以可能会发生重排序，但是c=a+b这个操作是不会被重排序的，因为需要保证最终的结果一定是c=a+b=3。
+   比如：`a=1;b=2;c=a+b` 这三个操作，第一步（a=1)和第二步(b=2)由于不存在数据依赖关系，所以可能会发生重排序，但是c=a+b这个操作是不会被重排序的，因为需要保证最终的结果一定是 `c=a+b=3`。
 
 重排序在单线程模式下是一定会保证最终结果的正确性，但是在多线程环境下，问题就不能保证了。
 
@@ -1023,11 +1023,11 @@ J.U.C 包提供了一个带有标记的**原子引用类 `AtomicStampedReference
 >
 > ThreadLocal的目的是为了解决多线程访问资源时的共享问题。
 
-结论：ThreadLocal 并不是像上面所说为了解决多线程 **共享**变量的问题。
+结论：ThreadLocal 并不是像上面所说为了解决多线程 **共享** 变量的问题。
 
 **正确理解**
 
-ThreadLoal 变量，它的基本原理是，同一个 ThreadLocal 所包含的对象（对ThreadLocal< StringBuilder >而言即为 StringBuilder 类型变量），在不同的 Thread 中有不同的副本（实际上是不同的实例）:
+ThreadLoal 变量，它的基本原理是，同一个 ThreadLocal 所包含的对象（对 `ThreadLocal< StringBuilder >` 而言即为 StringBuilder 类型变量），在不同的 Thread 中有不同的副本（实际上是不同的实例）:
 
 - 因为每个 Thread 内有自己的实例副本，且该副本只能由当前 Thread 使用；
 - 既然其它 Thread 不可访问，那就不存在多线程间共享的问题。
@@ -1152,7 +1152,7 @@ public class ThreadLocalDemo {
 
 我们大胆猜想一下，既然每个访问 ThreadLocal 变量的线程都有自己的一个“本地”实例副本。一个可能的方案是 ThreadLocal 维护一个 Map，Key 是当前线程，Value是ThreadLocal在当前线程内的实例。这样，线程通过该 ThreadLocal 的 get() 方案获取实例时，只需要以线程为键，从 Map 中找出对应的实例即可。该方案如下图所示
 
-![VarMap](https://user-gold-cdn.xitu.io/2019/12/15/16f0756f7c2e9912?imageView2/0/w/1280/h/960/format/webp/ignore-error/1)
+![VarMap](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/java-core-demo/20210406174404.webp)
 
 这个方案可以满足上文提到的每个线程内部都有一个ThreadLocal 实例备份的要求。每个新线程访问该 ThreadLocal 时，都会向 Map 中添加一个新的映射，而当每个线程结束时再清除该线程对应的映射。But，这样就存在两个问题：
 
@@ -1165,11 +1165,9 @@ public class ThreadLocalDemo {
 
 上面这个方案，存在多线程访问同一个 Map时可能会出现的同步问题。如果该 Map 由 Thread 维护，从而使得每个 Thread 只访问自己的 Map，就不存在这个问题。该方案如下图所示。
 
-![ThreadMap](https://user-gold-cdn.xitu.io/2019/12/15/16f0756fbeacc1d2?imageView2/0/w/1280/h/960/format/webp/ignore-error/1)
+![ThreadMap](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/java-core-demo/20210406174433.webp)
 
 该方案虽然没有锁的问题，但是由于每个线程在访问ThreadLocal 变量后，都会在自己的 Map 内维护该 ThreadLocal 变量与具体实例的映射，如果不删除这些引用（映射），就有可能会造成内存泄漏的问题。我们一起来看一下Jdk8是如何解决这个问题的。
-
-
 
 **`Thread` 类中维护着一个 `ThreadLocal.ThreadLocalMap` 类型的成员** `threadLocals`。这个成员就是用来存储当前线程独占的变量副本。
 
@@ -1390,9 +1388,7 @@ server.tomcat.max-threads=1
 
 当访问 id = 2 时，before 的应答不是 null，而是 1，不符合预期。
 
-【分析】实际情况和预期存在偏差。Spring Boot 程序运行在 Tomcat 中，执行程序的线程是 Tomcat 的工作线程，而 Tomcat 的工作线程是基于线程池的。**线程池会重用固定的几个线程，一旦线程重用，那么很可能首次从** **ThreadLocal 获取的值是之前其他用户的请求遗留的值。这时，ThreadLocal 中的用户信息就是其他用户的信息**。
-
-**并不能认为没有显式开启多线程就不会有线程安全问题**。使用类似 ThreadLocal 工具来存放一些数据时，需要特别注意在代码运行完后，显式地去清空设置的数据。
+【分析】实际情况和预期存在偏差。Spring Boot 程序运行在 Tomcat 中，执行程序的线程是 Tomcat 的工作线程，而 Tomcat 的工作线程是基于线程池的。**线程池会重用固定的几个线程，一旦线程重用，那么很可能首次从** **ThreadLocal 获取的值是之前其他用户的请求遗留的值。这时，ThreadLocal 中的用户信息就是其他用户的信息。并不能认为没有显式开启多线程就不会有线程安全问题**。使用类似 ThreadLocal 工具来存放一些数据时，需要特别注意在代码运行完后，显式地去清空设置的数据。
 
 #### ThreadLocal 错误案例修正
 
@@ -1536,15 +1532,15 @@ boolean tryLock(long time, TimeUnit unit) throws InterruptedException;
 boolean tryLock();
 ```
 
-- lockInterruptibly()
+- `lockInterruptibly()`
 
   支持中断。
 
-- tryLock()
+- `tryLock()`
 
   tryLock()方法是有返回值的，它表示用来尝试获取锁，如果获取成功，则返回true，如果获取失败（即锁已被其他线程获取），则返回false，也就说这个方法无论如何都会立即返回。在拿不到锁时不会一直在那等待。
 
-- tryLock(long time, TimeUnit unit)
+- `tryLock(long time, TimeUnit unit)`
 
   tryLock(long time, TimeUnit unit)方法和tryLock()方法是类似的，只不过区别在于这个方法在拿不到锁时会等待一定的时间，在时间期限之内如果还拿不到锁，就返回false。如果一开始拿到锁或者在等待期间内拿到了锁，则返回true。
 
