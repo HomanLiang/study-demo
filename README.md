@@ -32,9 +32,9 @@
 
 
 
-MyBatis
+## MyBatis
 
-[MyBatis 学习笔记](https://github.com/HomanLiang/study-demo/blob/main/mybatis-demo/index.md )
+[MyBatis 学习笔记](https://github.com/HomanLiang/study-demo/blob/main/mybatis-demo/document/index.md )
 
 
 
