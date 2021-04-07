@@ -9,11 +9,11 @@
 7. [MyBatis 框架设计](https://github.com/HomanLiang/study-demo/blob/main/mybatis-demo/document/chapter07.md)
 8. [MyBatis 运行原理](https://github.com/HomanLiang/study-demo/blob/main/mybatis-demo/document/chapter08.md)
 9. [MyBatis 缓存](https://github.com/HomanLiang/study-demo/blob/main/mybatis-demo/document/chapter09.md)
-10. MyBatis 拦截器
-11. MyBatis 应用
-12. MyBatis 增强
-13. MyBatis 源码
-14. MyBatis 面试题
+10. [MyBatis 拦截器](https://github.com/HomanLiang/study-demo/blob/main/mybatis-demo/document/chapter10.md)
+11. [MyBatis 应用](https://github.com/HomanLiang/study-demo/blob/main/mybatis-demo/document/chapter11.md)
+12. [MyBatis 增强](https://github.com/HomanLiang/study-demo/blob/main/mybatis-demo/document/chapter12.md)
+13. [MyBatis 源码](https://github.com/HomanLiang/study-demo/blob/main/mybatis-demo/document/chapter13.md)
+14. [MyBatis 面试题](https://github.com/HomanLiang/study-demo/blob/main/mybatis-demo/document/chapter14.md)
 
 
 

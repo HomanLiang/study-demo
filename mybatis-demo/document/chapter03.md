@@ -1178,3 +1178,154 @@ SELECT * FROM POST WHERE BLOG_ID = #{id}
 ```
 
 
+
+## 常用技巧
+
+### 批量插入
+
+**xxxMapper.xml:**
+
+```
+<!-- 批量插入生成的兑换码 -->
+     <insert id ="insertCodeBatch" parameterType="java.util.List" >
+            <selectKey resultType ="java.lang.Integer" keyProperty= "id"
+                 order= "AFTER">
+                SELECT LAST_INSERT_ID()
+            </selectKey >
+           insert into redeem_code
+           (bach_id, code, type, facevalue,create_user,create_time)
+           values
+            <foreach collection ="list" item="reddemCode" index= "index" separator =",">
+                (
+                #{reddemCode.batchId}, #{reddemCode.code},
+                #{reddemCode.type},
+                #{reddemCode.facevalue},
+                #{reddemCode.createUser}, #{reddemCode.createTime}
+                )
+            </foreach >
+     </insert >
+```
+
+**xxxMapper.java(部分):**
+
+```
+int insertCodeBatch(List<ReddemCode > reddemCodeList);
+```
+
+对于foreach标签的解释参考了网上的资料，具体如下：
+
+- foreach的主要用在构建in条件中，它可以在SQL语句中进行迭代一个集合。
+- foreach元素的属性主要有 item，index，collection，open，separator，close。
+- item表示集合中每一个元素进行迭代时的别名，index指定一个名字，用于表示在迭代过程中，每次迭代到的位置，open表示该语句以什么开始，separator表示在每次进行迭代之间以什么符号作为分隔 符，close表示以什么结束，在使用foreach的时候最关键的也是最容易出错的就是collection属性，该属性是必须指定的，但是在不同情况下，该属性的值是不一样的，主要有一下3种情况：
+
+1. 如果传入的是单参数且参数类型是一个List的时候，collection属性值为list
+2. 如果传入的是单参数且参数类型是一个array数组的时候，collection的属性值为array
+3. 如果传入的参数是多个的时候，我们就需要把它们封装成一个Map了，当然单参数也可以封装成map
+
+使用批量插入执行的SQL语句应该等价于：
+
+```
+ insert into redeem_code (batch_id, code, type, facevalue,create_user,create_time)
+ values
+ (?,?,?,?,?,? ),(?,?,?,?,?,? ),(?,?,?,?,?,? ),(?,?,?,?,?,? )
+```
+
+### 批量更新
+
+```
+<!-- 批量更新赛程 -->
+    <update id="updateMatchs" parameterType="java.util.List">
+        <foreach collection="matchs" item="item" index="index" open="" close="" separator=";">
+            update t_match
+            <set>
+                <if test="item.title !=null">
+                    TITLE = #{item.title,jdbcType=VARCHAR},
+                </if>
+                <if test="item.homeScore !=null">
+                    HOME_SCORE = #{item.homeScore,jdbcType=INTEGER},
+                </if>
+                <if test="item.visitScore !=null">
+                    VISTT_SCORE = #{item.visitScore,jdbcType=INTEGER},
+                </if>
+                <if test="item.liveSource !=null">
+                    LIVE_SOURCE = #{item.liveSource,jdbcType=VARCHAR},
+                </if>
+                <if test="item.liveURL !=null">
+                    LIVE_URL = #{item.liveURL,jdbcType=VARCHAR},
+                </if>
+                <if test="item.isHotMatch !=null">
+                    IS_HOT_MATCH = #{item.isHotMatch,jdbcType=VARCHAR}
+                </if>
+            </set>
+        where HOME_TEAM_ID = #{item.homeTeamId,jdbcType=VARCHAR} and
+        VISIT_TEAM_ID = #{item.visitTeamId,jdbcType=VARCHAR} and
+        MATCH_TIME = #{item.matchTime,jdbcType=BIGINT}
+        </foreach>
+    </update>
+```
+
+```
+/**
+     * 批量修改赛程
+     * 
+     * @param matchs
+     * @throws DaoException
+     */
+    void updateMatchs(@Param(value = "matchs")List<MatchBasic> matchs);
+```
+
+这种批量跟心数据库的方式可以在一次数据库连接中更新所有数据，避免了频繁数据库建立和断开连接的开销，可以很大程度的提高数据更新效率。但是这样的问题是如果这个过程中更新出错，将很难知道具体是哪个数据出错，如果使用数据自身的事务保证，那么一旦出错，所有的更新将自动回滚。而且通常这种方式也更容易出错。因此通常的使用的方案是进行折中，也就是一次批量更新一部分（分页进行更新，比如说一共有1000条数据，一次更新100条）。这样可以分担出错的概率，也更容易定位到出错的位置。
+ 当然如果数据量确实很大的时候，这种批量更新也一样会导致更新效率低下（比如说一次更新100条，那如果10亿条数据呢，一样要批量更新1000万次，建立和断开1000万次数据库，这个效率是无法承受的）。这时候也许只能考虑其他方案了，比如引入缓存机制等。
+
+###  特殊符号替换
+
+| 特殊字符 |                     替代符号                      |
+| :------: | :-----------------------------------------------: |
+|    &     |                       &amp;                       |
+|    <     |                       &lt;                        |
+|    >     |                       &gt;                        |
+|    "     |                      &quot;                       |
+|    '     |                      &apos;                       |
+| 小于等于 |      a<=b    a &lt;= b    a <![CDATA[<= ]]>b      |
+| 大于等于 |      a>=b    a &gt;= b    a <![CDATA[>= ]]>b      |
+|  不等于  | a!=b    a <![CDATA[ <> ]]>b    a <![CDATA[!= ]]>b |
+
+### SpringBoot中Mybatis打印sql
+
+如果使用的是application.properties文件，加入如下配置：
+        logging.level.com.example.demo.dao=debug
+        logging.level.com，后面的路径指的是mybatis对应的方法接口所在的包。并不是mapper.xml所在的包。
+        如果使用的是application.yml文件，加入如下配置：
+        logging:
+          level:
+             com.example.demo.dao : debug
+
+### 返回自增Id
+
+Mapper 接口：
+
+```
+Long insertStudent(@Param("data")Student student);
+```
+
+Mapper xml：
+
+```
+<insert id="insertStudent" parameterType="com.test.Student" useGeneratedKeys="true"  keyProperty="data.id">
+</insert>
+```
+
+### 非自增主键返回
+
+```
+<mapper namespace="com.itpsc.mapper.UserMapper" >
+    <insert id="adduser" parameterType="com.itpsc.entity.User">
+        <selectKey keyProperty="id" order="BEFORE" resultType="java.lang.String">
+            SELECT uuid()
+        </selectKey>
+        insert into t_user(id,name,password,phone) values(#{id},#{name},#{password},#{phone})
+    </insert>
+</mapper>
+```
+
+## 
