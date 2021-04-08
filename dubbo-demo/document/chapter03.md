@@ -4,358 +4,271 @@
 
 # Dubbo 服务发现（SPI）机制
 
-## 前言
-用到微服务就不得不来谈谈服务发现的话题。通俗的来说，就是在提供服务方把服务注册到注册中心，并且告诉服务消费方现在已经存在了这个服务。那么里面的细节到底是怎么通过代码实现的呢，现在我们来看看Dubbo中的SPI机制
-## SPI简介
-SPI 全称为 Service Provider Interface，是一种服务发现机制。SPI本质是将接口实现类的全限定名配置在文件中，并由服务加载器读取配置文件，加载实现类，这样运行时可以动态的为接口替换实现类
-## Dubbo中的SPI
-Dubbo与上面的普通的Java方式实现SPI不同，在Dubbo中重新实现了一套功能更强的SPI机制，即通过键值对的方式进行配置及缓存。其中也使用ConcurrentHashMap与synchronize防止并发问题出现。主要逻辑封装在ExtensionLoader中。下面我们看看源码。
-## ExtensionLoader源码解析
-由于内部的方法实在太多，我们只挑选与实现SPI的重要逻辑部分拿出来讲解。　　
+## 1.前言
+Dubbo 的成功离不开它采用微内核设计+SPI扩展，使得有特殊需求的接入方可以自定义扩展，做定制的二次开发。
 
-### getExtensionLoader(Class<T> type)
+良好的扩展性对于一个框架而言尤其重要，框架顾名思义就是搭好核心架子，给予用户简单便捷的使用，同时也需要满足他们定制化的需求。
+
+Dubbo 就依靠 SPI 机制实现了插件化功能，几乎将所有的功能组件做成基于 SPI 实现，并且默认提供了很多可以直接使用的扩展点，实现了面向功能进行拆分的对扩展开放的架构。
+
+## 2.SPI简介
+SPI (Service Provider Interface)，主要是用来在框架中使用的，最常见和莫过于我们在访问数据库时候用到的 `java.sql.Driver` 接口了。
+
+你想一下首先市面上的数据库五花八门，不同的数据库底层协议的大不相同，所以首先需要定制一个接口，来约束一下这些数据库，使得 Java 语言的使用者在调用数据库的时候可以方便、统一的面向接口编程。
+
+数据库厂商们需要根据接口来开发他们对应的实现，那么问题来了，真正使用的时候到底用哪个实现呢？从哪里找到实现类呢？
+
+这时候 Java SPI 机制就派上用场了，不知道到底用哪个实现类和找不到实现类，我们告诉它不就完事了呗。
+
+大家都约定好将实现类的配置写在一个地方，然后到时候都去哪个地方查一下不就知道了吗？
+
+Java SPI 就是这样做的，约定在 Classpath 下的 `META-INF/services/` 目录里创建一个以服务接口命名的文件，然后文件里面记录的是此 jar 包提供的具体实现类的全限定名。
+
+这样当我们引用了某个 jar 包的时候就可以去找这个 jar 包的 `META-INF/services/` 目录，再根据接口名找到文件，然后读取文件里面的内容去进行实现类的加载与实例化。
+
+比如我们看下 MySQL 是怎么做的。
+
+![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mybatis-demo/20210408220356.png)
+
+再来看一下文件里面的内容。
+
+![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mybatis-demo/20210408220410.png)
+
+MySQL 就是这样做的，为了让大家更加深刻的理解我再简单的写一个示例
+
+
+
+## 3.Java SPI
+
+### 3.1.Java SPI 示例
+
+![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mybatis-demo/20210408220513.png)
+
+然后我在 META-INF/services/ 目录下建了个以接口全限定名命名的文件，内容如下
+
 ```
-public static <T> ExtensionLoader<T> getExtensionLoader(Class<T> type) {
-        if (type == null) {
-            throw new IllegalArgumentException("Extension type == null");
-        } else if (!type.isInterface()) {
-            throw new IllegalArgumentException("Extension type (" + type + ") is not an interface!");
-        } else if (!withExtensionAnnotation(type)) {
-            throw new IllegalArgumentException("Extension type (" + type + ") is not an extension, because it is NOT annotated with @" + SPI.class.getSimpleName() + "!");
-        } else {
-            ExtensionLoader<T> loader = (ExtensionLoader)EXTENSION_LOADERS.get(type);
-            if (loader == null) {
-                EXTENSION_LOADERS.putIfAbsent(type, new ExtensionLoader(type));
-                loader = (ExtensionLoader)EXTENSION_LOADERS.get(type);
-            }
-
-            return loader;
-        }
-    }
+com.demo.spi.NuanNanAobing
+com.demo.spi.ShuaiAobing
 ```
-这个是可以将对应的接口转换为ExtensionLoader 实例。相当于告诉Dubbo这是个服务接口，里面有对应的服务提供者
 
-先是逻辑判断传进来的类不能为空，必须是接口且被@SPI注解注释过。这三个条件都满足就会创建ExtensionLoader 实例。同样的，如果当前类已经被创建过ExtensionLoader 实例，那么直接拿取。否则新建一个。这里使用的是键值对的存储类型，如下图：
+运行之后的结果如下
 
-![Image [3]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mybatis-demo/20210408002316.png)
+![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mybatis-demo/20210408220543.png)
 
-使用ConcurrentHashMap防止在并发时出现问题，并且效率高HashTable不少，所以我们日常项目并发场景中也应该多用ConcurrentHashMap进行存储。
+### 3.2.Java SPI 源码分析
 
-### getExtension(String name)
+之前的文章我也提到了 Dubbo 并没有用 Java 实现的 SPI，而是自定义 SPI，那肯定是 Java SPI 有什么不方便的地方或者劣势。
+
+因此丙带着大家先深入了解一下 Java SPI，这样才能知道哪里不好，进而再和 Dubbo SPI 进行对比的时候会更加的清晰其优势。
+
+大家看到源码不要怕，丙已经给大家做了注释，并且逻辑也不难的，想要变强源码不可或缺。为了让大家更好的理解，丙在源码分析完了之后还会画个图，帮大家再理一下思路。
+
+从上面我的示例中可以看到ServiceLoader.load()其实就是 Java SPI 入口，我们来看看到底做了什么操作。
+
+![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mybatis-demo/20210408220714.png)
+
+我用一句话概括一下，简单的说就是先找当前线程绑定的 ClassLoader，如果没有就用 SystemClassLoader，然后清除一下缓存，再创建一个 LazyIterator。
+
+那现在重点就是 LazyIterator了，从上面代码可以看到我们调用了 hasNext() 来做实例循环，通过 next() 得到一个实例。而 LazyIterator 其实就是 Iterator 的实现类。我们来看看它到底干了啥。
+
+![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mybatis-demo/20210408220730.png)
+
+不管进入 if 分支还是 else 分支，重点都在我框出来的代码，接下来就进入重要时刻了！
+
+![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mybatis-demo/20210408220744.png)
+
+可以看到这个方法其实就是在约定好的地方找到接口对应的文件，然后加载文件并且解析文件里面的内容。
+
+我们再来看一下 nextService()。
+
+![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mybatis-demo/20210408220754.png)
+
+所以就是通过文件里填写的全限定名加载类，并且创建其实例放入缓存之后返回实例。
+
+整体的 Java SPI 的源码解析已经完毕，是不是很简单？就是约定一个目录，根据接口名去那个目录找到文件，文件解析得到实现类的全限定名，然后循环加载实现类和创建其实例。
+
+我再用一张图来带大家过一遍。
+
+![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mybatis-demo/20210408220813.png)
+
+### 3.3.Java SPI 哪里不好
+
+相信大家一眼就能看出来，Java SPI 在查找扩展实现类的时候遍历 SPI 的配置文件并且将实现类全部实例化，假设一个实现类初始化过程比较消耗资源且耗时，但是你的代码里面又用不上它，这就产生了资源的浪费。
+
+所以说 Java SPI 无法按需加载实现类。
+
+
+
+## 4.Dubbo中的SPI
+### 4.1Dubbo SPI
+
+因此 Dubbo 就自己实现了一个 SPI，让我们想一下按需加载的话首先你得给个名字，通过名字去文件里面找到对应的实现类全限定名然后加载实例化即可。
+
+Dubbo 就是这样设计的，配置文件里面存放的是键值对，我截一个 Cluster 的配置。
+
+![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mybatis-demo/20210408223533.png)
+
+并且 Dubbo SPI 除了可以按需加载实现类之外，增加了 IOC 和 AOP 的特性，还有个自适应扩展机制。
+
+我们先来看一下 Dubbo 对配置文件目录的约定，不同于 Java SPI ，Dubbo 分为了三类目录。
+
+- `META-INF/services/` 目录：该目录下的 SPI 配置文件是为了用来兼容 Java SPI 。
+
+- `META-INF/dubbo/` 目录：该目录存放用户自定义的 SPI 配置文件。
+
+- `META-INF/dubbo/internal/` 目录：该目录存放 Dubbo 内部使用的 SPI 配置文件。
+
+### 4.2Dubbo SPI 简单实例
+
+用法很是简单，我就拿官网上的例子来展示一下。
+
+首先在 META-INF/dubbo 目录下按接口全限定名建立一个文件，内容如下：
+
 ```
-public T getExtension(String name) {
-    if (name == null || name.length() == 0)
-        throw new IllegalArgumentException("Extension name == null");
-    if ("true".equals(name)) {
-        // 获取默认的拓展实现类
-        return getDefaultExtension();
-    }
-    // Holder，顾名思义，用于持有目标对象
-    Holder<Object> holder = cachedInstances.get(name);
-    if (holder == null) {
-        cachedInstances.putIfAbsent(name, new Holder<Object>());
-        holder = cachedInstances.get(name);
-    }
-    Object instance = holder.get();
-    // 双重检查
-    if (instance == null) {
-        synchronized (holder) {
-            instance = holder.get();
-            if (instance == null) {
-                // 创建拓展实例
-                instance = createExtension(name);
-                // 设置实例到 holder 中
-                holder.set(instance);
-            }
-        }
-    }
-    return  instance;
-}
+optimusPrime = org.apache.spi.OptimusPrime
+bumblebee = org.apache.spi.Bumblebee
 ```
-这个方法主要是相当于得到具体的服务，上述我们已经对服务的接口进行加载，现在我们需要调用服务接口下的某一个具体服务实现类。就用这个方法。上述方法可以看出是会进入getOrCreateHolder中，这个方法顾名思义是获取或者创建Holder。进入到下面方法中：
-```
-private Holder<Object> getOrCreateHolder(String name) {
-        //检查缓存中是否存在
-        Holder<Object> holder = (Holder)this.cachedInstances.get(name);
-        if (holder == null) {
-        //缓存中不存在就去创建一个新的Holder
-            this.cachedInstances.putIfAbsent(name, new Holder());
-            holder = (Holder)this.cachedInstances.get(name);
-        }
 
-        return holder;
-    }
-```
-同样，缓存池也是以ConcurrentHashMap为存储结构
+然后在接口上标注@SPI 注解，以表明它要用SPI机制，类似下面这个图（我就是拿 Cluster 的图举个例子，和这个示例代码定义的接口不一样）。
 
-![Image [4]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mybatis-demo/20210408002330.png)
+![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mybatis-demo/20210408223706.png)
 
-### createExtension(String name)
-实际上getExtension方法不一定每次都能拿到，当服务实现类是第一次进行加载的时候就需要当前的方法
-```
-private T createExtension(String name) {
-        Class<?> clazz = (Class)this.getExtensionClasses().get(name);
-        if (clazz == null) {
-            throw this.findException(name);
-        } else {
-            try {
-                T instance = EXTENSION_INSTANCES.get(clazz);
-                if (instance == null) {
-                    EXTENSION_INSTANCES.putIfAbsent(clazz, clazz.newInstance());
-                    instance = EXTENSION_INSTANCES.get(clazz);
-                }
+接着通过下面的示例代码即可加载指定的实现类。
 
-                this.injectExtension(instance);
-                Set<Class<?>> wrapperClasses = this.cachedWrapperClasses;
-                Class wrapperClass;
-                if (CollectionUtils.isNotEmpty(wrapperClasses)) {
-                    for(Iterator var5 = wrapperClasses.iterator(); var5.hasNext(); instance = this.injectExtension(wrapperClass.getConstructor(this.type).newInstance(instance))) {
-                        wrapperClass = (Class)var5.next();
-                    }
-                }
+![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mybatis-demo/20210408223719.png)
 
-                return instance;
-            } catch (Throwable var7) {
-                throw new IllegalStateException("Extension instance (name: " + name + ", class: " + this.type + ") couldn't be instantiated: " + var7.getMessage(), var7);
-            }
-        }
-    }
-```
-可以看出createExtension实际上是一个私有方法，也就是由上面的getExtension自动触发。内部逻辑大致为：
-1. 通过 getExtensionClasses 获取所有的拓展类
-1. 通过反射创建拓展对象
-1. 向拓展对象中注入依赖（这里Dubbo有单独的IOC后面会介绍）
-1. 将拓展对象包裹在相应的 Wrapper 对象中
+再来看一下运行的结果。
 
-### getExtensionClasses()
-```
-private Map<String, Class<?>> getExtensionClasses() {
-    // 从缓存中获取已加载的拓展类
-    Map<String, Class<?>> classes = cachedClasses.get();
-    // 双重检查
-    if (classes == null) {
-        synchronized (cachedClasses) {
-            classes = cachedClasses.get();
-            if (classes == null) {
-                // 加载拓展类
-                classes = loadExtensionClasses();
-                cachedClasses.set(classes);
-            }
-        }
-    }
-    return classes;
-}
+![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mybatis-demo/20210408223730.png)
 
-//进入到loadExtensionClasses中
+### 4.3.Dubbo 源码分析
 
-private Map<String, Class<?>> loadExtensionClasses() {
-    // 获取 SPI 注解，这里的 type 变量是在调用 getExtensionLoader 方法时传入的
-    final SPI defaultAnnotation = type.getAnnotation(SPI.class);
-    if (defaultAnnotation != null) {
-        String value = defaultAnnotation.value();
-        if ((value = value.trim()).length() > 0) {
-            // 对 SPI 注解内容进行切分
-            String[] names = NAME_SEPARATOR.split(value);
-            // 检测 SPI 注解内容是否合法，不合法则抛出异常
-            if (names.length > 1) {
-                throw new IllegalStateException("more than 1 default extension name on extension...");
-            }
+> 此次分析的源码版本是 2.6.5
 
-            // 设置默认名称，参考 getDefaultExtension 方法
-            if (names.length == 1) {
-                cachedDefaultName = names[0];
-            }
-        }
-    }
+相信通过上面的描述大家已经对 Dubbo SPI 已经有了一定的认识，接下来我们来看看它的实现。
 
-    Map<String, Class<?>> extensionClasses = new HashMap<String, Class<?>>();
-    // 加载指定文件夹下的配置文件
-    loadDirectory(extensionClasses, DUBBO_INTERNAL_DIRECTORY);
-    loadDirectory(extensionClasses, DUBBO_DIRECTORY);
-    loadDirectory(extensionClasses, SERVICES_DIRECTORY);
-    return extensionClasses;
-}
+从上面的示例代码我们知道 ExtensionLoader 好像就是重点，它是类似 Java SPI 中 ServiceLoader 的存在。
 
-//进入到loadDirectory中
+我们可以看到大致流程就是先通过接口类找到一个 ExtensionLoader ，然后再通过 ExtensionLoader.getExtension(name) 得到指定名字的实现类实例。
 
-private void loadDirectory(Map<String, Class<?>> extensionClasses, String dir) {
-    // fileName = 文件夹路径 + type 全限定名 
-    String fileName = dir + type.getName();
-    try {
-        Enumeration<java.net.URL> urls;
-        ClassLoader classLoader = findClassLoader();
-        // 根据文件名加载所有的同名文件
-        if (classLoader != null) {
-            urls = classLoader.getResources(fileName);
-        } else {
-            urls = ClassLoader.getSystemResources(fileName);
-        }
-        if (urls != null) {
-            while (urls.hasMoreElements()) {
-                java.net.URL resourceURL = urls.nextElement();
-                // 加载资源
-                loadResource(extensionClasses, classLoader, resourceURL);
-            }
-        }
-    } catch (Throwable t) {
-        logger.error("...");
-    }
-}
+我们就先看下 getExtensionLoader() 做了什么。
 
-//进入到loadResource中
+![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mybatis-demo/20210408223754.png)
 
-private void loadResource(Map<String, Class<?>> extensionClasses, 
-    ClassLoader classLoader, java.net.URL resourceURL) {
-    try {
-        BufferedReader reader = new BufferedReader(
-            new InputStreamReader(resourceURL.openStream(), "utf-8"));
-        try {
-            String line;
-            // 按行读取配置内容
-            while ((line = reader.readLine()) != null) {
-                // 定位 # 字符
-                final int ci = line.indexOf('#');
-                if (ci >= 0) {
-                    // 截取 # 之前的字符串，# 之后的内容为注释，需要忽略
-                    line = line.substring(0, ci);
-                }
-                line = line.trim();
-                if (line.length() > 0) {
-                    try {
-                        String name = null;
-                        int i = line.indexOf('=');
-                        if (i > 0) {
-                            // 以等于号 = 为界，截取键与值
-                            name = line.substring(0, i).trim();
-                            line = line.substring(i + 1).trim();
-                        }
-                        if (line.length() > 0) {
-                            // 加载类，并通过 loadClass 方法对类进行缓存
-                            loadClass(extensionClasses, resourceURL, 
-                                      Class.forName(line, true, classLoader), name);
-                        }
-                    } catch (Throwable t) {
-                        IllegalStateException e = new IllegalStateException("Failed to load extension class...");
-                    }
-                }
-            }
-        } finally {
-            reader.close();
-        }
-    } catch (Throwable t) {
-        logger.error("Exception when load extension class...");
-    }
-}
+很简单，做了一些判断然后从缓存里面找是否已经存在这个类型的 ExtensionLoader ，如果没有就新建一个塞入缓存。最后返回接口类对应的 ExtensionLoader 。
 
-//进入到loadClass中
+我们再来看一下 getExtension() 方法，从现象我们可以知道这个方法就是从类对应的 ExtensionLoader 中通过名字找到实例化完的实现类。
 
-private void loadClass(Map<String, Class<?>> extensionClasses, java.net.URL resourceURL, 
-    Class<?> clazz, String name) throws NoSuchMethodException {
-    
-    if (!type.isAssignableFrom(clazz)) {
-        throw new IllegalStateException("...");
-    }
+![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mybatis-demo/20210408223806.png)
 
-    // 检测目标类上是否有 Adaptive 注解
-    if (clazz.isAnnotationPresent(Adaptive.class)) {
-        if (cachedAdaptiveClass == null) {
-            // 设置 cachedAdaptiveClass缓存
-            cachedAdaptiveClass = clazz;
-        } else if (!cachedAdaptiveClass.equals(clazz)) {
-            throw new IllegalStateException("...");
-        }
-        
-    // 检测 clazz 是否是 Wrapper 类型
-    } else if (isWrapperClass(clazz)) {
-        Set<Class<?>> wrappers = cachedWrapperClasses;
-        if (wrappers == null) {
-            cachedWrapperClasses = new ConcurrentHashSet<Class<?>>();
-            wrappers = cachedWrapperClasses;
-        }
-        // 存储 clazz 到 cachedWrapperClasses 缓存中
-        wrappers.add(clazz);
-        
-    // 程序进入此分支，表明 clazz 是一个普通的拓展类
-    } else {
-        // 检测 clazz 是否有默认的构造方法，如果没有，则抛出异常
-        clazz.getConstructor();
-        if (name == null || name.length() == 0) {
-            // 如果 name 为空，则尝试从 Extension 注解中获取 name，或使用小写的类名作为 name
-            name = findAnnotationName(clazz);
-            if (name.length() == 0) {
-                throw new IllegalStateException("...");
-            }
-        }
-        // 切分 name
-        String[] names = NAME_SEPARATOR.split(name);
-        if (names != null && names.length > 0) {
-            Activate activate = clazz.getAnnotation(Activate.class);
-            if (activate != null) {
-                // 如果类上有 Activate 注解，则使用 names 数组的第一个元素作为键，
-                // 存储 name 到 Activate 注解对象的映射关系
-                cachedActivates.put(names[0], activate);
-            }
-            for (String n : names) {
-                if (!cachedNames.containsKey(clazz)) {
-                    // 存储 Class 到名称的映射关系
-                    cachedNames.put(clazz, n);
-                }
-                Class<?> c = extensionClasses.get(n);
-                if (c == null) {
-                    // 存储名称到 Class 的映射关系
-                    extensionClasses.put(n, clazz);
-                } else if (c != clazz) {
-                    throw new IllegalStateException("...");
-                }
-            }
-        }
-    }
-}
-```
-上面的方法较多，理一下逻辑：
-1. getExtensionClasses()：先检查缓存，若缓存未命中，则通过 synchronized 加锁。加锁后再次检查缓存，并判断是否为空。此时如果 classes 仍为 null，则通过 loadExtensionClasses 加载拓展类。
-2. loadExtensionClasses()：对 SPI 注解的接口进行解析，而后调用 loadDirectory 方法加载指定文件夹配置文件。
-3. loadDirectory()：方法先通过 classLoader 获取所有资源链接，然后再通过 loadResource 方法加载资源。
-4. loadResource()：用于读取和解析配置文件，并通过反射加载类，最后调用 loadClass 方法进行其他操作。loadClass 方法用于主要用于操作缓存。
+可以看到重点就是 createExtension()，我们再来看下这个方法干了啥。
 
-### 小结
-我们稍微捋一下Dubbo是如何进行SPI的即发现接口的实现类。先是需要实例化扩展类加载器。这里为了更好的和微服务贴合起来，我们就把它称作服务加载器。在服务加载器中用的是ConcurrentHashMap的缓存结构。在我们需要寻找服务的过程中，Dubbo先通过反射加载类，而后将有@SPI表示的接口（即服务接口）的实现类（即服务提供方）进行配置对应的文件夹及文件。将配置文件以键值对的方式存到缓存中key就是当前服务接口下类的名字，value就是Dubbo生成的对应的类配置文件。方便我们下次调用。其中为了防止并发问题产生，使用ConcurrentHashMap，并且使用synchronize关键字对存在并发问题的节点进行双重检查。
+![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mybatis-demo/20210408223818.png)
 
-## Dubbo中的IOC
-在createExtension中有提到过将拓展对象注入依赖。这里使用的是injectExtension(T instance)：
-```
-private T injectExtension(T instance) {
-    try {
-        if (objectFactory != null) {
-            // 遍历目标类的所有方法
-            for (Method method : instance.getClass().getMethods()) {
-                // 检测方法是否以 set 开头，且方法仅有一个参数，且方法访问级别为 public
-                if (method.getName().startsWith("set")
-                    && method.getParameterTypes().length == 1
-                    && Modifier.isPublic(method.getModifiers())) {
-                    // 获取 setter 方法参数类型
-                    Class<?> pt = method.getParameterTypes()[0];
-                    try {
-                        // 获取属性名，比如 setName 方法对应属性名 name
-                        String property = method.getName().length() > 3 ? 
-                            method.getName().substring(3, 4).toLowerCase() + 
-                                method.getName().substring(4) : "";
-                        // 从 ObjectFactory 中获取依赖对象
-                        Object object = objectFactory.getExtension(pt, property);
-                        if (object != null) {
-                            // 通过反射调用 setter 方法设置依赖
-                            method.invoke(instance, object);
-                        }
-                    } catch (Exception e) {
-                        logger.error("fail to inject via method...");
-                    }
-                }
-            }
-        }
-    } catch (Exception e) {
-        logger.error(e.getMessage(), e);
-    }
-    return instance;
-}
-```
-在上面代码中，objectFactory 变量的类型为 AdaptiveExtensionFactory，AdaptiveExtensionFactory 内部维护了一个ExtensionFactory 列表，用于存储其他类型的 ExtensionFactory。Dubbo 目前提供了两种 ExtensionFactory，分别是 SpiExtensionFactory 和SpringExtensionFactory。前者用于创建自适应的拓展，后者是用于从 Spring 的 IOC 容器中获取所需的拓展。这就是我们常说的Dubbo为什么能够与Spring无缝连接，因为Dubbo底层就是依赖Spring的，对于Spring的IOC容器可直接拿来用。
+整体逻辑很清晰，先找实现类，判断缓存是否有实例，没有就反射建个实例，然后执行 set 方法依赖注入。如果有找到包装类的话，再包一层。
+
+到这步为止我先画个图，大家理一理，还是很简单的。
+
+![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mybatis-demo/20210408223837.png)
+
+那么问题来了 getExtensionClasses() 是怎么找的呢？injectExtension() 如何注入的呢（其实我已经说了set方法注入）？为什么需要包装类呢？
+
+#### 4.3.1.getExtensionClasses
+
+这个方法进去也是先去缓存中找，如果缓存是空的，那么调用 `loadExtensionClasses`，我们就来看下这个方法。
+
+![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mybatis-demo/20210408223858.png)
+
+而 `loadDirectory`里面就是根据类名和指定的目录，找到文件先获取所有的资源，然后一个一个去加载类，然后再通过`loadClass`去做一下缓存操作。
+
+![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mybatis-demo/20210408223910.png)
+
+可以看到，loadClass 之前已经加载了类，loadClass 只是根据类上面的情况做不同的缓存。分别有 `Adaptive` 、`WrapperClass` 和普通类这三种，普通类又将`Activate`记录了一下。至此对于普通的类来说整个 SPI 过程完结了。
+
+![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mybatis-demo/20210408223924.png)
+
+接下来我们分别看不是普通类的几种东西是干啥用的。
+
+#### 4.3.2.Adaptive 注解 - 自适应扩展
+
+在进入这个注解分析之前，我们需要知道 Dubbo 的自适应扩展机制。
+
+我们先来看一个场景，首先我们根据配置来进行 SPI 扩展的加载，但是我不想在启动的时候让扩展被加载，我想根据请求时候的参数来动态选择对应的扩展。
+
+怎么做呢？
+
+**Dubbo 通过一个代理机制实现了自适应扩展**，简单的说就是为你想扩展的接口生成一个代理类，可以通过JDK 或者 javassist 编译你生成的代理类代码，然后通过反射创建实例。
+
+这个实例里面的实现会根据本来方法的请求参数得知需要的扩展类，然后通过 `ExtensionLoader.getExtensionLoader(type.class).getExtension(从参数得来的name)`，来获取真正的实例来调用。
+
+我从官网搞了个例子，大家来看下。
+
+![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mybatis-demo/20210408224009.png)
+
+现在大家应该对自适应扩展有了一定的认识了，我们再来看下源码，到底怎么做的。
+
+![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mybatis-demo/20210408224019.png)
+
+这个注解就是自适应扩展相关的注解，可以修饰类和方法上，在修饰类的时候不会生成代理类，因为这个类就是代理类，修饰在方法上的时候会生成代理类。
+
+**Adaptive 注解在类上**
+
+比如这个 `ExtensionFactory` 有三个实现类，其中一个实现类就被标注了 Adaptive 注解。
+
+![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mybatis-demo/20210408224043.png)
+
+Protocol 没有实现类注释了 Adaptive ，但是接口上有两个方法注解了 Adaptive ，有两个方法没有。
+
+因此它走的逻辑应该应该是 `createAdaptiveExtensionClass`
+
+![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mybatis-demo/20210408224113.png)
+
+具体在里面如何生成代码的我就不再深入了，有兴趣的自己去看吧，我就把成品解析一下，就差不多了。
+
+![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mybatis-demo/20210408224126.png)
+
+我美化一下给大家看看。
+
+![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mybatis-demo/20210408224136.png)
+
+可以看到会生成包，也会生成 import 语句，类名就是接口加个$Adaptive，并且实现这接口，没有标记 Adaptive 注解的方法调用的话直接抛错。
+
+我们再来看一下标注了注解的方法，我就拿 export 举例。
+
+![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mybatis-demo/20210408224145.png)
+
+就像我前面说的那样，根据请求的参数，即 URL 得到具体要调用的实现类名，然后再调用 `getExtension` 获取。
+
+整个自适应扩展流程如下。
+
+![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mybatis-demo/20210408224159.png)
+
+#### 4.3.3.WrapperClass - AOP
+
+包装类是因为一个扩展接口可能有多个扩展实现类，而这些扩展实现类会有一个相同的或者公共的逻辑，如果每个实现类都写一遍代码就重复了，并且比较不好维护。
+
+因此就搞了个包装类，Dubbo 里帮你自动包装，只需要某个扩展类的构造函数只有一个参数，并且是扩展接口类型，就会被判定为包装类，然后记录下来，用来包装别的实现类。
+
+![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mybatis-demo/20210408224227.png)
+
+简单又巧妙，这就是 AOP 了。
+
+#### 4.3.4.injectExtension - IOC
+
+直接看代码，很简单，就是查找 set 方法，根据参数找到依赖对象则注入。
+
+![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mybatis-demo/20210408224247.png)
+
+这就是 IOC。
+
+#### 4.3.5.Activate 注解
+
+这个注解我就简单的说下，拿 Filter 举例，Filter 有很多实现类，在某些场景下需要其中的几个实现类，而某些场景下需要另外几个，而 Activate 注解就是标记这个用的。
+
+它有三个属性，group 表示修饰在哪个端，是 provider 还是 consumer，value 表示在 URL参数中出现才会被激活，order 表示实现类的顺序。
+
+### 4.4.总结
+
+先放个上述过程完整的图。
+
+![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mybatis-demo/20210408224323.png)

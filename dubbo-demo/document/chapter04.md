@@ -2,16 +2,28 @@
 
 
 
-# Dubbo 服务注册
+# Dubbo 服务注册（服务暴露）
 
-## 前言
+## 1.前言
 前面有说到Dubbo的服务发现机制，也就是SPI，那既然Dubbo内部实现了更加强大的服务发现机制，现在我们就来一起看看Dubbo在发现服务后需要做什么才能将服务注册到注册中心中。
-## Dubbo服务注册简介
-首先需要明白的是Dubbo是依赖于Spring容器的（至于为什么在上篇博客中有介绍），Dubbo服务注册过程也是始于Spring容器发布刷新事件。而后Dubbo在接收到事件后，就会进行服务注册，整个逻辑大致分为三个部分：
+## 2.Dubbo服务注册简介
+首先需要明白的是Dubbo是依赖于Spring容器的，Dubbo服务注册过程也是始于Spring容器发布刷新事件。而后Dubbo在接收到事件后，就会进行服务注册，整个逻辑大致分为三个部分：
 1. 检查参数，组装URL：服务消费方是通过URL拿到服务提供者的，所以我们需要为服务提供者配置好对应的URL。
 2. 导出服务到本地和远程：这里的本地指的是JVM，远程指的是实现invoke，使得服务消费方能够通过invoke调用到服务。
 3. 向注册中心注册服务：能够让服务消费方知道服务提供方提供了那个服务。
-## 接收Spring容器刷新事件
+
+![å¾ç](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mybatis-demo/20210408232542.webp)
+
+从**对象构建转换的角度**看可以分为两个步骤：
+
+- 第一步是将服务实现类转成 Invoker。
+
+- 第二步是将 Invoker 通过具体的协议转换成 Exporter。
+
+![å¾ç](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mybatis-demo/20210408232618.webp)
+
+## 3.接收Spring容器刷新事件
+
 在简介中我们提到Dubbo服务注册是始于Spring容器发布刷新事件，那么Dubbo是如何接收该事件的呢？
 
 在我们平常编写provider的接口实现类时，都会打上@Service注解，从而这个标注这个类属于ServiceBean。在ServiceBean中有这样一个方法onApplicationEvent。该方法会在收到 Spring 上下文刷新事件后执行服务注册操作
@@ -31,8 +43,8 @@ public void onApplicationEvent(ContextRefreshedEvent event) {
 注意这里是2.7.3的Dubbo，接收Spring上下文刷新事件已经不需要设置延迟导出，而是在导出的时候检查配置再决定是否需要延时，所以只有两个判断。而在2.6.x版本的Dubbo存在着isDelay的判断。这个是判断服务是否延时导出。这里说个题外话2.6.x的版本是com.alibaba.dubbo的，而2.7.x是org.apache.dubbo的，而2.7.0也开始代表dubbo从Apache里毕业了。
 
 在这里就是Dubbo服务导出到注册中心过程的起点。需要我们在服务接口实现类上打上@Service。ServiceBean是Dubbo与Spring 框架进行整合的关键，可以看做是两个框架之间的桥梁。具有同样作用的类还有ReferenceBean。
-## 检查配置参数以及URL装配
-### 检查配置
+## 4.检查配置参数以及URL装配
+### 4.1.检查配置
 在这一阶段Dubbo需要检查用户的配置是否合理，或者为用户补充缺省配置。就是从刷新事件开始，进入export()方法，源码解析如下：
 ```
 public void export() {
@@ -135,12 +147,21 @@ public void checkAndUpdateSubConfigs() {
 ```
 <dubbo:provider export="false" />
 ```
-### URL装配
+### 4.2.URL装配
 在Dubbo中的URL一般包括以下字段：protocol，host，port，path,parameters。在检查配置后会进入到doExport中。
-protocol：就是URL最前面的字段，表示的是协议，一般是：dubbo thrift http zk
-host.port：就是对应的IP地址和端口
-path：接口名称
-parameters：参数键值对
+
+```
+protocol://username:password@host:port/path?key=value&key=value
+```
+
+URL 具体的参数如下：
+
+- protocol：指的是 dubbo 中的各种协议，如：dubbo thrift http
+- username/password：用户名/密码
+- host/port：主机/端口
+- path：接口的名称
+- parameters：参数键值对
+
 ```
 protected synchronized void doExport() {
         if (this.unexported) {
@@ -461,8 +482,8 @@ dubbo://192.168.1.6:20880/org.apache.dubbo.demo.DemoService?anyhost=true&applica
 这个URL表示它是一个dubbo协议(DubboProtocol)，地址是当前服务器的ip，端口是要暴露的服务的端口号，可以从dubbo:protocol配置，服务接口为dubbo:service配置发布的接口。
 
 后半段主要是判断scope变量来决定是否将服务导出远程或者本地，导出到本地实际上很简单只需要生成Invoker。当导出到远程就需要添加监视器还要生成invoker。监视器能让Dubbo定时查看注册中心挂了没。会抛出指定异常，而invoker使得服务消费方能够远程调用到服务。并且还会进行注册到注册中心下面我们接着来看看服务的发布。因为Invoker比较重要在消费者和提供者中都有，所以这个后面会单独拿出来进行探讨。
-## 服务发布本地与远程
-### 服务发布到本地
+## 5.服务发布本地与远程
+### 5.1.服务发布到本地（本地暴露）
 ```
 private void exportLocal(URL url) {
         //进行本地URL的构建
@@ -474,7 +495,25 @@ private void exportLocal(URL url) {
     }
 ```
 可见发布到本地是重新构建了protocol，injvm就是代表在本地的JVM里，host与port都统一默认127.0.0.1:0。
-### 服务发布到远程
+
+**为什么要封装成 invoker？**
+
+至于为什么要**封装成 invoker 其实就是想屏蔽调用的细节，统一暴露出一个可执行体**，这样调用者简单的使用它，向它发起 invoke 调用，它有可能是一个本地的实现，也可能是一个远程的实现，也可能一个集群实现。
+
+**为什么要搞个本地暴露呢？**
+
+因为可能存在同一个 JVM 内部引用自身服务的情况，因此**暴露的本地服务在内部调用的时候可以直接消费同一个 JVM 的服务避免了网络间的通信**。
+
+可以有些同学已经有点晕，没事我这里立马搞个图带大家过一遍。
+
+![å¾ç](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mybatis-demo/20210408232839.webp)
+
+对 exportLocal 再来一波时序图分析。
+
+![å¾ç](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mybatis-demo/20210408232903.webp)
+
+### 5.2.服务发布到远程
+
 ```
 public <T> Exporter<T> export(Invoker<T> originInvoker) throws RpcException {
         //获取注册中心的URL，比如：zookeeper://127.0.0.1:2181/......
@@ -521,7 +560,7 @@ public <T> Exporter<T> export(Invoker<T> originInvoker) throws RpcException {
 
 ![Image [5]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mybatis-demo/20210408003048.png)
 
-## 服务注册
+## 6.服务注册
 服务注册操作对于 Dubbo 来说不是必需的，通过服务直连的方式就可以绕过注册中心。但通常我们不会这么做，直连方式不利于服务治理，仅推荐在测试服务时使用。对于 Dubbo 来说，注册中心虽不是必需，但却是必要的。源码如下：
 ```
 public void register(URL url) {
@@ -602,6 +641,6 @@ public void createEphemeral(String path) {
     }
 }
 ```
-根据上面的方法，可以将当前服务对应的配置信息（存储在URL中的）注册到注册中心/dubbo/org.apache.dubbo.demo.DemoService/providers/ 。里面直接使用了Curator进行创建节点（Curator是Netflix公司开源的一套zookeeper客户端框架）
-## 总结
+根据上面的方法，可以将当前服务对应的配置信息（存储在URL中的）注册到注册中心 `/dubbo/org.apache.dubbo.demo.DemoService/providers/ `。里面直接使用了Curator进行创建节点（Curator是Netflix公司开源的一套zookeeper客户端框架）
+## 7.总结
 到这里Dubbo的服务注册流程终于是解释完。核心在于Dubbo使用规定好的URL+SPI进行寻找和发现服务，通过URL定位注册中心，再通过将服务的URL发布到注册中心从而使得消费者可以知道服务的有哪些，里面可以看见对于URL这种复杂的对象并且需要经常更改的，通常采用建造者模式。而2.7.3版本的Dubbo源码也使用了Java8以后的新特性Lambda表达式来构建隐式函数。而一整套流程下来可以在ZooInspector这个zk可视化客户端看见我们创建的节点，前提是注册中心为zk。
