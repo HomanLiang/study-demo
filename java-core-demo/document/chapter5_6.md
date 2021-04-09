@@ -4,11 +4,11 @@
 
 # Java IO 工具类
 
-## 一、File
+## 1.File
 
 `File` 类是 `java.io` 包中唯一对文件本身进行操作的类。它可以对文件、目录进行增删查操作。
 
-### createNewFille
+### 1.1.createNewFille
 
 **可以使用 `createNewFille()` 方法创建一个新文件**。
 
@@ -27,7 +27,7 @@ File f = new File(filename);
 boolean flag = f.createNewFile();
 ```
 
-### mkdir
+### 1.2.mkdir
 
 **可以使用 `mkdir()` 来创建文件夹**，但是如果要创建的目录的父路径不存在，则无法创建成功。
 
@@ -40,7 +40,7 @@ File f = new File(filename);
 boolean flag = f.mkdir();
 ```
 
-### delete
+### 1.3.delete
 
 **可以使用 `delete()` 来删除文件或目录**。
 
@@ -53,7 +53,7 @@ File f = new File(filename);
 boolean flag = f.delete();
 ```
 
-### list 和 listFiles
+### 1.4.list 和 listFiles
 
 `File` 中给出了两种列出文件夹内容的方法：
 
@@ -74,7 +74,7 @@ File f = new File(filename);
 File files[] = f.listFiles();
 ```
 
-## 二、RandomAccessFile
+## 2.RandomAccessFile
 
 > 注：`RandomAccessFile` 类虽然可以实现对文件内容的读写操作，但是比较复杂。所以一般操作文件内容往往会使用字节流或字符流方式。
 
@@ -84,7 +84,7 @@ File files[] = f.listFiles();
 
 文件中记录的大小不一定都相同，只要能够确定哪些记录有多大以及它们在文件中的位置即可。
 
-### RandomAccessFile 写操作
+### 2.1.RandomAccessFile 写操作
 
 当用 `rw` 方式声明 `RandomAccessFile` 对象时，如果要写入的文件不存在，系统将自行创建。
 
@@ -118,7 +118,7 @@ public class RandomAccessFileDemo01 {
 }
 ```
 
-### RandomAccessFile 读操作
+### 2.2.RandomAccessFile 读操作
 
 读取是直接使用 `r` 的模式即可，以只读的方式打开文件。
 
@@ -162,7 +162,7 @@ public class RandomAccessFileDemo02 {
 }
 ```
 
-## 三、System
+## 3.System
 
 `System` 类中提供了大量的静态方法，可以获取系统相关的信息或系统级操作，其中提供了三个常用于 IO 的静态成员：
 
@@ -226,7 +226,7 @@ public class SystemInDemo {
 }
 ```
 
-## 四、Scanner
+## 4.Scanner
 
 **`Scanner` 可以获取用户的输入，并对数据进行校验**。
 

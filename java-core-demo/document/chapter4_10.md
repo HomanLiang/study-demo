@@ -20,11 +20,11 @@ Java 8 新特性
 
 ### 1.2.Future vs CompletableFuture
 
-CompletableFuture 是 [Future API](https://docs.oracle.com/javase/7/docs/api/java/util/concurrent/Future.html)的扩展。
+CompletableFuture 是 [Future API](https://docs.oracle.com/javase/7/docs/api/java/util/concurrent/Future.html) 的扩展。
 
 Future 被用于作为一个异步计算结果的引用。提供一个 `isDone()` 方法来检查计算任务是否完成。当任务完成时，`get()` 方法用来接收计算任务的结果。
 
-从 [Callbale和 Future 教程](https://www.callicoder.com/java-callable-and-future-tutorial/)可以学习更多关于 Future 知识.
+从 [Callbale和 Future 教程](https://www.callicoder.com/java-callable-and-future-tutorial/) 可以学习更多关于 Future 知识.
 
 Future API 是非常好的 Java 异步编程进阶，但是它缺乏一些非常重要和有用的特性。
 
@@ -165,7 +165,7 @@ CompletableFuture<String> future = CompletableFuture.supplyAsync(() -> {
 
 ### 1.5.在 CompletableFuture 转换和运行
 
-`CompletableFuture.get()`方法是阻塞的。它会一直等到Future完成并且在完成后返回结果。 但是，这是我们想要的吗？对于构建异步系统，我们应该附上一个回调给CompletableFuture，当Future完成的时候，自动的获取结果。 如果我们不想等待结果返回，我们可以把需要等待Future完成执行的逻辑写入到回调函数中。
+`CompletableFuture.get()` 方法是阻塞的。它会一直等到Future完成并且在完成后返回结果。 但是，这是我们想要的吗？对于构建异步系统，我们应该附上一个回调给CompletableFuture，当Future完成的时候，自动的获取结果。 如果我们不想等待结果返回，我们可以把需要等待Future完成执行的逻辑写入到回调函数中。
 
 可以使用 `thenApply()`, `thenAccept()` 和`thenRun()`方法附上一个回调给CompletableFuture。
 

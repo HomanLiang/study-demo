@@ -62,9 +62,8 @@ JMM 规定了**所有的变量都存储在主内存（Main Memory）中**。
 
 ![20210102225657](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/java-core-demo/20210322225137.png)
 
-> 说明：
+> 说明：这里说的主内存、工作内存与 Java 内存区域中的堆、栈、方法区等不是同一个层次的内存划分。
 >
-> 这里说的主内存、工作内存与 Java 内存区域中的堆、栈、方法区等不是同一个层次的内存划分。
 
 ### 2.2. JMM 内存操作的问题
 

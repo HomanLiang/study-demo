@@ -188,13 +188,10 @@ J.U.C 包中提供了几个非常有用的并发容器作为线程安全的容�
 
 J.U.C 包中提供的并发容器命名一般分为三类：
 
-- ```
-  Concurrent*
-  ```
-
-  - 这类型的锁竞争相对于 `CopyOnWrite*` 要高一些，但写操作代价要小一些。
+- `Concurrent*`
+- 这类型的锁竞争相对于 `CopyOnWrite*` 要高一些，但写操作代价要小一些。
   - 此外，`Concurrent*` 往往提供了较低的遍历一致性，即：当利用迭代器遍历时，如果容器发生修改，迭代器仍然可以继续进行遍历。代价就是，在获取容器大小 `size()` ，容器是否为空等方法，不一定完全精确，但这是为了获取并发吞吐量的设计取舍，可以理解。与之相比，如果是使用同步容器，就会出现 `fail-fast` 问题，即：检测到容器在遍历过程中发生了修改，则抛出 `ConcurrentModificationException`，不再继续遍历。
-
+  
 - `CopyOnWrite*` - 一个线程写，多个线程读。读操作时不加锁，写操作时通过在副本上加锁保证并发安全，空间开销较大。
 
 - `Blocking*` - 内部实现一般是基于锁，提供阻塞队列的能力。
@@ -598,11 +595,11 @@ CopyOnWriteArrayList 内部维护了一个数组，成员变量 array 就指向�
 - array - 对象数组，用于存放元素
 
 ```
-    /** The lock protecting all mutators */
-    final transient ReentrantLock lock = new ReentrantLock();
+/** The lock protecting all mutators */
+final transient ReentrantLock lock = new ReentrantLock();
 
-    /** The array, accessed only via getArray/setArray. */
-    private transient volatile Object[] array;
+/** The array, accessed only via getArray/setArray. */
+private transient volatile Object[] array;
 ```
 
 ![687474703a2f2f64756e77752e746573742e757063646e2e6e65742f63732f6a6176612f6a617661636f72652f636f6e7461696e65722f436f70794f6e577269746541727261794c6973742e706e67](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/java-core-demo/20210322221745.png)
@@ -624,11 +621,11 @@ private E get(Object[] a, int index) {
 
 （2）写操作
 
-所有的写操作都是同步的。他们在备份数组（图 3）的副本上工作。写操作完成后，后备阵列将被替换为复制的阵列，并释放锁定。支持数组变得易变，所以替换数组的调用是原子（图 5）。
+所有的写操作都是同步的。他们在备份数组的副本上工作。写操作完成后，后备阵列将被替换为复制的阵列，并释放锁定。支持数组变得易变，所以替换数组的调用是原子。
 
-写操作后创建的迭代器将能够看到修改的结构（图 6,7）。
+写操作后创建的迭代器将能够看到修改的结构。
 
-写时复制集合返回的迭代器不会抛出 `ConcurrentModificationException`，因为它们在数组的快照上工作，并且无论后续的修改（2,4）如何，都会像迭代器创建时那样完全返回元素。
+写时复制集合返回的迭代器不会抛出 `ConcurrentModificationException`，因为它们在数组的快照上工作，并且无论后续的修改如何，都会像迭代器创建时那样完全返回元素。
 
 **添加操作** - 添加的逻辑很简单，先将原容器 copy 一份，然后在新副本上执行写操作，之后再切换引用。当然此过程是要加锁的。
 
