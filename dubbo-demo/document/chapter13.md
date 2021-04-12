@@ -1,142 +1,133 @@
 [toc]
 
-# Dubbo 面试题
+# Dubbo 序列化协议
 
-## Netty 在 Dubbo 中是如何应用的？
+## Dubbo 支持的协议
 
-### dubbo 的 Consumer 消费者如何使用 Netty
-注意：此次代码使用了从 github 上 clone 的 dubbo 源码中的 dubbo-demo 例子。
-代码如下：
-```
-   System.setProperty("java.net.preferIPv4Stack", "true");
-   ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext(new String[]{"META-INF/spring/dubbo-demo-consumer.xml"});
-   context.start();
-    // @1
-   DemoService demoService = (DemoService) context.getBean("demoService"); // get remote service proxy
-   int a = 0;
-   while (true) {
-       try {
-           Thread.sleep(1000);
-           System.err.println( ++ a + " ");
+在通信过程中，不同的服务等级一般对应着不同的服务质量，那么选择合适的协议便是一件非常重要的事情。你可以根据你应用的创建来选择。例如，使用RMI协议，一般会受到防火墙的限制，所以对于外部与内部进行通信的场景，就不要使用RMI协议，而是基于HTTP协议或者Hessian协议。Dubbo支持8种左右的协议，如下所示：
 
-           String hello = demoService.sayHello("world"); // call remote method
-           System.out.println(hello); // get result
+- `dubbo://` Dubbo协议
+- `rmi://` RMI协议
+- `hessian:// `Hessian协议
+- `http://` HTTP协议
+- `webservice://` WebService协议
+- `thrift://` Thrift协议
+- `memcached://` Memcached协议
+- `redis://` Redis协议
+- 在通信过程中，不同的服务等级一般对应着不同的服务质量，那么选择合适的协议便是一件非常重要的事情。你可以根据你应用的创建来选择。
+- **例如，使用RMI协议，一般会受到防火墙的限制，所以对于外部与内部进行通信的场景，就不要使用RMI协议，而是基于HTTP协议或者Hessian协议。** 
 
-       } catch (Throwable throwable) {
-           throwable.printStackTrace();
-       }
-   }
-```
-当代码执行到 @1 的时候，会调用 Spring 容器的 getBean 方法，而 dubbo 扩展了 FactoryBean，所以，会调用 getObject 方法，该方法会创建代理对象。
+部分协议的特点和使用场景如下：
 
-这个过程中会调用 DubboProtocol 实例的 getClients（URL url） 方法，当这个给定的 URL 的 client 没有初始化则创建，然后放入缓存，代码如下：
+### dubbo协议
 
-![Image [5]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mybatis-demo/20210408004555.png)
+Dubbo缺省协议采用单一长连接和NIO异步通讯，适合于小数据量大并发的服务调用，以及服务消费者机器数远大于服务提供者机器数的情况。
 
-这个 initClient 方法就是创建 Netty 的 client 的。
+缺省协议，使用基于mina1.1.7+hessian3.2.1的tbremoting交互。
 
-![Image [6]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mybatis-demo/20210408004605.png)
+- 连接个数：单连接
+- 连接方式：长连接
+- 传输协议：TCP
+- 传输方式：NIO异步传输
+- 序列化：Hessian二进制序列化
+- 适用范围：传入传出参数数据包较小（建议小于100K），消费者比提供者个数多，单一消费者无法压满提供者，尽量不要用dubbo协议传输大文件或超大字符串。
+- 适用场景：常规远程服务方法调用
 
-最终调用的就是抽象父类 AbstractClient 的构造方法，构造方法中包含了创建 Socket 客户端，连接客户端等行为。
+**为什么要消费者比提供者个数多?**
 
-```
-public AbstractClient(URL url, ChannelHandler handler) throws RemotingException {
-   doOpen();
-   connect();
-}
-```
-doOpent 方法用来创建 Netty 的 bootstrap ：
-```
-protected void doOpen() throws Throwable {
-   NettyHelper.setNettyLoggerFactory();
-   bootstrap = new ClientBootstrap(channelFactory);
-   bootstrap.setOption("keepAlive", true);
-   bootstrap.setOption("tcpNoDelay", true);
-   bootstrap.setOption("connectTimeoutMillis", getTimeout());
-   final NettyHandler nettyHandler = new NettyHandler(getUrl(), this);
-   bootstrap.setPipelineFactory(new ChannelPipelineFactory() {
-       public ChannelPipeline getPipeline() {
-           NettyCodecAdapter adapter = new NettyCodecAdapter(getCodec(), getUrl(), NettyClient.this);
-           ChannelPipeline pipeline = Channels.pipeline();
-           pipeline.addLast("decoder", adapter.getDecoder());
-           pipeline.addLast("encoder", adapter.getEncoder());
-           pipeline.addLast("handler", nettyHandler);
-           return pipeline;
-       }
-   });
-}
-```
-connect 方法用来连接提供者：
-```
-protected void doConnect() throws Throwable {
-   long start = System.currentTimeMillis();
-   ChannelFuture future = bootstrap.connect(getConnectAddress());
-   boolean ret = future.awaitUninterruptibly(getConnectTimeout(), TimeUnit.MILLISECONDS);
-   if (ret && future.isSuccess()) {
-       Channel newChannel = future.getChannel();
-       newChannel.setInterestOps(Channel.OP_READ_WRITE);
-   }
-}
-```
-上面的代码中，调用了 bootstrap 的 connect 方法，熟悉的 Netty 连接操作。当然这里使用的是  jboss 的 netty3，稍微有点区别。点击这篇：[教你用 Netty 实现一个简单的 RPC](https://mp.weixin.qq.com/s?__biz=MzI3ODcxMzQzMw==&mid=2247491548&idx=3&sn=cbb7e36f2d41f2e80feeec5d78b4de13&chksm=eb539aeadc2413fc5d82cb18bb552b84a7fa37764c728e89885d2ed7d0a983978bff29a1e5ab&scene=21#wechat_redirect)。当连接成功后，注册写事件，准备开始向提供者传递数据。
+因dubbo协议采用单一长连接，假设网络为千兆网卡(1024Mbit=128MByte)，根据测试经验数据每条连接最多只能压满7MByte(不同的环境可能不一样，供参考)，理论上1个服务提供者需要20个服务消费者才能压满网卡。
 
-当 main 方法中调用 demoService.sayHello(“world”) 的时候，最终会调用 HeaderExchangeChannel 的 request 方法，通过 channel 进行请求。
-```
-public ResponseFuture request(Object request, int timeout) throws RemotingException {
-   Request req = new Request();
-   req.setVersion("2.0.0");
-   req.setTwoWay(true);
-   req.setData(request);
-   DefaultFuture future = new DefaultFuture(channel, req, timeout);
-   channel.send(req);
-   return future;
-}
-```
-send 方法中最后调用 jboss  Netty 中继承了  NioSocketChannel 的 NioClientSocketChannel 的 write 方法。完成了一次数据的传输。
+**为什么不能传大包?**
 
-### dubbo 的 Provider 提供者如何使用 Netty
-Provider demo 代码：
-```
-System.setProperty("java.net.preferIPv4Stack", "true");
-ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext(new String[]{"META-INF/spring/dubbo-demo-provider.xml"});
-context.start();
-System.in.read(); // press any key to exit
-```
-rovider 作为被访问方，肯定是一个 Server 模式的 Socket。如何启动的呢？
+因dubbo协议采用单一长连接，如果每次请求的数据包大小为500KByte，假设网络为千兆网卡(1024Mbit=128MByte)，每条连接最大7MByte(不同的环境可能不一样，供参考)，单个服务提供者的TPS(每秒处理事务数)最大为：128MByte / 500KByte = 262。
+单个消费者调用单个服务提供者的TPS(每秒处理事务数)最大为：7MByte / 500KByte = 14。如果能接受，可以考虑使用，否则网络将成为瓶颈。
 
-当 Spring 容器启动的时候，会调用一些扩展类的初始化方法，比如继承了 InitializingBean，ApplicationContextAware，ApplicationListener 。
+**为什么采用异步单一长连接?**
 
-而 dubbo 创建了 ServiceBean 继承了一个监听器。Spring 会调用他的 onApplicationEvent 方法，该类有一个 export 方法，用于打开 ServerSocket 。
+因为服务的现状大都是服务提供者少，通常只有几台机器，而服务的消费者多，可能整个网站都在访问该服务，
+比如Morgan的提供者只有6台提供者，却有上百台消费者，每天有1.5亿次调用，如果采用常规的hessian服务，服务提供者很容易就被压跨，通过单一连接，保证单一消费者不会压死提供者，长连接，减少连接握手验证等，并使用异步IO，复用线程池，防止C10K问题。
 
-然后执行了 DubboProtocol 的 createServer 方法，然后创建了一个NettyServer 对象。NettyServer 对象的 构造方法同样是  doOpen 方法和。
 
-代码如下：
-```
-protected void doOpen() throws Throwable {
-   NettyHelper.setNettyLoggerFactory();
-   ExecutorService boss = Executors.newCachedThreadPool(new NamedThreadFactory("NettyServerBoss", true));
-   ExecutorService worker = Executors.newCachedThreadPool(new NamedThreadFactory("NettyServerWorker", true));
-   ChannelFactory channelFactory = new NioServerSocketChannelFactory(boss, worker, getUrl().getPositiveParameter(Constants.IO_THREADS_KEY, Constants.DEFAULT_IO_THREADS));
-   bootstrap = new ServerBootstrap(channelFactory);
+### RMI
 
-   final NettyHandler nettyHandler = new NettyHandler(getUrl(), this);
-   channels = nettyHandler.getChannels();
-   bootstrap.setPipelineFactory(new ChannelPipelineFactory() {
-       public ChannelPipeline getPipeline() {
-           NettyCodecAdapter adapter = new NettyCodecAdapter(getCodec(), getUrl(), NettyServer.this);
-           ChannelPipeline pipeline = Channels.pipeline();
-           pipeline.addLast("decoder", adapter.getDecoder());
-           pipeline.addLast("encoder", adapter.getEncoder());
-           pipeline.addLast("handler", nettyHandler);
-           return pipeline;
-       }
-   });
-   channel = bootstrap.bind(getBindAddress());
-}
-```
-该方法中，看到了熟悉的 boss 线程，worker 线程，和 ServerBootstrap，在添加了编解码 handler  之后，添加一个 NettyHandler，最后调用 bind 方法，完成绑定端口的工作。和我们使用 Netty 是一摸一样。
+RMI协议采用JDK标准的java.rmi.*实现，采用阻塞式短连接和JDK标准序列化方式
 
-### 总结
-可以看到，dubbo 使用 Netty 还是挺简单的，消费者使用 NettyClient，提供者使用 NettyServer，Provider  启动的时候，会开启端口监听，使用我们平时启动 Netty 一样的方式。
+Java标准的远程调用协议。
 
-而 Client 在 Spring getBean 的时候，会创建 Client，当调用远程方法的时候，将数据通过 dubbo 协议编码发送到 NettyServer，然后 NettServer 收到数据后解码，并调用本地方法，并返回数据，完成一次完美的 RPC 调用。
+- 连接个数：多连接
+- 连接方式：短连接
+- 传输协议：TCP
+- 传输方式：同步传输
+- 序列化：Java标准二进制序列化
+- 适用范围：传入传出参数数据包大小混合，消费者与提供者个数差不多，可传文件。
+- 适用场景：常规远程服务方法调用，与原生RMI服务互操作
+
+
+### hessian
+
+Hessian协议用于集成Hessian的服务，Hessian底层采用Http通讯，采用Servlet暴露服务，Dubbo缺省内嵌Jetty作为服务器实现
+
+基于Hessian的远程调用协议。
+
+- 连接个数：多连接
+- 连接方式：短连接
+- 传输协议：HTTP
+- 传输方式：同步传输
+- 序列化：Hessian二进制序列化
+- 适用范围：传入传出参数数据包较大，提供者比消费者个数多，提供者压力较大，可传文件。
+- 适用场景：页面传输，文件传输，或与原生hessian服务互操作
+
+**说一下 Hessian 的数据结构**
+
+Hessian 的对象序列化机制有 8 种原始类型：
+
+- 原始二进制数据
+- boolean
+- 64-bit date（64 位毫秒值的日期）
+- 64-bit double
+- 32-bit int
+- 64-bit long
+- null
+- UTF-8 编码的 string
+
+另外还包括 3 种递归类型：
+
+- list for lists and arrays
+- map for maps and dictionaries
+- object for objects
+
+还有一种特殊的类型：
+
+- ref：用来表示对共享对象的引用。
+
+
+### http
+
+采用Spring的HttpInvoker实现 
+
+基于http表单的远程调用协议。
+
+- 连接个数：多连接
+- 连接方式：短连接
+- 传输协议：HTTP
+- 传输方式：同步传输
+- 序列化：表单序列化（JSON）
+- 适用范围：传入传出参数数据包大小混合，提供者比消费者个数多，可用浏览器查看，可用表单或URL传入参数，暂不支持传文件。
+- 适用场景：需同时给应用程序和浏览器JS使用的服务。
+
+### webservice
+
+基于CXF的frontend-simple和transports-http实现 
+
+基于WebService的远程调用协议。
+
+- 连接个数：多连接
+- 连接方式：短连接
+- 传输协议：HTTP
+- 传输方式：同步传输
+- 序列化：SOAP文本序列化
+- 适用场景：系统集成，跨语言调用。
+
+### thrif
+
+Thrift是Facebook捐给Apache的一个RPC框架，当前 dubbo 支持的 thrift 协议是对 thrift 原生协议的扩展，在原生协议的基础上添加了一些额外的头信息，比如service name，magic number等。

@@ -10,7 +10,7 @@
 
 大部分算法都是在权重比的基础上进行负载均衡，RandomLoadBalance 是默认的算法
 
-![](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mybatis-demo/20210408004206.png)
+![Image](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/dubbo-demo/20210410112153.png)
 
 ## AbstractLoadBalance
 AbstractLoadBalance 对一些通用的操作做了处理，是一个典型的模板方法模式的实现
@@ -76,6 +76,15 @@ calculateWarmupWeight 方法用来计算权重，保证随着预热时间的增�
 随机调用是负载均衡算法中最常用的算法之一，也是 dubbo 的默认负载均衡算法，实现起来也较为简单
 
 随机调用的缺点是在调用量比较少的情况下，有可能出现不均匀的情况
+
+这个算法是加权随机，思想其实很简单，我举个例子：假设现在有两台服务器分别是 A 和 B，我想让 70% 的请求落到 A 上，30% 的请求落到 B上，此时我只要搞个随机数生成范围在 [0,10)，这个 10 是由 7+3 得来的。
+
+然后如果得到的随机数在 [0,7) 则选择服务器 A，如果在 [7,10) 则选择服务器 B ，当然前提是这个随机数的分布性很好，概率才会正确。
+
+![图片](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/dubbo-demo/20210410123339.webp)
+
+比如随机数拿到的是5，此时 5-7 < 0 所以选择了 A ，如果随机数是8， 那么 8-7 大于1，然后 1-3 小于0 所以此时选择了 B。
+
 ```
 	@Override
     protected <T> Invoker<T> doSelect(List<Invoker<T>> invokers, URL url, Invocation invocation) {
@@ -457,10 +466,23 @@ dubbo 在实现该算法时的具体逻辑如下
     }
 ```
 ## ConsistentHashLoadBalance
-一致性hash算法是一种广泛应用与分布式缓存中的算法，该算法的优势在于新增和删除节点后，只有少量请求发生变动，大部分请求仍旧映射到原来的节点
-为了防止节点过少，造成节点分布不均匀，一般采用虚拟节点的方式，dubbo默认的是160个虚拟节点
+一致性hash算法是一种广泛应用与分布式缓存中的算法，该算法的优势在于新增和删除节点后，只有少量请求发生变动，大部分请求仍旧映射到原来的节点。
 
-网上关于一致性hash算法的文章有很多，这里就不再多赘述，以下是dubbo中的实现，需要说明的是， 一致性hash算法中权重配置不起作用
+为了防止节点过少，造成节点分布不均匀，一般采用虚拟节点的方式，dubbo默认的是160个虚拟节点。
+
+这个是一致性 Hash 负载均衡算法，一致性 Hash 想必大家都很熟悉了，常见的一致性 Hash 算法是 Karger 提出的，就是将 hash值空间设为 [0, 2^32 - 1]，并且是个循环的圆环状。
+
+将服务器的 IP 等信息生成一个 hash 值，将这个值投射到圆环上作为一个节点，然后当 key 来查找的时候顺时针查找第一个大于等于这个 key 的 hash 值的节点。
+
+一般而言还会引入虚拟节点，使得数据更加的分散，避免数据倾斜压垮某个节点，来看下官网的一个图。
+
+![图片](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/dubbo-demo/20210410123510.webp)
+
+整体的实现也不难，就是上面所说的那个逻辑，而圆环这是利用 treeMap 来实现的，通过 tailMap 来查找大于等于的第一个 invoker，如果没找到说明要拿第一个，直接赋值 treeMap 的 firstEntry。
+
+然后 Dubbo 默认搞了 160 个虚拟节点，整体的 hash 是方法级别的，即一个 service 的每个方法有一个 ConsistentHashSelector，并且是根据参数值来进行 hash的，也就是说负载均衡逻辑只受参数值影响，具有相同参数值的请求将会被分配给同一个服务提供者。
+
+以下是dubbo中的实现，需要说明的是， 一致性hash算法中权重配置不起作用
 ```
     @Override
     protected <T> Invoker<T> doSelect(List<Invoker<T>> invokers, URL url, Invocation invocation) {
@@ -574,10 +596,47 @@ dubbo 在实现该算法时的具体逻辑如下
     }
 ```
 ## 总结
-以上就是dubbo负载均衡源码的全部解析，如果还是不明白，可以看下官方文档的解析  http://dubbo.apache.org/zh-cn/docs/source_code_guide/loadbalance.html
-
 dubbo的负载均衡算法总体来说并不复杂，代码写的也很优雅，简洁，看起来很舒服，而且有很多细节的处理值得称赞，例如预热处理，轮训算法的平滑处理等。
 
 我们平时使用时，可以根据自己的业务场景，选择适合自己的算法，当然，一般情况下，默认的的随机算法就能满足我们的日常需求，而且随机算法的性能足够好。
 
 如果觉得dubbo提供的五种算法都不能满足自己的需求，还可以通过dubbo的SPI机制很方便的扩展自己的负载均衡算法。
+
+
+
+## 负载均衡配置示例
+
+### 服务端服务级别
+
+```xml
+   <dubbo:service interface="..." loadbalance="roundrobin" />
+```
+
+### 客户端服务级别
+
+```xml
+   <dubbo:reference interface="..." loadbalance="roundrobin" />
+```
+
+### 服务端方法级别
+
+```xml
+  <dubbo:service interface="...">
+      <dubbo:method name="..." loadbalance="roundrobin"/>
+  </dubbo:service>
+```
+
+### 客户端方法级别
+
+```xml
+  <dubbo:reference interface="...">
+      <dubbo:method name="..." loadbalance="roundrobin"/>
+  </dubbo:reference>
+```
+
+
+
+
+
+
+
