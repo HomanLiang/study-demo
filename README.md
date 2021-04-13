@@ -84,3 +84,9 @@
 
 [Docker 学习笔记](https://github.com/HomanLiang/study-demo/blob/main/docker-demo/document/index.md)
 
+
+
+## Nginx
+
+[Nginx 学习笔记](https://github.com/HomanLiang/study-demo/blob/main/nginx-demo/document/index.md)
+
