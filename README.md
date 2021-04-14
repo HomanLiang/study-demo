@@ -90,3 +90,9 @@
 
 [Nginx 学习笔记](https://github.com/HomanLiang/study-demo/blob/main/nginx-demo/document/index.md)
 
+
+
+## 项目设计
+
+[项目设计笔记](https://github.com/HomanLiang/study-demo/blob/main/project-design/document/index.md)
+
