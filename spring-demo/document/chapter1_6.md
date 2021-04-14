@@ -14,7 +14,7 @@
 
 | 接口名                  | 说明                                                         |
 | ----------------------- | ------------------------------------------------------------ |
-| BeanFactory             | 定义了基本IOC容器的规范，包含像getBean()这样的IOC容器的基本方法 |
+| BeanFactory             | 定义了基本IOC容器的规范，包含像 `getBean()` 这样的IOC容器的基本方法 |
 | HierarchicalBeanFactory | 增加了getParentBeanFactory()的接口功能，使BeanFactory具备了双亲IOC接口的关联功能 |
 | ConfigurableBeanFactory | 主要定义了对BeanFactory的配置功能，比如通过setParentBeanFactory()设置双亲IOC容器，通过addBeanPostProcessor()配置Bean后置处理器，等等。 |
 |AutowireCapableFactory|	这个工厂接口继承自BeanFacotory，它扩展了自动装配的功能，根据类定义BeanDefinition装配Bean、执行前、后处理器等|

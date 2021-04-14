@@ -4,7 +4,7 @@
 
 # Spring ORM
 
-## 一、总体说下Spring ORM框架的结构
+## 1.总体说下Spring ORM框架的结构
 
 说到ORM，就是所谓的对象关系映射，可以简单地理解成将java中的对象与数据库中的表对应起来的一种模型。那么Spring ORM到底是什么东西呢？我们来看看Spring ORM的源码结构就知道了！下面我贴一张图：
 
@@ -21,7 +21,7 @@
 - 3、获取会话`(Session)`，会话就是你和小编的一次通话，通话完，上面的链接可以关闭，也可以不关闭，看心情！哈哈！
 - 4、然后就是对数据库进行操作啦！
 
-## 二、详细讲下Spring ORM重要类及其使用
+## 2.详细讲下Spring ORM重要类及其使用
 
 下面我们对Spring ORM源码中的hibernate进行展开，如下图：
 
@@ -32,86 +32,86 @@
 - `HibernateOperations`接口，该接口封装了很多基于hibernate api的操作，该接口被`HibernateTemplate`实现，虽然该接口不经常使用，但是在Spring中可以用于测试。
 - `HibernateTemplate`类，该类实现了`HibernateOperations`接口，因此该类同样拥有了很对基于hibernate的数据库操作。但细心的小伙伴会发现，它的命名中出现了Template模板，可以推测它是一个模板类，没错，该类是模板方法设计模式的一个体现，该类中提供了一个模板方法，具体如下：
 
-```
-@Override
-@Nullable
-public <T> T execute(HibernateCallback<T> action) throws DataAccessException {
-	return doExecute(action, false);
-}
-```
+    ```
+    @Override
+    @Nullable
+    public <T> T execute(HibernateCallback<T> action) throws DataAccessException {
+        return doExecute(action, false);
+    }
+    ```
 
-该模板方法超级简单，传入一个Hibernate回调实例，然后执行`doExecute()`方法。你可能会问，那这个`HibernateCallback`是什么？`doExecute()`又是什么？ 打开`HibernateCallback`源码：
+	该模板方法超级简单，传入一个Hibernate回调实例，然后执行`doExecute()`方法。你可能会问，那这个`HibernateCallback`是什么？`doExecute()`又是什么？ 打开`HibernateCallback`源码：
 
-```
-@FunctionalInterface
-public interface HibernateCallback<T> {
-	@Nullable
-	T doInHibernate(Session session) throws HibernateException;
-}
-```
+    ```
+    @FunctionalInterface
+    public interface HibernateCallback<T> {
+        @Nullable
+        T doInHibernate(Session session) throws HibernateException;
+    }
+    ```
 
-哇，太简单了，这时我会想，那既然是个接口，肯定有实现类吧！然后我找呀找呀还是没找到。最后发现，该接口原来被`@FunctionalInterface`修饰，是一个函数式接口，所以我们可以用Lamada表达式来使用它！至于接口中声明的参数`Session`和`doInHibernate()`方法，其实道理很简单，就是通过获取一个会话实例`(还记得你和小编的一次通电话吗！上面第一节第三步)`来做些操作数据库的事`(上面第四步)`，这些操作`(比如数据持久化)`你就可以在`doInHibernate()`方法中写嘛！具体如下：
+	哇，太简单了，这时我会想，那既然是个接口，肯定有实现类吧！然后我找呀找呀还是没找到。最后发现，该接口原来被`@FunctionalInterface`修饰，是一个函数式接口，所以我们可以用Lamada表达式来使用它！至于接口中声明的参数`Session`和`doInHibernate()`方法，其实道理很简单，就是通过获取一个会话实例`(还记得你和小编的一次通电话吗！上面第一节第三步)`来做些操作数据库的事`(上面第四步)`，这些操作`(比如数据持久化)`你就可以在`doInHibernate()`方法中写嘛！具体如下：
 
-```
-new HibernateTemplate().execute((e) -> e.createQuery("select * from user"));
-```
+    ```
+    new HibernateTemplate().execute((e) -> e.createQuery("select * from user"));
+    ```
 
-当然在实际使用中我们不能直接就这么`new HibernateTemplate()`,你还必须传入一个`sessionFactory`的实例，再者一般实例化都是交给Spring容器去做的，不需要显示去new,这里只是栗子，重点在于演示`HibernateCallback`怎么去使用。或者既然它是一个函数式接口，也不一定要依赖`HibernateTemplate`类，只要你传入一个`Session`实例即可！
+	当然在实际使用中我们不能直接就这么`new HibernateTemplate()`,你还必须传入一个`sessionFactory`的实例，再者一般实例化都是交给Spring容器去做的，不需要显示去new,这里只是栗子，重点在于演示`HibernateCallback`怎么去使用。或者既然它是一个函数式接口，也不一定要依赖`HibernateTemplate`类，只要你传入一个`Session`实例即可！
 
-接下来我们看一看`doExecute()`方法：
+	接下来我们看一看`doExecute()`方法：
 
-```
-@SuppressWarnings("deprecation")
-@Nullable
-protected <T> T doExecute(HibernateCallback<T> action, boolean enforceNativeSession) throws DataAccessException {
-	Assert.notNull(action, "Callback object must not be null");//先断言保证action不为空
-	Session session = null;//会话对象
-	boolean isNew = false;//是不是新的会话
-	try {
-		session = obtainSessionFactory().getCurrentSession();//初始化会话对象
-	}
-	catch (HibernateException ex) {
-		logger.debug("Could not retrieve pre-bound Hibernate session", ex);
-	}
-	if (session == null) {
-		session = obtainSessionFactory().openSession();
-		session.setFlushMode(FlushMode.MANUAL);//设置提交方式
-		isNew = true;
-	}
-	try {
-		enableFilters(session);
-		//根据是否强制将原生Hibernate会话session暴露给回调代码,默认为false,如果是true,就做一个代理
-		Session sessionToExpose =
-				(enforceNativeSession || isExposeNativeSession() ? session : createSessionProxy(session));
-		return action.doInHibernate(sessionToExpose);
-	}
-	catch (HibernateException ex) {
-		throw SessionFactoryUtils.convertHibernateAccessException(ex);
-	}
-	catch (PersistenceException ex) {
-		if (ex.getCause() instanceof HibernateException) {
-			throw SessionFactoryUtils.convertHibernateAccessException((HibernateException) ex.getCause());
-		}
-		throw ex;
-	}
-	catch (RuntimeException ex) {
-		// Callback code threw application exception...
-		throw ex;
-	}
-	finally {
-		if (isNew) {
-			SessionFactoryUtils.closeSession(session);
-		}
-		else {
-			disableFilters(session);
-		}
-	}
-}
-```
+    ```
+    @SuppressWarnings("deprecation")
+    @Nullable
+    protected <T> T doExecute(HibernateCallback<T> action, boolean enforceNativeSession) throws DataAccessException {
+        Assert.notNull(action, "Callback object must not be null");//先断言保证action不为空
+        Session session = null;//会话对象
+        boolean isNew = false;//是不是新的会话
+        try {
+            session = obtainSessionFactory().getCurrentSession();//初始化会话对象
+        }
+        catch (HibernateException ex) {
+            logger.debug("Could not retrieve pre-bound Hibernate session", ex);
+        }
+        if (session == null) {
+            session = obtainSessionFactory().openSession();
+            session.setFlushMode(FlushMode.MANUAL);//设置提交方式
+            isNew = true;
+        }
+        try {
+            enableFilters(session);
+            //根据是否强制将原生Hibernate会话session暴露给回调代码,默认为false,如果是true,就做一个代理
+            Session sessionToExpose =
+                    (enforceNativeSession || isExposeNativeSession() ? session : createSessionProxy(session));
+            return action.doInHibernate(sessionToExpose);
+        }
+        catch (HibernateException ex) {
+            throw SessionFactoryUtils.convertHibernateAccessException(ex);
+        }
+        catch (PersistenceException ex) {
+            if (ex.getCause() instanceof HibernateException) {
+                throw SessionFactoryUtils.convertHibernateAccessException((HibernateException) ex.getCause());
+            }
+            throw ex;
+        }
+        catch (RuntimeException ex) {
+            // Callback code threw application exception...
+            throw ex;
+        }
+        finally {
+            if (isNew) {
+                SessionFactoryUtils.closeSession(session);
+            }
+            else {
+                disableFilters(session);
+            }
+        }
+    }
+    ```
 
 - `LocalSessionFactoryBean`类，该类表示一个`FactoryBean`对象，用于生成所有的`Session`，一般我们在Spring配置文件中配置该bean
 
-## 三、来个栗子压压惊！
+## 3.来个栗子压压惊！
 
 `数据库结构`：
 
@@ -288,7 +288,7 @@ dependencies {
 }
 ```
 
-## 四、其他特性总结`(具体可以自行阅读源代码)`
+## 4.其他特性总结`(具体可以自行阅读源代码)`
 
 - 1、`HibernateTemplate`自己管理事务，不需要我们来对事务进行管理，不需要我们来打开`Session`，关闭`Session`
 - 2、在`HibernateTemplate`中，还可以对其注入过滤器，所有的过滤器都会在你执行一个操作前开启，并在操作完成之后完全结束

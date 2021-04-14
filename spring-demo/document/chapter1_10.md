@@ -4,32 +4,32 @@
 
 # Spring DAO
 
-## 回顾对模版代码优化过程
+## 1.回顾对模版代码优化过程
 
 我们来回忆一下我们怎么对模板代码进行优化的！
 
 - 首先来看一下我们**原生的JDBC：需要手动去数据库的驱动从而拿到对应的连接**..
 
-```
-try {
-    String sql = "insert into t_dept(deptName) values('test');";
-    Connection con = null;
-    Statement stmt = null;
-    Class.forName("com.mysql.jdbc.Driver");
-    // 连接对象
-    con = DriverManager.getConnection("jdbc:mysql:///hib_demo", "root", "root");
-    // 执行命令对象
-    stmt =  con.createStatement();
-    // 执行
-    stmt.execute(sql);
+    ```
+    try {
+        String sql = "insert into t_dept(deptName) values('test');";
+        Connection con = null;
+        Statement stmt = null;
+        Class.forName("com.mysql.jdbc.Driver");
+        // 连接对象
+        con = DriverManager.getConnection("jdbc:mysql:///hib_demo", "root", "root");
+        // 执行命令对象
+        stmt =  con.createStatement();
+        // 执行
+        stmt.execute(sql);
 
-    // 关闭
-    stmt.close();
-    con.close();
-} catch (Exception e) {
-	e.printStackTrace();
-}
-```
+        // 关闭
+        stmt.close();
+        con.close();
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+    ```
 
 - 因为JDBC是面向接口编程的，因此数据库的驱动都是由数据库的厂商给做到好了，我们**只要加载对应的数据库驱动，便可以获取对应的数据库连接**....因此，我们**写了一个工具类，专门来获取与数据库的连接(Connection)**,当然啦，为了更加灵活，我们的**工具类是读取配置文件的方式来做的**。
 
@@ -106,7 +106,7 @@ try {
 
 ------
 
-## 使用Spring的JDBC
+## 2.使用Spring的JDBC
 
 上面已经回顾了一下以前我们的JDBC开发了，那么看看Spring对JDBC又是怎么优化的
 
@@ -117,153 +117,150 @@ try {
   - **spring-tx-3.2.5.RELEASE.jar**
 - 首先还是看一下我们原生的JDBC代码：**获取Connection是可以抽取出来的，直接使用dataSource来得到Connection就行了**。
 
-```
-	public void save() {
-		try {
-			String sql = "insert into t_dept(deptName) values('test');";
-			Connection con = null;
-			Statement stmt = null;
-			Class.forName("com.mysql.jdbc.Driver");
-			// 连接对象
-			con = DriverManager.getConnection("jdbc:mysql:///hib_demo", "root", "root");
-			// 执行命令对象
-			stmt =  con.createStatement();
-			// 执行
-			stmt.execute(sql);
-			
-			// 关闭
-			stmt.close();
-			con.close();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
-```
+    ```
+        public void save() {
+            try {
+                String sql = "insert into t_dept(deptName) values('test');";
+                Connection con = null;
+                Statement stmt = null;
+                Class.forName("com.mysql.jdbc.Driver");
+                // 连接对象
+                con = DriverManager.getConnection("jdbc:mysql:///hib_demo", "root", "root");
+                // 执行命令对象
+                stmt =  con.createStatement();
+                // 执行
+                stmt.execute(sql);
+
+                // 关闭
+                stmt.close();
+                con.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    ```
 
 - 值得注意的是，**JDBC对C3P0数据库连接池是有很好的支持的。因此我们直接可以使用Spring的依赖注入，在配置文件中配置dataSource就行了**！
 
-```
-	<bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource">
-		<property name="driverClass" value="com.mysql.jdbc.Driver"></property>
-		<property name="jdbcUrl" value="jdbc:mysql:///hib_demo"></property>
-		<property name="user" value="root"></property>
-		<property name="password" value="root"></property>
-		<property name="initialPoolSize" value="3"></property>
-		<property name="maxPoolSize" value="10"></property>
-		<property name="maxStatements" value="100"></property>
-		<property name="acquireIncrement" value="2"></property>
-	</bean>
-```
+    ```
+        <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource">
+            <property name="driverClass" value="com.mysql.jdbc.Driver"></property>
+            <property name="jdbcUrl" value="jdbc:mysql:///hib_demo"></property>
+            <property name="user" value="root"></property>
+            <property name="password" value="root"></property>
+            <property name="initialPoolSize" value="3"></property>
+            <property name="maxPoolSize" value="10"></property>
+            <property name="maxStatements" value="100"></property>
+            <property name="acquireIncrement" value="2"></property>
+        </bean>
+    ```
 
-```
-	// IOC容器注入
-	private DataSource dataSource;
-	public void setDataSource(DataSource dataSource) {
-		this.dataSource = dataSource;
-	}
+    ```
+        // IOC容器注入
+        private DataSource dataSource;
+        public void setDataSource(DataSource dataSource) {
+            this.dataSource = dataSource;
+        }
 
-	
-	public void save() {
-		try {
-			String sql = "insert into t_dept(deptName) values('test');";
-			Connection con = null;
-			Statement stmt = null;
-			// 连接对象
-			con = dataSource.getConnection();
-			// 执行命令对象
-			stmt =  con.createStatement();
-			// 执行
-			stmt.execute(sql);
-			
-			// 关闭
-			stmt.close();
-			con.close();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
-```
+        public void save() {
+            try {
+                String sql = "insert into t_dept(deptName) values('test');";
+                Connection con = null;
+                Statement stmt = null;
+                // 连接对象
+                con = dataSource.getConnection();
+                // 执行命令对象
+                stmt =  con.createStatement();
+                // 执行
+                stmt.execute(sql);
+
+                // 关闭
+                stmt.close();
+                con.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    ```
 
 - **Spring来提供了JdbcTemplate这么一个类给我们使用！它封装了DataSource，也就是说我们可以在Dao中使用JdbcTemplate就行了。**
 - 创建dataSource，创建jdbcTemplate对象
 
-```
-<?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:context="http://www.springframework.org/schema/context"
-       xmlns:c="http://www.springframework.org/schema/c"
-       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+    ```
+    <?xml version="1.0" encoding="UTF-8"?>
+    <beans xmlns="http://www.springframework.org/schema/beans"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xmlns:context="http://www.springframework.org/schema/context"
+           xmlns:c="http://www.springframework.org/schema/c"
+           xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
 
-    <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource">
-        <property name="driverClass" value="com.mysql.jdbc.Driver"></property>
-        <property name="jdbcUrl" value="jdbc:mysql:///zhongfucheng"></property>
-        <property name="user" value="root"></property>
-        <property name="password" value="root"></property>
-        <property name="initialPoolSize" value="3"></property>
-        <property name="maxPoolSize" value="10"></property>
-        <property name="maxStatements" value="100"></property>
-        <property name="acquireIncrement" value="2"></property>
-    </bean>
+        <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource">
+            <property name="driverClass" value="com.mysql.jdbc.Driver"></property>
+            <property name="jdbcUrl" value="jdbc:mysql:///zhongfucheng"></property>
+            <property name="user" value="root"></property>
+            <property name="password" value="root"></property>
+            <property name="initialPoolSize" value="3"></property>
+            <property name="maxPoolSize" value="10"></property>
+            <property name="maxStatements" value="100"></property>
+            <property name="acquireIncrement" value="2"></property>
+        </bean>
 
-    <!--扫描注解-->
-    <context:component-scan base-package="bb"/>
+        <!--扫描注解-->
+        <context:component-scan base-package="bb"/>
 
-    <!-- 2. 创建JdbcTemplate对象 -->
-    <bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
-        <property name="dataSource" ref="dataSource"></property>
-    </bean>
-    
-</beans>
-```
+        <!-- 2. 创建JdbcTemplate对象 -->
+        <bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
+            <property name="dataSource" ref="dataSource"></property>
+        </bean>
+
+    </beans>
+    ```
 
 - userDao
 
-```
-package bb;
+    ```
+    package bb;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.stereotype.Component;
+    import org.springframework.beans.factory.annotation.Autowired;
+    import org.springframework.jdbc.core.JdbcTemplate;
+    import org.springframework.stereotype.Component;
 
-/**
- * Created by ozc on 2017/5/10.
- */
+    /**
+     * Created by ozc on 2017/5/10.
+     */
+    @Component
+    public class UserDao implements IUser {
 
+        //使用Spring的自动装配
+        @Autowired
+        private JdbcTemplate template;
 
-@Component
-public class UserDao implements IUser {
+        @Override
+        public void save() {
+            String sql = "insert into user(name,password) values('zhoggucheng','123')";
+            template.update(sql);
+        }
 
-    //使用Spring的自动装配
-    @Autowired
-    private JdbcTemplate template;
-
-    @Override
-    public void save() {
-        String sql = "insert into user(name,password) values('zhoggucheng','123')";
-        template.update(sql);
     }
-
-}
-```
+    ```
 
 - 测试：
 
-```
-    @Test
-    public void test33() {
-        ApplicationContext ac = new ClassPathXmlApplicationContext("bb/bean.xml");
+    ```
+        @Test
+        public void test33() {
+            ApplicationContext ac = new ClassPathXmlApplicationContext("bb/bean.xml");
 
-        UserDao userDao = (UserDao) ac.getBean("userDao");
-        userDao.save();
-    }
-```
-
-![这里写图片描述](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/spring-demo/20210330211826.webp)
+            UserDao userDao = (UserDao) ac.getBean("userDao");
+            userDao.save();
+        }
+    ```
+    
+    ![这里写图片描述](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/spring-demo/20210330211826.webp)
 
 ------
 
-### JdbcTemplate查询
+### 2.1.JdbcTemplate查询
 
 我们要是使用JdbcTemplate查询会发现**有很多重载了query()方法**
 
@@ -325,7 +322,9 @@ public class UserDao implements IUser {
 复制代码
 ```
 
-## 事务控制概述
+## 3.事务控制
+
+### 3.1.事务控制概述
 
 下面主要讲解Spring的事务控制，如何使用Spring来对程序进行事务控制....
 
@@ -333,7 +332,7 @@ public class UserDao implements IUser {
 
 一般地，我们**事务控制都是在service层做的**。。为什么是在service层而不是在dao层呢？？有没有这样的疑问...
 
-**service层是业务逻辑层，service的方法一旦执行成功，那么说明该功能没有出错**。
+service层是业务逻辑层，service的方法一旦执行成功，那么说明该功能没有出错。
 
 一个**service方法可能要调用dao层的多个方法**...如果在dao层做事务控制的话，一个dao方法出错了，仅仅把事务回滚到当前dao的功能，这样是不合适的[因为我们的业务由多个dao方法组成]。如果没有出错，调用完dao方法就commit了事务，这也是不合适的[导致太多的commit操作]。
 
@@ -342,27 +341,27 @@ public class UserDao implements IUser {
 - **编程式事务控制**
 - **声明式事务控制**
 
-## 编程式事务控制
+### 3.2.编程式事务控制
 
 **自己手动控制事务，就叫做编程式事务控制。**
 
 - Jdbc代码：
 
-  - ```
+    ```
     Conn.setAutoCommite(false);  // 设置手动控制事务
     ```
 
 - Hibernate代码：
 
-  - ```
-      Session.beginTransaction();    // 开启一个事务
+    ```
+    Session.beginTransaction();    // 开启一个事务
     ```
 
 - **【细粒度的事务控制： 可以对指定的方法、指定的方法的某几行添加事务控制】**
 
 - **(比较灵活，但开发起来比较繁琐： 每次都要开启、提交、回滚.)**
 
-## 声明式事务控制
+### 3.3.声明式事务控制
 
 **Spring提供对事务的控制管理就叫做声明式事务控制**
 
@@ -386,9 +385,7 @@ Spring提供了对事务控制的实现。
     Hibernate技术：HibernateTransactionManager
     ```
 
-------
-
-# 声明式事务控制
+#### 3.3.1.声明式事务控制示例
 
 我们基于Spring的JDBC来做例子吧
 
@@ -401,128 +398,125 @@ Spring提供了对事务控制的实现。
 
 ------
 
-## 搭建配置环境
+##### 3.3.1.1.搭建配置环境
 
 - 编写一个接口
 
-```
-public interface IUser {
-    void save();
-}
-```
+    ```
+    public interface IUser {
+        void save();
+    }
+    ```
 
 - **UserDao实现类，使用JdbcTemplate对数据库进行操作！**
 
-```
-@Repository
-public class UserDao implements IUser {
+    ```
+    @Repository
+    public class UserDao implements IUser {
 
-    //使用Spring的自动装配
-    @Autowired
-    private JdbcTemplate template;
+        //使用Spring的自动装配
+        @Autowired
+        private JdbcTemplate template;
 
-    @Override
-    public void save() {
-        String sql = "insert into user(name,password) values('zhong','222')";
-        template.update(sql);
+        @Override
+        public void save() {
+            String sql = "insert into user(name,password) values('zhong','222')";
+            template.update(sql);
+        }
+
     }
-
-}
-```
+    ```
 
 - userService
 
-```
-@Service
-public class UserService {
+    ```
+    @Service
+    public class UserService {
 
-    @Autowired
-    private UserDao userDao;
-    public void save() {
+        @Autowired
+        private UserDao userDao;
+        public void save() {
 
-        userDao.save();
+            userDao.save();
+        }
     }
-}
-```
+    ```
 
 - bean.xml配置：配置数据库连接池、jdbcTemplate对象、扫描注解
 
-```
-<?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:context="http://www.springframework.org/schema/context"
-       xmlns:c="http://www.springframework.org/schema/c"
-       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+    ```
+    <?xml version="1.0" encoding="UTF-8"?>
+    <beans xmlns="http://www.springframework.org/schema/beans"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xmlns:context="http://www.springframework.org/schema/context"
+           xmlns:c="http://www.springframework.org/schema/c"
+           xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
 
+        <!--数据连接池配置-->
+        <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource">
+            <property name="driverClass" value="com.mysql.jdbc.Driver"></property>
+            <property name="jdbcUrl" value="jdbc:mysql:///zhongfucheng"></property>
+            <property name="user" value="root"></property>
+            <property name="password" value="root"></property>
+            <property name="initialPoolSize" value="3"></property>
+            <property name="maxPoolSize" value="10"></property>
+            <property name="maxStatements" value="100"></property>
+            <property name="acquireIncrement" value="2"></property>
+        </bean>
 
-    <!--数据连接池配置-->
-    <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource">
-        <property name="driverClass" value="com.mysql.jdbc.Driver"></property>
-        <property name="jdbcUrl" value="jdbc:mysql:///zhongfucheng"></property>
-        <property name="user" value="root"></property>
-        <property name="password" value="root"></property>
-        <property name="initialPoolSize" value="3"></property>
-        <property name="maxPoolSize" value="10"></property>
-        <property name="maxStatements" value="100"></property>
-        <property name="acquireIncrement" value="2"></property>
-    </bean>
+        <!--扫描注解-->
+        <context:component-scan base-package="bb"/>
 
-    <!--扫描注解-->
-    <context:component-scan base-package="bb"/>
+        <!-- 2. 创建JdbcTemplate对象 -->
+        <bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
+            <property name="dataSource" ref="dataSource"></property>
+        </bean>
 
-    <!-- 2. 创建JdbcTemplate对象 -->
-    <bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
-        <property name="dataSource" ref="dataSource"></property>
-    </bean>
-
-</beans>
-```
-
-------
-
-前面搭建环境的的时候，是没有任何的事务控制的。
-
-也就是说，**当我在service中调用两次userDao.save()，即时在中途中有异常抛出，还是可以在数据库插入一条记录的**。
-
+    </beans>
+    ```
+    
+    前面搭建环境的的时候，是没有任何的事务控制的。
+    
+    也就是说，**当我在service中调用两次userDao.save()，即时在中途中有异常抛出，还是可以在数据库插入一条记录的**。
+    
 - Service代码：
 
-```
-@Service
-public class UserService {
+    ```
+    @Service
+    public class UserService {
 
-    @Autowired
-    private UserDao userDao;
-    public void save() {
+        @Autowired
+        private UserDao userDao;
+        public void save() {
 
-        userDao.save();
+            userDao.save();
 
-        int i = 1 / 0;
-        userDao.save();
+            int i = 1 / 0;
+            userDao.save();
+        }
     }
-}
-```
+    ```
 
 - 测试代码：
 
-```
-public class Test2 {
+    ```
+    public class Test2 {
 
-    @Test
-    public void test33() {
-        ApplicationContext ac = new ClassPathXmlApplicationContext("bb/bean.xml");
+        @Test
+        public void test33() {
+            ApplicationContext ac = new ClassPathXmlApplicationContext("bb/bean.xml");
 
-        UserService userService = (UserService) ac.getBean("userService");
-        userService.save();
+            UserService userService = (UserService) ac.getBean("userService");
+            userService.save();
+        }
     }
-}
-```
-
-![这里写图片描述](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/spring-demo/20210330212056.webp)
+    ```
+    
+    ![这里写图片描述](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/spring-demo/20210330212056.webp)
 
 ------
 
-### XML方式实现声明式事务控制
+##### 3.3.1.2.XML方式实现声明式事务控制
 
 **首先，我们要配置事务的管理器类：因为JDBC和Hibernate的事务控制是不同的。**
 
@@ -575,7 +569,7 @@ public class Test2 {
 
 ------
 
-### 使用注解的方法实现事务控制
+##### 3.3.1.3.使用注解的方法实现事务控制
 
 当然了，有的人可能觉得到XML文件上配置太多东西了。**Spring也提供了使用注解的方式来实现对事务控制**
 
@@ -614,13 +608,13 @@ public class Test2 {
 
 ------
 
-## 事务属性
+##### 3.3.1.4.事务属性
 
 其实我们**在XML配置管理器类如何管理事务，就是在指定事务的属性！**我们来看一下事务的属性有什么：
 
 ![这里写图片描述](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/spring-demo/20210330212152.webp)
 
-### 事务传播行为:
+**事务传播行为:**
 
 看了上面的事务属性，没有接触过的其实就这么一个：`propagation = Propagation.REQUIRED`事务的传播行为。
 
@@ -633,68 +627,68 @@ public class Test2 {
 
 **当事务传播行为是Propagation.REQUIRED**
 
-- **现在有一个日志类，它的事务传播行为是Propagation.REQUIRED**
+- 现在有一个日志类，它的事务传播行为是Propagation.REQUIRED
 
-```
-	Class Log{
-			Propagation.REQUIRED  
-			insertLog();  
-	}
-```
+    ```
+        Class Log{
+                Propagation.REQUIRED  
+                insertLog();  
+        }
+    ```
 
-- **现在，我要在保存之前记录日志**
+- 现在，我要在保存之前记录日志
 
-```
-	Propagation.REQUIRED
-	Void  saveDept(){
-		insertLog();   
-		saveDept();
-	}
-```
+    ```
+        Propagation.REQUIRED
+        Void  saveDept(){
+            insertLog();   
+            saveDept();
+        }
+    ```
+    
+    saveDept()本身就存在着一个事务，当调用insertLog()的时候，insertLog()的事务会加入到saveDept()事务中
+    
+    也就是说，saveDept()方法内始终是一个事务，如果在途中出现了异常，那么insertLog()的数据是会被回滚的【因为在同一事务内】
 
-**saveDept()本身就存在着一个事务，当调用insertLog()的时候，insertLog()的事务会加入到saveDept()事务中**
-
-也就是说，**saveDept()方法内始终是一个事务，如果在途中出现了异常，那么insertLog()的数据是会被回滚的【因为在同一事务内】**
-
-```
-	Void  saveDept(){
-		insertLog();    // 加入当前事务
-		.. 异常, 会回滚
-		saveDept();
-	}
-```
+    ```
+        Void  saveDept(){
+            insertLog();    // 加入当前事务
+            .. 异常, 会回滚
+            saveDept();
+        }
+    ```
 
 ------
 
 **当事务传播行为是Propagation.REQUIRED_NEW**
 
-- **现在有一个日志类，它的事务传播行为是Propagation.REQUIRED_NEW**
+- 现在有一个日志类，它的事务传播行为是Propagation.REQUIRED_NEW
 
-```
-	Class Log{
-			Propagation.REQUIRED  
-			insertLog();  
-	}
-```
+    ```
+        Class Log{
+                Propagation.REQUIRED  
+                insertLog();  
+        }
+    ```
 
-- **现在，我要在保存之前记录日志**
+- 现在，我要在保存之前记录日志
 
-```
-	Propagation.REQUIRED
-	Void  saveDept(){
-		insertLog();   
-		saveDept();
-	}
-```
+    ```
+        Propagation.REQUIRED
+        Void  saveDept(){
+            insertLog();   
+            saveDept();
+        }
+    ```
 
-当执行到saveDept()中的insertLog()方法时，**insertLog()方法发现 saveDept()已经存在事务了，insertLog()会独自新开一个事务，直到事务关闭之后，再执行下面的方法**
+	当执行到saveDept()中的insertLog()方法时，insertLog()方法发现 saveDept()已经存在事务了，insertLog()会独自新开一个事务，直到事务关闭之后，再执行下面的方法
 
-**如果在中途中抛出了异常，insertLog()是不会回滚的，因为它的事务是自己的，已经提交了**
+	如果在中途中抛出了异常，insertLog()是不会回滚的，因为它的事务是自己的，已经提交了
 
-```
-	Void  saveDept(){
-		insertLog();    // 始终开启事务
-		.. 异常, 日志不会回滚
-		saveDept();
-	}
-```
+    ```
+        Void  saveDept(){
+            insertLog();    // 始终开启事务
+            .. 异常, 日志不会回滚
+            saveDept();
+        }
+    ```

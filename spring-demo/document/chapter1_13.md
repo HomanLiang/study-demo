@@ -68,7 +68,7 @@ Spring MVC是基于Model 2实现的技术框架。Spring MVC通过一个Dispatch
 
 1. 在(1)处，通过contextConfigLocation参数指定业务层Spring容器的配置文件（多个配置文件用`,`分割）。
 2. 在(2)处，ContextLoaderListener是一个ServletLoaderListener，它通过contextConfigLocation指定的Spring配置文件启动业务层的Spring容器。
-3. 在(3)处，配置了名为web的DispatcherServlet，它默认加载/WEB-INF/web-servlet.xml（`<servlet-name>-servlet.xml`）的Spring配置文件，启动Web层的Spring容器。Web层容器将作为业务层容器的子容器，Web层容器可以访问业务层容器的Bean，而业务层容器访问不了Web层容器的Bean。
+3. 在(3)处，配置了名为web的DispatcherServlet，它默认加载 `/WEB-INF/web-servlet.xml`（`<servlet-name>-servlet.xml`）的Spring配置文件，启动Web层的Spring容器。Web层容器将作为业务层容器的子容器，Web层容器可以访问业务层容器的Bean，而业务层容器访问不了Web层容器的Bean。
 4. 在(4)处，通过 `<servlet-mapping>` 指定DispatcherServlet处理`/*`全部的HTTP请求。一个web.xml可以配置多个DispatcherServlet，通过其对应的 `<servlet-mapping>` 配置，让每个DispatcherServlet处理不同的请求。
 
 **DispatcherServlet 的配置参数**
@@ -184,9 +184,9 @@ org.springframework.web.servlet.FlashMapManager=org.springframework.web.servlet.
 
 ### 2.2 获取请求内容
 
-1. 可以通过@RequestParam、@RequestHeader、@PathVariable获取HTTP请求信息。
-2. 可以使用@CookieValue让方法入参绑定某个Cookie值
-3. 可以使用@MatrixVariable注解将请求中的矩阵变量绑定到处理器的方法参数中。
+1. 可以通过`@RequestParam`、`@RequestHeader`、`@PathVariable`获取HTTP请求信息。
+2. 可以使用`@CookieValue`让方法入参绑定某个Cookie值
+3. 可以使用`@MatrixVariable`注解将请求中的矩阵变量绑定到处理器的方法参数中。
 4. 可以使用命令/表单对象（就是一个POJO）绑定请求参数值，Spring会按照请求参数名和对象属性名匹配的方式，自动为该对象填充属性。
 5. 可以使用Servlet API的类作为处理方法的入参，如HttpServletRequest、HttpServletResponse、HttpSession；如果使用HttpServletResponse返回相应，则处理方法返回着设置成void即可；在`org.springframework.web.context.request`定义了若干个可代理Servlet原生API类的接口，如WebRequest和NativeWebRequest。
 6. 可以使用java.io中的InputStream、Reader、OutputStream、Writer作为方法的入参。
@@ -221,15 +221,15 @@ RequestMappingHandlerAdapter已经默认装配了以下的HttpMessageConverter�
 
 **使用HttpMessageConverter**
 
-1. 可以使用@RequestBody、@ResponseBody对处理方法进行标注
-2. 可以使用HttpEntity<T>、ResponseEntity<T>作为处理方法的入参或返回值
+1. 可以使用`@RequestBody`、`@ResponseBody`对处理方法进行标注
+2. 可以使用`HttpEntity<T>`、`ResponseEntity<T>`作为处理方法的入参或返回值
 
 > RestTemplate是Spring的模板类，可以使用该类调用Web服务端的服务，它支持Rest风格的URL。
 
 **结论**
 
-1. 当控制器处理方法使用到@RequestBody、@ResponseBody 或 HttpEntity<T>、ResponseEntity<T> 时，Spring MVC才会使用注册的HttpMessageConvertor对请求、相应消息进行处理。
-2. 当控制器处理方法使用到@RequestBody、@ResponseBody 或 HttpEntity<T>、ResponseEntity<T>时，Spring 首先根据请求头或响应的Accept属性选择匹配的 HttpMessageConverter，进而根据参数类型或泛型类型的过滤得到匹配的 HttpMessageConverter，若找不到可用的 HttpMessageConverter 将报错。
+1. 当控制器处理方法使用到`@RequestBody`、`@ResponseBody` 或 `HttpEntity<T>`、`ResponseEntity<T>` 时，Spring MVC才会使用注册的HttpMessageConvertor对请求、相应消息进行处理。
+2. 当控制器处理方法使用到`@RequestBody`、`@ResponseBody` 或 `HttpEntity<T>`、`ResponseEntity<T>`时，Spring 首先根据请求头或响应的Accept属性选择匹配的 HttpMessageConverter，进而根据参数类型或泛型类型的过滤得到匹配的 HttpMessageConverter，若找不到可用的 HttpMessageConverter 将报错。
 3. @RequestBody、@ResponseBody不需要成对出现。
 
 **处理XML和JSON**
@@ -315,10 +315,10 @@ public class Main {
 
 Spring MVC提供了多种途径输出模型数据：
 
-1. ModelAndView：当处理方法返回值类型为ModelAndView时，方法体即可通过该对象添加模型数据；
-2. @ModelAttribute：在方法入参标注该注解后，入参的对象就会放到数据模型中；
+1. `ModelAndView`：当处理方法返回值类型为ModelAndView时，方法体即可通过该对象添加模型数据；
+2. `@ModelAttribute`：在方法入参标注该注解后，入参的对象就会放到数据模型中；
 3. Map和Model：如果方法入参为org.framework.ui.Model、org.framework.ui.ModelMap、java.util.Map，当处理方法返回时，Map中的数据会自动添加到模型中；
-4. @SessionAttributes：将模型中的某个属性暂存到HttpSession中，以便多个请求之间可以共享这个属性。
+4. `@SessionAttributes`：将模型中的某个属性暂存到HttpSession中，以便多个请求之间可以共享这个属性。
 
 ## 3 处理方法的数据绑定
 
@@ -332,7 +332,7 @@ Spring MVC通过反射对目标签名进行分析，将请求消息绑定到处�
 
 ### 3.2 数据转换
 
-类型转换模块位于org.framework.core.convert包中，同时由于历史原因，Spring还支持JDK的PropertyEditor。
+类型转换模块位于`org.framework.core.convert`包中，同时由于历史原因，Spring还支持JDK的PropertyEditor。
 
 **ConversionService简介**
 
@@ -364,11 +364,9 @@ ConversionService 是 Spring 类型转换体系的核心接口，它定义了以
 
 Spring 在 org.springframework.core.convert.converter 包中定义了3种类型的转换器接口，实现任意一个转换器接口都可以作为自定义转换器注册到ConversionServiceFactoryBean中。这3种类型的转换器接口分别为：
 
-- Converter<S, T>：将S类型的对象转换为T类型的对象
-- GenericConverter：根据源类对象及目标类对象所在的宿主类的上下文信息进行类型转换工作。该类还有一个子接口ConditionalGenericConverter，它添加了一个接口方法根据源类型及目标类型所在宿主类的上下文信息决定是否要进行类型转换。
-- ConverterFactory：
-
-ConversionServiceFactoryBean 的 converters 属性可接受 Converter、ConverterFactory、 GenericConverter或ConditionalGenericConverter接口的实现类，并把这些转换器的转换逻辑统一封装到一个 ConversionService 实例对象中（GenericConversionService)。Spring 在Bean属性配置及Spring MVC请求消息绑定时将利用这个ConversionService实例完成类型转换工作。
+- `Converter<S, T>`：将S类型的对象转换为T类型的对象
+- `GenericConverter`：根据源类对象及目标类对象所在的宿主类的上下文信息进行类型转换工作。该类还有一个子接口ConditionalGenericConverter，它添加了一个接口方法根据源类型及目标类型所在宿主类的上下文信息决定是否要进行类型转换。
+- `ConverterFactory`：ConversionServiceFactoryBean 的 converters 属性可接受 Converter、ConverterFactory、 GenericConverter或ConditionalGenericConverter接口的实现类，并把这些转换器的转换逻辑统一封装到一个 ConversionService 实例对象中（GenericConversionService)。Spring 在Bean属性配置及Spring MVC请求消息绑定时将利用这个ConversionService实例完成类型转换工作。
 
 **在Spring中使用@lnitBinder 和 WebBindingInitializer装配自定义编辑器**
 
@@ -415,7 +413,9 @@ Spring的转换器并不提供输入及输出信息格式化的工作，一般�
 **启用注解驱动格式化功能**
 
 对属性对象的输入/输出进行格式化，从本质上讲依然属于“类型转换”的范畴。 Spring就是基于对象转换框架植入“格式化”功能的。Spring 在格式化模块中定义了一个实现 ConversionService 接口的 FormattingConversionService实现类，该实现类扩展了 GenericConversionService，因此它既具有类型转换功能，又具有格式化功能。
+
  FormattingConversionService 也拥有一个对应的 **FormattingConversionServiceFactoryBean** 工厂类，后者用于在Spring上下文中构造一个FormattingConversionService。通过这个工厂类，既可以注册自定义的转换器，还可以注册自定义的注解驱动逻辑。由于 FormattingConversionServiceFactoryBean 在内部会自动注册 NumberFormatAnnotationFormatterFactory 和 JodaDateTimeFormatAnnotationFormatterFactory，因此装配了 FormattingConversionServiceFactoryBean 后，就可以在 Spring MVC 入参绑定及模型数据输出时使用注解驱动的格式化功能。
+
  值得注意的是，`<mvc:annotation-driven/>`标签内部默认创建的ConversionService实例就是一个 FormattingConversionServiceFactoryBean。
 
 ### 3.4 数据校验
@@ -534,33 +534,31 @@ public Map<String, Object> receiveJson2(@RequestBody User user) throws Exception
 - 注意jackson相关jar的引入，以及springmvc.xml文件中定义JSON转换器的配置，spring3.x/4.x用的两个转换器名称上略有不同，当时坑了我好久才发现
 - 若springmvc.xml配置文件中使用了<mvc:annotation-driven />，则会自动提供读取JSON的功能，此时步骤2可省略；
 - 对于GET/POST请求，请求头的contentType不同分为以下几种情况：
-  - application/x-www-urlencoded（默认），可以使用@RequestParam、@RequestBody、@ModelAttribute处理；
-  - multipart/form-data，可使用@RequestParam，对于文件则可以使用MultipartFile类接收处理；@RequestBody不能处理；
-  - application/json、application/xml等格式，须使用@RequestBody处理
+  - `application/x-www-urlencoded`（默认），可以使用@RequestParam、@RequestBody、@ModelAttribute处理；
+  - `multipart/form-data`，可使用@RequestParam，对于文件则可以使用MultipartFile类接收处理；@RequestBody不能处理；
+  - `application/json`、`application/xml`等格式，须使用@RequestBody处理
 
+## 4.视图和视图解析器
 
-
-## 4 视图和视图解析器
-
-## 5 本地化
+## 5.本地化
 
 Spring提供了以下4个本地化解析器。
 
-- AcceptHeaderLocaleResolver:根据 HTTP 报文头的 Accept-Language 参数确定本 地化类型。如果没有显式定义本地化解析器，则Spring MVC默认采用 AcceptHeaderLocaleResolver。
-- CookieLocaleResolver:根据指定的Cookie值确定本地化类型。
-- SessionLocaleResolver:根据Session中特定的属性值确定本地化类型。
-- LocaleChangeInterceptor:从请求参数中获取本次请求对应的本地化类型。
+- `AcceptHeaderLocaleResolver`:根据 HTTP 报文头的 Accept-Language 参数确定本 地化类型。如果没有显式定义本地化解析器，则Spring MVC默认采用 AcceptHeaderLocaleResolver。
+- `CookieLocaleResolver`:根据指定的Cookie值确定本地化类型。
+- `SessionLocaleResolver`:根据Session中特定的属性值确定本地化类型。
+- `LocaleChangeInterceptor`:从请求参数中获取本次请求对应的本地化类型。
 
 ## 6 文件上传
 
 Spring MVC为文件上传提供了直接支持，这种支持是通过即插即用的MultipartResolver 实现的。Spring 使用 Jakarta Commons FileUpload 技术实现了一个 MultipartResolver 实现 类：CommonsMultipartResolver。
  在Spring MVC上下文中默认没有装配MultipartResolver,因此默认情况下不能 处理文件的上传工作。如果想使用Spring的文件上传功能，则需要先在上下文中配置 MultipartResolver。
 
-## 7 WebSocket
+## 7.WebSocket
 
-## 8 静态资源处理
+## 8.静态资源处理
 
-1. `<mvc:default-servlet-handler/>`：在 smart-servlet.xml 中配置 `<mvc:default-servlet-handler/>` 后，会在 Spring MVC 上下文中定义一个 org.springframework.web.servlet.resource.DefaultServletHttpRequestHandler，它将充当一个检查员的角色，对进入DispatcherServlet的URL进行筛查。如果发现是静态资源的请求，就将该请求转由Web应用服务器默认的Servlet处理；如果不是静态资源 的请求，则由DispatcherServlet继续处理。
+1. `<mvc:default-servlet-handler/>`：在 smart-servlet.xml 中配置 `<mvc:default-servlet-handler/>` 后，会在 Spring MVC 上下文中定义一个 `org.springframework.web.servlet.resource.DefaultServletHttpRequestHandler`，它将充当一个检查员的角色，对进入DispatcherServlet的URL进行筛查。如果发现是静态资源的请求，就将该请求转由Web应用服务器默认的Servlet处理；如果不是静态资源 的请求，则由DispatcherServlet继续处理。
 2. `<mvc:resources/>`：`<mvc:default-servlet-handler/>`将静态资源的处理经由Spring MVC框架交回Web应 用服务器。而`<mvc:resources/>`更进一步，由SpringMVC框架自己处理静态资源，并添 加一些有用的附加功能。
 
 ## 9 拦截器
@@ -791,39 +789,41 @@ headers：指定request中必须包含某些指定的header值，才能让该方
 
 - 不同点 
 
-  @Autowired为Spring提供的注解，需要导入包org.springframework.beans.factory.annotation.Autowired;只按照byType注入。
+	@Autowired为Spring提供的注解，需要导入包org.springframework.beans.factory.annotation.Autowired;只按照byType注入。
 
-```
-public class TestServiceImpl {
-    // 下面两种@Autowired只要使用一种即可
-    @Autowired
-    private UserDao userDao; // 用于字段上
+    ```
+    public class TestServiceImpl {
+        // 下面两种@Autowired只要使用一种即可
+        @Autowired
+        private UserDao userDao; // 用于字段上
 
-    @Autowired
-    public void setUserDao(UserDao userDao) { // 用于属性的方法上
-        this.userDao = userDao;
+        @Autowired
+        public void setUserDao(UserDao userDao) { // 用于属性的方法上
+            this.userDao = userDao;
+        }
     }
-}
-```
+    ```
 
-@Autowired注解是按照类型（byType）装配依赖对象，默认情况下它要求依赖对象必须存在，如果允许null值，可以设置它的required属性为false。如果我们想使用按照名称（byName）来装配，可以结合@Qualifier注解一起使用。如下：
+	@Autowired注解是按照类型（byType）装配依赖对象，默认情况下它要求依赖对象必须存在，如果允许null值，可以设置它的required属性为false。如果我们想使用按照名称（byName）来装配，可以结合@Qualifier注解一起使用。如下：
 
-```
-public class TestServiceImpl {
-    @Autowired
-    @Qualifier("userDao")
-    private UserDao userDao; 
-}
-```
+    ```
+    public class TestServiceImpl {
+        @Autowired
+        @Qualifier("userDao")
+        private UserDao userDao; 
+    }
+    ```
+  
+  @Resource默认按照ByName自动注入，由J2EE提供，需要导入包javax.annotation.Resource。@Resource有两个重要的属性：name和type，而Spring将@Resource注解的name属性解析为bean的名字，而type属性则解析为bean的类型。所以，如果使用name属性，则使用byName的自动注入策略，而使用type属性时则使用byType自动注入策略。如果既不制定name也不制定type属性，这时将通过反射机制使用byName自动注入策略。
 
-
-@Resource默认按照ByName自动注入，由J2EE提供，需要导入包javax.annotation.Resource。@Resource有两个重要的属性：name和type，而Spring将@Resource注解的name属性解析为bean的名字，而type属性则解析为bean的类型。所以，如果使用name属性，则使用byName的自动注入策略，而使用type属性时则使用byType自动注入策略。如果既不制定name也不制定type属性，这时将通过反射机制使用byName自动注入策略。
-
+    ```
     @Resource(name="ad")
     private AdBo ad;
-    
+
     @Resource(type=BidBo.class)
     private BidBo bid;
+    ```
+  
 - 如果同时指定了name和type，则从Spring上下文中找到唯一匹配的bean进行装配，找不到则抛出异常。
 - 如果指定了name，则从上下文中查找名称（id）匹配的bean进行装配，找不到则抛出异常。 
 
@@ -842,7 +842,7 @@ public class TestServiceImpl {
 先介绍下方法体的用法
 
 ```
-@ModelAttribute("user")
+	@ModelAttribute("user")
     public User getUser() {
         User user = new User();
         user.setId(1234567L);
@@ -850,7 +850,7 @@ public class TestServiceImpl {
         user.setPassword("admin");
         return user;
     }
-@RequestMapping(value = "testUser", method = {RequestMethod.GET, RequestMethod.POST})
+	@RequestMapping(value = "testUser", method = {RequestMethod.GET, RequestMethod.POST})
     public String testUser(Map<String, Object> map) {
         System.out.println(map.get("user"));
         return "success";
@@ -860,11 +860,11 @@ public class TestServiceImpl {
 当我们发出/testUser.do这个请求时，SpringMvc 在执行该请求前会先逐个调用在方法级上标注了 
 @ModelAttribute 的方法，然后将该模型参数放入testUser()函数的Map参数中 
 
-执行结果： 
+**执行结果：** 
 
 User{id=123456,name=”sunwukong”,password=”admin”} 
 
-作用在参数上 
+**作用在参数上** 
 
 SpringMVC先从模型数据中获取对象，再将请求参数绑定到对象中，再传入形参，并且数据模型中的对象会被覆盖
 
@@ -1293,7 +1293,7 @@ spring-MVC.xml的相关配置
 单例是不安全的，会导致属性重复使用。
 
 - 不要在controller中定义成员变量。
-- 万一必须要定义一个非静态成员变量时候，则通过注解@Scope(“prototype”)，将其设置为多例模式。
+- 万一必须要定义一个非静态成员变量时候，则通过注解 `@Scope(“prototype”)`，将其设置为多例模式。
 - 在Controller中使用ThreadLocal变量
 
 **为什么设计成单例设计模式?**

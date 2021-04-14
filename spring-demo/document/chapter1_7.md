@@ -274,7 +274,12 @@ AOP联盟为增强定义了`org.aopalliance.aop.Advice`接口，Spring支持5种
 5. 引介增强：`org.springframework.aop.IntroductionInterceptor` 代表引介增强，表示在目标类中添加一些新的方法和属性。
 
 > AOP联盟规范了一套用于规范AOP实现的底层API，通过这些统一的底层API，可以使得各个AOP实现及工具产品之间实现相互移植。这些API主要以标准接口的形式提供，是AOP编程思想所要解决的横切交叉关注点问题各部件的最高抽象。Spring的AOP框架中也直接以这些API为基础所构建。
->  AOP联盟的API主要包括四个部分，第一个是aop包，定义了一个表示通知Advice的标识接口，各种各样的通知都继承或实现了该接口；aop包中还包括了一个用于描述AOP系统框架错误的运行时异常AspectException。 第二个部分是intercept包，也就是拦截器包，这个包中规范了AOP核心概念中的连接点及通知(Advice)类型。 第三及第四部分是instrument及reflect包。这两个包中的API主要包括AOP框架或产品为了实现把横切关注点的模块与核心应用模块组合集成，所需要使用的设施、技术及底层实现规范等。
+>
+> AOP联盟的API主要包括四个部分：
+>
+> - 第一个是aop包，定义了一个表示通知Advice的标识接口，各种各样的通知都继承或实现了该接口；aop包中还包括了一个用于描述AOP系统框架错误的运行时异常AspectException。 
+> - 第二个部分是intercept包，也就是拦截器包，这个包中规范了AOP核心概念中的连接点及通知(Advice)类型。 
+> - 第三及第四部分是instrument及reflect包。这两个包中的API主要包括AOP框架或产品为了实现把横切关注点的模块与核心应用模块组合集成，所需要使用的设施、技术及底层实现规范等。
 
 ### 3.2.前置增强
 
@@ -325,7 +330,7 @@ class BarberTony {
 
 #### 3.2.1.代理工厂类ProxyFactory
 
-使用代理工厂类ProxyFactory将增强织入到目标类中，这个JDK的Proxy和InvocationHandler如出一辙，事实上ProxyFactory内部就是使用JDK**或者**CGLib动态代理技术将增强应用到目标类的。
+使用代理工厂类ProxyFactory将增强织入到目标类中，这个JDK的Proxy和InvocationHandler如出一辙，事实上ProxyFactory内部就是使用 JDK 或者 CGLib 动态代理技术将增强应用到目标类的。
 
 Spring定义了`org.springframework.aop.framework.AopProxy`接口，并提供了两个包访问权限的实现类：
 
@@ -398,7 +403,8 @@ public void afterThrowing(Method method, Object[] args, Object target, Exception
 ### 3.6.引介增强
 
 引介增强为目标类创建新的方法和属性，所以引介增强的连接点是类级别的，而非方法级别的。通过引介增强，可以为目标类添加一个接口的实现，即目标类原来没有实现某个接口，引介增强后可以为目标类创建实现某接口的代理。
- Spring定义了引介增强接口IntroductionInterceptor，该接口没有定义任何方法。一般通过扩展其实现类DelegatingIntroductionInterceptor来定义自己的增强类。
+
+Spring定义了引介增强接口IntroductionInterceptor，该接口没有定义任何方法。一般通过扩展其实现类DelegatingIntroductionInterceptor来定义自己的增强类。
 
 ```java
 public class Main {
@@ -467,11 +473,11 @@ class Service {
 
 **为什么需要ThreadLocal**
 
-如果没有对ServiceMonitor进行线程安全的处理，就必须将singleton属性设置为false，让ProxyFactoryBean产生prototype的作用域类型的代理。 这里就带来了一个严重的性能问题，因为CGLib动态创建代理的性能很低，而每次getBean方法从容器中获取作用域为prototype的Bean时都将返回一个新的代理实例，所以这种影响是巨大的，这就是为什么需要通过ThreadLocal对ServiceMonitor的开关进行线程安全化处理的原因。通过线程安全处理后，就可以使用默认的singleton作用域，这样创建代理的动作仅发生一次。
+如果没有对 `ServiceMonitor` 进行线程安全的处理，就必须将singleton属性设置为false，让 `ProxyFactoryBean` 产生 `prototype` 的作用域类型的代理。 这里就带来了一个严重的性能问题，因为CGLib动态创建代理的性能很低，而每次getBean方法从容器中获取作用域为 `prototype` 的Bean时都将返回一个新的代理实例，所以这种影响是巨大的，这就是为什么需要通过ThreadLocal对ServiceMonitor的开关进行线程安全化处理的原因。通过线程安全处理后，就可以使用默认的singleton作用域，这样创建代理的动作仅发生一次。
 
 ## 4.创建切面
 
-我们希望有选择地织入目标类的某些特定方法中，就需要使用切点进行目标连接点的定位。Spring通过`org.springframework.aop.Pointcut`接口描述切点，Pointcut由ClassFilter和MethodMatcher构成。ClassFilter定位特定的类，MethodMatcher定位特定的方法。
+我们希望有选择地织入目标类的某些特定方法中，就需要使用切点进行目标连接点的定位。Spring通过`org.springframework.aop.Pointcut`接口描述切点，`Pointcut`由`ClassFilter`和`MethodMatcher`构成。ClassFilter定位特定的类，MethodMatcher定位特定的方法。
 
 **静态方法匹配器与动态方法匹配器**
 
@@ -494,26 +500,26 @@ Spring支持两种方法匹配器——静态方法匹配器和动态方法匹�
 
 Spring使用`org.springframework.aop.Advisor`接口表示切面的概念，一个切面同时包含横切代码和连接点信息。
 
-1. Advisor：代表一般切面，仅包含一个Advice，因为Advice包含了横切代码和连接点信息，所以Advice本身一个简单的切面，只不过它代表的横切的连接点是所有目标类的所有方法，因为这个横切面太宽泛，所以一般不会直接使用。
-2. PointcutAdvisor：代表具有切点的切面，包括Advice和Pointcut两个类，这样就可以通过类、方法名以及方位等信息灵活的定义切面的连接点，提供更具实用性的切面。PointcutAdvisor主要有6个具体的实现类：
-3. IntroductionAdvisor：代表引介切面， 引介切面是对应引介增强的特殊的切面，它应用于类层上面，所以引介切点使用ClassFilter进行定义。
+1. `Advisor`：代表一般切面，仅包含一个Advice，因为Advice包含了横切代码和连接点信息，所以Advice本身一个简单的切面，只不过它代表的横切的连接点是所有目标类的所有方法，因为这个横切面太宽泛，所以一般不会直接使用。
+2. `PointcutAdvisor`：代表具有切点的切面，包括Advice和Pointcut两个类，这样就可以通过类、方法名以及方位等信息灵活的定义切面的连接点，提供更具实用性的切面。PointcutAdvisor主要有6个具体的实现类：
+3. `IntroductionAdvisor`：代表引介切面， 引介切面是对应引介增强的特殊的切面，它应用于类层上面，所以引介切点使用ClassFilter进行定义。
 
 **PointcutAdvisor的实现类**
 
 ![14623831-c397aff64dfc5c2a](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/spring-demo/20210329222352.webp)
 
-- DefaultPointcutAdvisor：最常用的切面类型，它可以通过任意Pointcut和Advice定义一个切面，唯一不支持的就是引介的切面类型，一般可以通过扩展该类实现自定义的切面。
-- NameMatchMethodPointcutAdvisor：通过该类可以定义按方法名定义切点的切面。
-- RegexpMethodPointcutAdvisor：对于按正则表达式匹配方法名进行切点的切面，可以通过扩展该实现类进行操作。RegexpMethodPointcutAdvisor允许用户以正则表达式模式串定义方法匹配的切点，其内部通过JdkRegexpMethodPointcut构造出正则表达式方法名切点。
-- StaticMethodMatcherPointcutAdvisor：静态方法匹配器切点定义的切面，默认情况下匹配所有的目标类。
-- AspectJExpressionPointcutAdvisor：用于AspectJ切点表达式定义切点的切面。
-- AspectJPointcutAdvisor：用于AspectJ语法定义切点的切面。
+- `DefaultPointcutAdvisor`：最常用的切面类型，它可以通过任意Pointcut和Advice定义一个切面，唯一不支持的就是引介的切面类型，一般可以通过扩展该类实现自定义的切面。
+- `NameMatchMethodPointcutAdvisor`：通过该类可以定义按方法名定义切点的切面。
+- `RegexpMethodPointcutAdvisor`：对于按正则表达式匹配方法名进行切点的切面，可以通过扩展该实现类进行操作。RegexpMethodPointcutAdvisor允许用户以正则表达式模式串定义方法匹配的切点，其内部通过JdkRegexpMethodPointcut构造出正则表达式方法名切点。
+- `StaticMethodMatcherPointcutAdvisor`：静态方法匹配器切点定义的切面，默认情况下匹配所有的目标类。
+- `AspectJExpressionPointcutAdvisor`：用于AspectJ切点表达式定义切点的切面。
+- `AspectJPointcutAdvisor`：用于AspectJ语法定义切点的切面。
 
 > Advisor都实现了org.springframework.core.Ordered接口，Spring 将根据Advisor定义的顺序决定织入切面的顺序。
 
 ### 4.3.静态普通方法名匹配切面
 
-1. 定义切面，继承StaticMethodMatcherPointcutAdvisor并实现其matches()方法
+1. 定义切面，继承StaticMethodMatcherPointcutAdvisor并实现其 `matches()` 方法
 2. 定义增强，实现Advice或者其子类并实现相关方法
 3. 为切面设置增强
 4. 通过ProxyFactory生成代理类

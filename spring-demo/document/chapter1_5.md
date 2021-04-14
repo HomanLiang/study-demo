@@ -22,19 +22,19 @@
 
 主要包括：
 
-- DefaultListableBeanFactory
+- **DefaultListableBeanFactory**
 
   这就是大家常说的 ioc 容器，它里面有很多 map、list。spring 帮我们创建的 singleton 类型的 bean 就存放在其中一个 map 中。我们定义的监听器（ApplicationListener）也被放到一个 Set 集合中。
 
-- BeanDefinitionRegistry
+- **BeanDefinitionRegistry**
 
   把一个 BeanDefinition 放到 beanDefinitionMap。
 
-- AnnotatedBeanDefinitionReader
+- **AnnotatedBeanDefinitionReader**
 
   针对 AnnotationConfigApplicationContext 而言。一个 BeanDefinition 读取器。
 
-- 扩展点集合
+- **扩展点集合**
 
   存放 spring 扩展点（主要是 BeanFactoryPostProcessor、BeanPostProcessor）接口的 list 集合。
 
@@ -55,7 +55,7 @@
 
 ### 4.1 初始化和启动
 
-我们平时常说的spring 启动其实就是调用 AbstractApplicationContext#refresh 完成 spring context 的初始化和启动过程。spring context 初始化从开始到最后结束以及启动，这整个过程都在 refresh 这个方法中。refresh 方法刚开始做的是一些 spring context 的准备工作，也就是 spring context 的初始化，比如：创建 BeanFactory、注册 BeanFactoryPostProcessor 等，只有等这些准备工作做好以后才去开始 spring context 的启动。
+我们平时常说的spring 启动其实就是调用 `AbstractApplicationContext#refresh` 完成 spring context 的初始化和启动过程。spring context 初始化从开始到最后结束以及启动，这整个过程都在 refresh 这个方法中。refresh 方法刚开始做的是一些 spring context 的准备工作，也就是 spring context 的初始化，比如：创建 BeanFactory、注册 BeanFactoryPostProcessor 等，只有等这些准备工作做好以后才去开始 spring context 的启动。
 
 与现实生活联系一下，你可以把初始化理解为准备原料（对应到编程中就是创建好一些数据结构，并为这些数据结构填充点数据进去），等准备了你才能去真正造玩偶、造东西呀（对应到编程中就是执行算法）。在编程中数据结构与算法是分不开的也是这个道理呀，它们相互依赖并没有严格的界限划分。
 
@@ -65,7 +65,7 @@ spring context 启动后可以提供它的服务的这段时间。
 
 ### 4.3 关闭/销毁
 
-不需要用 spring context ，关闭它时，其实对应到代码上就是  acaContext.close();
+不需要用 spring context ，关闭它时，其实对应到代码上就是  `acaContext.close();`
 
 ## 5.应用场景
 

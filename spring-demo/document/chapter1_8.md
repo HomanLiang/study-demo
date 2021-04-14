@@ -9,7 +9,7 @@
 Spring对AOP功能进行了很重要的增强：
 
 1. 新增了基于Schema的配置支持，为AOP专门提供了aop命名空间
-2. 新增了对AspectJ切点表达式语言的支持。@AspectJ允许开发者在POJO中定义切面。Spring使用和@AspectJ相同风格的注解，并通过AspectJ提供的注解库和解析库处理切点。由于Spring只支持方法级的切点，仅对@AspectJ提供了有限的支持
+2. 新增了对AspectJ切点表达式语言的支持。`@AspectJ` 允许开发者在POJO中定义切面。Spring使用和 `@AspectJ` 相同风格的注解，并通过AspectJ提供的注解库和解析库处理切点。由于Spring只支持方法级的切点，仅对 `@AspectJ` 提供了有限的支持
 3. 可以无缝地集成AspectJ
 
 ## 2.使用@Aspect
@@ -184,7 +184,7 @@ AspectJ除上表中所列的函数外，还有call()、initialization()、 prein
 
 #### 3.2.2.函数及其支持的通配符
 
-- 支持所有通配符：execution()、within()，如within(com.ankeetc.*)、`within(com.ankeetc.service..*.*Service+)`等；
+- 支持所有通配符：`execution()`、`within()`，如`within(com.ankeetc.*)`、`within(com.ankeetc.service..*.*Service+)`等；
 - 仅支持+通配符：args()、this()、target()，如`args(com.ankeetc.Waiter+)`、 `target(java.util.List+)`等。虽然这三个函数可以支持+通配符，但其意义不大，因为对于这些函数来说使用和不使用+都是一样的，如`target(com.ankeetc.Waiter+)`和`target(com.ankeetc.aspectj.Waiter)`是等价的。
 - 不支持通配符：@args()、@within()、@target()和@annotation()，如`@args(com.ankeetc.anno.NeedTest)`，`@within(com.ankeetc.anno.NeedTest)`。
 
@@ -324,9 +324,9 @@ class RunAdvice {
 ```
 
 ```xml
-    <aop:aspectj-autoproxy/>
-    <bean class="com.ankeetc.spring.Player"/>
-    <bean class="com.ankeetc.spring.RunAdvice"/>
+<aop:aspectj-autoproxy/>
+<bean class="com.ankeetc.spring.Player"/>
+<bean class="com.ankeetc.spring.RunAdvice"/>
 ```
 
 ### 4.2.execution()

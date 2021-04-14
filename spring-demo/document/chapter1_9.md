@@ -24,11 +24,11 @@
 
  Spring的事务管理主要包括3个接口：
 
-- PlatformTransactionManager：根据TransactionDefinition提供的事务属性配置信息，创建事务.
+- **PlatformTransactionManager**：根据TransactionDefinition提供的事务属性配置信息，创建事务.
 
-- TransactionDefinition：封状事务的隔离级别、超时时间、是否只读事务和传播规则等事务属性.
+- **TransactionDefinition**：封状事务的隔离级别、超时时间、是否只读事务和传播规则等事务属性.
 
-- TransactionStatus：封装了事务的具体运行状态，如是否是新事务，是否已经提交事务，设置当前事务为rollback-only等；
+- **TransactionStatus**：封装了事务的具体运行状态，如是否是新事务，是否已经提交事务，设置当前事务为rollback-only等；
 
 ### PlatformTransactionManager
 
@@ -36,32 +36,32 @@
 
 ![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/spring-demo/20210329233952.png)
 
-- TransactionStatus getTransaction(@Nullable TransactionDefinition definition):根据事务定义信息从事事务环境返回一个已存在的事务，或者创建一个新的事务。
+- `TransactionStatus getTransaction(@Nullable TransactionDefinition definition)`：根据事务定义信息从事事务环境返回一个已存在的事务，或者创建一个新的事务。
 
-- void commit(TransactionStatus status)：根据事务的状态提交事务，如果事务状态已经标识为rollback-only,该方法执行回滚事务的操作
+- `void commit(TransactionStatus status)`：根据事务的状态提交事务，如果事务状态已经标识为rollback-only,该方法执行回滚事务的操作
 
-- void rollback(TransactionStatus status)：将事务回滚，当commit方法抛出异常时，rollback会被隐式调用 
+- `void rollback(TransactionStatus status)`：将事务回滚，当commit方法抛出异常时，rollback会被隐式调用 
 
 常用的事务管理器: 
 
-- DataSourceTransactionManager:支持JDBC,MyBatis等；
+- **DataSourceTransactionManager**:支持JDBC,MyBatis等；
 
-- HibernateTransactionManager:支持Hibernate
+- **HibernateTransactionManager**:支持Hibernate
 
 ###  TransactionDefinition
 
 ![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/spring-demo/20210329234215.png)
 
-- 事务隔离级别：用来解决并发事务出现的问题
-  - ISOLATION_DEFAULT：默认隔离级别，即使用底层数据库默认的隔离级别；
-  - ISOLATION_READ_UNCOMMITTED：未提交读
-  - ISOLATION_READ_COMMITTED ：提交读，一般情况我们使用这个
-  - ISOLATION_REPEATABLE_READ ：可重复读
-  - ISOLATION_SERIALIZABLE : 序列化
+- **事务隔离级别**：用来解决并发事务出现的问题
+  - `ISOLATION_DEFAULT`：默认隔离级别，即使用底层数据库默认的隔离级别；
+  - `ISOLATION_READ_UNCOMMITTED`：未提交读
+  - `ISOLATION_READ_COMMITTED `：提交读，一般情况我们使用这个
+  - `ISOLATION_REPEATABLE_READ` ：可重复读
+  - `ISOLATION_SERIALIZABLE` : 序列化
 
 注：除第一个外，后面四个都是spring通过java代码模拟出来的
 
-- 传播规则：在一个事务中调用其他事务方法，此时事务该如何传播，按照什么规则传播，用谁的事务，还是都不用等
+- **传播规则**：在一个事务中调用其他事务方法，此时事务该如何传播，按照什么规则传播，用谁的事务，还是都不用等
 
   ![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/spring-demo/20210329234237.png)
 
@@ -69,17 +69,19 @@
 
   ![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/spring-demo/20210329234248.png)
 
-  情况一：遵从当前事务
+  **情况一：遵从当前事务**
+  
   - REQUIRED:必须存在事务，如果当前存在一个事务，则加入该事务，否则将新建一个事务（缺省）
   - SUPPORTS：支持当前事务，指如果当前存在逻辑事务，就加入到该事务，如果当前没有事务，就以非事务方式执行
-  - MANDATORY：必须有事务，使用当前事务执行，如果当前没有事务，则抛出异常IllegalTransactionStateException
-
-  情况二：不遵从当前事务
+- MANDATORY：必须有事务，使用当前事务执行，如果当前没有事务，则抛出异常IllegalTransactionStateException
+  
+  **情况二：不遵从当前事务**
+  
   - REQUIRES_NEW：不管当前是否存在事务，每次都创建新事务
-  - NOT_SUPPORTED：以非事务方式执行，如果当前存在事务，就把当前事务暂停，以非事务方式执行
+- NOT_SUPPORTED：以非事务方式执行，如果当前存在事务，就把当前事务暂停，以非事务方式执行
   - NEVER：不支持事务，如果当前存在事务，则抛出异常：IllegalTransactionStateException
-
-  情况三：寄生事务（外部事务和寄生事务）
+  
+  **情况三：寄生事务（外部事务和寄生事务）**
   
   - NESTED：如果当前存在事务，则在内部事务内执行，如果当前不存在事务，则创建一个新的事务，嵌套事务使用数据库中的保存点来实现，即嵌套事务回滚不影响外部事务，但外部事务回滚将导致嵌套事务回滚。 
 
@@ -653,7 +655,9 @@ public class User2ServiceImpl implements User2Service {
 
 #### 2.PROPAGATION_REQUIRES_NEW
 
-我们为 User1Service 和 User2Service 相应方法加上`Propagation.REQUIRES_NEW`属性。**User1Service 方法：**
+我们为 User1Service 和 User2Service 相应方法加上`Propagation.REQUIRES_NEW`属性。
+
+**User1Service 方法：**
 
 ```
 @Service

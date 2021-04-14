@@ -14,7 +14,7 @@ Spring 总共大约有 20 个模块， 由 1300 多个不同的文件构成。 �
 
 ## 1.核心容器
 
-Spring的核心容器是其他模块建立的基础，有spring-core、spring-beans、spring-context、spring-context-support和spring-expression（Spring表达式语言）等模块组成。
+Spring的核心容器是其他模块建立的基础，有`spring-core`、`spring-beans`、`spring-context`、`spring-context-support`和`spring-expression（Spring表达式语言）`等模块组成。
 
 - **spring-core 模块**：提供了框架的基本组成部分，包括控制反转（Inversion of Control，IOC）和依赖注入（Dependency Injection，DI）功能。
 
@@ -28,7 +28,7 @@ Spring的核心容器是其他模块建立的基础，有spring-core、spring-be
 
 ## 2.AOP 和设备支持
 
-由spring-aop、 spring-aspects 和 spring-instrument等 3 个模块组成。
+由 `spring-aop`、` spring-aspects` 和 `spring-instrument` 等 3 个模块组成。
 
 - **spring-aop 模块**：是 Spring 的另一个核心模块，提供了一个符合 AOP 要求的面向切面的编程实现。 作为继 OOP（面向对象编程） 后， 对程序员影响最大的编程思想之一， AOP 极大地开拓了人们对于编程的思路。 在 Spring 中， 以动态代理技术为基础，允许定义方法拦截器和切入点，将代码按照功能进行分离，以便干净地解耦。
 
@@ -38,7 +38,7 @@ Spring的核心容器是其他模块建立的基础，有spring-core、spring-be
 
 ## 3.数据访问与集成
 
-由 spring-jdbc、spring-orm、spring-oxm、spring-jms 和 spring-tx 等 5 个模块组成。
+由 `spring-jdbc`、`spring-orm`、`spring-oxm`、`spring-jms` 和 `spring-tx` 等 5 个模块组成。
 
 - **spring-jdbc 模块**：提供了一个JDBC的抽象层，消除了烦琐的JDBC编码和数据库厂商特有的错误代码解析， 用于简化JDBC。主要是提供 JDBC 模板方式、 关系数据库对象化方式、 SimpleJdbc 方式、 事务管理来简化 JDBC 编程， 主要实现类是 JdbcTemplate、 SimpleJdbcTemplate 以及 NamedParameterJdbcTemplate。
 
