@@ -49,7 +49,7 @@ redis               latest              sha256:854715f5cd1b64d2f62ec219a7b7bacea
 hello-world         latest              sha256:6540fc08ee6e6b7b63468dc3317e3303aae178cb8a45ed3123180328bcc1d20f   fce289e99eb9        7 months ago        1.84kB
 ```
 - `--no-trunc` :显示完整的镜像信息
-用法如：`docker images -a`
+用法如：`docker images --no-trunc`
 
 ### 2.2.搜索镜像
 命令：`docker search [option] keyword`
@@ -332,7 +332,13 @@ CONTAINER ID        IMAGE               COMMAND                  CREATED        
 
 然而使用 attach 命令有时候并不方便 。 当多个窗口同时 attach 到同一个容器的时候，所有窗口都会同步显示；当某个窗口因命令阻塞时，其他窗口也无法执行操作了 。
 
-命令：`docker exec -it 容器ID /bash/shell`
+命令：
+
+`docker exec -it 容器ID /bash/shell`
+
+`docker exec -it 容器名 /bin/bash`
+
+`docker exec -it 容器名 /bin/sh`
 
 可以看到会打开一个新的 bash 终端，在不影响容器内其他应用的前提下，用户可以与容器进行交互。
 

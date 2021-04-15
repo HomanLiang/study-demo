@@ -199,11 +199,15 @@ Swarm群集会产生两种不同类型的流量：
 
 在Swarm service中有三个重要的网络概念：
 
-- overlay networks 管理Swarm中docker守护进程间的通信。可以将容器附加到一个或多个已存在的overlay网络上，使容器与容器之间能够通信；
-- ingress network 是一个特殊的 overlay 网络，用于服务节点间的负载均衡。当任何 Swarm 节点在发布的端口上接收到请求时，它将该请求交给一个名为 IPVS 的模块。IPVS 跟踪参与该服务的所有IP地址，选择其中的一个，并通过 ingress 网络将请求路由到它；
-- 初始化或加入 Swarm 集群时会自动创建 ingress 网络，大多数情况下，用户不需要自定义配置，但是 docker 17.05 和更高版本允许你自定义。
-- docker_gwbridge是一种桥接网络，将 overlay 网络（包括 ingress 网络）连接到一个单独的 Docker 守护进程的物理网络。默认情况下，服务正在运行的每个容器都连接到本地 Docker 守护进程主机的 docker_gwbridge 网络。
-docker_gwbridge 网络在初始化或加入 Swarm 时自动创建。大多数情况下，用户不需要自定义配置，但是 Docker 允许自定义。
+- `overlay networks`： 管理Swarm中docker守护进程间的通信。可以将容器附加到一个或多个已存在的overlay网络上，使容器与容器之间能够通信；
+
+- `ingress network`： 是一个特殊的 overlay 网络，用于服务节点间的负载均衡。当任何 Swarm 节点在发布的端口上接收到请求时，它将该请求交给一个名为 IPVS 的模块。IPVS 跟踪参与该服务的所有IP地址，选择其中的一个，并通过 ingress 网络将请求路由到它；
+
+  初始化或加入 Swarm 集群时会自动创建 ingress 网络，大多数情况下，用户不需要自定义配置，但是 docker 17.05 和更高版本允许你自定义。
+
+- `docker_gwbridge`： 是一种桥接网络，将 overlay 网络（包括 ingress 网络）连接到一个单独的 Docker 守护进程的物理网络。默认情况下，服务正在运行的每个容器都连接到本地 Docker 守护进程主机的 docker_gwbridge 网络。
+
+  docker_gwbridge 网络在初始化或加入 Swarm 时自动创建。大多数情况下，用户不需要自定义配置，但是 Docker 允许自定义。
 
 查看docker01上面的默认网络，如下（注意其SCOPE列，确认其生效范围）：
 
@@ -239,15 +243,18 @@ docker_gwbridge 网络在初始化或加入 Swarm 时自动创建。大多数情
 ### 11.1.指定某个service运行在同一台docker服务器上
 在第一篇的博文中测试过，如果Swarm群集中的manager下发一个service任务，那么，下发的任务将随机分布在群集中的docker服务器之上运行， 如果说，由于需要将自己的生产环境配置的统一、规范一些，某一台docker服务器，我就只运行web服务，另一台docker主机，我就只运行PHP服务，那么，怎么解决呢？
 
-解决方案一：
+**解决方案一：**
+
 ```
 [root@docker01 ~]# docker service create --replicas 3 --constraint node.hostname==docker03 --name test nginx
 #在docker03主机上，基于nginx镜像，运行3个名为test的容器
 ```
 上述命令的执行后如下所示：
+
 ![Image [10]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/docker-demo/20210413221601.png)
 
-解决方案二：
+**解决方案二：**
+
 ```
 [root@docker01 ~]# docker node update --label-add mem=max docker02
 #以键值对的方式给docker02主机打上标签“mem=max”，等号两边的内容是可以自定义的

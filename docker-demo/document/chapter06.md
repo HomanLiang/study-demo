@@ -32,6 +32,7 @@
 数据卷是完全被 docker 管理的，就像上图中的黄色区域描述的一样，docker 在宿主机的文件系统中找了个文件管理数据卷相关的数据。因此你可能根本不需要知道数据卷文件在宿主机上的存储位置(事实上抱着刨根问底的精神我们还是很想搞清楚它背后的工作原理！)。
 
 docker 数据卷的本质是容器中的一个特殊目录。在容器创建的过程中，docker 会将宿主机上的指定目录(一个以数据卷 ID 为名称的目录)挂载到容器中指定的目录上。这里使用的挂载方式为绑定挂载(bind mount)，所以挂载完成后的宿主机目录和容器内的目标目录表现一致。
+
 比如我们执行下面的命令创建数据卷 hello，并挂载到容器 testcon 的 /world 目录：
 
 ```
@@ -214,8 +215,9 @@ docker会默认生成一个，通过docker inspet 可以查看具体路径
 
 备注
 
-Docker挂载主机目录Docker访问出现cannot open directory .: Permission denied
-解决办法：在挂载目录后多加一个--privileged=true参数即可
+Docker挂载主机目录Docker访问出现 `cannot open directory .: Permission denied`
+
+解决办法：在挂载目录后多加一个`--privileged=true`参数即可
 
 ## 2.数据卷容器
 ### 2.1.是什么

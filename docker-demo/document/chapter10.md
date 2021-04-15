@@ -14,7 +14,8 @@ mysql和tomcat是两个独立的容器，但是tomcat需要和mysql通信，而m
 #### 1.1.2.怎么通信
 要谈通信，就需要谈一下ip，因为不知道ip是无法通信的。最简单的例子你jdbc要连接mysql数据库，你也需要配置mysql的ip地址。容器之间也不例外，都是靠虚拟ip来完成的。
 
-何为虚拟ip？
+**何为虚拟ip？**
+
 虚拟ip：容器创建完成后都会生成一个唯一的ip，这个ip外界不能直接访问，他只用于容器之间进行通信交互用。这就是虚拟ip。
 
 容器之间的虚拟ip是互通的。
@@ -30,11 +31,11 @@ mysql和tomcat是两个独立的容器，但是tomcat需要和mysql通信，而m
     docker ps
     ```
     
-    知识点出现了！！！--name是神马鬼？先看如下一个场景
+    知识点出现了！！！`--name` 是神马鬼？先看如下一个场景
     
     在公司或者你直接买的阿里云数据库/redis等服务为什么给你个数据库域名而不是推荐用ip？因为ip的话可变，比如你业务系统写死了ip，这时候人家那边内网ip变了，你这所有用这个数据库的业务系统都要跟着改。用域名的话一劳永逸，底层ip变了后再映射到新域名上就行，不影响业务系统。
     
-    --name就是给docker配置名称来与虚拟ip做映射，因为ip老变化，每次变化的时候其他容器都需要跟着改动才行。配个名称一劳永逸。创建容器的时候通过 --name xxx 即可指定。
+    `--name` 就是给docker配置名称来与虚拟ip做映射，因为ip老变化，每次变化的时候其他容器都需要跟着改动才行。配个名称一劳永逸。创建容器的时候通过 `--name xxx` 即可指定。
     
 2. 创建mysql容器
 
@@ -88,7 +89,7 @@ mysql和tomcat是两个独立的容器，但是tomcat需要和mysql通信，而m
 #### 1.1.4.总结
 1. 容器简单虚拟ip是互通的
 
-1. 用--name 和 --link可以完成自定义“域名”来取代可变化的ip
+1. 用 `--name` 和 `--link` 可以完成自定义“域名”来取代可变化的ip
 
 ### 1.2.双向通信
 方式有很多，一般都采取桥接方式。由于篇幅过长，自行Google即可。重点搞懂了容器间的通信是什么意思，大概怎么做即可。比如上面的--link也是其一做法。
@@ -110,7 +111,7 @@ docker run -v /home/main/programe:/usr/local/tomcat/webapps tomcat
 ```
 
 ### 2.3.实战
-1. 准备
+1. **准备**
 
 	在如下目录里创建如下文件，并写上Hello Volumn~
 
@@ -118,7 +119,7 @@ docker run -v /home/main/programe:/usr/local/tomcat/webapps tomcat
    /home/main/docker/webapps/volumn-test/index.html
     ```
 
-2. 操作
+2. **操作**
 
 	很简单，按照上面的语法来就成了，如下就是将 `/home/main/docker/webapps` 下的目录挂载到容器部 `/usr/local/tomcat/webapps` 的目录下
 
@@ -126,7 +127,7 @@ docker run -v /home/main/programe:/usr/local/tomcat/webapps tomcat
    docker run --name t2 -d -p 8200:8080 -v /home/main/docker/webapps:/usr/local/tomcat/webapps tomcat
     ```
 
-3. 验证
+3. **验证**
 
 	我们先进入容器
 
@@ -134,7 +135,7 @@ docker run -v /home/main/programe:/usr/local/tomcat/webapps tomcat
    docker exec -it t2 /bin/bash
     ```
 
-	然后查看/usr/local/tomcat/webapps下是否有我们挂载的目录以及文件
+	然后查看 `/usr/local/tomcat/webapps` 下是否有我们挂载的目录以及文件
 
     ```
    root@4be396ff443b:/usr/local/tomcat/webapps# ls -R volumn-test/
@@ -160,7 +161,7 @@ docker run -v /home/main/programe:/usr/local/tomcat/webapps tomcat
 
 	很完美，容器无感知的就生效了。
 
-4. 好处
+4. **好处**
 
 	我这是启动了一个容器举例，如果多启动几个呢？然后产品要修改文案，那么你登录每个容器里去修改？或者重新打包然后重新启动所有容器？有点小题大做呀，利用-v命令进行挂载实现宿主机和容器的数据共享她不香吗？
 
@@ -170,7 +171,7 @@ docker run -v /home/main/programe:/usr/local/tomcat/webapps tomcat
 ### 2.5.解决问题
 共享容器诞生了！
 #### 2.5.1.共享容器概念
-如果容器太多，每一次都要写-v xxx:xxx，过于复杂，也容易出错，这时候可以通过docker create创建共享容器，然后启动的时候通过--volumes-from指定创建的共享容器名称即可，也就是说可以把上面-v xxx:xxx这一串统一放到一个地方去管理，容器启动的时候直接引用这个统一配置即可，方便统一管理。
+如果容器太多，每一次都要写-v xxx:xxx，过于复杂，也容易出错，这时候可以通过 `docker create` 创建共享容器，然后启动的时候通过 `--volumes-from` 指定创建的共享容器名称即可，也就是说可以把上面 `-v xxx:xxx` 这一串统一放到一个地方去管理，容器启动的时候直接引用这个统一配置即可，方便统一管理。
 #### 2.5.2.语法
 ```
 # 创建共享容器语法，只是创建不是启动。最后的/bin/true 就是一个占位符，没啥乱用。
@@ -201,6 +202,7 @@ docker run -p 8400:8080 --volumes-from webpage --name t4 -d tomcat
 docker-compose就是为了简化这个过程的，相当于是个脚本，把这三个容器用脚本统一来管理和启动。节省运维时间和避免出错率。也就是说多应用互相协同才能完成一件事的时候，是很好用的，否则直接Dockerfile就完了。
 ### 3.2.安装Docker Compose
 > 基于Linux的安装。
+>
 > 参考的官方安装文档：https://docs.docker.com/compose/install/
 
 执行如下两个命令就完事了:
@@ -310,7 +312,7 @@ docker-compose --version
 ![Image [5]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/docker-demo/20210413212422.png)
 
 ### 3.4.和Dockerfile区别
-Dockerfile容器间通信需要--link或者桥接方式进行，而DockerCompose全自动的呀。也就是说单容器的话肯定Dockerfile了，但是多容器之间需要交互、有依赖关系，那用DockerCompose来统一管理那些零散的Dockerfile来达到自动构建部署的一体化脚本。
+Dockerfile容器间通信需要 `--link` 或者桥接方式进行，而DockerCompose全自动的呀。也就是说单容器的话肯定Dockerfile了，但是多容器之间需要交互、有依赖关系，那用DockerCompose来统一管理那些零散的Dockerfile来达到自动构建部署的一体化脚本。
 
 ### 3.5.实战
 #### 3.5.1.需求描述
@@ -393,9 +395,10 @@ Dockerfile容器间通信需要--link或者桥接方式进行，而DockerCompose
 	![Image [6]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/docker-demo/20210413212925.png)
 
 3. 最终Boss：docker-compose.yml
-	现在我们应用程序的Dockerfile和应用程序所依赖的数据库Dockerfile都已就绪。还剩下最后一个终极yml配置文件
-
-    ```
+	
+现在我们应用程序的Dockerfile和应用程序所依赖的数据库Dockerfile都已就绪。还剩下最后一个终极yml配置文件
+   
+   ```
     # 目前最稳定版本：3.3，所以3.3就行。
     version: '3.3'
     services:
@@ -419,8 +422,8 @@ Dockerfile容器间通信需要--link或者桥接方式进行，而DockerCompose
         ports:
           - "80:80"
         restart: always
-    ```
-
+```
+	
 4. 启动
 
     ```
@@ -428,7 +431,7 @@ Dockerfile容器间通信需要--link或者桥接方式进行，而DockerCompose
     docker-compose up -d
     ```
 
-	启动结果：
+    启动结果：
 
     ```
     [root@izm5e3qug7oee4q1y4opibz docker-compose-app]# docker-compose up -d
@@ -442,7 +445,7 @@ Dockerfile容器间通信需要--link或者桥接方式进行，而DockerCompose
      ---> d29a05c5bfcb
     Step 3/3 : ADD init-db.sql .
      ---> 6ae6d9eb35ca
-
+    
     Successfully built 6ae6d9eb35ca
     Successfully tagged docker-compose-app_db:latest
     WARNING: Image for service db was built because it did not already exist. To rebuild this image you must use `docker-compose build` or `docker-compose up --build`.
@@ -476,22 +479,22 @@ Dockerfile容器间通信需要--link或者桥接方式进行，而DockerCompose
      ---> Running in 64bdeff2f1ce
     Removing intermediate container 64bdeff2f1ce
      ---> 77d18bae9bbc
-
+    
     Successfully built 77d18bae9bbc
     Successfully tagged docker-compose-app_app:latest
     Creating docker-compose-app_db_1 ... done
     Creating docker-compose-app_app_1 ... done
     ```
-    
-	> 可以看到先为我们构建了mysql的镜像然后又构建了bsbdj.jar的镜像。最后执行了CMD ["java","-jar","bsbdj.jar"]，这些过程全自动化。
 
-	查看容器
+    > 可以看到先为我们构建了mysql的镜像然后又构建了bsbdj.jar的镜像。最后执行了CMD ["java","-jar","bsbdj.jar"]，这些过程全自动化。
+
+    查看容器
 
     ```
     docker-compose ps
     ```
 
-	结果：
+    结果：
 
     ```
     [root@izm5e3qug7oee4q1y4opibz docker-compose-app]# docker-compose ps
@@ -500,7 +503,7 @@ Dockerfile容器间通信需要--link或者桥接方式进行，而DockerCompose
     docker-compose-app_app_1   java -jar bsbdj.jar           Up      0.0.0.0:80->80/tcp 
     docker-compose-app_db_1    docker-entrypoint.sh mysqld   Up      3306/tcp, 33060/tcp
     ```
-    
+
     然后访问 `http://ip:80` 即可看到效果。
 
 #### 3.5.4.补充

@@ -35,9 +35,10 @@ $ sudo mv /tmp/docker-machine /usr/local/bin/docker-machine
 ### 前提条件
 
 在使用 docker-machine 进行远程安装前我们需要做一些准备工作：
-**1.   在目标主机上创建一个用户并加入sudo 组**
-**2.   为该用户设置 sudo 操作不需要输入密码**
-**3.   把本地用户的 ssh public key 添加到目标主机上**
+
+1. 在目标主机上创建一个用户并加入sudo 组
+2. 为该用户设置 sudo 操作不需要输入密码
+3. 把本地用户的 ssh public key 添加到目标主机上
 
 比如我们要在远程主机上添加一个名为 nick 的用户并加入 sudo 组：
 
@@ -79,6 +80,7 @@ $ docker-machine create -d generic \
 ```
 
 注意，create 命令本是要创建虚拟主机并安装 Docker，因为本例中的目标主机已经存在，所以仅安装 Docker。-d 是 --driver 的简写形式，主要用来指定使用什么驱动程序来创建目标主机。Docker Machine 支持在云服务器上创建主机，就是靠使用不同的驱动来实现了。本例中使用 generic 就可以了。接下来以 --generic 开头的三个参数主要是指定操作的目标主机和使用的账户。最后一个参数 krdevdb 是虚拟机的名称，Docker Machine 会用它来设置目标主机的名称。
+
 好了，就这么简单！经过简短的等待 Docker 就在目标机器上安装成功了：
 
 ![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/docker-demo/20210413210551.png)
@@ -90,7 +92,8 @@ $ docker-machine create -d generic \
 ![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/docker-demo/20210413210558.png)
 
 其中的 krdevdb 主机就是刚才我们安装了 Docker 的主机，最后一列显示了安装的 Docker 版本：v17.05.0-ce。
-然后执行 eval $(docker-machine env krdevdb) 命令，就可以通过本地的客户端操作远程主机上的 Docker daemon 了。执行 docker version 命令看看：
+
+然后执行 `eval $(docker-machine env krdevdb) ` 命令，就可以通过本地的客户端操作远程主机上的 Docker daemon 了。执行 docker version 命令看看：
 
 ![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/docker-demo/20210413210603.png)
 

@@ -4,7 +4,7 @@
 
 # Docker 安装
 
-## 安装步骤
+## 1.安装步骤
 1. 安装工具包
     ```
     $ sudo yum install -y yum-utils 		#安装工具包，缺少这些依赖将无法完成
@@ -259,5 +259,5 @@
 
 	![Image [7]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/docker-demo/20210412214637.png)
 
-### run干了什么
+### 1.1.run干了什么
 ![Image [3]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/docker-demo/20210412214901.png)

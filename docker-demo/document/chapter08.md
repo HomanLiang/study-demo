@@ -50,7 +50,7 @@ Dockerfile面向开发，Docker镜像成为交付标准，Docker容器则涉及�
 ### 3.1.FROM
 基础镜像，当前新镜像是基于哪个镜像的
 
-每个Dockerfile的第一挑指令必须是FROM,FROM指令指定一个已存在的镜像，后续指令都继续该镜像进行，这个镜像也称为基础镜像
+每个Dockerfile的第一挑指令必须是FROM，FROM指令指定一个已存在的镜像，后续指令都继续该镜像进行，这个镜像也称为基础镜像
 
 ### 3.2.MAINTAINER
 MAINTAINER指令没有具体的格式，建议一般使用姓名和邮箱
@@ -118,11 +118,14 @@ RUN buildDeps='gcc libc6-dev make wget' \
 ### 3.6.ENV
 用来在构建镜像过程中设置环境变量
 
+```
 ENV MY_PATH /usr/mytest
+```
+
 这个环境变量可以在后续的任何RUN指令中使用，这就如同在命令前面指定了环境变量前缀一样；
 也可以在其它指令中直接使用这些环境变量，
 
-比如：WORKDIR $MY_PATH
+比如：`WORKDIR $MY_PATH`
 
 ### 3.7.ARG 构建参数
 ```
@@ -130,9 +133,9 @@ ENV MY_PATH /usr/mytest
 ```
 构建参数和 ENV 的效果一样，都是设置环境变量。所不同的是，ARG 所设置的构建环境的环境变量，在将来容器运行时是不会存在这些环境变量的。但是不要因此就使用 ARG 保存密码之类的信息，因为 docker history 还是可以看到所有值的。
 
-Dockerfile 中的 ARG 指令是定义参数名称，以及定义其默认值。该默认值可以在构建命令 docker build 中用 --build-arg <参数名>=<值> 来覆盖。
+Dockerfile 中的 ARG 指令是定义参数名称，以及定义其默认值。该默认值可以在构建命令 `docker build` 中用 `--build-arg <参数名>=<值>` 来覆盖。
 
-在 1.13 之前的版本，要求 --build-arg 中的参数名，必须在 Dockerfile 中用 ARG 定义过了，换句话说，就是 --build-arg 指定的参数，必须在 Dockerfile 中使用了。如果对应参数没有被使用，则会报错退出构建。
+在 1.13 之前的版本，要求 `--build-arg` 中的参数名，必须在 Dockerfile 中用 ARG 定义过了，换句话说，就是 --build-arg 指定的参数，必须在 Dockerfile 中使用了。如果对应参数没有被使用，则会报错退出构建。
 
 从 1.13 开始，这种严格的限制被放开，不再报错退出，而是显示警告信息，并继续构建。这对于使用 CI 系统，用同样的构建流程构建不同的 Dockerfile 的时候比较有帮助，避免构建命令必须根据每个 Dockerfile 的内容修改。
 
@@ -141,9 +144,11 @@ Dockerfile 中的 ARG 指令是定义参数名称，以及定义其默认值。�
 
 在ADD文件时，Docker通过目的地址参数末尾的字符来判断文件源是目录还是文件。如果目标地址以/结尾那么Docker就认为源位置指向的是一个目录。如果目的地址不是以/结尾，那么Docker就认为原文件指向的是文件。
 
+```
 ADD jdk-8u91-linux-x64.tar.gz /opt
+```
 
-是将宿主机当前目录下的 jdk-8u91-linux-x64.tar.gz 拷贝到容器/opt目录下 ，容器的目标路径必须的绝对路径。
+是将宿主机当前目录下的 `jdk-8u91-linux-x64.tar.gz` 拷贝到容器/opt目录下 ，容器的目标路径必须的绝对路径。
 
 一般将Dockerfile与需要添加到容器中的文件放在同一目录下，有助于编写来源路径
 
@@ -188,18 +193,18 @@ CMD指令用于执行容器提供默认值。每个Dockerfile只有一个CMD命�
 
 Docker run 命令可以覆盖CMD指令。如果在Dockerfile里指定了CMD指令，而同时在docker run命令行中也指定的要运行的命令，命令行中指定的命令会覆盖Dockerfile中的CMD指令。
 
-如 CMD java app.jar 容器启动时启动app.jar应用
+如 `CMD java app.jar` 容器启动时启动app.jar应用
 
 ### 3.12.ENTRYPOINT
 指定一个容器启动时要运行的命令
 
 ENTRYPOINT 的目的和 CMD 一样，都是在指定容器启动程序及参数
 
-区别：
+**区别：**
 
-可以在docker run 命令中覆盖CMD命令。
+- 可以在docker run 命令中覆盖CMD命令。
 
-ENTRYPOINT指令提供的命令则不容易在启动容器时被覆盖。实际上docker run命令中指定的任何参数会被当做参数再次传递给ENTRYPOINT指令中指定的命令。
+- ENTRYPOINT指令提供的命令则不容易在启动容器时被覆盖。实际上docker run命令中指定的任何参数会被当做参数再次传递给ENTRYPOINT指令中指定的命令。
 
 ### 3.13.ONBUILD
 当构建一个被继承的Dockerfile时运行命令，父镜像在被子继承后父镜像的onbuild被触发
@@ -254,7 +259,7 @@ Removing intermediate container 83d41700285a
 Successfully built 79bf24642eb4
 Successfully tagged niugang/java:latest
 ```
-对于 docker build -t niugang/java . 这个命令-t 选项指定镜像名称 并读取当前（即.）目录中的Dockerfile文件
+对于 `docker build -t niugang/java` . 这个命令-t 选项指定镜像名称 并读取当前（即.）目录中的Dockerfile文件
 
 **step 4 验证**
 
