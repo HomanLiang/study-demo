@@ -194,7 +194,7 @@ public class DemoConfig {
 
 #### 1.2.6.最重要的来了
 
-如图，新建META-INF文件夹，然后创建spring.factories文件，
+如图，新建META-INF文件夹，然后创建`spring.factories`文件，
 
 ![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/spring-demo/20210401233058.png)
 

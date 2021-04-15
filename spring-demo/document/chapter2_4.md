@@ -230,7 +230,7 @@ SpringBoot会从这四个位置全部加载主配置文件；**互补配置**；
    所有的配置都可以在命令行上进行指定
 
     ```
-    java -jar spring-boot-02-config-02-0.0.1-SNAPSHOT.jar --server.port=8087 --server.context-path=/abc
+   java -jar spring-boot-02-config-02-0.0.1-SNAPSHOT.jar --server.port=8087 --server.context-path=/abc
     ```
 
 	多个配置用空格分开； --配置项=值

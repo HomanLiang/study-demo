@@ -14,7 +14,7 @@
 
 ### 1.2.@PropertySource与Environment读取配置文件
 
-​	此注解@PropertySource 为Spring 中的 Environment提供方便和声明机制，通常与Configuration一起搭配使用。
+此注解@PropertySource 为Spring 中的 Environment提供方便和声明机制，通常与Configuration一起搭配使用。
 
 - 新建一个maven 项目，添加pom.xml 依赖：
 
@@ -159,7 +159,7 @@
 
 #### 1.3.1.@Value 基本使用
 
-​	我们以DB的配置文件为例，来看一下如何使用`@Value`读取配置文件
+我们以DB的配置文件为例，来看一下如何使用 `@Value` 读取配置文件
 
 - 首先新建一个**DBConnection**，具体代码如下：
 
@@ -383,7 +383,7 @@
 
 ### 1.4.@PropertySource 与 @Import
 
-​	@Import 可以用来导入 @PropertySource 标注的类，具体代码如下：
+@Import 可以用来导入 @PropertySource 标注的类，具体代码如下：
 
 - 新建一个**PropertySourceReadApplication** 类，用于读取配置文件并测试，具体代码如下：
 
@@ -646,15 +646,15 @@ org.springframework.boot.autoconfigure.EnableAutoConfiguration=core.bean.MyConfi
 
 ![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/spring-demo/20210401214552.webp)
 
-getCandidateConfigurations会到classpath下的读取META-INF/spring.factories文件的配置，并返回一个字符串数组。
+getCandidateConfigurations会到classpath下的读取 `META-INF/spring.factories` 文件的配置，并返回一个字符串数组。
 
-调试的时候读取到了core.bean.MyConfig，也读到了一些其他的配置，下面会讲。
+调试的时候读取到了 `core.bean.MyConfig`，也读到了一些其他的配置，下面会讲。
 
 ![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/spring-demo/20210401214603.webp)
 
 具体的就不细说了，有兴趣的朋友可以自己调试一下。
 
-META-INF/spring.factories还可以配置多个配置类。
+`META-INF/spring.factories` 还可以配置多个配置类。
 
 比如我们在core-bean下在定义二个类，
 
@@ -688,7 +688,7 @@ public class Myconfig2 {
 }
 ```
 
-修改META-INF/spring.factories下的配置
+修改 `META-INF/spring.factories` 下的配置
 
 ```undefined
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=core.bean.MyConfig,core.bean.Myconfig2,core.bean.People
@@ -825,7 +825,7 @@ public class Application {
 
 做过web开发的同学一定都有用过@Controller，@Service，@Repository注解，查看其源码你会发现，他们中有一个**共同的注解@Component**，没错@ComponentScan注解默认就会装配标识了@Controller，@Service，@Repository，@Component注解的类到spring容器中，好下面咱们就先来简单演示一下这个例子
 
-在包com.zhang.controller下新建一个UserController带@Controller注解如下：
+在包 `com.zhang.controller` 下新建一个UserController带@Controller注解如下：
 
 ```
 package com.zhang.controller;
@@ -1073,7 +1073,7 @@ userService2
 
 可以发现同样userService2被加入到了spring容器中 
 
-好了includeFilters参数就演示到这，**另外一个参数excludeFilters和includeFilters用户一摸一样，只是他是****过滤出不加入****spring容器中**，感兴趣的同学可以自己试试，我这边就不演示了
+好了includeFilters参数就演示到这，另外一个参数excludeFilters和includeFilters用户一摸一样，只是他是过滤出不加入spring容器中，感兴趣的同学可以自己试试，我这边就不演示了
 
 **4.3.总结一下@ComponentScan的常用方式如下**
 

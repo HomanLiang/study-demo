@@ -76,7 +76,7 @@ SpringBoot应用标注在某个类上说明这个类是SpringBoot的主配置类
 
 ![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/spring-demo/20210402000050.png)
 
-@Import注解就是给Spring容器中导入一些组件，这里传入了一个组件的选择器:AutoConfigurationImportSelector。
+@Import注解就是给Spring容器中导入一些组件，这里传入了一个组件的选择器: `AutoConfigurationImportSelector`。
 
 里面有一个selectImports方法，将所有需要导入的组件以全类名的方式返回；这些组件就会被添加到容器中。
 
@@ -98,11 +98,11 @@ debug运行看看：
 
 ![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/spring-demo/20210402000152.png)
 
-会从META-INF/spring.factories中获取资源，然后通过Properties加载资源：
+会从 `META-INF/spring.factories` 中获取资源，然后通过Properties加载资源：
 
 ![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/spring-demo/20210402000213.png)
 
-Spring Boot在启动的时候从类路径下的META-INF/spring.factories中获取EnableAutoConfiguration指定的值，将这些值作为自动配置类导入到容器中，自动配置类就生效，帮我们进行自动配置工作。以前我们需要自己配置的东西，自动配置类都帮我们完成了。
+Spring Boot在启动的时候从类路径下的 `META-INF/spring.factories` 中获取 `EnableAutoConfiguration` 指定的值，将这些值作为自动配置类导入到容器中，自动配置类就生效，帮我们进行自动配置工作。以前我们需要自己配置的东西，自动配置类都帮我们完成了。
 
 ![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/spring-demo/20210402000227.png)
 
