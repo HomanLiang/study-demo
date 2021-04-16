@@ -4,7 +4,7 @@
 
 # Docker 开源工具
 
-## watchtower：自动更新 Docker 容器
+## 1.watchtower：自动更新 Docker 容器
 Watchtower 监视运行容器并监视这些容器最初启动时的镜像有没有变动。当 Watchtower 检测到一个镜像已经有变动时，它会使用新镜像自动重新启动相应的容器。我想在我的本地开发环境中尝试最新的构建镜像，所以使用了它。
 
 Watchtower 本身被打包为 Docker 镜像，因此可以像运行任何其他容器一样运行它。要运行 Watchtower，你需要执行以下命令：
@@ -30,7 +30,7 @@ GitHub 地址：https://github.com/v2tec/watchtower
 
 
 
-## docker-gc：容器和镜像的垃圾回收
+## 2.docker-gc：容器和镜像的垃圾回收
 
 Docker-gc 工具通过删除不需要的容器和镜像来帮你清理 Docker 主机。它会删除存在超过一个小时的所有容器。此外，它还删除不属于任何留置容器的镜像。
 
@@ -63,7 +63,7 @@ GitHub 地址：https://github.com/spotify/docker-gc
 
 
 
-## docker-slim：面向容器的神奇减肥药
+## 3.docker-slim：面向容器的神奇减肥药
 
 如果你担心你的 Docker 镜像的大小，docker-slim 可以帮你排忧解难。
 
@@ -92,7 +92,7 @@ GitHub 地址：https://github.com/docker-slim/docker-slim
 
 
 
-## rocker：突破 Dockerfile 的限制
+## 4.rocker：突破 Dockerfile 的限制
 
 大多数使用 Docker 的开发人员都使用 Dockerfile 来构建镜像。Dockerfile 是一种声明式的方法，用于定义用户可以在命令行上调用的所有命令，从而组装镜像。
 
@@ -135,7 +135,10 @@ $ rocker d build --push -var VERSION-1.0
 ```
 GitHub 地址：https://github.com/grammarly/rocker
 
-## ctop：容器的类顶层接口
+
+
+## 5.ctop：容器的类顶层接口
+
 ctop 是我最近开始使用的一个工具，它能够提供多个容器的实时指标视图。如果你是一个 Mac 用户，可以使用 brew 安装，如下所示：
 ```
 $ brew install ctop

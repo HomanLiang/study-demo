@@ -78,7 +78,7 @@ docker images
 
 	至此，集群搭建成功。
 	
-	如果一直Waiting for the cluster to join ......
+	如果一直 `Waiting for the cluster to join ......`
 	
 	大部分是端口问题，除了开放集群的端口还要开放集群端口+10000端口来保证集群之间的通信
 	
@@ -139,11 +139,11 @@ docker run -d -p 8088:8088 --name sb springbootdemo:1.0
 
 报了如下错误：
 > WARNING: IPv4 forwarding is disabled. Networking will not work.
->
-> 解决：
+
+解决：
+
 ```
 #需要做如下配置
-解决办法：
 vim/etc/sysctl.conf
 net.ipv4.ip_forward=1 #添加这段代码
 
