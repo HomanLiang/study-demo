@@ -4,9 +4,9 @@
 
 # Dubbo URL和协议
 
-## URL简介
+## 1.URL简介
 URL也就是Uniform Resource Locator，中文叫统一资源定位符。Dubbo中无论是服务消费方，或者服务提供方，或者注册中心。都是通过URL进行定位资源的。所以今天来聊聊Dubbo中的统一URL资源模型是怎么样的。
-## Dubbo中的URL
+## 2.Dubbo中的URL
 标准的URL格式如下：
 ```
 protocol://username:password@host:port/path?key=value&key=value
@@ -55,30 +55,30 @@ consumer://30.5.120.217/org.apache.dubbo.demo.DemoService?application=demo-consu
 描述一个消费者
 ```
 
-## Dubbo中有关URL的服务
-### 解析服务
+## 3.Dubbo中有关URL的服务
+### 3.1.解析服务
 - Spring在遇到dubbo名称空间时，会回调DubboNamespaceHandler。这个类也是Dubbo基于spring扩展点编写的解析xml文件的类。
 - 解析的xml标签使用DubboBeanDefinitionParser将其转化为bean对象。
 - 服务提供方在ServiceConfig.export()初始化时将bean对象转化为URL格式，所有Bean属性转换成URL参数。这时候的URL就会传给协议扩展点。根据URL中protocol的值通过扩展点自适应机制进行不同协议的服务暴露或引用。
 - 而服务消费方则是ReferenceConfig.export()方法。
-### 直接暴露服务端口
+### 3.2.直接暴露服务端口
 - 在没有注册中心时，ServiceConfig解析出的URL格式为：dubbo://service-host/com.foo.FooService?version=1.0.0
 - 基于扩展点自适应机制。通过URL的dubbo://协议头识别，这时候就调用DubboProtocol中的export方法进行暴露服务端口
-### 向注册中心暴露服务端口
+### 3.3.向注册中心暴露服务端口
 - 有注册中心时。ServiceConfig解析出的URL格式就类似：registry://registry-host/org.apache.dubbo.registry.RegistryService?export=URL.encode("dubbo://service-host/com.foo.FooService?version=1.0.0")
 - 基于扩展点自适应机制，识别到URL以registry://开头，就会调用RegistryProtocol中的export方法先将该URL注册到注册中心里
 - 再传给Protocol扩展点进行暴露，这时候就只剩下dubbo://service-host/com.foo.FooService?version=1.0.0。同样的基于dubbo://协议头识别，通过DubboProtocol的export方法打开服务端口
-### 直接引用服务
+### 3.4.直接引用服务
 - 在没有注册中心，ReferenceConfig解析出的URL格式就为dubbo://service-host/com.foo.FooService?version=1.0.0
 - 基于扩展点自适应机制，通过 URL 的dubbo://协议头识别，直接调用DubboProtocol的refer方法，返回提供者引用
-### 从注册中心引用服务
+### 3.5.从注册中心引用服务
 - 有注册中心时，ReferenceCofig解析出来的URL格式为：registry://registry-host/org.apache.dubbo.registry.RegistryService?refer=URL.encode("consumer://consumer-host/com.foo.FooService?version=1.0.0")
 - 同样先识别URL的协议头，调用RegistryProtocol中的refer方法
 - 通过refer参数中的条件查询到提供者的URL。如dubbo://service-host/com.foo.FooService?version=1.0.0。此时就会调用DubboProtocol中的refer方法得到提供者引用
 - 最后若是存在集群Cluster扩展点，需要伪装成单个提供者引用返回
 
-## Dubbo协议
-### 协议简介
+## 4.Dubbo协议
+### 4.1.协议简介
 聊完了Dubbo中的URL模型就来聊聊Dubbo中的协议。协议是双方确定的交流语义，协议在双方传输数据中起到的了交换作用，没有协议就无法完成数据交换。在dubbo中就是Codec2
 ```
 @SPI
@@ -98,7 +98,7 @@ public interface Codec2 {
 }
 ```
 encode是将通信对象编码到ByteBufferWrapper，decode是将从网络上读取的ChannelBuffer解码为Object。
-## 协议图解
+## 5.协议图解
 ![Image [2]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mybatis-demo/20210408003822.png)
 
 具体的解释如下：

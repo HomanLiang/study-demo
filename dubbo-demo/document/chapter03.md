@@ -149,9 +149,9 @@ bumblebee = org.apache.spi.Bumblebee
 
 从上面的示例代码我们知道 ExtensionLoader 好像就是重点，它是类似 Java SPI 中 ServiceLoader 的存在。
 
-我们可以看到大致流程就是先通过接口类找到一个 ExtensionLoader ，然后再通过 ExtensionLoader.getExtension(name) 得到指定名字的实现类实例。
+我们可以看到大致流程就是先通过接口类找到一个 ExtensionLoader ，然后再通过 `ExtensionLoader.getExtension(name)` 得到指定名字的实现类实例。
 
-我们就先看下 getExtensionLoader() 做了什么。
+我们就先看下 `getExtensionLoader()` 做了什么。
 
 ![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mybatis-demo/20210408223754.png)
 
@@ -171,7 +171,7 @@ bumblebee = org.apache.spi.Bumblebee
 
 ![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mybatis-demo/20210408223837.png)
 
-那么问题来了 getExtensionClasses() 是怎么找的呢？injectExtension() 如何注入的呢（其实我已经说了set方法注入）？为什么需要包装类呢？
+那么问题来了 `getExtensionClasses()` 是怎么找的呢？`injectExtension()` 如何注入的呢（其实我已经说了set方法注入）？为什么需要包装类呢？
 
 #### 4.3.1.getExtensionClasses
 

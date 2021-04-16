@@ -58,11 +58,13 @@ data 就是我所说的那些数据，其他是框架的，包括协议版本、
 
 - **特殊字符隔断形式**：其实就是定义一个特殊结束符，根据特殊的结束符来判断一个协议单元的结束，比如用换行符等等。
 
-  这个协议的优点是长度自由，反正根据特殊字符来截断，缺点就是需要一直读，直到读到一个完整的协议单元之后才能开始解析，然后假如传输的数据里面混入了这个特殊字符就出错了。
+  这个协议的优点是长度自由，反正根据特殊字符来截断
+
+  缺点就是需要一直读，直到读到一个完整的协议单元之后才能开始解析，然后假如传输的数据里面混入了这个特殊字符就出错了。
 
 - **header+body 形式**：也就是头部是固定长度的，然后头部里面会填写 body 的长度， body 是不固定长度的，这样伸缩性就比较好了，可以先解析头部，然后根据头部得到 body 的 len 然后解析 body。
 
-  dubbo 协议就是属于 header+body 形式，而且也有特殊的字符 0xdabb ，这是用来解决 TCP 网络粘包问题的。
+  **dubbo 协议就是属于 header+body 形式**，而且也有特殊的字符 0xdabb ，这是用来解决 TCP 网络粘包问题的。
 
 ### 4.2.Dubbo 协议
 
@@ -90,12 +92,16 @@ Dubbo 支持的协议很多，我们就简单的分析下 Dubbo 协议。
 
 序列化大致分为两大类，一种是字符型，一种是二进制流。
 
-- **字符型**的代表就是 XML、JSON，字符型的优点就是调试方便，它是对人友好的，我们一看就能知道那个字段对应的哪个参数。
+- **字符型**的代表就是 XML、JSON，字符型
+
+  优点就是调试方便，它是对人友好的，我们一看就能知道那个字段对应的哪个参数。
 
   缺点就是传输的效率低，有很多冗余的东西，比如 JSON 的括号，对于网络传输来说传输的时间变长，占用的带宽变大。
 
-- 还有一大类就是**二进制流型**，这种类型是对机器友好的，它的数据更加的紧凑，所以占用的字节数更小，传输更快。
+- 还有一大类就是**二进制流型**
 
+  这种类型是对机器友好的，它的数据更加的紧凑，所以占用的字节数更小，传输更快。
+  
   缺点就是调试很难，肉眼是无法识别的，必须借用特殊的工具转换。
 
 更深层次的就不深入了，序列化还是有很多门道的，以后有机会再谈。
@@ -142,11 +148,11 @@ String hello = demoService.sayHello("world");
 
 ![图片](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/dubbo-demo/20210408235419.webp)
 
-然后我们再来看一下 MockClusterInvoker#invoke 代码。
+然后我们再来看一下 `MockClusterInvoker#invoke` 代码。
 
 ![图片](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/dubbo-demo/20210408235424.webp)
 
-可以看到就是判断配置里面有没有配置 mock， mock 的话就不展开分析了，我们来看看 this.invoker.invoke 的实现，实际上会调用 AbstractClusterInvoker#invoker 。
+可以看到就是判断配置里面有没有配置 mock， mock 的话就不展开分析了，我们来看看 `this.invoker.invoke` 的实现，实际上会调用 `AbstractClusterInvoker#invoker` 。
 
 ![图片](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/dubbo-demo/20210408235430.webp)
 
@@ -182,7 +188,7 @@ String hello = demoService.sayHello("world");
 
 - **oneway**还是很常见的，就是当你不关心你的请求是否发送成功的情况下，就用 oneway 的方式发送，这种方式消耗最小，啥都不用记，啥都不用管。
 
-- **异步调用**，其实 Dubbo 天然就是异步的，可以看到 client 发送请求之后会得到一个 ResponseFuture，然后把 future 包装一下塞到上下文中，这样用户就可以从上下文中拿到这个 future，然后用户可以做了一波操作之后再调用 future.get 等待结果。
+- **异步调用**，其实 Dubbo 天然就是异步的，可以看到 client 发送请求之后会得到一个 ResponseFuture，然后把 future 包装一下塞到上下文中，这样用户就可以从上下文中拿到这个 future，然后用户可以做了一波操作之后再调用 `future.get` 等待结果。
 
 - **同步调用**，这是我们最常用的，也就是 Dubbo 框架帮助我们异步转同步了，从代码可以看到在 Dubbo 源码中就调用了 `future.get`，所以给用户的感觉就是我调用了这个接口的方法之后就阻塞住了，必须要等待结果到了之后才能返回，所以就是同步的。
 

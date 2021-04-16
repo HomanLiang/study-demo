@@ -4,13 +4,13 @@
 
 # Dubbo 简介
 
-## 相关文档
- [官方文档](http://dubbo.apache.org/)
+## 1.相关文档
+[官方文档](http://dubbo.apache.org/)
 [dubbo可视化测试工具](https://gitee.com/IdeaHome_admin/dubbo-proxy-tools)
 
 
 
-## Dubbo是什么？
+## 2.Dubbo是什么？
 
 Dubbo是一个分布式服务框架，致力于提供高性能和透明化的RPC远程服务调用方案，以及SOA服务治理方案。
 
@@ -32,7 +32,7 @@ Dubbo是一个分布式服务框架，致力于提供高性能和透明化的RPC
 
 ![å¨è¿éæå¥å¾çæè¿°](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/dubbo-demo/20210410110720.png)
 
-## Dubbo能做什么？
+## 3.Dubbo能做什么？
 
 - **透明化的远程方法调用**
 
@@ -48,7 +48,7 @@ Dubbo是一个分布式服务框架，致力于提供高性能和透明化的RPC
 
   Dubbo采用全spring配置方式，透明化接入应用，对应用没有任何API侵入，只需用Spring加载Dubbo的配置即可，Dubbo基于Spring的Schema扩展进行加载。
 
-## Dubbo的架构和设计思路
+## 4.Dubbo的架构和设计思路
 
 Dubbo框架具有极高的扩展性，主要采用微核+插件体系，并且文档齐全，很方便二次开发，适应性极强。
 
@@ -106,7 +106,7 @@ Dubbo框架设计一共划分了10个层，而最上面的Service层是留给实
 
 
 
-## 和淘宝HSF相比，Dubbo的特点是什么？
+## 5.和淘宝HSF相比，Dubbo的特点是什么？
 
 1. **Dubbo比HSF的部署方式更轻量**
 
@@ -126,7 +126,7 @@ Dubbo框架设计一共划分了10个层，而最上面的Service层是留给实
 
 
 
-## Dubbo适用于哪些场景？
+## 6.Dubbo适用于哪些场景？
 
 ![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/dubbo-demo/20210410111216.jpeg)
 
@@ -150,13 +150,13 @@ Dubbo框架设计一共划分了10个层，而最上面的Service层是留给实
 
 
 
-## Dubbo与SpringCloud的比较
+## 7.Dubbo与SpringCloud的比较
 
-### dubbo与SpringCloud的核心要素比较
+### 7.1.dubbo与SpringCloud的核心要素比较
 
 ![zrf48nu4gc](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/dubbo-demo/20210410192548.jpeg)
 
-### 整体比较
+### 7.2.整体比较
 
 1. dubbo由于是二进制的传输，占用带宽会更少
 2. springCloud是http协议传输，带宽会比较多，同时使用http协议一般会使用JSON报文，消耗会更大

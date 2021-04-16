@@ -196,7 +196,6 @@ private void doExportUrls() {
     }
 
 //进入到加载注册中心链接的方法
-
 protected List<URL> loadRegistries(boolean provider) {
         List<URL> registryList = new ArrayList();
         if (CollectionUtils.isNotEmpty(this.registries)) {
@@ -550,7 +549,7 @@ public <T> Exporter<T> export(Invoker<T> originInvoker) throws RpcException {
     }
 ```
 上面的源码主要是根据前面生成的URL进行服务的发布和注册（注册在下一节展开源码）。当执行到doLocalExport也就是发布本地服务到远程时候会调用 DubboProtocol 的 export 方法大致会经历下面一些步骤来导出服务
-- 从Invoker获取providerUrl，构建serviceKey(group/service:version:port)，构建DubboExporter并以serviceKey为key放入本地map缓存
+- 从Invoker获取providerUrl，构建serviceKey(`group/service:version:port`)，构建DubboExporter并以serviceKey为key放入本地map缓存
 - 处理url携带的本地存根和callback回调
 - 根据url打开服务器端口，暴露本地服务。先以url.getAddress为key查询本地缓存serverMap获取ExchangeServer，如果不存在，则通过createServer创建。
 - createServer方法，设置心跳时间，判断url中的传输方式(key=server,对应Transporter服务)是否支持，设置codec=dubbo，最后根据url和ExchangeHandler对象绑定server返回，这里的ExchangeHandler非常重要，它就是消费方调用时，底层通信层回调的Handler，从而获取包含实际Service实现的Invoker执行器，它是定义在DubboProtocol类中的ExchangeHandlerAdapter内部类。
