@@ -36,3 +36,8 @@
 
 
 ## 高并发
+
+1. [高并发简介](https://github.com/HomanLiang/study-demo/blob/main/project-design/document/chapter5_01.md)
+2. [高并发 - 秒杀设计](https://github.com/HomanLiang/study-demo/blob/main/project-design/document/chapter5_02.md)
+3. [高并发 - 案例1](https://github.com/HomanLiang/study-demo/blob/main/project-design/document/chapter5_03.md)
+4. [高并发 - 案例2（微信抢红包）](https://github.com/HomanLiang/study-demo/blob/main/project-design/document/chapter5_04.md)
