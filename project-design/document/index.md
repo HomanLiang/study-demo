@@ -6,7 +6,34 @@
 
 ## 设计模式
 
-
+1. 设计模式简介
+2. [面向对象设计的六大原则](https://github.com/HomanLiang/study-demo/blob/main/project-design/document/chapter2_02.md)
+3. 创建型模式
+   - [抽象工厂模式](https://github.com/HomanLiang/study-demo/blob/main/project-design/document/chapter2_03_01.md)
+   - [工厂方法模式](https://github.com/HomanLiang/study-demo/blob/main/project-design/document/chapter2_03_02.md)
+   - [创建者模式](https://github.com/HomanLiang/study-demo/blob/main/project-design/document/chapter2_03_03.md)
+   - [原型模式](https://github.com/HomanLiang/study-demo/blob/main/project-design/document/chapter2_03_04.md)
+   - [单例模式](https://github.com/HomanLiang/study-demo/blob/main/project-design/document/chapter2_03_05.md)
+4. 结构型模式
+   - [适配器模式](https://github.com/HomanLiang/study-demo/blob/main/project-design/document/chapter2_04_01.md)
+   - [桥接模式](https://github.com/HomanLiang/study-demo/blob/main/project-design/document/chapter2_04_02.md)
+   - [组合模式](https://github.com/HomanLiang/study-demo/blob/main/project-design/document/chapter2_04_03.md)
+   - [装饰模式](https://github.com/HomanLiang/study-demo/blob/main/project-design/document/chapter2_04_04.md)
+   - [外观模式](https://github.com/HomanLiang/study-demo/blob/main/project-design/document/chapter2_04_05.md)
+   - [享元模式](https://github.com/HomanLiang/study-demo/blob/main/project-design/document/chapter2_04_06.md)
+   - [代理模式](https://github.com/HomanLiang/study-demo/blob/main/project-design/document/chapter2_04_07.md)
+5. 行为型模式
+   - [职责链模式](https://github.com/HomanLiang/study-demo/blob/main/project-design/document/chapter2_05_01.md)
+   - [命令模式](https://github.com/HomanLiang/study-demo/blob/main/project-design/document/chapter2_05_02.md)
+   - [解释器模式](https://github.com/HomanLiang/study-demo/blob/main/project-design/document/chapter2_05_03.md)
+   - [迭代模式](https://github.com/HomanLiang/study-demo/blob/main/project-design/document/chapter2_05_04.md)
+   - [中介者模式](https://github.com/HomanLiang/study-demo/blob/main/project-design/document/chapter2_05_05.md)
+   - [备忘录模式](https://github.com/HomanLiang/study-demo/blob/main/project-design/document/chapter2_05_06.md)
+   - [观察者模式](https://github.com/HomanLiang/study-demo/blob/main/project-design/document/chapter2_05_07.md)
+   - [状态模式](https://github.com/HomanLiang/study-demo/blob/main/project-design/document/chapter2_05_08.md)
+   - [策略模式](https://github.com/HomanLiang/study-demo/blob/main/project-design/document/chapter2_05_09.md)
+   - [模板方法](https://github.com/HomanLiang/study-demo/blob/main/project-design/document/chapter2_05_10.md)
+   - [访问者模式](https://github.com/HomanLiang/study-demo/blob/main/project-design/document/chapter2_05_11.md)
 
 ## 项目方案
 
