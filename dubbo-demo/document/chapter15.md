@@ -497,12 +497,11 @@ net.ipv4.tcp_rmem = 4096 873800 16777216
 net.ipv4.tcp_wmem = 4096 873800 16777216
 ```
 
-然后执行sysctl –p 使之生效。
+然后执行 `sysctl –p` 使之生效。
 
 服务端代码如下，接受一个报文，然后返回两倍的报文长度，随机sleep 0-300ms，所以均值应该是150ms。服务端每10s打印一次tps和响应时间，这里的tps是指完成函数调用的tps，而不涉及传输，响应时间也是这个函数的时间
 
 ```
-
    //服务端实现
    public String sayHello(String name) {
         counter.getAndIncrement();

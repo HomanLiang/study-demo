@@ -44,37 +44,46 @@ public URL(String protocol, String username, String password, String host, int p
 - parameter：参数键值对
 
 大致样子如下：
-```
-dubbo://192.168.1.6:20880/moe.cnkirito.sample.HelloService?timeout=3000
-描述一个 dubbo 协议的服务
 
-zookeeper://127.0.0.1:2181/org.apache.dubbo.registry.RegistryService?application=demo-consumer&dubbo=2.0.2&interface=org.apache.dubbo.registry.RegistryService&pid=1214&qos.port=33333&timestamp=1545721981946
-描述一个 zookeeper 注册中心
+- 描述一个 dubbo 协议的服务
 
-consumer://30.5.120.217/org.apache.dubbo.demo.DemoService?application=demo-consumer&category=consumers&check=false&dubbo=2.0.2&interface=org.apache.dubbo.demo.DemoService&methods=sayHello&pid=1209&qos.port=33333&side=consumer&timestamp=1545721827784
-描述一个消费者
-```
+    ```
+    dubbo://192.168.1.6:20880/moe.cnkirito.sample.HelloService?timeout=3000
+    ```
+
+- 描述一个 zookeeper 注册中心
+
+    ```
+    zookeeper://127.0.0.1:2181/org.apache.dubbo.registry.RegistryService?application=demo-consumer&dubbo=2.0.2&interface=org.apache.dubbo.registry.RegistryService&pid=1214&qos.port=33333&timestamp=1545721981946
+    ```
+
+- 描述一个消费者
+
+    ```
+    consumer://30.5.120.217/org.apache.dubbo.demo.DemoService?application=demo-consumer&category=consumers&check=false&dubbo=2.0.2&interface=org.apache.dubbo.demo.DemoService&methods=sayHello&pid=1209&qos.port=33333&side=consumer&timestamp=1545721827784
+    ```
 
 ## 3.Dubbo中有关URL的服务
+
 ### 3.1.解析服务
 - Spring在遇到dubbo名称空间时，会回调DubboNamespaceHandler。这个类也是Dubbo基于spring扩展点编写的解析xml文件的类。
 - 解析的xml标签使用DubboBeanDefinitionParser将其转化为bean对象。
-- 服务提供方在ServiceConfig.export()初始化时将bean对象转化为URL格式，所有Bean属性转换成URL参数。这时候的URL就会传给协议扩展点。根据URL中protocol的值通过扩展点自适应机制进行不同协议的服务暴露或引用。
-- 而服务消费方则是ReferenceConfig.export()方法。
+- 服务提供方在 `ServiceConfig.export()` 初始化时将bean对象转化为URL格式，所有Bean属性转换成URL参数。这时候的URL就会传给协议扩展点。根据URL中protocol的值通过扩展点自适应机制进行不同协议的服务暴露或引用。
+- 而服务消费方则是 `ReferenceConfig.export()` 方法。
 ### 3.2.直接暴露服务端口
-- 在没有注册中心时，ServiceConfig解析出的URL格式为：dubbo://service-host/com.foo.FooService?version=1.0.0
-- 基于扩展点自适应机制。通过URL的dubbo://协议头识别，这时候就调用DubboProtocol中的export方法进行暴露服务端口
+- 在没有注册中心时，ServiceConfig解析出的URL格式为：`dubbo://service-host/com.foo.FooService?version=1.0.0`
+- 基于扩展点自适应机制。通过URL的 `dubbo://` 协议头识别，这时候就调用DubboProtocol中的export方法进行暴露服务端口
 ### 3.3.向注册中心暴露服务端口
-- 有注册中心时。ServiceConfig解析出的URL格式就类似：registry://registry-host/org.apache.dubbo.registry.RegistryService?export=URL.encode("dubbo://service-host/com.foo.FooService?version=1.0.0")
-- 基于扩展点自适应机制，识别到URL以registry://开头，就会调用RegistryProtocol中的export方法先将该URL注册到注册中心里
-- 再传给Protocol扩展点进行暴露，这时候就只剩下dubbo://service-host/com.foo.FooService?version=1.0.0。同样的基于dubbo://协议头识别，通过DubboProtocol的export方法打开服务端口
+- 有注册中心时。ServiceConfig解析出的URL格式就类似：`registry://registry-host/org.apache.dubbo.registry.RegistryService?export=URL.encode("dubbo://service-host/com.foo.FooService?version=1.0.0")`
+- 基于扩展点自适应机制，识别到URL以 `registry://` 开头，就会调用RegistryProtocol中的export方法先将该URL注册到注册中心里
+- 再传给Protocol扩展点进行暴露，这时候就只剩下 `dubbo://service-host/com.foo.FooService?version=1.0.0`。同样的基于dubbo://协议头识别，通过DubboProtocol的export方法打开服务端口
 ### 3.4.直接引用服务
-- 在没有注册中心，ReferenceConfig解析出的URL格式就为dubbo://service-host/com.foo.FooService?version=1.0.0
-- 基于扩展点自适应机制，通过 URL 的dubbo://协议头识别，直接调用DubboProtocol的refer方法，返回提供者引用
+- 在没有注册中心，ReferenceConfig解析出的URL格式就为 `dubbo://service-host/com.foo.FooService?version=1.0.0`
+- 基于扩展点自适应机制，通过 URL 的 `dubbo://` 协议头识别，直接调用DubboProtocol的refer方法，返回提供者引用
 ### 3.5.从注册中心引用服务
-- 有注册中心时，ReferenceCofig解析出来的URL格式为：registry://registry-host/org.apache.dubbo.registry.RegistryService?refer=URL.encode("consumer://consumer-host/com.foo.FooService?version=1.0.0")
+- 有注册中心时，ReferenceCofig解析出来的URL格式为：`registry://registry-host/org.apache.dubbo.registry.RegistryService?refer=URL.encode("consumer://consumer-host/com.foo.FooService?version=1.0.0")`
 - 同样先识别URL的协议头，调用RegistryProtocol中的refer方法
-- 通过refer参数中的条件查询到提供者的URL。如dubbo://service-host/com.foo.FooService?version=1.0.0。此时就会调用DubboProtocol中的refer方法得到提供者引用
+- 通过refer参数中的条件查询到提供者的URL。如 `dubbo://service-host/com.foo.FooService?version=1.0.0`。此时就会调用DubboProtocol中的refer方法得到提供者引用
 - 最后若是存在集群Cluster扩展点，需要伪装成单个提供者引用返回
 
 ## 4.Dubbo协议
@@ -113,19 +122,18 @@ encode是将通信对象编码到ByteBufferWrapper，decode是将从网络上读
 
 - Serialization ID（5bits）：标识序列化类型。
 
-	Status（8bits）：仅在Req/Res为0时才有用（即响应）。主要用于标识响应状态
-	
-	- 20：OK，响应正确
-	- 30：CLIENT_TIMEOUT，客户端连接超时
-	- 31：SERVER_TIMEOUT，服务端连接超时
-	- 40：BAD_REQUEST，错误请求
-	- 50：BAD_RESPONSE，错误响应
-	- 60：SERVICE_NOT_FOUND，服务未找到
-	- 70：SERVICE_ERROR，服务出错
-	- 80：SERVER_ERROR，服务端出错
-	- 90：CLIENT_ERROR，客户端出错
-	- 100：SERVER_THREADPOOL_EXHAUSTED_ERROR，服务端线程池已满，无法创建新线程
-	
+- Status（8bits）：仅在Req/Res为0时才有用（即响应）。主要用于标识响应状态
+  - 20：OK，响应正确
+  - 30：CLIENT_TIMEOUT，客户端连接超时
+  - 31：SERVER_TIMEOUT，服务端连接超时
+  - 40：BAD_REQUEST，错误请求
+  - 50：BAD_RESPONSE，错误响应
+  - 60：SERVICE_NOT_FOUND，服务未找到
+  - 70：SERVICE_ERROR，服务出错
+  - 80：SERVER_ERROR，服务端出错
+  - 90：CLIENT_ERROR，客户端出错
+  - 100：SERVER_THREADPOOL_EXHAUSTED_ERROR，服务端线程池已满，无法创建新线程
+
 - Request ID（64bits）：标识唯一请求，long类型
 
 - Data Length（32bits）：序列化后的内容长度（可变的），int类型。这也是为什么实体类需要实现序列化接口。因为Dubbo协议底层是传输序列化后的内容

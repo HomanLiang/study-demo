@@ -3,7 +3,7 @@
 # Dubbo 负载均衡
 
 在分布式系统中，负载均衡是必不可少的一个模块，dubbo 中提供了五种负载均衡的实现，在阅读这块源码之前，建议先学习负载均衡的基础知识。把看源码当做一个印证自己心中所想的过程，这样会得到事半功倍的效果
-## 类结构
+## 1.类结构
 先来看一下这一块的类结构图
 
 ![Image [3]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mybatis-demo/20210408004155.png)
@@ -12,7 +12,7 @@
 
 ![Image](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/dubbo-demo/20210410112153.png)
 
-## AbstractLoadBalance
+## 2.AbstractLoadBalance
 AbstractLoadBalance 对一些通用的操作做了处理，是一个典型的模板方法模式的实现
 
 select 方法只做一些简单的范围校验，具体的实现有子类通过 doSelect 方法去实现
@@ -72,7 +72,7 @@ calculateWarmupWeight 方法用来计算权重，保证随着预热时间的增�
         return ww < 1 ? 1 : (Math.min(ww, weight));
     }
 ```
-## RandomLoadBalance
+## 3.RandomLoadBalance
 随机调用是负载均衡算法中最常用的算法之一，也是 dubbo 的默认负载均衡算法，实现起来也较为简单
 
 随机调用的缺点是在调用量比较少的情况下，有可能出现不均匀的情况
@@ -130,11 +130,13 @@ calculateWarmupWeight 方法用来计算权重，保证随着预热时间的增�
         return invokers.get(ThreadLocalRandom.current().nextInt(length));
     }
 ```
-## RoundRobinLoadBalance
+## 4.RoundRobinLoadBalance
 轮训算法避免了随机算法在小数据量产生的不均匀问题，我个人认为，轮训算法可以理解为随机算法的一种特例，在大量请求的情况下，从调用次数看，和随机并无区别，主要区别在于短时间内的调用分配上
 
-加权轮训算法给人的直观感受，实现起来并不复杂，算出一权重总量，依次调用即可
-例如A，B，C 三个节点的权重比依次 1，200，1000，如果依次轮训调用，就会出现先调用A 10 次，再调用B 200次，最后调用 C 1000次，不断重复前面的过程
+加权轮训算法给人的直观感受，实现起来并不复杂，算出一权重总量，依次调用即可。
+
+例如A，B，C 三个节点的权重比依次 1，200，1000，如果依次轮训调用，就会出现先调用A 10 次，再调用B 200次，最后调用 C 1000次，不断重复前面的过程。
+
 但这样有一个问题，我们可以发现C 被练习调用1000次，会对C瞬间造成很大的压力
 
 dubbo的新版本采用的是平滑加权轮询算法，轮训的过程中节点之间穿插调用，可以避免了上面说的问题，因此这块源码看起来会稍有难度
@@ -263,7 +265,7 @@ public class RoundRobinLoadBalance extends AbstractLoadBalance {
 
 }
 ```
-## LeastActiveLoadBalance
+## 5.LeastActiveLoadBalance
 最少活跃数调用算法是指在调用时判断此时每个服务提供者此时正在处理的请求个数，选取最小的调用
 
 dubbo 在实现该算法时的具体逻辑如下
@@ -371,7 +373,7 @@ dubbo 在实现该算法时的具体逻辑如下
         return invokers.get(leastIndexes[ThreadLocalRandom.current().nextInt(leastCount)]);
     }
 ```
-## ShortestResponseLoadBalance
+## 6.ShortestResponseLoadBalance
 最短时间调用调用算法是指预估出来每个处理完请求的提供者所需时间，然后又选择最少最短时间的提供者进行调用，整体处理逻辑和最少活跃数算法基本相似
 
 dubbo 在实现该算法时的具体逻辑如下
@@ -465,7 +467,7 @@ dubbo 在实现该算法时的具体逻辑如下
         return invokers.get(shortestIndexes[ThreadLocalRandom.current().nextInt(shortestCount)]);
     }
 ```
-## ConsistentHashLoadBalance
+## 7.ConsistentHashLoadBalance
 一致性hash算法是一种广泛应用与分布式缓存中的算法，该算法的优势在于新增和删除节点后，只有少量请求发生变动，大部分请求仍旧映射到原来的节点。
 
 为了防止节点过少，造成节点分布不均匀，一般采用虚拟节点的方式，dubbo默认的是160个虚拟节点。
@@ -595,7 +597,7 @@ dubbo 在实现该算法时的具体逻辑如下
 
     }
 ```
-## 总结
+## 8.总结
 dubbo的负载均衡算法总体来说并不复杂，代码写的也很优雅，简洁，看起来很舒服，而且有很多细节的处理值得称赞，例如预热处理，轮训算法的平滑处理等。
 
 我们平时使用时，可以根据自己的业务场景，选择适合自己的算法，当然，一般情况下，默认的的随机算法就能满足我们的日常需求，而且随机算法的性能足够好。
@@ -604,21 +606,21 @@ dubbo的负载均衡算法总体来说并不复杂，代码写的也很优雅，
 
 
 
-## 负载均衡配置示例
+## 9.负载均衡配置示例
 
-### 服务端服务级别
+### 9.1.服务端服务级别
 
 ```xml
    <dubbo:service interface="..." loadbalance="roundrobin" />
 ```
 
-### 客户端服务级别
+### 9.2.客户端服务级别
 
 ```xml
    <dubbo:reference interface="..." loadbalance="roundrobin" />
 ```
 
-### 服务端方法级别
+### 9.3.服务端方法级别
 
 ```xml
   <dubbo:service interface="...">
@@ -626,7 +628,7 @@ dubbo的负载均衡算法总体来说并不复杂，代码写的也很优雅，
   </dubbo:service>
 ```
 
-### 客户端方法级别
+### 9.4.客户端方法级别
 
 ```xml
   <dubbo:reference interface="...">

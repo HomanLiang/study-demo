@@ -4,7 +4,7 @@
 
 # Dubbo 应用
 
-## 启动时检查
+## 1.启动时检查
 
 我们检查依赖的服务是否启动，可利用下面三个属性，优先级从左到右逐渐降低。
 
@@ -12,7 +12,7 @@
 
 检查判断优先级：`dubbo.reference.check` > `dubbo.consumer.check` > `dubbo.registry.check`
 
-## 只订阅
+## 2.只订阅
 
 一般在开发环境时，我们新开发的接口都还不能发布出去，所以我们本地的服务不能往注册中心注册；
 
@@ -23,7 +23,7 @@ dubbo.registry.register=false
 dubbo.registry.subscribe=true
 ```
 
-## 集群容错
+## 3.集群容错
 
 集群容错模式可利用 `dubbo.reference.cluster`、`dubbo.consumer.cluster` 和 `dubbo.service.cluster`、`dubbo.provider.cluster` 等属性配置。
 
@@ -41,19 +41,19 @@ dubbo.registry.subscribe=true
 
 **dubbo 提供的集群容错模式：**
 
-**Failover Cluster**：失败自动切换，当出现失败，重试其它服务器。通常用于读操作，但重试会带来更长延迟。可通过 retries="2" 来设置重试次数(不含第一次)。
+- **Failover Cluster**：失败自动切换，当出现失败，重试其它服务器。通常用于读操作，但重试会带来更长延迟。可通过 retries="2" 来设置重试次数(不含第一次)。
 
-**Failfast Cluster**：快速失败，即只发起一次调用，失败立即报错。通常用于非幂等性的写操作。
+- **Failfast Cluster**：快速失败，即只发起一次调用，失败立即报错。通常用于非幂等性的写操作。
 
-**Failsafe Cluster**：失败安全，出现异常时直接忽略掉。通常用于写入审计日志等不重要的操作。
+- **Failsafe Cluster**：失败安全，出现异常时直接忽略掉。通常用于写入审计日志等不重要的操作。
 
-**Failback Cluster**：失败自动恢复，后台记录失败请求，定时重发。通常用于消息通知操作。
+- **Failback Cluster**：失败自动恢复，后台记录失败请求，定时重发。通常用于消息通知操作。
 
-**Forking Cluster**：并行调用多个服务器，只要一个成功就返回。通常用于实时性要求较高的读操作，但需要浪费更多服务资源。可通过 forks="2" 来设置最大并行数。
+- **Forking Cluster**：并行调用多个服务器，只要一个成功就返回。通常用于实时性要求较高的读操作，但需要浪费更多服务资源。可通过 forks="2" 来设置最大并行数。
 
-**Broadcast Cluster**：广播调用所有提供者，逐个调用，任意一台报错则报错。通常用于通知所有提供者更新缓存或日志等本地资源信息。
+- **Broadcast Cluster**：广播调用所有提供者，逐个调用，任意一台报错则报错。通常用于通知所有提供者更新缓存或日志等本地资源信息。
 
-## 负载均衡
+## 4.负载均衡
 
 在集群负载均衡时，Dubbo 提供了多种均衡策略，缺省为 random 随机调用。
 
@@ -105,7 +105,7 @@ public class DubboServiceOneImpl implements DubboServiceOne {}
 private DubboServiceOne DubboServiceOne;
 ```
 
-## 直连提供者
+## 5.直连提供者
 
 在开发及测试环境下，经常需要绕过注册中心，只测试指定服务提供者，这时候可能需要点对点直连，点对点直连方式，将以服务接口为单位，忽略注册中心的提供者列表，A 接口配置点对点，不影响 B 接口从注册中心获取列表。
 
@@ -119,17 +119,19 @@ java -D com.alibaba.xxx.XxxService=dubbo://localhost:20890
 
 ```xml
 <debbo.reference url="dubbo://localhost:20890" interfaceClass=""/>
+
+
 @DubboReference(url="dubbo://localhost:20890")
 private DubboServiceOne DubboServiceOne;
 ```
 
-## 本地调用
+## 6.本地调用
 
 本地调用使用了 injvm 协议，是一个伪协议，它不开启端口，不发起远程调用，只在 JVM 内直接关联，但执行 Dubbo 的 Filter 链。
 
 protocol、provider、consumer、service、reference 都可以设置。
 
-## 本地存根
+## 7.本地存根
 
 远程服务后，客户端通常只剩下接口，而实现全在服务器端，但提供方有些时候想在客户端也执行部分逻辑，比如：做 ThreadLocal 缓存，提前验证参数，调用失败后伪造容错数据等等，此时就需要在 API 中带上 Stub，客户端生成 Proxy 实例，会把 Proxy 通过构造函数传给 Stub ，然后把 Stub 暴露给用户，Stub 可以决定要不要去调 Proxy。
 
@@ -199,7 +201,7 @@ public class TestStubController {
 }
 ```
 
-## 本地伪装
+## 8.本地伪装
 
 本地伪装通常用于服务降级，比如某验权服务，当服务提供方全部挂掉后，客户端不抛出异常，而是通过 mock 数据返回授权失败。
 
@@ -209,13 +211,13 @@ mock 机制可利用`<dubbo.reference>`标签或者`@DubboReference`的mock属�
 
 详细可看我自己写的文章：https://blog.csdn.net/Howinfun/article/details/113439208
 
-## 服务延迟暴露
+## 9.服务延迟暴露
 
 Dubbo 2.6.5 之后，所有服务都将在 Spring 初始化完成后进行暴露，如果你不需要延迟暴露服务，无需配置 delay。
 
 可使用 `dubbo.service.delay` 属性来设置延迟多少秒暴露服务。delay 的时间单位为毫秒。
 
-## 并发控制
+## 10.并发控制
 
 并发控制都是在服务提供者端设置的。
 

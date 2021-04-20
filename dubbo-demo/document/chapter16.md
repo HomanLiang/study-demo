@@ -2,7 +2,7 @@
 
 # Dubbo 面试题
 
-## 说说Dubbo的分层？
+## 1.说说Dubbo的分层？
 
 从大的范围来说，dubbo分为三层，business业务逻辑层由我们自己来提供接口和实现还有一些配置信息，RPC层就是真正的RPC调用的核心层，封装整个RPC的调用过程、负载均衡、集群容错、代理，remoting则是对网络传输协议和数据转换的封装。
 
@@ -10,7 +10,7 @@
 
 ![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/dubbo-demo/20210410202903.jpeg)
 
-## 能说下Dubbo的工作原理吗？
+## 2.能说下Dubbo的工作原理吗？
 
 1. 服务启动的时候，provider和consumer根据配置信息，连接到注册中心register，分别向注册中心注册和订阅服务
 2. register根据服务订阅关系，返回provider信息到consumer，同时consumer会把provider信息缓存到本地。如果信息有变更，consumer会收到来自register的推送
@@ -20,7 +20,7 @@
 
 ![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/dubbo-demo/20210410202918.jpeg)
 
-## 为什么要通过代理对象通信？
+## 3.为什么要通过代理对象通信？
 
 主要是为了实现接口的透明代理，封装调用细节，让用户可以像调用本地方法一样调用远程方法，同时还可以通过代理实现一些其他的策略，比如：
 
@@ -32,7 +32,7 @@
 
 4、接口调用数据统计
 
-## 说说服务暴露的流程？
+## 4.说说服务暴露的流程？
 
 1. 在容器启动的时候，通过ServiceConfig解析标签，创建dubbo标签解析器来解析dubbo的标签，容器创建完成之后，触发ContextRefreshEvent事件回调开始暴露服务
 2. 通过ProxyFactory获取到invoker，invoker包含了需要执行的方法的对象信息和具体的URL地址
@@ -41,7 +41,7 @@
 
 ![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/dubbo-demo/20210410202929.jpeg)
 
-## 说说服务引用的流程？
+## 5.说说服务引用的流程？
 
 服务暴露之后，客户端就要引用服务，然后才是调用的过程。
 
@@ -53,17 +53,19 @@
 
    
 
-## 有哪些负载均衡策略？
+## 6.有哪些负载均衡策略？
 
 1. 加权随机：假设我们有一组服务器 servers = [A, B, C]，他们对应的权重为 weights = [5, 3, 2]，权重总和为10。现在把这些权重值平铺在一维坐标值上，[0, 5) 区间属于服务器 A，[5, 8) 区间属于服务器 B，[8, 10) 区间属于服务器 C。接下来通过随机数生成器生成一个范围在 [0, 10) 之间的随机数，然后计算这个随机数会落到哪个区间上就可以了。
 2. 最小活跃数：每个服务提供者对应一个活跃数 active，初始情况下，所有服务提供者活跃数均为0。每收到一个请求，活跃数加1，完成请求后则将活跃数减1。在服务运行一段时间后，性能好的服务提供者处理请求的速度更快，因此活跃数下降的也越快，此时这样的服务提供者能够优先获取到新的服务请求。
 3. 一致性hash：通过hash算法，把provider的invoke和随机节点生成hash，并将这个 hash 投射到 [0, 2^32 - 1] 的圆环上，查询的时候根据key进行md5然后进行hash，得到第一个节点的值大于等于当前hash的invoker。
 
-![图片来自dubbo官方](https://tva1.sinaimg.cn/large/007S8ZIlgy1gjtjbirenpj31920kiq51.jpg)图片来自dubbo官方
+![图片来自dubbo官方](https://tva1.sinaimg.cn/large/007S8ZIlgy1gjtjbirenpj31920kiq51.jpg)
 
-1. 加权轮询：比如服务器 A、B、C 权重比为 5:2:1，那么在8次请求中，服务器 A 将收到其中的5次请求，服务器 B 会收到其中的2次请求，服务器 C 则收到其中的1次请求。
+<center>图片来自dubbo官方</center>
 
-## 集群容错方式有哪些？
+4. 加权轮询：比如服务器 A、B、C 权重比为 5:2:1，那么在8次请求中，服务器 A 将收到其中的5次请求，服务器 B 会收到其中的2次请求，服务器 C 则收到其中的1次请求。
+
+## 7.集群容错方式有哪些？
 
 1. Failover Cluster失败自动切换：dubbo的默认容错方案，当调用失败时自动切换到其他可用的节点，具体的重试次数和间隔时间可用通过引用服务的时候配置，默认重试次数为1也就是只调用一次。
 2. Failback Cluster快速失败：在调用失败，记录日志和调用信息，然后返回空结果给consumer，并且通过定时任务每隔5秒对失败的调用进行重试
@@ -72,7 +74,7 @@
 5. Forking Cluster并行调用多个服务提供者：通过线程池创建多个线程，并发调用多个provider，结果保存到阻塞队列，只要有一个provider成功返回了结果，就会立刻返回结果
 6. Broadcast Cluster广播模式：逐个调用每个provider，如果其中一台报错，在循环调用结束后，抛出异常。
 
-## 了解Dubbo SPI机制吗？
+## 8.了解Dubbo SPI机制吗？
 
 SPI 全称为 Service Provider Interface，是一种服务发现机制，本质是将接口实现类的全限定名配置在文件中，并由服务加载器读取配置文件，加载实现类，这样可以在运行时，动态为接口替换实现类。
 
@@ -88,7 +90,7 @@ key=com.xxx.value
 
 然后通过dubbo的ExtensionLoader按照指定的key加载对应的实现类，这样做的好处就是可以按需加载，性能上得到优化。
 
-## 如果让你实现一个RPC框架怎么设计？
+## 9.如果让你实现一个RPC框架怎么设计？
 
 1. 首先需要一个服务注册中心，这样consumer和provider才能去注册和订阅服务
 2. 需要负载均衡的机制来决定consumer如何调用客户端，这其中还当然要包含容错和重试的机制
@@ -97,7 +99,7 @@ key=com.xxx.value
 
 那么，本质上，只要熟悉一两个RPC框架，就很容易想明白我们自己要怎么实现一个RPC框架。
 
-## Dubbo中zookeeper做注册中心，如果注册中心集群全都挂掉，发布者和订阅者之间还能通信么？
+## 10.Dubbo中zookeeper做注册中心，如果注册中心集群全都挂掉，发布者和订阅者之间还能通信么？
 
 - 【提供者】在 【启动】 时，向注册中心zk 【注册】 自己提供的服务。
 
@@ -113,9 +115,9 @@ key=com.xxx.value
 
 
 
-## Netty 在 Dubbo 中是如何应用的？
+## 11.Netty 在 Dubbo 中是如何应用的？
 
-### dubbo 的 Consumer 消费者如何使用 Netty
+### 11.1.dubbo 的 Consumer 消费者如何使用 Netty
 注意：此次代码使用了从 github 上 clone 的 dubbo 源码中的 dubbo-demo 例子。
 代码如下：
 ```
@@ -205,7 +207,7 @@ public ResponseFuture request(Object request, int timeout) throws RemotingExcept
 ```
 send 方法中最后调用 jboss  Netty 中继承了  NioSocketChannel 的 NioClientSocketChannel 的 write 方法。完成了一次数据的传输。
 
-### dubbo 的 Provider 提供者如何使用 Netty
+### 11.2.dubbo 的 Provider 提供者如何使用 Netty
 Provider demo 代码：
 ```
 System.setProperty("java.net.preferIPv4Stack", "true");
@@ -247,7 +249,7 @@ protected void doOpen() throws Throwable {
 ```
 该方法中，看到了熟悉的 boss 线程，worker 线程，和 ServerBootstrap，在添加了编解码 handler  之后，添加一个 NettyHandler，最后调用 bind 方法，完成绑定端口的工作。和我们使用 Netty 是一摸一样。
 
-### 总结
+### 11.3.总结
 可以看到，dubbo 使用 Netty 还是挺简单的，消费者使用 NettyClient，提供者使用 NettyServer，Provider  启动的时候，会开启端口监听，使用我们平时启动 Netty 一样的方式。
 
 而 Client 在 Spring getBean 的时候，会创建 Client，当调用远程方法的时候，将数据通过 dubbo 协议编码发送到 NettyServer，然后 NettServer 收到数据后解码，并调用本地方法，并返回数据，完成一次完美的 RPC 调用。

@@ -4,13 +4,13 @@
 
 # Dubbo 超时配置
 
-## RPC场景
+## 1.RPC场景
 
 本文所有问题均以下图做为业务场景，一个web api做为前端请求，product service是产品服务，其中调用comment service(评论服务)获取产品相关评论，comment service从持久层中加载数据。
 
 ![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/dubbo-demo/20210410170111.png)
 
-## 超时是针对消费端还是服务端？
+## 2.超时是针对消费端还是服务端？
 
 - 如果是针对消费端，那么当消费端发起一次请求后，如果在规定时间内未得到服务端的响应则直接返回超时异常，但服务端的代码依然在执行。
 - 如果是针对服务端，那么当消费端发起一次请求后，一直等待服务端的响应，服务端在方法执行到指定时间后如果未执行完，此时返回一个超时异常给到消费端。
@@ -38,15 +38,15 @@ comment service : 并没有异常，而是慢慢悠悠的执行自己的逻辑�
 
 > 从日志来看，超时影响的是消费端，与服务端没有直接关系。
 
-## 超时在哪设置？
+## 3.超时在哪设置？
 
 **消费端**
 
 - 全局控制
 
-```markup
-<dubbo:consumer timeout="1000"></dubbo:consumer>
-```
+    ```markup
+    <dubbo:consumer timeout="1000"></dubbo:consumer>
+    ```
 
 - 接口控制
 - 方法控制
@@ -55,16 +55,16 @@ comment service : 并没有异常，而是慢慢悠悠的执行自己的逻辑�
 
 - 全局控制
 
-```markup
-<dubbo:provider timeout="1000"></dubbo:provider>
-```
+    ```markup
+    <dubbo:provider timeout="1000"></dubbo:provider>
+    ```
 
 - 接口控制
 - 方法控制
 
 可以看到dubbo针对超时做了比较精细化的支持，无论是消费端还是服务端，无论是接口级别还是方法级别都有支持。
 
-## 超时设置的优先级是什么？
+## 4.超时设置的优先级是什么？
 
 > 上面有提到dubbo支持多种场景下设置超时时间，也说过超时是针对消费端的。那么既然超时是针对消费端，为什么服务端也可以设置超时呢？
 
@@ -72,7 +72,7 @@ comment service : 并没有异常，而是慢慢悠悠的执行自己的逻辑�
 
 另外针对控制的粒度，dubbo支持了接口级别也支持方法级别，可以根据不同的实际情况精确控制每个方法的超时时间。所以最终的优先顺序为：客户端方法级>服务端方法级>客户端接口级>服务端接口级>客户端全局>服务端全局
 
-## 超时的实现原理是什么？
+## 5.超时的实现原理是什么？
 
 之前有简单提到过, dubbo默认采用了netty做为网络组件，它属于一种NIO的模式。消费端发起远程请求后，线程不会阻塞等待服务端的返回，而是马上得到一个ResponseFuture，消费端通过不断的轮询机制判断结果是否有返回。因为是通过轮询，轮询有个需要特别注要的就是避免死循环，所以为了解决这个问题就引入了超时机制，只在一定时间范围内做轮询，如果超时时间就返回超时异常。
 
@@ -145,7 +145,7 @@ public Object get(int timeout) throws RemotingException {
     }
 ```
 
-## 超时解决的是什么问题？
+## 6.超时解决的是什么问题？
 
 设置超时主要是解决什么问题？如果没有超时机制会怎么样？
 
@@ -285,7 +285,7 @@ Caused by: java.util.concurrent.RejectedExecutionException: Thread pool is EXHAU
 
 通过上面的分析，对调用的服务设置超时时间，是为了避免因为某种原因导致线程被长时间占用，最终出现线程池用完返回拒绝服务的异常。
 
-## 超时与服务降级
+## 7.超时与服务降级
 
 按我们文章之前的场景，web api 请求产品明细时调用product service，为了查询产品评论product service调用comment service。如果此时由于comment service异常，响应时间增大到10S（远大于上游服务设置的超时时间），会发生超时异常，进而导致整个获取产品明细的接口异常，这也就是平常说的强依赖。这类强依赖是超时不能解决的，解决方案一般是两种：
 
@@ -296,13 +296,13 @@ Caused by: java.util.concurrent.RejectedExecutionException: Thread pool is EXHAU
 
 
 
-## Dubbo超时机制导致的雪崩连接
+## 8.Dubbo超时机制导致的雪崩连接
 
 **Bug** **影响：** Dubbo 服务提供者出现无法获取 Dubbo 服务处理线程异常，后端 DB 爆出拿不到数据库连接池，导致前端响应时间异常飙高，系统处理能力下降，核心基础服务无法提供正常服务。
 
 **Bug** **发现过程：**
 
-线 上，对于高并发的服务化接口应用，时常会出现Dubbo连接池爆满情况，通常，我们理所应当的认为，这是客户端并发连接过高所致，一方面调整连接池大小， 一方面考虑去增加服务接口的机器，当然也会考虑去优化服务接口的应用。很自然的，当我们在线上压测一个营销页面（为大促服务，具备高并发）时，我们遇到了 这种情况。而通过不断的深入研究，我发现了一个特别的情况。
+线上，对于高并发的服务化接口应用，时常会出现Dubbo连接池爆满情况，通常，我们理所应当的认为，这是客户端并发连接过高所致，一方面调整连接池大小， 一方面考虑去增加服务接口的机器，当然也会考虑去优化服务接口的应用。很自然的，当我们在线上压测一个营销页面（为大促服务，具备高并发）时，我们遇到了 这种情况。而通过不断的深入研究，我发现了一个特别的情况。
 
 场景描述：
 
@@ -318,13 +318,13 @@ Caused by: java.util.concurrent.RejectedExecutionException: Thread pool is EXHAU
 
 2. Dubbo Consumer端有大量的Dubbo超时和重试的异常，且重试3次后，均失败。
 
-Dubbo Consumer端的最大并发时91个
+   Dubbo Consumer端的最大并发时91个
 
-![alt](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/dubbo-demo/20210410171329.jpeg)
+   ![alt](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/dubbo-demo/20210410171329.jpeg)
 
-Dubbo Provider端的最大并发却是600个，而服务端配置的dubbo最大线程数即为600。
+   Dubbo Provider端的最大并发却是600个，而服务端配置的dubbo最大线程数即为600。
 
-![alt](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/dubbo-demo/20210410171400.png)
+   ![alt](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/dubbo-demo/20210410171400.png)
 
 这个时候，出于性能测试的警觉性，发现这两个并发数极为不妥。
 
@@ -404,28 +404,28 @@ Dubbo Provider端的最大并发却是600个，而服务端配置的dubbo最大�
 
 **Bug** **解决办法：**
 
-**其实这过程中不仅仅有一些方法论，也有一些是性能测试经验的功底，更重要的是产出了一些通用性的性能问题解决方案，以及部分参数和技术方案的设计对系统架构的影响。**
+其实这过程中不仅仅有一些方法论，也有一些是性能测试经验的功底，更重要的是产出了一些通用性的性能问题解决方案，以及部分参数和技术方案的设计对系统架构的影响。
 
-1. **对于核心的服务中心，去除dubbo超时重试机制，并重新评估设置超时时间。**
+1. 对于核心的服务中心，去除dubbo超时重试机制，并重新评估设置超时时间。
 
-2. **对于存在tair或者其他中间件缓存产品，对NULL数据进行缓存，防止出现缓存的变相击穿问题**
+2. 对于存在tair或者其他中间件缓存产品，对NULL数据进行缓存，防止出现缓存的变相击穿问题
 
 
 
-## Dubbo超时和重连机制
+## 9.Dubbo超时和重连机制
 
 dubbo启动时默认有重试机制和超时机制。
 
 超时机制的规则是如果在一定的时间内，provider没有返回，则认为本次调用失败，
 重试机制在出现调用失败时，会再次调用。如果在配置的调用次数内都失败，则认为此次请求异常，抛出异常。
 
-如果出现超时，通常是业务处理太慢，可在服务提供方执行：jstack PID > jstack.log 分析线程都卡在哪个方法调用上，这里就是慢的原因。
+如果出现超时，通常是业务处理太慢，可在服务提供方执行：`jstack PID > jstack.log` 分析线程都卡在哪个方法调用上，这里就是慢的原因。
 
 如果不能调优性能，请将timeout设大。
 
 **某些业务场景下，如果不注意配置超时和重试，可能会引起一些异常。**
 
-### 超时机制
+### 9.1.超时机制
 
 Dubbo是阿里开源的分布式远程调用方案(RPC)，由于网络或服务端不可靠，会导致调用出现一种不确定的中间状态（超时）。为了避免超时导致客户端资源（线程）挂起耗尽，必须设置超时时间。
 
@@ -436,7 +436,7 @@ Provider可以配置的Consumer端主要属性有timeout、retries、loadbalance
 
 根据规则2，纵使消费端配置优于服务端配置，但消费端配置超时时间不能随心所欲，需要根据业务实际情况来设定。如果超时时间设置得太短，复杂业务本来就需要很长时间完成，服务端无法在设定的超时时间内完成业务处理；如果超时时间设置太长，会由于服务端或者网络问题导致客户端资源大量线程挂起。
 
-### 超时设置
+### 9.2.超时设置
 
 DUBBO消费端设置超时时间需要根据业务实际情况来设定，如果设置的时间太短，一些复杂业务需要很长时间完成，导致在设定的超时时间内无法完成正常的业务处理。
 
@@ -485,19 +485,19 @@ DUBBO消费端设置超时时间需要根据业务实际情况来设定，如果
     
 
 
-### 重连机制
+### 9.3.重连机制
 
 dubbo在调用服务不成功时，默认会重试2次。
 
 Dubbo的路由机制，会把超时的请求路由到其他机器上，而不是本机尝试，所以 dubbo的重试机制也能一定程度的保证服务的质量。
-但是如果不合理的配置重试次数，当失败时会进行重试多次，这样在某个时间点出现性能问题，调用方再连续重复调用，
-系统请求变为正常值的retries倍，系统压力会大增，容易引起服务雪崩，需要根据业务情况规划好如何进行异常处理，何时进行重试。
 
-### Dubbo协议超时实现
+但是如果不合理的配置重试次数，当失败时会进行重试多次，这样在某个时间点出现性能问题，调用方再连续重复调用，系统请求变为正常值的retries倍，系统压力会大增，容易引起服务雪崩，需要根据业务情况规划好如何进行异常处理，何时进行重试。
+
+### 9.4.Dubbo协议超时实现
 
 Dubbo协议超时实现使用了Future模式，主要涉及类DubboInvoker，ResponseFuture, DefaultFuture。 
 
-ResponseFuture.get()在请求还未处理完或未到超时前一直是wait状态；响应达到后，设置请求状态，并进行notify唤醒。
+`ResponseFuture.get()` 在请求还未处理完或未到超时前一直是wait状态；响应达到后，设置请求状态，并进行notify唤醒。
 
 ```
     public Object get() throws RemotingException {
@@ -567,9 +567,9 @@ ResponseFuture.get()在请求还未处理完或未到超时前一直是wait状�
 
 
 
-## 浅谈dubbo的ExceptionFilter异常处理
+## 10.浅谈dubbo的ExceptionFilter异常处理
 
-### 背景
+### 10.1.背景
 
 我们的项目使用了dubbo进行不同系统之间的调用。每个项目都有一个全局的异常处理，对于业务异常，我们会抛出自定义的业务异常（继承RuntimeException）。全局的异常处理会根据不同的异常类型进行不同的处理。
 
@@ -577,7 +577,7 @@ ResponseFuture.get()在请求还未处理完或未到超时前一直是wait状�
 
 这是为什么呢？还需要从dubbo的ExceptionFilter说起。
 
-### ExceptionFilter
+### 10.2.ExceptionFilter
 
 如果Dubbo的 provider端 抛出异常（Throwable），则会被 provider端 的ExceptionFilter拦截到，执行以下invoke方法：
 
@@ -709,7 +709,7 @@ public class ExceptionFilter implements Filter {
 }  
 ```
 
-#### 代码分析
+#### 10.2.1.代码分析
 
 按逻辑顺序进行分析，满足其中一个即返回，不再继续执行判断。
 
@@ -748,6 +748,7 @@ public interface GenericService {
 ```
 
 泛接口实现方式主要用于服务器端没有API接口及模型类元的情况，参数及返回值中的所有POJO均用Map表示，通常用于框架集成，比如：实现一个通用的远程服务Mock框架，可通过实现GenericService接口处理所有服务请求。
+
 不适用于此场景，不在此处探讨。
 
 **逻辑1**
@@ -918,11 +919,11 @@ return new RpcResult(new RuntimeException(StringUtils.toString(exception)));
 
 不满足上述条件，会做toString处理并被封装成RuntimeException抛出。
 
-#### 核心思想
+#### 10.2.2.核心思想
 
 尽力避免反序列化时失败（只有在jdk版本或api版本不一致时才可能发生）。
 
-### 如何正确捕获业务异常
+### 10.3.如何正确捕获业务异常
 
 了解了ExceptionFilter，解决上面提到的问题就很简单了。
 
@@ -946,7 +947,7 @@ return new RpcResult(new RuntimeException(StringUtils.toString(exception)));
 
  
 
-#### 给dubbo接口添加白名单
+#### 10.3.1.给dubbo接口添加白名单
 
 dubbo Filter的使用具体内容如下：
 

@@ -4,15 +4,15 @@
 
 # Dubbo 容错机制
 
-## 相关概念
+## 1.相关概念
 
-### 前置动作
+### 1.1.前置动作
 
 集群容错真正发生在消费端。当消费端发起调用时，会先从**服务目录**查询满足需求的服务提供者信息，在此基础上进行**路由**，路由后的结果才会真正进行容错处理。所以，就会有如下的活动图：
 
 ![éç¾¤å®¹éåç½®å¨ä½](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/dubbo-demo/20210410115618.png)
 
-### invoker 是什么？
+### 1.2.invoker 是什么？
 
 在 Dubbo 中 invoker 其实就是一个具有调用功能的对象，在服务暴露端封装的就是真实的服务实现，把真实的服务实现封装一下变成一个 invoker。
 
@@ -26,9 +26,7 @@
 
 ![å¾ç](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/dubbo-demo/20210410114252.webp)
 
-### 服务目录到底是什么？
-
-服务目录也就是 Directory，其实之前也介绍过的，但不是单独拎出来讲的，可能大伙儿还不太清晰，今儿咱再来盘一下。
+### 1.3.服务目录到底是什么？
 
 服务目录到底是个什么东西呢，看名字好像就是服务的目录，通过这个目录来查找远程服务？
 
@@ -44,7 +42,7 @@
 
 这个 Node 就不管了，主要是看 Directory ，正常操作搞一个抽象类来实现 Directory 接口，抽象类会实现一些公共方法，并且定义好逻辑，然后具体的实现由子类来完成，可以看到有两个子类，分别是 StaticDirectory 和 RegistryDirectory。
 
-### RegistryDirectory
+### 1.4.RegistryDirectory
 
 我们先来看下 RegistryDirectory ，它是一个动态目录，我们来看一下具体的结构。
 
@@ -87,7 +85,7 @@ RegistryDirectory 定义了三种集合，分别是 invokerUrls 、routerUrls �
 
 所以是在 refreshInvoker 的时候构造 methodInvokerMap，然后在调用的时候再读 methodInvokerMap，最后再销毁无用的 invoker。
 
-### StaticDirectory
+### 1.5.StaticDirectory
 
 StaticDirectory，这个是**用在多注册中心的时候，它是一个静态目录，即固定的不会增减的**，所有 Invoker 是通过构造器来传入。
 
@@ -101,7 +99,7 @@ StaticDirectory 的内部逻辑非常的简单，就是一个 list 存储了这�
 
 ![图片](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/dubbo-demo/20210410114557.webp)
 
-### 什么是服务路由？
+### 1.6.什么是服务路由？
 
 服务路由其实就是路由规则，它规定了服务消费者可以调用哪些服务提供者，Dubbo 一共有三种路由分别是：条件路由 ConditionRouter、脚本路由 ScriptRouter 和标签路由 TagRouter。
 
@@ -119,7 +117,7 @@ StaticDirectory 的内部逻辑非常的简单，就是一个 list 存储了这�
 
 具体的路由匹配和表达式解析就不深入了，有兴趣的同学自行了解，其实知道这个功能是干嘛的差不多了，反正经过路由的过滤之后消费者拿到的都是能调用的远程服务。
 
-### Dubbo 的 Cluster 有什么用？
+### 1.7.Dubbo 的 Cluster 有什么用？
 
 前面我们已经说了有服务目录，并且目录还经过了路由规则的过滤，此时我们手上还是有一堆 invokers，那对于消费者来说就需要进行抉择，那到底选哪个 invoker 进行调用呢？
 
@@ -143,9 +141,9 @@ Dubbo 默认的 cluster 实现有很多，主要有以下几种：
 
 
 
-## 集群容错策略
+## 2.集群容错策略
 
-### FailoverClusterInvoker
+### 2.1.FailoverClusterInvoker
 
 这个 cluster 实现的是失败自动切换功能，简单的说一个远程调用失败，它就立马换另一个，当然是有重试次数的。
 
@@ -157,7 +155,7 @@ Dubbo 默认的 cluster 实现有很多，主要有以下几种：
 
 这个 **select 实际上还进行了粘性处理**，也就是会记录上一次选择的 invoker ，这样使得每次调用不会一直换invoker，如果上一次没有 invoker，或者上一次的 invoker 下线了则会进行负载均衡选择。
 
-### FailfastClusterInvoker
+### 2.2.FailfastClusterInvoker
 
 这个 cluster 只会进行一次远程调用，如果失败后立即抛出异常，也就是快速失败，它适合于不支持幂等的一些调用。
 
@@ -167,7 +165,7 @@ Dubbo 默认的 cluster 实现有很多，主要有以下几种：
 
 ![Dubboçå¿«éå¤±è´¥å®¹éæºå¶](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/dubbo-demo/20210410122407.png)
 
-### FailsafeClusterInvoker
+### 2.3.FailsafeClusterInvoker
 
 这个 cluster 是一种失败安全的 cluster，也就是调用出错仅仅就日志记录一下，然后返回了一个空结果，适用于写入审计日志等操作。
 
@@ -177,7 +175,7 @@ Dubbo 默认的 cluster 实现有很多，主要有以下几种：
 
 ![Dubboçå¤±è´¥å®å¨å®¹éæºå¶](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/dubbo-demo/20210410122419.png)
 
-### FailbackClusterInvoker
+### 2.4.FailbackClusterInvoker
 
 这个 cluster 会在调用失败后，记录下来这次调用，然后返回一个空结果给服务消费者，并且会通过定时任务对失败的调用进行重调。
 
@@ -191,7 +189,7 @@ Dubbo 默认的 cluster 实现有很多，主要有以下几种：
 
 ![Dubboçå¤±è´¥èªå¨æ¢å¤å®¹éæºå¶](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/dubbo-demo/20210410122352.png)
 
-### ForkingClusterInvoker
+### 2.5.ForkingClusterInvoker
 
 这个 cluster 会在运行时把所有 invoker 都通过线程池进行并发调用，只要有一个服务提供者成功返回了结果，doInvoke 方法就会立即结束运行。
 
@@ -201,7 +199,7 @@ Dubbo 默认的 cluster 实现有很多，主要有以下几种：
 
 ![Dubboçå¹¶è¡è°ç¨å¤ä¸ªæå¡æä¾èå®¹éæºå¶](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/dubbo-demo/20210410122440.png)
 
-### BroadcastClusterInvoker
+### 2.6.BroadcastClusterInvoker
 
 这个 cluster 会在运行时把所有 invoker 逐个调用，然后在最后判断如果有一个调用抛错的话，就抛出异常。
 
@@ -211,13 +209,13 @@ Dubbo 默认的 cluster 实现有很多，主要有以下几种：
 
 ![Dubboçå¹¿æ­æ¹å¼å®¹éæºå¶](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/dubbo-demo/20210410122451.png)
 
-### AbstractClusterInvoker
+### 2.7.AbstractClusterInvoker
 
 这其实是它们的父类，不过 AvailableCluster 内部就是返回 AbstractClusterInvoker，这个主要用在多注册中心的时候，比较简单，就是哪个能用就用那个。
 
 ![图片](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/dubbo-demo/20210410122253.png)
 
-### 小结 Cluster
+### 2.8.小结 Cluster
 
 可以看到上面有很多种集群的实现，分别适用不同的场景，这其实就是很好的抽象，加了这个中间层向服务消费者屏蔽了集群调用的细节，并且可以在不同场景选择更合适的实现。
 
@@ -225,7 +223,7 @@ Dubbo 默认的 cluster 实现有很多，主要有以下几种：
 
 
 
-## 串联容错机制和负载均衡
+## 3.串联容错机制和负载均衡
 
 先来看下官网的这一张图，很是清晰，然后我再用语言来阐述一遍。
 
