@@ -8,7 +8,7 @@
 
 
 
-## 搜索模板 Template
+## 1.搜索模板 Template
 
 [Search 模板](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-template.html)使用 **mustache** 语言来呈现搜索请求，使得搜索请求**参数化**，达到开发人员与搜索工程师解耦的效果。
 
@@ -45,7 +45,7 @@ POST template_name/_search/template
 
 
 
-## 搜索建议 Suggesters
+## 2.搜索建议 Suggesters
 
 [搜索建议](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-suggesters.html)帮助用户在输入搜索的过程中，进行自动补全或者纠错，这种功能在 ES 中通过 **Suggesters** 来完成。
 
@@ -66,7 +66,7 @@ ES 提供了 4 种类别的 **Suggesters**：
 
 
 
-### Term suggester
+### 2.1.Term suggester
 
 示例：
 
@@ -138,7 +138,7 @@ POST /articles/_search
 
 
 
-### Phrase Suggester
+### 2.2.Phrase Suggester
 
 `Phrase Suggester` 在 `Term Suggester` 的基础上增加了一些额外的逻辑。
 
@@ -175,7 +175,7 @@ POST /articles/_search
 
 
 
-### Completion Suggester
+### 2.3.Completion Suggester
 
 `Completion Suggester` 用于自动补全，用户每输入一个字符，就需要即时发送一个查询请求到后端查找匹配项。
 
@@ -237,7 +237,7 @@ POST articles/_search?pretty
 
 
 
-### Context Suggester
+### 2.4.Context Suggester
 
 `Context Suggester` 是对 `Completion Suggester` 的扩展，称为**上下文感知推荐**，可以在搜索时提供更多的上下文信息。
 
@@ -318,7 +318,7 @@ POST comments/_search
 
 
 
-### 几种建议的指标比较
+### 2.5.几种建议的指标比较
 
 比较：
 

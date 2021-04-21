@@ -4,7 +4,7 @@
 
 # ElasticSearch URI 查询
 
-## URI 查询格式
+## 1.URI 查询格式
 
 URI 查询的一般格式如下：
 
@@ -28,19 +28,19 @@ GET /index_name/_search?q=key:val&df=title&sort=year:desc&from=0&size=10
 
 
 
-## 范查询
+## 2.范查询
 
 如果查询时没有指定字段，就会在所有的字段中查询，这叫做**范查询**。例如 `q=2012`。
 
 
 
-## Term：单词查询
+## 3.Term：单词查询
 
 **Term 查询**不需要用引号引住。比如 `q=A B` 表示包含 `A` 或 `B`。
 
 
 
-## Phrase：词组查询
+## 4.Phrase：词组查询
 
 **Phrase 查询**需要用引号引住。
 
@@ -48,7 +48,7 @@ GET /index_name/_search?q=key:val&df=title&sort=year:desc&from=0&size=10
 
 
 
-## 查询分组
+## 5.查询分组
 
 比如 `q=title:A B`，表示的是 `title:A` 或 `B`，会在 `title` 字段中查询 `A`，在所有的字段中查询 `B`。
 
@@ -56,7 +56,7 @@ GET /index_name/_search?q=key:val&df=title&sort=year:desc&from=0&size=10
 
 
 
-## 布尔查询
+## 6.布尔查询
 
 在使用 `{"profile":"true"}` 查看执行过程时，会有两个概念 `must` 和 `must_not`：
 
@@ -78,7 +78,7 @@ GET /index_name/_search?q=key:val&df=title&sort=year:desc&from=0&size=10
 
 
 
-## 范围查询
+## 7.范围查询
 
 用于数字类型：
 
@@ -93,7 +93,7 @@ GET /index_name/_search?q=key:val&df=title&sort=year:desc&from=0&size=10
 
 
 
-## 通配符与正则查询
+## 8.通配符与正则查询
 
 在通配符查询中：
 
@@ -113,7 +113,7 @@ GET /index_name/_search?q=key:val&df=title&sort=year:desc&from=0&size=10
 
 
 
-## 模糊匹配与近似查询
+## 9.模糊匹配与近似查询
 
 示例：
 

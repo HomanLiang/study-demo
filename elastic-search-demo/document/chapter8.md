@@ -6,7 +6,7 @@
 
 **DSL**（Domain Specific Language）查询也叫做 **Request Body** 查询，它比 **URI 查询**更高阶，能支持更复杂的查询。
 
-## 分页
+## 1.分页
 
 默认情况下，查询按照算分排序，返回前 10 条记录。
 
@@ -28,7 +28,7 @@ POST /index_name/_search
 }
 ```
 
-### 深度分页问题
+### 1.1.深度分页问题
 
 ES 是一个分布式系统，数据保存在多个分片中，那么查询时就需要查询多个分片。
 
@@ -68,11 +68,11 @@ POST index_name/_search
 
 
 
-### Search After
+### 1.2.Search After
 
 [Search After](https://www.elastic.co/guide/en/elasticsearch/reference/7.10/paginate-search-results.html#search-after) 通过实时获取下一页的文档信息来实现，使用方法：
 
-- 第一步搜索需要指定 **sort**，并且保证值是唯一的（通过sort by id 来保证）。
+- 第一步搜索需要指定 **sort**，并且保证值是唯一的（通过 `sort by id` 来保证）。
 - 随后的搜索，都使用上一次搜索的最后一个文档的 sort 值进行搜索。
 
 **Search After** 的方式不支持指定页数，只能一页一页的往下翻。
@@ -133,13 +133,13 @@ POST users/_search
 
 
 
-### Scroll
+### 1.3.Scroll
 
 [Scroll](https://www.elastic.co/guide/en/elasticsearch/reference/7.10/paginate-search-results.html#scroll-search-results) 通过创建一个**快照**来实现，方法：
 
 - 每次查询时，输入上一次的 `Scroll Id`。
 
-**Scroll** 方式的缺点是，当有新的数据写入时，**新写入的数据无法被查到**（第一次建立快照时有多少数据，就只能查到多少数据）。
+- **Scroll** 方式的缺点是，当有新的数据写入时，**新写入的数据无法被查到**（第一次建立快照时有多少数据，就只能查到多少数据）。
 
 示例：
 
@@ -176,7 +176,7 @@ POST /_search/scroll
 
 
 
-### 不同分页方式的使用场景
+### 1.4.不同分页方式的使用场景
 
 分页方式共 4 种：
 
@@ -190,7 +190,7 @@ POST /_search/scroll
 
 
 
-## 排序
+## 2.排序
 
 ES 默认使用算分进行排序，我们可以使用 [sort-processor](https://www.elastic.co/guide/en/elasticsearch/reference/current/sort-processor.html)（不需要再计算算分）来指定排序规则；可以对某个字段进行排序，最好只对**数字型**和**日期型**字段排序。
 
@@ -241,7 +241,7 @@ PUT index_name/_mapping
 
 
 
-## 字段过滤
+## 3.字段过滤
 
 可以使用 `_source` 设置需要返回哪些字段。示例：
 
@@ -259,7 +259,7 @@ POST /index_name/_search
 
 
 
-## 脚本字段
+## 4.脚本字段
 
 可以使用脚本进行简单的表达式运算。
 
@@ -282,7 +282,7 @@ POST /index_name/_search
 
 
 
-## 查询与过滤
+## 5.查询与过滤
 
 查询会有相关性算分；过滤不需要进行算分，可以利用缓存，性能更好。
 
@@ -290,7 +290,7 @@ POST /index_name/_search
 
 
 
-## 全文本查询
+## 6.全文本查询
 
 [全文本](https://www.elastic.co/guide/en/elasticsearch/reference/current/full-text-queries.html)（Full text）查询会对搜索字符串进行**分词处理**。
 
@@ -308,7 +308,7 @@ POST /index_name/_search
 
 
 
-### Match 查询
+### 6.1.Match 查询
 
 **Match** 查询是全文搜索的标准查询，与下面的几种查询相比，更加强大，灵活性也更大，最常使用。（**搜索词分词**）
 
@@ -345,7 +345,7 @@ POST index_name/_search
 
 
 
-### Match Phrase 查询
+### 6.2.Match Phrase 查询
 
 使用 [match_phrase](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-match-query-phrase.html) 关键字。示例：
 
@@ -376,7 +376,7 @@ POST index_name/_search
 
 
 
-### Query String 查询
+### 6.3.Query String 查询
 
 使用 [query_string](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-query-string-query.html) 关键字。示例：
 
@@ -415,7 +415,7 @@ POST index_name/_search
 
 
 
-### Simple Query String 查询
+### 6.4.Simple Query String 查询
 
 使用 [simple_query_string](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-simple-query-string-query.html) 关键字。
 
@@ -466,7 +466,7 @@ GET index_name/_search
 
 
 
-### Multi-match 查询
+### 6.5.Multi-match 查询
 
 一个字符串在多个字段中查询的情况，如何匹配最终的结果。（还有一个 **dis-max** 查询也是针对这种情况的）
 
@@ -497,7 +497,7 @@ POST index_name/_search
 
 
 
-## Term 查询
+## 7.Term 查询
 
 [Term 查询](https://www.elastic.co/guide/en/elasticsearch/reference/current/term-level-queries.html)与**全文本**查询不同的是，Term 查询不会对查询字符串进行分词处理，Term 查询会在字段匹配**精确值**。
 
@@ -519,7 +519,7 @@ Term 查询输入字符串作为一个整体，在倒排索引中查找匹配的
 
 
 
-### 结构化数据与查询
+### 7.1.结构化数据与查询
 
 结构化查询是对**结构化数据**的查询，可以使用 **Term 语句**进行查询。
 
@@ -534,13 +534,13 @@ Term 查询输入字符串作为一个整体，在倒排索引中查找匹配的
 
 
 
-### term 查询
+### 7.2.term 查询
 
 如果某个文档的指定字段**包含**某个**确切值**，则返回该文档。（**搜索词不分词**）
 
 
 
-#### 示例 1 精确匹配
+#### 7.2.1.示例 1 精确匹配
 
 下面举一个 term 查询的例子，首先插入一个文档：
 
@@ -608,7 +608,7 @@ POST /products/_search
 
 
 
-#### 示例 2 查询布尔值
+#### 7.2.2.示例 2 查询布尔值
 
 **term 查询**有算分：
 
@@ -642,7 +642,7 @@ POST index_name/_search
 
 
 
-### range 查询
+### 7.3.range 查询
 
 [range 查询](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-range-query.html)中有几个常用的比较运算：
 
@@ -655,7 +655,7 @@ POST index_name/_search
 
 
 
-#### 数字类型 range 查询
+#### 7.3.1.数字类型 range 查询
 
 示例：
 
@@ -675,7 +675,7 @@ POST index_name/_search
 
 
 
-#### 日期类型 range 查询
+#### 7.3.2.日期类型 range 查询
 
 对于日期类型有几个常用的符号：
 
@@ -707,7 +707,7 @@ POST index_name/_search
 
 
 
-### exists 查询
+### 7.4.exists 查询
 
 **exists 语句**可以判断文档是否存在**某个字段**。
 
@@ -745,7 +745,7 @@ POST index_name/_search
 
 
 
-### terms 查询
+### 7.5.terms 查询
 
 **terms 语句**用于处理多值查询，相当于一个多值版的 **term 语句**，可以一次查询多个值。
 
@@ -767,7 +767,7 @@ POST index_name/_search
 
 
 
-## 复合查询
+## 8.复合查询
 
 [复合查询](https://www.elastic.co/guide/en/elasticsearch/reference/current/compound-queries.html)（Compound）能够包装其他**复合查询**或**叶查询**，以组合其结果和分数，更改其行为或者将查询转成**过滤**。
 
@@ -781,7 +781,7 @@ POST index_name/_search
 
 
 
-### bool 查询
+### 8.1.bool 查询
 
 **bool 查询**是一个或**多个子查询**的组合，共包含以下 4 种子句：
 
@@ -823,7 +823,7 @@ POST index_name/_search
 
 
 
-### boosting 查询
+### 8.2.boosting 查询
 
 **boosting 查询**会给不同的查询条件分配不同的级别（**positive / negative**），不同的级别对算分有着不同的印象，从而影响最终的算分。
 
@@ -856,7 +856,7 @@ GET index_name/_search
 
 
 
-### constant_score 查询
+### 8.3.constant_score 查询
 
 **constant_score 查询**可以将查询转成一个**过滤**，可以避免**算分**（降低开销），并有效利用缓存（提高性能）。
 
@@ -879,7 +879,7 @@ POST /index_name/_search
 
 
 
-### dis_max 查询
+### 8.4.dis_max 查询
 
 一个字符串在多个字段中查询的情况，如何匹配最终的结果。（还有一个 **Multi-match** 查询也是针对这种情况的）
 
@@ -913,7 +913,7 @@ POST index_name/_search
 
 
 
-### function_score 查询
+### 8.5.function_score 查询
 
 **function_score 查询**可以在查询结束后，对每一个匹配的文档进行**重新算分**，然后再根据新的算分进行排序。
 
@@ -927,7 +927,7 @@ POST index_name/_search
 
 
 
-#### field_value_factor 示例
+#### 8.5.1.field_value_factor 示例
 
 首先插入测试数据：
 
@@ -1042,7 +1042,7 @@ POST /blogs/_search
 
 
 
-#### Boost Mode 和 Max Boost 参数
+#### 8.5.2.Boost Mode 和 Max Boost 参数
 
 Boost Mode：
 
@@ -1080,7 +1080,7 @@ POST /blogs/_search
 
 
 
-#### random_score 示例
+#### 8.5.3.random_score 示例
 
 示例：
 

@@ -12,7 +12,7 @@ ES 提供了多种操作数据的方式，其中较为常见的方式就是RESTf
 
 
 
-## ES 中的索引
+## 1.ES 中的索引
 
 ES 中的文档都会存储在某个**索引**（Index）中，索引是文档的容器，是一类文档的集合，相当于关系型数据库中的表的概念。
 
@@ -39,11 +39,11 @@ ES 中可以创建很多不同的索引，表示不同的文档集合。
 
 
 
-## Index APIs
+## 2.Index APIs
 
-### 创建索引
+### 2.1.创建索引
 
-#### 简单创建索引
+#### 2.1.1.简单创建索引
 
 ```
 PUT /twitter
@@ -67,7 +67,7 @@ PUT /twitter
 
 
 
-#### 创建索引并指定索引的映射 Mapping
+#### 2.1.2.创建索引并指定索引的映射 Mapping
 
 ```
 PUT /test
@@ -85,7 +85,7 @@ PUT /test
 
 
 
-#### 创建索引并给索引指定别名 Aliases
+#### 2.1.3.创建索引并给索引指定别名 Aliases
 
 ```
 PUT /test
@@ -104,7 +104,7 @@ PUT /test
 
 
 
-#### 创建成功返回结果
+#### 2.1.4.创建成功返回结果
 
 ```
 {
@@ -116,9 +116,9 @@ PUT /test
 
 
 
-### 修改索引
+### 2.2.修改索引
 
-#### 修改索引设置 settings
+#### 2.2.1.修改索引设置 settings
 
 ```
 PUT /twitter/_settings
@@ -129,9 +129,9 @@ PUT /twitter/_settings
 }
 ```
 
-#### 修改索引别名 Aliases
+#### 2.2.2.修改索引别名 Aliases
 
-##### 增加别名
+##### 2.2.2.1.增加别名
 
 ```console
 POST /_aliases
@@ -142,7 +142,7 @@ POST /_aliases
 }
 ```
 
-##### 移除别名
+##### 2.2.2.2.移除别名
 
 ```
 POST /_aliases
@@ -153,7 +153,7 @@ POST /_aliases
 }
 ```
 
-##### 重命名别名
+##### 2.2.2.3.重命名别名
 
 ```
 POST /_aliases
@@ -167,11 +167,9 @@ POST /_aliases
 
 
 
+### 2.3.查看指定索引
 
-
-### 查看指定索引
-
-#### 查询索引
+#### 2.3.1.查询索引
 
 Request:
 
@@ -189,7 +187,7 @@ GET /_all
 
 
 
-#### 查询索引别名
+#### 2.3.2.查询索引别名
 
 ```
 GET /_alias
@@ -201,7 +199,7 @@ GET /<index>/_alias/<alias>
 
 
 
-#### 查询索引设置
+#### 2.3.3.查询索引设置
 
 Request:
 
@@ -214,7 +212,7 @@ GET /log_2013_-*/_settings/index.number_*
 
 
 
-#### 查询映射
+#### 2.3.4.查询映射
 
 ```
 GET /_mapping
@@ -224,9 +222,9 @@ GET /<index>/_mapping
 
 
 
-### 删除索引
+### 2.4.删除索引
 
-#### 删除索引
+#### 2.4.1.删除索引
 
 Request:
 
@@ -234,7 +232,7 @@ Request:
 DELETE /<index>
 ```
 
-#### 删除别名
+#### 2.4.2.删除别名
 
 Request:
 
@@ -246,9 +244,9 @@ DELETE /<index>/_aliases/<alias>
 
 
 
-### 分词 Analyze
+### 2.5.分词 Analyze
 
-#### 查询使用分词器
+#### 2.5.1.查询使用分词器
 
 ```
 GET /_analyze
@@ -260,7 +258,7 @@ GET /<index>/_analyze
 POST /<index>/_analyze
 ```
 
-#### 测试分词器结果
+#### 2.5.2.测试分词器结果
 
 ```
 GET /_analyze
@@ -280,11 +278,7 @@ GET /_analyze
 
 
 
-
-
-
-
-## ES 中的文档
+## 3.ES 中的文档
 
 在 ES 中，**文档**（Document）是可搜索数据的最小存储单位，相当于关系数据库中的一条记录。
 
@@ -316,7 +310,7 @@ GET /_analyze
 }
 ```
 
-### 文档元数据
+### 3.1.文档元数据
 
 将上面那个 Json 数据存储到 ES 后，会像下面这样：
 
@@ -348,7 +342,7 @@ GET /_analyze
 
 
 
-### 文档的删除与更新
+### 3.2.文档的删除与更新
 
 ES 中文档的**删除操作不会马上将其删除**，而是会将其标记到 **del** 文件中，在后期合适的时候（比如 Merge 阶段）会真正的删除。
 
@@ -356,7 +350,7 @@ ES 中文档的**删除操作不会马上将其删除**，而是会将其标记�
 
 
 
-### 文档中的字段数
+### 3.3.文档中的字段数
 
 在 ES 中，一个文档默认最多可以有 **1000** 个字段，可以通过 [index.mapping.total_fields.limit](https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping.html#mapping-limit-settings) 进行设置。
 
@@ -366,97 +360,97 @@ ES 中文档的**删除操作不会马上将其删除**，而是会将其标记�
 
 
 
-## Document APIs
+## 4.Document APIs
 
-### 插入文档
+### 4.1.插入文档
 
 - Create document IDs automatically
 
-```
-POST twitter/_doc/
-{
-    "user" : "kimchy",
-    "post_date" : "2009-11-15T14:12:12",
-    "message" : "trying out Elasticsearch"
-}
-```
+    ```
+    POST twitter/_doc/
+    {
+        "user" : "kimchy",
+        "post_date" : "2009-11-15T14:12:12",
+        "message" : "trying out Elasticsearch"
+    }
+    ```
 
-​	返回结果：
+	返回结果：
 
-```
-{
-    "_shards" : {
-        "total" : 2,
-        "failed" : 0,
-        "successful" : 2
-    },
-    "_index" : "twitter",
-    "_type" : "_doc",
-    "_id" : "W0tpsmIBdwcYyG50zbta",
-    "_version" : 1,
-    "_seq_no" : 0,
-    "_primary_term" : 1,
-    "result": "created"
-}
-```
+    ```
+    {
+        "_shards" : {
+            "total" : 2,
+            "failed" : 0,
+            "successful" : 2
+        },
+        "_index" : "twitter",
+        "_type" : "_doc",
+        "_id" : "W0tpsmIBdwcYyG50zbta",
+        "_version" : 1,
+        "_seq_no" : 0,
+        "_primary_term" : 1,
+        "result": "created"
+    }
+    ```
 
 - Insert a JSON document into the `twitter` index with an `_id` of 1:
 
-```
-PUT twitter/_doc/1
-{
-    "user" : "kimchy",
-    "post_date" : "2009-11-15T14:12:12",
-    "message" : "trying out Elasticsearch"
-}
-```
+    ```
+    PUT twitter/_doc/1
+    {
+        "user" : "kimchy",
+        "post_date" : "2009-11-15T14:12:12",
+        "message" : "trying out Elasticsearch"
+    }
+    ```
 
-​	The API returns the following result:
+	The API returns the following result:
 
-```
-{
-    "_shards" : {
-        "total" : 2,
-        "failed" : 0,
-        "successful" : 2
-    },
-    "_index" : "twitter",
-    "_type" : "_doc",
-    "_id" : "1",
-    "_version" : 1,
-    "_seq_no" : 0,
-    "_primary_term" : 1,
-    "result" : "created"
-}
-```
+    ```
+    {
+        "_shards" : {
+            "total" : 2,
+            "failed" : 0,
+            "successful" : 2
+        },
+        "_index" : "twitter",
+        "_type" : "_doc",
+        "_id" : "1",
+        "_version" : 1,
+        "_seq_no" : 0,
+        "_primary_term" : 1,
+        "result" : "created"
+    }
+    ```
 
 - Use the `_create` resource to index a document into the `twitter` index if no document with that ID exists:
 
-```console
-PUT twitter/_create/1
-{
-    "user" : "kimchy",
-    "post_date" : "2009-11-15T14:12:12",
-    "message" : "trying out Elasticsearch"
-}
-```
+    ```console
+    PUT twitter/_create/1
+    {
+        "user" : "kimchy",
+        "post_date" : "2009-11-15T14:12:12",
+        "message" : "trying out Elasticsearch"
+    }
+    ```
 
 - Set the `op_type` parameter to *create* to index a document into the `twitter` index if no document with that ID exists:
 
-```console
-PUT twitter/_doc/1?op_type=create
-{
-    "user" : "kimchy",
-    "post_date" : "2009-11-15T14:12:12",
-    "message" : "trying out Elasticsearch"
-}
-```
+    ```console
+    PUT twitter/_doc/1?op_type=create
+    {
+        "user" : "kimchy",
+        "post_date" : "2009-11-15T14:12:12",
+        "message" : "trying out Elasticsearch"
+    }
+    ```
 
 
 
-### 查询文档
+### 4.2.查询文档
 
-#### 查询单个文档
+#### 4.2.1.查询单个文档
 
 Request:
 
@@ -495,7 +489,7 @@ GET twitter/_doc/0
 }
 ```
 
-#### Multi get API
+#### 4.2.2.Multi get API
 
 Request:
 
@@ -532,9 +526,9 @@ GET /twitter/_mget
 
 
 
-### 修改文档
+### 4.3.修改文档
 
-#### 单个文档更新
+#### 4.3.1.单个文档更新
 
 Request:
 
@@ -574,7 +568,7 @@ POST test/_update/1
 
 
 
-#### 单个文档Upsert
+#### 4.3.2.单个文档Upsert
 
 If the document does not already exist, the contents of the `upsert` element are inserted as a new document. If the document exists, the `script` is executed:
 
@@ -594,7 +588,7 @@ POST test/_update/1
 }
 ```
 
-#### 单个文档 Scripted Upsert
+#### 4.3.3.单个文档 Scripted Upsert
 
 To run the script whether or not the document exists, set `scripted_upsert` to `true`:
 
@@ -618,7 +612,7 @@ POST sessions/_update/dh3sgudg8gsrgl
 
 
 
-#### 单个文档 Doc as Upsert
+#### 4.3.4.单个文档 Doc as Upsert
 
 Instead of sending a partial `doc` plus an `upsert` doc, you can set `doc_as_upsert` to `true` to use the contents of `doc` as the `upsert` value:
 
@@ -632,7 +626,7 @@ POST test/_update/1
 }
 ```
 
-#### 通过查询更新
+#### 4.3.5.通过查询更新
 
 ```console
 POST twitter/_update_by_query
@@ -653,9 +647,9 @@ POST twitter/_update_by_query
 
 
 
-### 删除文档
+### 4.4.删除文档
 
-#### 单个文档删除
+#### 4.4.1.单个文档删除
 
 Request:
 
@@ -690,7 +684,7 @@ DELETE /twitter/_doc/1
 
 
 
-#### 通过查询删除
+#### 4.4.2.通过查询删除
 
 Request:
 
@@ -735,7 +729,7 @@ POST /twitter/_delete_by_query
 
 
 
-### Bulk API
+### 4.5.Bulk API
 
 Performs multiple indexing or delete operations in a single API call. This reduces overhead and can greatly increase indexing speed.
 
@@ -841,9 +835,9 @@ POST _bulk
 
 
 
-## Search APIs
+## 5.Search APIs
 
-### Search
+### 5.1.Search
 
 Request:
 
@@ -919,7 +913,7 @@ GET /twitter/_search?q=user:kimchy
 
 
 
-### URI Search
+### 5.2.URI Search
 
 完全通过URI查询，包括查询条件。
 
@@ -929,7 +923,7 @@ GET twitter/_search?q=user:kimchy
 
 
 
-### Request Body Search
+### 5.3.Request Body Search
 
 通过方法体请求搜索（**后面会详细讲**）
 
@@ -993,7 +987,7 @@ GET /twitter/_search
 
 
 
-### Count API
+### 5.4.Count API
 
 获取匹配查询的文档数量
 
@@ -1037,9 +1031,9 @@ GET /twitter/_count
 
 
 
-## 说明
+## 6.说明
 
-### GET 操作
+### 6.1.GET 操作
 
 **GET** 操作可以获取指定文档的内容。
 
@@ -1053,7 +1047,7 @@ GET /twitter/_count
 
 
 
-### POST / PUT 操作
+### 6.2.POST / PUT 操作
 
 **POST/PUT** 操作用于创建文档。
 
@@ -1118,7 +1112,7 @@ PUT index_name/_doc/id?op_type=XXX
 
 
 
-### Update 操作
+### 6.3.Update 操作
 
 Update 操作用于更新文档的内容。
 
@@ -1133,7 +1127,7 @@ Update 操作用于更新文档的内容。
 
 
 
-### Delete 操作
+### 6.4.Delete 操作
 
 Delete 操作用于删除索引或文档。
 
@@ -1149,7 +1143,7 @@ Delete 操作用于删除索引或文档。
 
 
 
-### Bulk 批量操作
+### 6.5.Bulk 批量操作
 
 批量操作指的是，在一次 API 调用中，对不同的索引进行多次操作。
 
@@ -1176,7 +1170,7 @@ POST _bulk
 
 
 
-### Mget 批量读取
+### 6.6.Mget 批量读取
 
 **Mget** 一次读取多个文档的内容，设计思想类似 Bulk 操作。
 
@@ -1218,7 +1212,7 @@ GET _mget
 
 
 
-### Msearch 批量查询
+### 6.7.Msearch 批量查询
 
 **Msearch** 操作用于批量查询，格式如下：
 
@@ -1244,7 +1238,7 @@ POST _msearch
 
 
 
-### ES 常见错误码
+### 6.8.ES 常见错误码
 
 当我们的请求发生错误的时候，ES 会返回相应的**错误码**，常见的错误码如下：
 
@@ -1256,7 +1250,7 @@ POST _msearch
 
 
 
-### Reindex 重建索引
+### 6.9.Reindex 重建索引
 
 有时候我们需要**重建索引**，比如以下情况：
 
@@ -1271,7 +1265,7 @@ ES 中提供两种重建 API：
 
 
 
-#### 添加子字段
+#### 6.9.1.添加子字段
 
 先在一个索引中插入数据：
 
@@ -1353,7 +1347,7 @@ POST blogs/_search
 
 
 
-#### Update by query
+#### 6.9.2.Update by query
 
 下面使用 `Update by query` 对索引进行重建：
 
@@ -1389,7 +1383,7 @@ POST tech_blogs/_update_by_query?pipeline=blog_pipeline
 
 
 
-#### 修改字段类型
+#### 6.9.3.修改字段类型
 
 在原有 **mapping** 上，**修改字段类型**是不允许的：
 
@@ -1443,7 +1437,7 @@ PUT blogs_new/
 
 
 
-#### Reindex
+#### 6.9.4.Reindex
 
 下面使用 **Reindex** 将原来索引中的数据，导入到新的索引中：
 
@@ -1466,7 +1460,7 @@ POST _reindex
 
 
 
-### ES 的并发控制
+### 6.10.ES 的并发控制
 
 同一个资源在多并发处理的时候，会发生冲突的问题。
 
@@ -1500,7 +1494,7 @@ PUT products/_doc/1
 
 
 
-#### 内部版本控制方式
+#### 6.10.1.内部版本控制方式
 
 使用内部版本控制的方式：
 
@@ -1529,7 +1523,7 @@ PUT products/_doc/1?if_seq_no=0&if_primary_term=1
 
 
 
-#### 外部版本控制方式
+#### 6.10.2.外部版本控制方式
 
 先看下数据库中的数据：
 
