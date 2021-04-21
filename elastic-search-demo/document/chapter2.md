@@ -4,9 +4,9 @@
 
 # ElasticSearch 套件安装
 
-## ElasticSearch 安装与运行
+## 1.ElasticSearch 安装与运行
 
-### 下载 ES
+### 1.1.下载 ES
 
 ES 是基于 Java 语言开发的，因此，要安装 ES，首先需要有 Java 环境。
 
@@ -46,7 +46,7 @@ ES 是基于 Java 语言开发的，因此，要安装 ES，首先需要有 Java
     - Xmx 和 Xms 默认为 1g。
     - [这里](https://www.elastic.co/cn/blog/a-heap-of-trouble)有一些介绍，你可以参考一下。
 
-### 启动 ES
+### 1.2.启动 ES
 
 **bin** 目录中有一个 `elasticsearch` 命令，用于运行 ES 实例。我们可以通过 `--help` 参数查看其帮助：
 
@@ -107,7 +107,7 @@ bin/elasticsearch
 
 ![image-20210227123638317](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/elastic-search-demo/image-20210227123638317.png)
 
-### 安装 ES 插件
+### 1.3.安装 ES 插件
 
 我们可以通过安装 ES 插件来为 ES 扩展功能。
 
@@ -181,7 +181,7 @@ LAPTOP-VH778PAK analysis-icu 7.10.1
 
 
 
-### 运行 ES 集群
+### 1.4.运行 ES 集群
 
 我们可以运行多个 ES 实例，将其组成一个 ES 集群，命令如下：
 
@@ -232,7 +232,7 @@ ip        heap.percent ram.percent cpu  node.role  master name
 
 
 
-## head插件
+## 2.head插件
 
 head插件可以用来快速查看elasticsearch中的数据概况以及非全量的数据，也支持控件化查询和rest请求，但是体验都不是很好。
  一般就用它来看各个索引的数据量以及分片的状态。

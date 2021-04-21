@@ -11,7 +11,7 @@ ES 中的查询 API 有两种：
 
 
 
-## 指定查询范围
+## 1.指定查询范围
 
 通过 URI 可以指定在哪些索引中进行查询，有下面几种格式：
 
@@ -25,7 +25,7 @@ ES 中的查询 API 有两种：
 
   
 
-## URI 查询
+## 2.URI 查询
 
 URI 查询使用 HTTP GET 请求的方式，使用 `q` 指定查询的内容，格式如下：
 
@@ -43,7 +43,7 @@ GET /index_name/_search?q=key:val
 
 
 
-## Request Body 查询
+## 3.Request Body 查询
 
 Request Body 查询可以使用 GET 或 POST 方式，格式如下：
 
@@ -69,7 +69,7 @@ POST index_name/_search
 
 
 
-## ES 查询的响应内容
+## 4.ES 查询的响应内容
 
 如果查询成功，会返回如下格式的内容：
 
@@ -79,7 +79,7 @@ POST index_name/_search
 
 
 
-## 相关性指标
+## 5.相关性指标
 
 搜索的相关性有 3 种衡量指标：
 

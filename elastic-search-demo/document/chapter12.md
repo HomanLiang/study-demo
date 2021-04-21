@@ -2,8 +2,6 @@
 
 # ElasticSearch 数据建模
 
-
-
 通常在使用 ES 构建数据模型时，需要考虑以下几点：
 
 - 字段类型
@@ -13,7 +11,7 @@
 
 
 
-## 字段类型
+## 1.字段类型
 
 对于不同类型的数据，主要考虑下面几点：
 
@@ -27,7 +25,7 @@
 
 
 
-## 搜索需求
+## 2.搜索需求
 
 对于搜索需求，主要考虑以下几点：
 
@@ -36,7 +34,7 @@
 
 
 
-## 聚合与排序
+## 3.聚合与排序
 
 对于聚合与排序，主要考虑以下几点：
 
@@ -46,13 +44,13 @@
 
 
 
-## 额外存储
+## 4.额外存储
 
 将 [store](https://www.elastic.co/guide/en/elasticsearch/reference/7.10/mapping-store.html) 设置为 `true`（默认为 `false`），可以存储字段的原始内容；一般在 [_source](https://www.elastic.co/guide/en/elasticsearch/reference/7.10/mapping-source-field.html) 的 [enabled](https://www.elastic.co/guide/en/elasticsearch/reference/7.10/enabled.html) 为 `false` 时使用。
 
 
 
-## 示例
+## 5.示例
 
 如果需要对一些图书信息进行建模，需求如下：
 
@@ -90,7 +88,7 @@
 
 
 
-### 手动设置 mapping
+### 5.1.手动设置 mapping
 
 下面根据需求，手动设置 mapping：
 
@@ -128,7 +126,7 @@ PUT books
 
 
 
-### 增加需求
+### 5.2.增加需求
 
 如果现在需要添加一个字段 `content`，用于存储图书的内容，因此该字段的**信息量将非常大**，这将**导致 _source 的内容过大**，导致过大的网络开销。
 

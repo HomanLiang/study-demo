@@ -4,13 +4,13 @@
 
 # ElasticSearch 分词器
 
-## 参考文档
+## 1.参考文档
 
 - [官方文档](https://www.elastic.co/guide/en/elasticsearch/reference/7.4/analysis.html)
 
 
 
-## 精确值与全文本
+## 2.精确值与全文本
 
 ES 中有 **精确值**（Exact Values）与 **全文本**（Full Text）之分：
 
@@ -27,7 +27,7 @@ ES 中有 **精确值**（Exact Values）与 **全文本**（Full Text）之分�
 
 
 
-## 分词过程
+## 3.分词过程
 
 搜索引擎需要建立单词（Term / Token）与倒排索引项的对应关系，那么首先就需要将文档拆分为单词，这个过程叫做分词。
 
@@ -35,7 +35,7 @@ ES 中有 **精确值**（Exact Values）与 **全文本**（Full Text）之分�
 
 
 
-## 分词器
+## 4.分词器
 
 ES 使用分词器（Analyzer）对文档进行分词，ES 中内置了很多分词器供我们使用，我们也可以定制自己的分词器。
 
@@ -47,7 +47,7 @@ ES 使用分词器（Analyzer）对文档进行分词，ES 中内置了很多分
 
 
 
-## ES 中的分词器
+## 5.ES 中的分词器
 
 ES 有下面这些[内置的分词器](https://www.elastic.co/guide/en/elasticsearch/reference/current/analysis-analyzers.html)：
 
@@ -70,7 +70,7 @@ ES 有下面这些[内置的分词器](https://www.elastic.co/guide/en/elasticse
 
 
 
-## 测试分词器
+## 6.测试分词器
 
 我们可以通过下面的 API 来测试分词器：
 
@@ -84,7 +84,7 @@ GET _analyze
 
 
 
-## 自定义分词器
+## 7.自定义分词器
 
 当 ES 中的内置分词器不能满足需求时，我们可以[定制自己的分词器](https://www.elastic.co/guide/en/elasticsearch/reference/current/analysis-custom-analyzer.html)。
 
@@ -99,7 +99,7 @@ GET _analyze
 
 
 
-### 1、内置分词器组件
+### 7.1.内置分词器组件
 
 ES 对这 3 部分都有内置：
 
@@ -170,7 +170,7 @@ POST _analyze
 
 
 
-### 2、自定义分词器
+### 7.2.自定义分词器
 
 [自定义分词器](https://www.elastic.co/guide/en/elasticsearch/reference/current/analysis-custom-analyzer.html)需要使用 **settings** 配置，示例：
 
@@ -252,7 +252,7 @@ POST index_name/_analyze
 
 
 
-## 安装分词器插件
+## 8.安装分词器插件
 
 我们还可以通过**安装插件**的方式，来安装其它分词器。
 
@@ -286,9 +286,9 @@ elasticsearch-plugin install analysis-icu
 
 
 
-## IK分词器
+## 9.IK分词器
 
-### 1、IK分词器的安装
+### 9.1.IK分词器的安装
 
 **下载地址：**https://github.com/medcl/elasticsearch-analysis-ik/releases在这上面有elasticsearch所对应版本的IK分词器以编译的包，可以在上面找到对应版本进行下载使用
 
@@ -312,7 +312,7 @@ elasticsearch-plugin install analysis-icu
 
 
 
-### 2、使用ik分词器
+### 9.2.使用ik分词器
 
 创建索引时指定分词器：
 
@@ -370,7 +370,7 @@ IK分词器示例：
 
 
 
-### 3、扩展词典
+### 9.3.扩展词典
 
 在`$ES_HOME/plugins/ik/elasticsearch-analysis-ik-7.5.1/config/IKAnalyzer.cfg.xml` 配置文件下
 
@@ -396,15 +396,13 @@ IK分词器示例：
 
 
 
-## ES 实现实时从Mysql数据库中读取热词,停用词
+## 10.ES 实现实时从Mysql数据库中读取热词,停用词
 
 IK分词器虽然自带词库
 
 ![image-20210306213327744](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/elastic-search-demo/image-20210306213327744.png)
 
 但是在实际开发应用中对于词库的灵活度的要求是远远不够的,IK分词器虽然配置文件中能添加扩展词库,但是需要重启ES
-
-
 
 其实IK本身是支持热更新词库的,但是需要我感觉不是很好
 
@@ -418,7 +416,7 @@ IK分词器虽然自带词库
 
  
 
-### 方案一:IK原生方案
+### 10.1.方案一:IK原生方案
 
 1. 外挂词库,就是在IK配置文件中添加扩展词库文件多个之间使用分号分割
 
@@ -436,7 +434,7 @@ IK分词器虽然自带词库
 
 
 
-### 方案二:通过定时读取Mysql完成词库的热更新
+### 10.2.方案二:通过定时读取Mysql完成词库的热更新
 
 首先要下载IK分词器的源码
 
