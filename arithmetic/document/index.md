@@ -3,27 +3,24 @@
 ## 数据结构
 
 1. 数据结构简介
-2. 链表
-3. 栈
-4. 队列
-5. 哈希
-6. LRU缓存机制
-7. 树
-8. 树 - 二叉堆
+2. [数组](https://github.com/HomanLiang/study-demo/blob/main/arithmetic-demo/document/chapter1_02.md)
+3. [链表](https://github.com/HomanLiang/study-demo/blob/main/arithmetic-demo/document/chapter1_03.md)
+4. 栈
+5. 堆
+6. 队列
+7. 哈希
+8. 树
 9. 树 - 二叉树
-10. 树 - 红黑树
-11. 树 - B树
-12. 树 - AVL树
-13. 图
-14. 矩阵
+10. 树 - 二叉堆
+11. 树 - 红黑树
+12. 树 - B树
+13. 树 - AVL树
+14. 图
+15. 矩阵
 
 ## 算法
 
-1. [算法简介](https://github.com/HomanLiang/study-demo/blob/main/arithmetic-demo/document/chapter2_01.md)
+1. 算法简介
 2. 排序算法
-3. 排序算法 - 基础排序
-4. 排序算法 - 快速排序
 5. 二分查找算法
-6. 递归算法
-7. 如何找出栈中的最小值
-8. 一千万个整数里面快速查找某个整数
+6. [递归算法](https://github.com/HomanLiang/study-demo/blob/main/arithmetic-demo/document/chapter2_02.md)
