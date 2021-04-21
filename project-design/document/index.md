@@ -2,7 +2,7 @@
 
 ## 基础知识
 
-
+1. [系统设计面试指南](https://github.com/HomanLiang/study-demo/blob/main/project-design/document/chapter1_01.md)
 
 ## 设计模式
 
@@ -37,7 +37,24 @@
 
 ## 项目方案
 
-
+1. 接口设计
+   1. 接口设计介绍
+   2. 接口设计 - 安全性
+   3. 接口设计 - 幂等性
+   4. 接口设计 - 防刷
+2. 注册登录
+   1. 注册登录 - 单点登录
+3. 权限管理
+   1. 权限管理 - 通用权限管理系统
+4. 电商
+   1. 电商 - 订单号生成
+   2. 电商 - 拼团业务
+   3. 电商 - 支付
+   4. 电商 - 快递鸟API对接
+   5. 电商 - 积分兑换
+   6. 电商 - 淘宝商品和类目体系
+5. 消息系统
+   1. 消息系统 - 站内消息系统设计
 
 ## 分布式
 
@@ -68,3 +85,5 @@
 2. [高并发 - 秒杀设计](https://github.com/HomanLiang/study-demo/blob/main/project-design/document/chapter5_02.md)
 3. [高并发 - 案例1](https://github.com/HomanLiang/study-demo/blob/main/project-design/document/chapter5_03.md)
 4. [高并发 - 案例2（微信抢红包）](https://github.com/HomanLiang/study-demo/blob/main/project-design/document/chapter5_04.md)
+5. 高并发 - 下单
+6. 
