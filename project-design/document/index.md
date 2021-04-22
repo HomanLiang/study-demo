@@ -41,15 +41,12 @@
    1. 接口设计介绍
    2. 接口设计 - 安全性
    3. 接口设计 - 幂等性
-   4. 接口设计 - 防刷
-2. 注册登录
-   1. 注册登录 - 单点登录
-3. 权限管理
-   1. 权限管理 - 通用权限管理系统
+   4. [接口设计 - 防刷](https://github.com/HomanLiang/study-demo/blob/main/project-design/document/chapter3_01_04.md)
+   5. [接口设计 - 版本控制](https://github.com/HomanLiang/study-demo/blob/main/project-design/document/chapter3_01_05.md)
 4. 电商
-   1. 电商 - 订单号生成
-   2. 电商 - 拼团业务
+   1. [电商 - 订单号生成](https://github.com/HomanLiang/study-demo/blob/main/project-design/document/chapter3_02_01.md)
    3. 电商 - 支付
+   3. [电商 - 支付常见问题](https://github.com/HomanLiang/study-demo/blob/main/project-design/document/chapter3_02_03.md)
    4. 电商 - 快递鸟API对接
    5. 电商 - 积分兑换
    6. 电商 - 淘宝商品和类目体系
