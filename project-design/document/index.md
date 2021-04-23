@@ -47,11 +47,11 @@
    1. [电商 - 订单号生成](https://github.com/HomanLiang/study-demo/blob/main/project-design/document/chapter3_02_01.md)
    3. 电商 - 支付
    3. [电商 - 支付常见问题](https://github.com/HomanLiang/study-demo/blob/main/project-design/document/chapter3_02_03.md)
-   4. 电商 - 快递鸟API对接
-   5. 电商 - 积分兑换
-   6. 电商 - 淘宝商品和类目体系
-5. 消息系统
-   1. 消息系统 - 站内消息系统设计
+   4. [电商 - 快递鸟API对接](https://github.com/HomanLiang/study-demo/blob/main/project-design/document/chapter3_02_04.md)
+   5. [电商 - 积分兑换](https://github.com/HomanLiang/study-demo/blob/main/project-design/document/chapter3_02_05.md)
+   6. [电商 - 淘宝商品和类目体系](https://github.com/HomanLiang/study-demo/blob/main/project-design/document/chapter3_02_06.md)
+5. 异常监控
+   1. [异常监控方式](https://github.com/HomanLiang/study-demo/blob/main/project-design/document/chapter3_03_01.md)
 
 ## 分布式
 
