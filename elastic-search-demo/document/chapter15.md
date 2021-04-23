@@ -12,7 +12,6 @@ ES 的[安全管理](https://www.elastic.co/guide/en/elasticsearch/reference/cur
 - [用户鉴权](https://www.elastic.co/guide/en/elasticsearch/reference/current/authorization.html)：设置用户有哪些访问权限。
 - [传输加密](https://www.elastic.co/guide/en/elasticsearch/reference/current/encrypting-communications.html)：数据在传输的过程中，要加密。
 - [日志审计](https://www.elastic.co/guide/en/elasticsearch/reference/current/auditing.html)：记录集群操作。
-- 等
 
 这里有一些免费的安全方案：
 
@@ -24,7 +23,7 @@ ES 的[安全管理](https://www.elastic.co/guide/en/elasticsearch/reference/cur
 
 
 
-## 身份认证
+## 1.身份认证
 
 ES 中提供的认证叫做 [Realms](https://www.elastic.co/guide/en/elasticsearch/reference/current/realms.html)，有以下几种方式，可分为两类：
 
@@ -40,7 +39,7 @@ ES 中提供的认证叫做 [Realms](https://www.elastic.co/guide/en/elasticsear
 
 
 
-## 用户鉴权
+## 2.用户鉴权
 
 用户鉴权通过定义一个角色，并分配一组权限；然后将角色分配给用户，使得用户拥有这些权限。
 
@@ -64,7 +63,7 @@ ES 中提供了很多关于用户与角色的 API：
 
 
 
-## 启动 ES 安全功能
+## 3.启动 ES 安全功能
 
 下面演示如何使用 ES 的安全功能。
 
@@ -104,7 +103,7 @@ curl -u elastic 'localhost:9200'
 
 
 
-## 启动 Kibana 安全功能
+## 4.启动 Kibana 安全功能
 
 打开 Kibana 的配置文件 `kibana.yml`，写入下面内容：
 
@@ -121,7 +120,7 @@ elasticsearch.password: "111111"         # 密码
 
 
 
-## 使用 Kibana 创建角色和用户
+## 5.使用 Kibana 创建角色和用户
 
 下面演示如何使用 Kibana 创建角色和用户。登录 Kibana 之后进行如下操作：
 
@@ -131,7 +130,7 @@ elasticsearch.password: "111111"         # 密码
 
 ![20210125182437975](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/elastic-search-demo/20210125182437975.png)
 
-### 1，创建角色
+### 5.1.创建角色
 
 点击 `Create role` 创建角色：
 
@@ -148,7 +147,7 @@ elasticsearch.password: "111111"         # 密码
 
 经过上面的操作，创建的角色名为 `test_role`，该角色对 `test_index` 索引有**只读权限**；如果进行超越范围的操作，将发生错误。
 
-### 2，创建用户
+### 5.2.创建用户
 
 进入到创建用户的界面，点击 `Create user` 创建用户：
 
@@ -158,7 +157,7 @@ elasticsearch.password: "111111"         # 密码
 
 ![20210125213636132](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/elastic-search-demo/20210125213636132.png)
 
-### 3，使用用户
+### 5.3.使用用户
 
 使用新创建的用户登录 Kibana：
 
@@ -168,7 +167,7 @@ elasticsearch.password: "111111"         # 密码
 
 
 
-## 传输加密
+## 6.传输加密
 
 传输加密指的是在数据的传输过程中，对数据进行加密（可防止数据被抓包）。
 
@@ -181,7 +180,7 @@ elasticsearch.password: "111111"         # 密码
 
 更多的内容可参考[这里](https://www.elastic.co/guide/en/elasticsearch/reference/current/configuring-tls.html)。
 
-### 1，集群内部传输加密
+### 6.1.集群内部传输加密
 
 在 ES 中可以使用 TLS 协议对数据进行加密，需要进行以下步骤：
 
@@ -189,7 +188,7 @@ elasticsearch.password: "111111"         # 密码
 - 为 ES 节点创建证书和私钥
 - 配置证书
 
-**1.1，创建 CA 证书**
+**6.1.1.创建 CA 证书**
 
 使用如下命令创建 CA：
 
@@ -203,7 +202,7 @@ bin\elasticsearch-certutil ca
 elastic-stack-ca.p12
 ```
 
-**1.2，生成证书和私钥**
+**6.1.2.生成证书和私钥**
 
 使用如下命令为 ES 中的节点生成证书和私钥
 
@@ -217,11 +216,11 @@ bin\elasticsearch-certutil cert --ca elastic-stack-ca.p12
 elastic-certificates.p12
 ```
 
-**1.3，配置证书**
+**6.1.3.配置证书**
 
 将创建好的证书 `elastic-certificates.p12` 放在 `config/certs` 目录下。
 
-**1.4，启动集群**
+**6.1.4.启动集群**
 
 ```shell
 # 启动第一个节点
@@ -272,7 +271,7 @@ xpack.security.transport.ssl.keystore.path: certs/elastic-certificates.p12
 xpack.security.transport.ssl.truststore.path: certs/elastic-certificates.p12
 ```
 
-### 2，集群外部传输加密
+### 6.2.集群外部传输加密
 
 通过配置如下三个参数，使得 ES 支持 HTTPS：
 
@@ -306,9 +305,9 @@ bin\elasticsearch
 https://localhost:5601/
 ```
 
-### 3，配置 Kibana 链接 ES HTTPS
+### 6.3.配置 Kibana 链接 ES HTTPS
 
-**3.1，为 Kibana 生成 pem 文件**
+**6.3.1.为 Kibana 生成 pem 文件**
 
 首先用 `openssl` 为 kibana 生成 pem：
 
@@ -324,7 +323,7 @@ elastic-ca.pem
 
 将该文件放在 `config\certs` 目录下。
 
-**3.2，配置 kibana.yml**
+**6.3.2.配置 kibana.yml**
 
 在 Kibana 的配置文件 `kibana.yml` 中配置如下参数：
 
@@ -334,15 +333,15 @@ elasticsearch.ssl.certificateAuthorities: ["C:\\elasticsearch-7.10.1\\config\\ce
 elasticsearch.ssl.verificationMode: certificate
 ```
 
-**3.3，运行 Kibana**
+**6.3.3.运行 Kibana**
 
 ```shell
 bin\kibana
 ```
 
-### 4，配置 Kibana 支持 HTTPS
+### 6.4.配置 Kibana 支持 HTTPS
 
-**4.1，为 Kibana 生成 pem**
+**6.4.1.为 Kibana 生成 pem**
 
 ```shell
 bin/elasticsearch-certutil ca --pem
@@ -363,7 +362,7 @@ ca.key
 
 将这两个文件放到 Kibana 的配置文件目录 `config\certs`。
 
-**4.2，配置 kibana.yml**
+**6.4.2.配置 kibana.yml**
 
 在 Kibana 的配置文件 `kibana.yml` 中配置如下参数：
 
@@ -373,7 +372,7 @@ server.ssl.certificate: config\\certs\\ca.crt
 server.ssl.key: config\\certs\\ca.key
 ```
 
-**4.3，运行 Kibana**
+**6.4.3.运行 Kibana**
 
 ```shell
 bin\kibana

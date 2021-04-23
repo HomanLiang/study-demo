@@ -4,7 +4,7 @@
 
 # ElasticSearch 集群的规划部署与运维
 
-## 常见的集群部署方式
+## 1.常见的集群部署方式
 
 ES 有以下不同类型的节点：
 
@@ -19,7 +19,7 @@ ES 有以下不同类型的节点：
 
 但是在生产环境，建议一个节点只负责单一角色，以达到高可用性及高性能。同时根据业务需求和硬件资源来合理分配节点。
 
-### 1，节点配置参数
+### 1.1.节点配置参数
 
 在默认情况下，一个节点会同时扮演 Master eligible Node，Data Node 和 Ingest Node。
 
@@ -35,7 +35,7 @@ ES 有以下不同类型的节点：
 
 默认情况下，每个节点都是一个 Coordinating 节点，可以将 `node.master`，`node.data` 和 `node.ingest` 同时设置为 `false`，让一个节点**只负责** Coordinating 节点的角色。
 
-### 2，配置单一角色
+### 1.2.配置单一角色
 
 默认情况下，一个节点会承担多个角色，可以通过配置让一个节点只负责单一角色。
 
@@ -58,7 +58,7 @@ ES 有以下不同类型的节点：
   - node.ingest：`false`
   - node.data：`false`
 
-### 3，水平扩展架构
+### 1.3.水平扩展架构
 
 集群的水平扩展：
 
@@ -67,7 +67,7 @@ ES 有以下不同类型的节点：
 
 ![image-20210306172946095](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/elastic-search-demo/image-20210306172946095.png)
 
-### 4，读写分离架构
+### 1.4.读写分离架构
 
 使用 **Ingest** 节点对数据预处理。
 
@@ -75,7 +75,7 @@ ES 有以下不同类型的节点：
 
 
 
-## 分片设计与管理
+## 2.分片设计与管理
 
 ES 中的文档存储在索引中，索引的最小存储单位是分片，不同的索引存储在不同的分片中。
 
@@ -93,7 +93,7 @@ ES 中的文档存储在索引中，索引的最小存储单位是分片，不�
 
 关于每个节点上的分片数的设置，可参考[这里](https://www.elastic.co/guide/en/elasticsearch/reference/7.10/allocation-total-shards.html)。
 
-### 1，主分片的设计
+### 2.1.主分片的设计
 
 如果某个索引只有**一个主分片**：
 
@@ -119,7 +119,7 @@ ES 中的文档存储在索引中，索引的最小存储单位是分片，不�
 - 从分片数量考虑：
   - **一个 ES 集群的分片**（包括主分片和副本分片）**总数不超过 10 W**。
 
-### 2，副本分片的设计
+### 2.2.副本分片的设计
 
 副本分片是主分片的备份：
 
@@ -132,14 +132,14 @@ ES 中的文档存储在索引中，索引的最小存储单位是分片，不�
 
 
 
-## 集群容量规划
+## 3.集群容量规划
 
 容量规划指的是，在一个实际项目中：
 
 - 一个集群需要多少节点，以及节点类型分配。
 - 一个索引需要几个主分片，几个副本分片。
 
-### 1，要考虑的因素
+### 3.1.要考虑的因素
 
 做容量规划时要考虑的因素：
 
@@ -153,9 +153,8 @@ ES 中的文档存储在索引中，索引的最小存储单位是分片，不�
   - 写入需求
   - 查询需求
   - 聚合需求
-  - 等
 
-### 2，硬件配置
+### 3.2.硬件配置
 
 对系统整体性能要求高的，建议使用 SSD，内存与硬盘的比例可为 1：10。
 
@@ -165,7 +164,7 @@ JVM 配置为机器内存的一半，建议 JVM 内存配置不超过 32 G。
 
 单个节点的数据建议控制在 2TB 以内，最大不超过 5 TB。
 
-### 3，常见应用场景
+### 3.3.常见应用场景
 
 有如下常见应用场景：
 
@@ -174,7 +173,7 @@ JVM 配置为机器内存的一半，建议 JVM 内存配置不超过 32 G。
 - 日志类应用：
   - 每日新增数据量比较稳定，数据量持续增长，可预期。
 
-**3.1，处理时间序列数据**
+**3.3.1.处理时间序列数据**
 
 ES 中提供了 [Date Math 索引名](https://www.elastic.co/guide/en/elasticsearch/reference/current/date-math-index-names.html)用于写入时间序列的数据。
 
@@ -202,7 +201,7 @@ POST /%3Clogs-%7Bnow%2Fw%7D%3E/_search
 
 
 
-## ES 开发模式与生产模式
+## 4.ES 开发模式与生产模式
 
 从 ES 5 开始，ES 支持开发模式与生产模式，ES 可通过配置自动选择不同的模式去运行：
 
@@ -213,14 +212,14 @@ POST /%3Clogs-%7Bnow%2Fw%7D%3E/_search
   - http.host：真实 IP 地址
   - transport.bind_host：真实 IP 地址
 
-### 1，Booststrap 检测
+### 4.1.Booststrap 检测
 
 在生产模式启动 ES 集群时，会进行 [Booststrap 检测](https://www.elastic.co/guide/en/elasticsearch/reference/current/bootstrap-checks.html)（只有检测通过才能启动成功），它包括：
 
 - JVM 检测
 - Linux 检测：只在 Linux 环境进行
 
-### 2，JVM 配置
+### 4.2.JVM 配置
 
 JVM 通过 `config` 目录下的 [jvm.options](https://www.elastic.co/guide/en/elasticsearch/reference/current/jvm-options.html) 文件进行配置，需要注意以下几点：
 
@@ -229,7 +228,7 @@ JVM 通过 `config` 目录下的 [jvm.options](https://www.elastic.co/guide/en/e
 - JVM 有 Server 和 Client 两种模式，在 ES 的生产模式必须使用 Server 模式；
 - 需要关闭 JVM Swapping
 
-### 3，更多的 ES 配置
+### 4.3.更多的 ES 配置
 
 更多的关于 **ES 的配置**可参考其官方文档，包括：
 
@@ -239,7 +238,7 @@ JVM 通过 `config` 目录下的 [jvm.options](https://www.elastic.co/guide/en/e
 
 
 
-## 监控集群状态
+## 5.监控集群状态
 
 集群状态为 **Green** 只能代表分片正常分配，不能代表没有其它问题。
 
@@ -256,11 +255,11 @@ ES 提供了很多监控相关的 API：
 - [_index/stats](https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-stats.html)：索引指标统计。
 - 一些 [cat](https://www.elastic.co/guide/en/elasticsearch/reference/current/cat.html) API。
 
-### 1，Slow log
+### 5.1.Slow log
 
 ES 的 [Slow log](https://www.elastic.co/guide/en/elasticsearch/reference/current/index-modules-slowlog.html) 可以设置一些阈值，当写入时间或者查询时间超过这些阈值后，会将相关操作记录日志。
 
-### 2，集群诊断
+### 5.2.集群诊断
 
 需要监控的指标：
 
@@ -276,19 +275,19 @@ ES 的 [Slow log](https://www.elastic.co/guide/en/elasticsearch/reference/curren
 
 
 
-## **Elasticsearch 运维实战常用命令**
+## 6.Elasticsearch 运维实战常用命令
 
-### 1、集群状态非绿排查清单
+### 6.1.集群状态非绿排查清单
 
-#### 1.1 集群状态的含义
+#### 6.1.1.集群状态的含义
 
 - 红色：至少一个主分片未分配成功；
 - 黄色：至少一个副本分片未分配成功；
 - 绿色：全部主&副本都分配成功。
 
-#### 1.2 排查实战
+#### 6.1.2.排查实战
 
-**1.2.1 查看集群状态**
+**6.1.2.1.查看集群状态**
 
 ```
 GET _cluster/health
@@ -296,7 +295,7 @@ GET _cluster/health
 
 返回状态举例："status" : "red", 红色，至少一个主分片未分配成功。
 
-**1.2.2 到底哪个节点出现了红色或者黄色问题呢？**
+**6.1.2.2.到底哪个节点出现了红色或者黄色问题呢？**
 
 ```
 GET _cluster/health?level=indices
@@ -311,13 +310,13 @@ GET /_cat/indices?v&health=red
 
 找到对应的索引。
 
-**1.2.3 到底索引的哪个分片出现了红色或者黄色问题呢？**
+**6.1.2.3.到底索引的哪个分片出现了红色或者黄色问题呢？**
 
 ```
 GET _cluster/health?level=shards
 ```
 
-**1.2.4 到底什么原因导致了集群变成红色或者黄色呢？**
+**6.1.2.4.到底什么原因导致了集群变成红色或者黄色呢？**
 
 ```
 GET _cluster/allocation/explain
@@ -338,7 +337,7 @@ GET _cluster/allocation/explain
 
 根本原因，shard分片与节点过滤类型不一致 到此，找到了根本原因，也就知道了对应解决方案。
 
-#### 1.3 扩展思考：类似 "current_state" : "unassigned",——未分配 还有哪些？
+#### 6.1.3.扩展思考：类似 "current_state" : "unassigned",——未分配 还有哪些？
 
 实战：
 
@@ -362,7 +361,7 @@ GET _cat/shards?h=index,shard,prirep,state,unassigned.reason
 
 
 
-### 2、节点间分片移动
+### 6.2.节点间分片移动
 
 适用场景：手动移动分配分片。将启动的分片从一个节点移动到另一节点。
 
@@ -384,7 +383,7 @@ POST /_cluster/reroute
 
 
 
-### 3、集群节点优雅下线
+### 6.3.集群节点优雅下线
 
 适用场景：保证集群颜色绿色的前提下，将某个节点优雅下线。
 
@@ -399,7 +398,7 @@ PUT /_cluster/settings
 
 
 
-### 4、强制刷新
+### 6.4.强制刷新
 
 适用场景：刷新索引是确保当前仅存储在事务日志中的所有数据也永久存储在Lucene索引中。
 
@@ -415,7 +414,7 @@ POST /_flush/synced
 
 
 
-### 5、更改并发分片的数量以平衡集群
+### 6.5.更改并发分片的数量以平衡集群
 
 适用场景：
 
@@ -432,7 +431,7 @@ PUT /_cluster/settings
 
 
 
-### 6、更改每个节点同时恢复的分片数量
+### 6.6.更改每个节点同时恢复的分片数量
 
 适用场景：
 
@@ -449,7 +448,7 @@ PUT /_cluster/settings
 
 
 
-### 7、调整恢复速度
+### 6.7.调整恢复速度
 
 适用场景：
 
@@ -468,7 +467,7 @@ PUT /_cluster/settings
 
 
 
-### 8、清除节点上的缓存
+### 6.8.清除节点上的缓存
 
 适用场景：如果节点达到较高的JVM值，则可以在节点级别上调用该API 以使 Elasticsearch 清理缓存。
 
@@ -480,7 +479,7 @@ POST /_cache/clear
 
 
 
-### 9、调整断路器
+### 6.9.调整断路器
 
 适用场景：为了避免在Elasticsearch中进入OOM，可以调整断路器上的设置。这将限制搜索内存，并丢弃所有估计消耗比所需级别更多的内存的搜索。
 
@@ -497,7 +496,7 @@ PUT /_cluster/settings
 
 
 
-### 10、集群迁移
+### 16.10.集群迁移
 
 适用场景：集群数据迁移、索引数据迁移等。
 
@@ -522,7 +521,7 @@ POST _reindex
 
 
 
-### 11、集群数据备份和恢复
+### 6.11.集群数据备份和恢复
 
 适用场景：高可用业务场景，定期增量、全量数据备份，以备应急不时之需。
 
@@ -543,7 +542,7 @@ POST /_snapshot/my_backup/snapshot_hamlet_index/_restore
 
 
 
-### 小结
+### 6.12.小结
 
 文章开头的几个运维问题已经解决，其他性能相关的问题，后面会有另外的博文做梳理。
 

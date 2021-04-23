@@ -6,7 +6,7 @@
 
 
 
-## REST API在 Elasticsearch 方面有哪些优势？
+## 1.REST API在 Elasticsearch 方面有哪些优势？
 
 REST API是使用超文本传输协议的系统之间的通信，该协议以 XML 和 JSON格式传输数据请求。
 
@@ -18,7 +18,7 @@ REST API与平台和语言无关，只是用于数据交换的语言是XML或JSO
 
 
 
-## Elasticsearch的倒排索引是什么？
+## 2.Elasticsearch的倒排索引是什么？
 
 面试官：想了解你对基础概念的认知。
 
@@ -47,7 +47,7 @@ lucene从4+版本后开始大量使用的数据结构是FST。FST有两个优点
 
  
 
-## 解释 Elasticsearch 中的相关性和得分？
+## 3.解释 Elasticsearch 中的相关性和得分？
 
 当你在互联网上搜索有关 Apple 的信息时。它可以显示有关水果或苹果公司名称的搜索结果。
 
@@ -64,17 +64,17 @@ ES 会将相关的内容都返回给你，只是：计算得出的评分高的�
 
 
 
-## 请解释有关 Elasticsearch的 NRT？
+## 4.请解释有关 Elasticsearch的 NRT？
 
 从文档索引（写入）到可搜索到之间的延迟默认一秒钟，因此Elasticsearch是近实时（NRT）搜索平台。
 
 也就是说：文档写入，最快一秒钟被索引到，不能再快了。
 
-写入调优的时候，我们通常会动态调整：refresh_interval = 30s 或者更达值，以使得写入数据更晚一点时间被搜索到。
+写入调优的时候，我们通常会动态调整：`refresh_interval = 30s` 或者更达值，以使得写入数据更晚一点时间被搜索到。
 
 
 
-## elasticsearch 是如何实现 master 选举的
+## 5.elasticsearch 是如何实现 master 选举的
 
 面试官：想了解 ES 集群的底层原理，不再只关注业务层面了。
 
@@ -97,7 +97,7 @@ Elasticsearch 的选主是 ZenDiscovery 模块负责的，主要包含 Ping（�
 
 
 
-## 如何解决ES集群的脑裂问题
+## 6.如何解决ES集群的脑裂问题
 
 所谓集群脑裂，是指 Elasticsearch 集群中的节点（比如共 20 个），其中的 10 个选了一个 master，另外 10 个选了另一个 master 的情况。
 
@@ -107,7 +107,7 @@ Elasticsearch 的选主是 ZenDiscovery 模块负责的，主要包含 Ping（�
 
 
 
-## 在并发情况下，ES如果保证读写一致？
+## 7.在并发情况下，ES如果保证读写一致？
 
 1. 可以通过版本号使用乐观并发控制，以确保新版本不会被旧版本覆盖，由应用层来处理具体的冲突；
 2. 另外对于写操作，一致性级别支持quorum/one/all，默认为quorum，即只有当大多数分片可用时才允许写操作。但即使大多数可用，也可能存在因为网络等原因导致写入副本失败，这样该副本被认为故障，分片将会在一个不同的节点上重建。
@@ -115,7 +115,7 @@ Elasticsearch 的选主是 ZenDiscovery 模块负责的，主要包含 Ping（�
 
 
 
-### 详细解释
+### 7.1.详细解释
 
 1. **当我们在说一致性，我们在说什么？**
 
@@ -160,7 +160,8 @@ Elasticsearch 的选主是 ZenDiscovery 模块负责的，主要包含 Ping（�
 	3. 决定分片在节点之间的分配
 
 	稳定的主节点对集群的健康是非常重要的。虽然主节点也可以协调节点，路由搜索和从客户端新增数据到数据节点，但最好不要使用这些专用的主节点。一个重要的原则是，尽可能做尽量少的工作。
-	 对于大型的生产集群来说，推荐使用一个专门的主节点来控制集群，该节点将不处理任何用户请求。
+	
+	对于大型的生产集群来说，推荐使用一个专门的主节点来控制集群，该节点将不处理任何用户请求。
 
 
 
@@ -192,7 +193,7 @@ Elasticsearch 的选主是 ZenDiscovery 模块负责的，主要包含 Ping（�
 
 
 
-## ES对于大数据量（上亿量级）的聚合如何实现？
+## 8.ES对于大数据量（上亿量级）的聚合如何实现？
 
 Elasticsearch 提供的首个近似聚合是cardinality 度量。它提供一个字段的基数，即该字段的distinct或者unique值的数目。它是基于HLL算法的。HLL 会先对我们的输入作哈希运算，然后根据哈希运算的结果中的 bits 做概率估算从而得到基数。
 
@@ -202,7 +203,7 @@ Elasticsearch 提供的首个近似聚合是cardinality 度量。它提供一个
 
 
 
-## 对于GC方面，在使用ES时要注意什么？
+## 9.对于GC方面，在使用ES时要注意什么？
 
 1. 倒排词典的索引需要常驻内存，无法GC，需要监控data node上segment memory增长趋势。
 1. 各类缓存，field cache, filter cache, indexing cache, bulk queue等等，要设置合理的大小，并且要应该根据最坏的情况来看heap是否够用，也就是各类缓存全部占满的时候，还有heap空间可以分配给其他任务吗？避免采用clear cache等“自欺欺人”的方式来释放内存。
@@ -212,7 +213,7 @@ Elasticsearch 提供的首个近似聚合是cardinality 度量。它提供一个
 
 
 
-## Elasticsearch作为解决方案需要注意什么？
+## 10.Elasticsearch作为解决方案需要注意什么？
 
 本文以15年国外经典博客的框架为线索，剔除过时的技术体系、技术栈内容，结合近千万级业务场景和最新Elastic技术洞察重新梳理出：Elasticsearch方案选型必须了解的10件事。
 
@@ -248,7 +249,7 @@ Elasticsearch 提供的首个近似聚合是cardinality 度量。它提供一个
 
 
 
-## 数据建模
+## 11.数据建模
 
 1. **使用别名**
 
@@ -365,7 +366,7 @@ Elasticsearch 提供的首个近似聚合是cardinality 度量。它提供一个
 
 
 
-## es分布式架构原理
+## 12.es分布式架构原理
 
 首先需要明白es是如何存储数据的，es把对应的数据转换为index。
 
@@ -379,9 +380,9 @@ es集群多个节点，会自动选举一个节点为master节点，这个master
 
 
 
-## es的数据写入与读取
+## 13.es的数据写入与读取
 
-### es数据的写入
+### 13.1.es数据的写入
 
 1. **es数据的写入过程**
 
@@ -420,7 +421,7 @@ es集群多个节点，会自动选举一个节点为master节点，这个master
 
 
 
-### es数据的读取
+### 13.2.es数据的读取
 
 1. **读取数据**
 
@@ -436,7 +437,7 @@ es集群多个节点，会自动选举一个节点为master节点，这个master
 
 
 
-## 详细描述一下 Elasticsearch 写入索引文档的过程
+## 14.详细描述一下 Elasticsearch 写入索引文档的过程
 
 面试官：想了解 ES 的底层原理，不再只关注业务层面了。
 
@@ -466,13 +467,13 @@ es集群多个节点，会自动选举一个节点为master节点，这个master
 
 
 
-## elasticsearch 了解多少，说说你们公司 es 的集群架构，索引数据大小，分片有多少，以及一些调优手段 。
+## 15.elasticsearch 了解多少，说说你们公司 es 的集群架构，索引数据大小，分片有多少，以及一些调优手段 。
 
 面试官：想了解应聘者之前公司接触的 ES 使用场景、规模，有没有做过比较大规模的索引设计、规划、调优。
 
 解答：如实结合自己的实践场景回答即可。
 
-### 架构情况
+### 15.1.架构情况
 
 **情况1：**
 
@@ -494,7 +495,7 @@ es集群多个节点，会自动选举一个节点为master节点，这个master
 
 
 
-### 调优手段
+### 15.2.调优手段
 
 1. **设计阶段调优**
    - 根据业务增量需求，采取基于日期模板创建索引，通过 roll over API 滚动索引；
@@ -543,7 +544,7 @@ es集群多个节点，会自动选举一个节点为master节点，这个master
 
 
 
-### elasticsearch 索引数据多了怎么办，如何调优，部署
+### 15.3.elasticsearch 索引数据多了怎么办，如何调优，部署
 
 面试官：想了解大数据量的运维能力。
 
@@ -591,7 +592,7 @@ es集群多个节点，会自动选举一个节点为master节点，这个master
 
 
 
-## Elasticsearch 在部署时，对 Linux 的设置有哪些优化方法
+## 16.Elasticsearch 在部署时，对 Linux 的设置有哪些优化方法
 
 面试官：想了解对 ES 集群的运维能力。
 
@@ -605,13 +606,7 @@ es集群多个节点，会自动选举一个节点为master节点，这个master
 
 
 
-## 拼写纠错是如何实现的？
-
-
-
-
-
-## 如何监控Elasticsearch集群状态？
+## 17.如何监控Elasticsearch集群状态？
 
 1. 查看集群的健康状态
 
@@ -648,6 +643,7 @@ es集群多个节点，会自动选举一个节点为master节点，这个master
    ![20200619142157410](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/elastic-search-demo/20200619142157410.png)
 
    通过该连接返回了集群中的所有索引，其中.kibana是kibana连接后在es建的索引，`http-log-*` 是我自己添加的。
+
    **这些信息，包括：**
 
    - 索引健康（health），green为正常，yellow表示索引不可靠（单节点），red索引不可用。与集群健康状态一致。
@@ -671,6 +667,7 @@ es集群多个节点，会自动选举一个节点为master节点，这个master
    ![20200619142621636](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/elastic-search-demo/20200619142621636.png)
 
    通过该连接返回了集群中的各节点所在磁盘的磁盘状况
+
    **返回的信息包括：**
 
    - 分片数（shards），集群中各节点的分片数相同。
@@ -691,6 +688,7 @@ es集群多个节点，会自动选举一个节点为master节点，这个master
    ![20200619142835812](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/elastic-search-demo/20200619142835812.png)
 
    通过该连接返回了集群中各节点的情况。这些信息中比较重要的是master列，带`*`星号表明该节点是主节点。带-表明该节点是从节点。
+
    另外还是heap.percent堆内存使用情况，ram.percent运行内存使用情况，cpu使用情况。
 
    
@@ -707,7 +705,7 @@ es集群多个节点，会自动选举一个节点为master节点，这个master
 
 
 
-## translog日志文件作用是什么？
+## 18.translog日志文件作用是什么？
 
 **Translog实现机制的理解**
 
@@ -753,9 +751,9 @@ index.translog.flush_threshold_ops: 50000
 
 
 
-## Elasticsearch如何保证数据不丢失？
+## 19.Elasticsearch如何保证数据不丢失？
 
-### 如何保证数据写入过程中不丢
+### 19.1.如何保证数据写入过程中不丢
 
 数据写入请求达到时，以需要的数据格式组织并写入磁盘的过程叫做数据提交，对应es就是创建倒排索引，维护segment文件
 
@@ -767,7 +765,7 @@ index.translog.flush_threshold_ops: 50000
 
 Mysql有redo undo log ，而HBASE、LevelDB，RockDB等采用的LSM tree则提供了write ahead log 这样的设计，来保证数据的不丢失
 
-#### 直接落盘的 translog 为什么不怕降低写入吞吐量？
+#### 19.1.1.直接落盘的 translog 为什么不怕降低写入吞吐量？
 
 上述论述中，数据以同步方式落盘会有性能问题，为什么将translog和wal直接落盘不影响性能？原因如下：
 
@@ -780,24 +778,30 @@ es默认是每个请求都会同步落盘translog ，即配置`index.translog.du
 
 elasticsearch本身也提供了flush api来触发上述commit动作，但无特殊需求，尽量不要手动触发
 
-### 如何保证已写数据在集群中不丢
+### 19.2.如何保证已写数据在集群中不丢
 
 对每个shard采用副本机制。保证写入每个shard的数据不丢
 
-### in-memory buffer
+### 19.3.in-memory buffer
 
 前述translog只是保证数据不丢，为了其记录的高效性，其本身并不维护复杂的数据结构。 实际的业务数据的会先写入到in-memory buffer中，当调用refresh后，该buffer中的数据会被清空，转而reopen一个segment,使得其数据对查询可见。但这个segment本身也还是在内存中，如果系统宕机，数据依然会丢失。需要通过translog进行恢复
 
 其实这跟lsm tree非常相似，新写入内存的业务数据存放在内存的MemTable（对应es的in-memory buffer），它对应热数据的写入，当达到一定量并维护好数据结构后，将其转成内存中的ImmutableMemTable(对应es的内存segment)，它变得可查询。
 
-### 总结
+### 19.4.总结
 
 - refresh 用于将写入内存in-memory buffer数据，转为查询可见的segment
+  
   ![image-20210306215721985](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/elastic-search-demo/image-20210306215721985.png)
+  
 - 每次一次写入除了写入内存外in-memory buffer，还会默认的落盘translog
+  
   ![image-20210306215748639](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/elastic-search-demo/image-20210306215748639.png)
+  
 - translog 达到一定量后，触发in-memory buffer落盘，并清空自己，这个动作叫做flush
+  
   ![image-20210306215812266](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/elastic-search-demo/image-20210306215812266.png)
+  
 - 如遇当前写入的shard宕机，则可以通过磁盘中的translog进行数据恢复
 
 
