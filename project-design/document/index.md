@@ -39,10 +39,11 @@
 
 1. 接口设计
    1. 接口设计介绍
-   2. 接口设计 - 安全性
+   2. [接口设计 - GraphQL](https://github.com/HomanLiang/study-demo/blob/main/project-design/document/chapter3_01_02.md)
    3. 接口设计 - 幂等性
    4. [接口设计 - 防刷](https://github.com/HomanLiang/study-demo/blob/main/project-design/document/chapter3_01_04.md)
    5. [接口设计 - 版本控制](https://github.com/HomanLiang/study-demo/blob/main/project-design/document/chapter3_01_05.md)
+   6. 接口设计 - 安全性
 4. 电商
    1. [电商 - 订单号生成](https://github.com/HomanLiang/study-demo/blob/main/project-design/document/chapter3_02_01.md)
    3. 电商 - 支付
@@ -84,3 +85,38 @@
 4. [高并发 - 案例2（微信抢红包）](https://github.com/HomanLiang/study-demo/blob/main/project-design/document/chapter5_04.md)
 5. 高并发 - 下单
 6. 
+
+
+
+## 相关工具和库
+
+1. 构建工具
+
+   1. [Maven](https://github.com/HomanLiang/study-demo/blob/main/project-design/document/chapter6_01_01.md)
+   2. [Gradle](https://github.com/HomanLiang/study-demo/blob/main/project-design/document/chapter6_01_02.md)
+   3. [Jenkins](https://github.com/HomanLiang/study-demo/blob/main/project-design/document/chapter6_01_03.md)
+
+2. 调试工具
+
+   1. [Arthas](https://github.com/HomanLiang/study-demo/blob/main/project-design/document/chapter6_02_01.md)
+
+3. 常用的库
+
+   1. [日志库](https://github.com/HomanLiang/study-demo/blob/main/project-design/document/chapter6_03_01.md)
+
+   2. [Json库](https://github.com/HomanLiang/study-demo/blob/main/project-design/document/chapter6_03_01.md)
+
+   3. OSHI - 一款为 Java 语言提供的基于 JNA 的（本机）操作系统和硬件信息库
+
+   4. EasyExcel - 一款快速、简单避免 OOM 的 java 处理 Excel 工具。
+
+   5. Hutool -  一个非常实用的 Java 工具类库，对文件、流、加密解密、转码、正则、线程、XML 等 JDK 方法进行了封装。
+
+   6. Guava
+
+      Guava工程包含了若干被Google的 Java项目广泛依赖 的核心库，例如：集合 [collections] 、缓存 [caching] 、原生类型支持 [primitives support] 、并发库 [concurrency libraries] 、通用注解 [common annotations] 、字符串处理 [string processing] 、I/O 等等。
+
+   7. MapStruct - Java 实体映射工具
+   
+   8. javafaker - 生成仿真数据
+
