@@ -102,3 +102,15 @@
 
 [项目设计笔记](https://github.com/HomanLiang/study-demo/blob/main/project-design/document/index.md)
 
+
+
+## 项目管理
+
+[项目管理笔记](https://github.com/HomanLiang/study-demo/blob/main/project-manage/document/index.md)
+
+
+
+## 团队管理
+
+[团队管理笔记](https://github.com/HomanLiang/study-demo/blob/main/project-manage/document/index.md)
+
