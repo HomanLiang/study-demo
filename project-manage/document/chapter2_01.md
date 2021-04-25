@@ -4,8 +4,8 @@
 
 # Git
 
-# 1.概要
-## 1.1.什么是Git
+## 1.概要
+### 1.1.什么是Git
 Git是目前世界上最先进的分布式版本控制系统。
 
 Git是免费、开源的
@@ -28,11 +28,11 @@ Git是免费、开源的
 - 不符合常规思维。
 - 代码保密性差，一旦开发者把整个库克隆下来就可以完全公开所有代码和版本信息。 
 
-## 1.2.相关网址
+### 1.2.相关网址
 [官网](https://git-scm.com/)
 [源码](https://github.com/git/git/)
 
-## 1.3.常用术语
+### 1.3.常用术语
 - 仓库（Repository）
 
   受版本控制的所有文件修订历史的共享数据库
@@ -95,8 +95,8 @@ Git是免费、开源的
 
   标记指的是某个分支某个特定时间点的状态。通过标记，可以很方便的切换到标记时的状态。
 
-# 2.Git安装与配置
-## 2.1.搭建Git工作环境
+## 2.Git安装与配置
+### 2.1.搭建Git工作环境
 **下载Git**
 
 打开 git官网，下载git对应操作系统的版本。
@@ -143,8 +143,8 @@ Git是免费、开源的
 
 点击Create New Repository可以直接创建一个新的仓库。
 
-## 2.2.Git配置 - git config
-### 2.2.1.查看配置 - git config -l
+### 2.2.Git配置 - git config
+#### 2.2.1.查看配置 - git config -l
 使用 `git config -l` 可以查看现在的git环境详细配置
 
 ![Image [11]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/project-manage/20210425221436.png)
@@ -160,7 +160,7 @@ git config --global  --list
 #查看当前仓库配置信息
 git config --local  --list
 ```
-### 2.2.2.Git配置文件分类
+#### 2.2.2.Git配置文件分类
 在Windows系统中，Git在$HOME目录中查找.gitconfig文件（一般位于C:\Documents and Settings$USER下）
 
 **Git相关的配置文件有三个：**
@@ -178,7 +178,7 @@ git config --local  --list
 
   这里可以直接编辑配置文件，通过命令设置后会响应到这里。
 
-### 2.2.2.设置用户名与邮箱（用户标识，必要）
+#### 2.2.2.设置用户名与邮箱（用户标识，必要）
 当你安装Git后首先要做的事情是设置你的用户名称和e-mail地址。这是非常重要的，因为每次Git提交都会使用该信息。它被永远的嵌入到了你的提交中：
 ```
 $ git config --global user.name "zhangguo"  #名称
@@ -188,8 +188,8 @@ $ git config --global user.email zhangguo@qq.com   #邮箱
 
 ![Image [14]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/project-manage/20210425221746.png)
 
-### 2.2.3.添加或删除配置项
-#### 2.2.3.1.添加配置项 
+#### 2.2.3.添加或删除配置项
+##### 2.2.3.1.添加配置项 
 ```
 git config [--local|--global|--system]  section.key value
 [--local|--global|--system]  #可选的，对应本地，全局，系统不同级别的设置
@@ -206,7 +206,7 @@ value #对应的值
 
 ![Image [15]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/project-manage/20210425221857.png)
 
-#### 2.2.3.2.删除配置项 
+##### 2.2.3.2.删除配置项 
 ```
 git config [--local|--global|--system] --unset section.key
 ```
@@ -214,7 +214,7 @@ git config [--local|--global|--system] --unset section.key
 
 ![Image [16]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/project-manage/20210425221916.png)
 
-#### 2.2.3.3.更多配置项
+##### 2.2.3.3.更多配置项
 ```
 git config --global color.ui true   #打开所有的默认终端着色
 git config --global alias.ci commit   #别名 ci 是commit的别名
@@ -280,8 +280,8 @@ git config core.filemode false  #忽略修改权限的文件
     --show-origin             #show origin of config (file, standard input, blob, command line)    显示配置（文件、标准输入、数据块、命令行）的来源
 ```
 
-# 3.Git理论基础
-## 3.1.工作区域
+## 3.Git理论基础
+### 3.1.工作区域
 Git本地有三个工作区域：工作目录（Working Directory）、暂存区(Stage/Index)、资源库(Repository或Git Directory)。如果在加上远程的git仓库(Remote Directory)就可以分为四个工作区域。文件在这四个区域之间的转换关系如下：
 
 ![Image [17]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/project-manage/20210425224007.png)
@@ -302,7 +302,7 @@ Git本地有三个工作区域：工作目录（Working Directory）、暂存区
 - Local Repo：本地仓库，一个存放在本地的版本库；HEAD会只是当前的开发分支（branch）。
 - Stash：隐藏，是一个工作状态保存栈，用于保存/恢复WorkSpace中的临时状态。
 
-## 3.2.工作流程
+### 3.2.工作流程
 git的工作流程一般是这样的：
 
 １. 在工作目录中添加、修改文件；
@@ -313,18 +313,18 @@ git的工作流程一般是这样的：
 
 ![Image [19]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/project-manage/20210425225323.png)
 
-## 3.3.图解教程
+### 3.3.图解教程
 个人认为Git的原理相比别的版本控制器还是复杂一些的，有一份图解教程比较直观：
 
 ![Image [20]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/project-manage/20210425225339.png)
 
-# 4.Git操作
-## 4.1.创建工作目录与常用指令
+## 4.Git操作
+### 4.1.创建工作目录与常用指令
 工作目录（WorkSpace)一般就是你希望Git帮助你管理的文件夹，可以是你项目的目录，也可以是一个空目录，建议不要有中文。
 
-## 4.2.获得GIT仓库
+### 4.2.获得GIT仓库
 创建本地仓库的方法有两种：一种是创建全新的仓库，另一种是克隆远程仓库。
-### 4.2.1.创建全新仓库
+#### 4.2.1.创建全新仓库
 需要用GIT管理的项目的根目录执行：
 ```
 # 在当前目录新建一个Git代码库
@@ -349,7 +349,7 @@ $ git init [project-name]
 
 ![Image [24]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/project-manage/20210425225516.png)
 
-### 4.2.2.克隆远程仓库
+#### 4.2.2.克隆远程仓库
 另一种方式是克隆远程目录，由于是将远程服务器上的仓库完全镜像一份至本地，而不是取某一个特定版本，所以用clone而不是checkout，语法格式如下：
 ```
 # 克隆一个项目和它的整个代码历史(版本信息)
@@ -366,10 +366,10 @@ $ git clone [url]
 
 ![Image [27]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/project-manage/20210425230230.png)
 
-## 4.3.GIT文件操作
+### 4.3.GIT文件操作
 版本控制就是对文件的版本控制，要对文件进行修改、提交等操作，首先要知道文件当前在什么状态，不然可能会提交了现在还不想提交的文件，或者要提交的文件没提交上。GIT不关心文件两个版本之间的具体差别，而是关心文件的整体是否有改变，若文件被改变，在添加提交时就生成文件新版本的快照，而判断文件整体是否改变的方法就是用SHA-1算法计算文件的校验和。
 
-### 4.3.1.文件4种状态
+#### 4.3.1.文件4种状态
 ![Image [28]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/project-manage/20210425230246.png)
 
 - Untracked: 未跟踪, 此文件在文件夹中, 但并没有加入到git库, 不参与版本控制. 通过git add 状态变为Staged.
@@ -379,7 +379,7 @@ $ git clone [url]
 
 ![Image [29]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/project-manage/20210425230302.png)
 
-### 4.3.2.查看文件状态
+#### 4.3.2.查看文件状态
 上面说文件有4种状态，通过如下命令可以查看到文件的状态：
 ```
 #查看指定文件状态
@@ -398,7 +398,7 @@ foo.htm文件的状态为untracked（未跟踪），提示通过git add可以暂
 
 GIT在这一点做得很好，在输出每个文件状态的同时还说明了怎么操作，像上图就有怎么暂存、怎么跟踪文件、怎么取消暂存的说明。
 
-### 4.3.3.添加文件与目录
+#### 4.3.3.添加文件与目录
 ![Image [31]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/project-manage/20210425230345.png)
 
 工作区（Working Directory）就是你在电脑里能看到的目录。
@@ -422,7 +422,7 @@ $ git add .
 
 ![Image [32]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/project-manage/20210425230356.png)
 
-### 4.3.4.移除文件与目录（撤销add）
+#### 4.3.4.移除文件与目录（撤销add）
 ![Image [33]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/project-manage/20210425230412.png)
 
 当执行如下命令时，会直接从暂存区删除文件，工作区则不做出改变
@@ -489,7 +489,7 @@ git mv a.txt b.txt
 
 当执行 `git checkout HEAD .` 或者 `git checkout HEAD <file>` 命令时，会用 HEAD 指向的 master 分支中的全部或者部分文件替换暂存区和以及工作区中的文件。这个命令也是极具危险性的，因为不但会清除工作区中未提交的改动，也会清除暂存区中未提交的改 动。
 
-### 4.3.5.查看文件修改后的差异
+#### 4.3.5.查看文件修改后的差异
 git diff用于显示WorkSpace中的文件和暂存区文件的差异
 
 用 `git status` 只能查看对哪些文件做了改动，如果要看改动了什么，可以用：
@@ -514,7 +514,7 @@ git diff HEAD~n
 ```
 ![Image [41]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/project-manage/20210425230658.png)
 
-### 4.3.6.签出
+#### 4.3.6.签出
 如果仓库中已经存在文件f4.txt，在工作区中对f4修改了，如果想撤销可以使用checkout，签出覆盖
 
 检出命令git checkout是git最常用的命令之一，同时也是一个很危险的命令，因为这条命令会重写工作区
@@ -558,7 +558,7 @@ $ git checkout commit_id -- file_name
 
 ![Image [43]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/project-manage/20210425230736.png)
 
-### 4.3.7.忽略文件
+#### 4.3.7.忽略文件
 有些时候我们不想把某些文件纳入版本控制中，比如数据库文件，临时文件，设计文件等
 
 在主目录下建立".gitignore"文件，此文件有如下规则：
@@ -630,7 +630,7 @@ IgnoreLexer.java~
 
 /verification
 ```
-### 4.3.8.提交
+#### 4.3.8.提交
 通过add只是将文件或目录添加到了index暂存区，使用commit可以实现将暂存区的文件提交到本地仓库。
 ```
 # 提交暂存区到仓库区
@@ -667,13 +667,13 @@ $ git commit --amend [file1] [file2] ...
 
 从上图中可以看出暂存区中没有了bar.htm
 
-#### 4.3.8.1.修订提交
+##### 4.3.8.1.修订提交
 如果我们提交过后发现有个文件改错了，或者只是想修改提交说明，这时可以对相应文件做出修改，将修改过的文件通过"git add"添加到暂存区，然后执行以下命令：
 ```
 #修订提交
 git commit --amend
 ```
-#### 4.3.8.2.撤销提交（commit）
+##### 4.3.8.2.撤销提交（commit）
 原理就是放弃工作区和index的改动，同时HEAD指针指向前一个commit对象
 ```
 #撤销上一次的提交
@@ -692,7 +692,7 @@ git revert <commit-id>
 ```
 这条命令会把指定的提交的所有修改回滚，并同时生成一个新的提交。
 
-### 4.3.9.日志与历史
+#### 4.3.9.日志与历史
 查看提交日志可以使用git log指令，语法格式如下：
 ```
 #查看提交日志
@@ -712,12 +712,12 @@ git log [<options>] [<revision range>] [[\--] <path>…?]
 
 几乎所有输入过的都被记录下来的，不愧是做版本控制的。
 
-#### 4.3.9.1.查看所有分支日志
+##### 4.3.9.1.查看所有分支日志
 "git reflog"中会记录这个仓库中所有的分支的所有更新记录，包括已经撤销的更新。
 
 ![Image [52]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/project-manage/20210425230956.png)
 
-### 4.3.10.查看文件列表
+#### 4.3.10.查看文件列表
 使用git ls-files指令可以查看指定状态的文件列表，格式如下：
 ```
 #查看指定状态的文件
@@ -727,15 +727,15 @@ git ls-files [-z] [-t] [-v] (--[cached|deleted|others|ignored|stage|unmerged|kil
 
 ![Image [53]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/project-manage/20210425231005.png)
 
-### 4.3.11.撤销更新
-#### 4.3.11.1.撤销暂存区更新
+#### 4.3.11.撤销更新
+##### 4.3.11.1.撤销暂存区更新
 使用 `git add` 把更新提交到了暂存区。这时"git status"的输出中提示我们可以通过 `git reset HEAD <file>...` 把暂存区的更新移出到WorkSpace中
 
 示例：f6已经提交，工作区修改，暂存区修改，撤销
 
 ![Image [54]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/project-manage/20210425231018.png)
 
-#### 4.3.11.2.撤销本地仓库更新
+##### 4.3.11.2.撤销本地仓库更新
 使用git log查看提交日志
 
 ![Image [55]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/project-manage/20210425231039.png)
@@ -769,13 +769,13 @@ git reset --hard e0e79d7
 
 `--soft`：撤销相应的更新，把这些更新的内容放到Stage中
 
-### 4.3.12.删除文件
-#### 4.3.12.1.删除未跟踪文件
+#### 4.3.12.删除文件
+##### 4.3.12.1.删除未跟踪文件
 如果文件还是未跟踪状态，直接删除文件就可了，bash中使用rm可以删除文件，示例如下：
 
 ![Image [58]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/project-manage/20210425231150.png)
 
-#### 4.3.12.2.删除已提交文件
+##### 4.3.12.2.删除已提交文件
 ![Image [59]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/project-manage/20210425231157.png)
 
 `-f` 强制删除，物理删除了，同时删除工作区和暂存区中的文件
@@ -787,17 +787,17 @@ git checkout -- <file>...
 ```
 ![Image [60]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/project-manage/20210425231214.png)
 
-#### 4.3.12.3.删除暂存区的文件，不删除工作区的文件
+##### 4.3.12.3.删除暂存区的文件，不删除工作区的文件
 ![Image [61]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/project-manage/20210425231227.png)
 
 使用 `git reset HEAD <file>...`同样可以实现上面的功能
 
-### 4.3.13.文件操作小结
+#### 4.3.13.文件操作小结
 ![Image [62]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/project-manage/20210425231341.png)
 
 Git很强大，很灵活，这是毋庸置疑的。但也正因为它的强大造成了它的复杂，因此会有很多奇奇怪怪的问题出现，多用就好了。
 
-## 4.4.GIT分支
+### 4.4.GIT分支
 分支在GIT中相对较难
 
 分支就是科幻电影里面的平行宇宙，当你正在电脑前努力学习Git的时候，另一个你正在另一个平行宇宙里努力学习SVN。
@@ -866,7 +866,7 @@ $ git branch -d [branch-name]
 $ git push origin --delete [branch-name]
 $ git branch -dr [remote/branch]
 ```
-### 4.4.1.新建分支与切换分支
+#### 4.4.1.新建分支与切换分支
 每次提交，Git都把它们串成一条时间线，这条时间线就是一个分支。截止到目前，只有一条时间线，在Git里，这个分支叫主分支，即master分支。HEAD严格来说不是指向提交，而是指向master，master才是指向提交的，所以，HEAD指向的就是当前分支。
 
 一开始的时候，master分支是一条线，Git用master指向最新的提交，再用HEAD指向master，就能确定当前分支，以及当前分支的提交点：
@@ -943,7 +943,7 @@ $ git branch -dr [remote/branch]
 
   ![Image [82]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/project-manage/20210425231928.png)
 
-### 4.4.2.查看分支
+#### 4.4.2.查看分支
 1. 列出所有本地分支使用 `$ git branch`
 
   ![Image [83]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/project-manage/20210425231953.png)
@@ -956,7 +956,7 @@ $ git branch -dr [remote/branch]
 
   ![Image [85]](C:\Users\hmliang\Desktop\temp\Image [85].png)
 
-### 4.4.3.分支合并
+#### 4.4.3.分支合并
 合并指定分支到当前分支使用指令 `$ git merge [branch]`
 
 这里的合并分支就是对分支的指针操作，我们先创建一个分支再合并到主分支：
@@ -977,7 +977,7 @@ $ git branch -dr [remote/branch]
 
 ![Image [90]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/project-manage/20210425232143.png)
 
-### 4.4.4.解决冲突
+#### 4.4.4.解决冲突
 如果同一个文件在合并分支时都被修改了则会引起冲突，如下所示：
 
 提交前两个分支的状态
@@ -1010,7 +1010,7 @@ Git用<<<<<<<，=======，>>>>>>>标记出不同分支的内容，其中<<<HEAD�
 
 ![Image [97]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/project-manage/20210425232249.png)
 
-#### 4.4.4.1.分支策略
+##### 4.4.4.1.分支策略
 master主分支应该非常稳定，用来发布新版本，一般情况下不允许在上面工作，工作一般情况下在新建的dev分支上工作，工作完后，比如上要发布，或者说dev分支代码稳定后可以合并到主分支master上来。
 
 ### 4.5.删除分支
@@ -1030,21 +1030,21 @@ $ git branch -dr [remote/branch]
 ![Image [99]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/project-manage/20210425232309.png)
 
 
-# 5.常用操作
-## 5.1.暂存
+## 5.常用操作
+### 5.1.暂存
 `git stash`暂存（存储在本地，并将项目本次操作还原）
 `git stash pop` 使用上一次暂存，并将这个暂存删除，使用该命令后，如果有冲突，终端会显示，如果有冲突需要先解决冲突（这就避免了冲突提交服务器，将冲突留在本地，然后解决）
 `git stash list` 查看所有的暂存
 `git stash clear` 清空所有的暂存
 `git stash drop [-q|--quiet] [<stash>]` 删除某一个暂存，在中括号里面放置需要删除的暂存ID
 `git stash apply` 使用某个暂存，但是不会删除这个暂存
-### 5.1.1.暂存不小心清空，结果里面有需要的代码，也是有找回方法的
+#### 5.1.1.暂存不小心清空，结果里面有需要的代码，也是有找回方法的
 `git fsck --lost-found` 命令找出刚才删除的分支里面的提交对象。
 然后使用 `git show` 命令查看是否正确，
 如果正确使用`git merge`命令找回
 
 
-## 5.2.删除本地和远程分支
+### 5.2.删除本地和远程分支
 1. 切换到要操作的项目文件夹
 
   命令行 : `$ cd <ProjectPath>`
@@ -1074,7 +1074,7 @@ $ git branch -dr [remote/branch]
   命令行 : `$ git branch -a`
 
   ![Image [104]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/project-manage/20210425232412.png)
-## 5.2.撤销commit
+### 5.2.撤销commit
 写完代码后，我们一般这样
 ```
 git add . //添加所有文件
@@ -1120,31 +1120,31 @@ HEAD^的意思是上一个版本，也可以写成HEAD~1
 
 此时会进入默认vim编辑器，修改注释完毕后保存就好了。
 
-# 6.git-flow
+## 6.git-flow
 `git-flow` 是一个 git 扩展集，按 Vincent Driessen 的分支模型提供高层次的库操作
 
-## 6.1.基础建议
+### 6.1.基础建议
 - Git flow 提供了极出色的命令帮忙以及输出提示。请仔细阅读并观察发生了什么事情...
 - macOS 程序 Sourcetree 是一个极出色的 git 界面客户端，已经提供了 git-flow 的支持。
 - Git-flow 是一个基于归并的解决方案，它并没有提供重置(rebase)特性分支的能力。
-## 6.2.安装
+### 6.2.安装
 Linux
 ```
 $ apt-get install git-flow
 ```
 安装 git-flow, 你需要 wget 和 util-linux。
-## 6.3.开始
-### 6.3.1.初始化
+### 6.3.开始
+#### 6.3.1.初始化
 使用 git-flow，从初始化一个现有的 git 库内开始:
 ```
 git flow init
 ```
 你必须回答几个关于分支的命名约定的问题。建议使用默认值。
-## 6.4.特性
+### 6.4.特性
 - 为即将发布的版本开发新功能特性。
 - 这通常只存在开发者的库中。
 
-### 6.4.1.增加新特性
+#### 6.4.1.增加新特性
 新特性的开发是基于 'develop' 分支的。
 
 通过下面的命令开始开发新特性：
@@ -1153,7 +1153,7 @@ git flow feature start MYFEATURE
 ```
 这个操作创建了一个基于'develop'的特性分支，并切换到这个分支之下。
 
-### 6.4.2.完成新特性
+#### 6.4.2.完成新特性
 完成开发新特性。这个动作执行下面的操作.
 - 合并 MYFEATURE 分支到 'develop'
 - 删除这个新特性分支
@@ -1161,12 +1161,12 @@ git flow feature start MYFEATURE
 ```
 git flow feature finish MYFEATURE
 ```
-### 6.4.3.发布新特性
+#### 6.4.3.发布新特性
 你是否合作开发一项新特性？发布新特性分支到远程服务器，所以，其它用户也可以使用这分支。
 ```
 git flow feature publish MYFEATURE
 ```
-### 6.4.4.取得一个发布的新特性分支
+#### 6.4.4.取得一个发布的新特性分支
 取得其它用户发布的新特性分支，并签出远程的变更。
 ```
 git flow feature pull origin MYFEATURE
@@ -1177,10 +1177,10 @@ git flow feature track MYFEATURE
 ```
 跟踪在origin上的特性分支
 
-## 6.5.作一个release版本
+### 6.5.作一个release版本
 - 支持一个新的用于生产环境的发布版本。
 - 允许修正小问题，并为发布版本准备元数据。
-### 6.5.1.开始准备release版本
+#### 6.5.1.开始准备release版本
 - 开始准备release版本，使用 git flow release 命令.
 - 它从 'develop' 分支开始创建一个 release 分支。
 ```
@@ -1194,7 +1194,7 @@ git flow release publish RELEASE
 ```
 (你可以通过` git flow release track RELEASE` 命令签出 release 版本的远程变更)
 
-### 6.5.2.完成 release 版本
+#### 6.5.2.完成 release 版本
 完成 release 版本是一个大 git 分支操作。它执行下面几个动作：
 
 - 归并 release 分支到 'master' 分支
@@ -1205,28 +1205,28 @@ git flow release publish RELEASE
 git flow release finish RELEASE
 ```
 
-## 6.6.紧急修复
+### 6.6.紧急修复
 - 紧急修复来自这样的需求：生产环境的版本处于一个不预期状态，需要立即修正。
 - 有可能是需要修正 master 分支上某个 TAG 标记的生产版本。
 
-### 6.6.1.开始 git flow 紧急修复
+#### 6.6.1.开始 git flow 紧急修复
 像其它 git flow 命令一样, 紧急修复分支开始自：
 ```
 git flow hotfix start VERSION [BASENAME]
 ```
 VERSION 参数标记着修正版本。你可以从 [BASENAME]开始，[BASENAME]为finish release时填写的版本号
-### 6.6.2.完成紧急修复
+#### 6.6.2.完成紧急修复
 当完成紧急修复分支，代码归并回 develop 和 master 分支。相应地，master 分支打上修正版本的 TAG。
 ```
 git flow hotfix finish VERSION
 ```
 
-## 6.7.命令
+### 6.7.命令
 ![Image [105]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/project-manage/20210425232603.png)
 
 
-# 7.Git 工作流
-## 7.1.基本的 Git 工作流
+## 7.Git 工作流
+### 7.1.基本的 Git 工作流
 最基本的 Git 工作流是只有一个分支 - master 分支的模式。开发人员直接提交 master 分支并使用它来部署到预发布和生产环境。
 
 ![Image [106]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/project-manage/20210425232643.png)
@@ -1240,7 +1240,7 @@ git flow hotfix finish VERSION
 1. 生产环境出现 bug 的概率会大增。
 1. 维护干净的代码将更加困难。
 
-## 7.2.Git 功能分支工作流
+### 7.2.Git 功能分支工作流
 当你有多个开发人员在同一个代码库上工作时，Git 功能分支工作流将成为必选项。
 
 假设你有一个正在开发一项新功能的开发人员。另一个开发人员正在开发第二个功能。现在，如果两个开发人员都向同一个分支提交代码，这将使代码库陷入混乱，并产生大量冲突。
@@ -1253,7 +1253,7 @@ git flow hotfix finish VERSION
 
 使用此工作流的优点是，Git 功能分支工作流使你可以在代码上进行协作，而不必担心代码冲突。
 
-## 7.3.带有 Develop 分支的 Git 功能分支工作流
+### 7.3.带有 Develop 分支的 Git 功能分支工作流
 此工作流是开发团队中比较流行的工作流之一。它与 Git 功能分支工作流相似，但它的 develop 分支与 master 分支并行存在。
 
 在此工作流中，master 分支始终代表生产环境的状态。每当团队想要部署代码到生产环境时，他们都会部署 master 分支。
@@ -1266,15 +1266,15 @@ Develop 分支代表针对下一版本的最新交付的代码。开发人员从
 
 此工作流的优点是，它使团队能够一致地合并所有新功能，在预发布阶段对其进行测试并部署到生产环境中。尽管这种工作流让代码维护变得更加容易，但是对于某些团队来说，这样做可能会感到有些疲倦，因为频繁的 Git 操作可能会让你感到乏味。
 
-## 7.4.Gitflow 工作流
+### 7.4.Gitflow 工作流
 Gitflow 工作流与我们之前讨论的工作流非常相似，我们将它们与其他两个分支（ release 分支和 hot-fix 分支）结合使用。
 
-### 7.4.1.Hot-Fix 分支
+#### 7.4.1.Hot-Fix 分支
 Hot-fix 分支是唯一一个从 master 分支创建的分支，并且直接合并到 master 分支而不是 develop 分支。仅在必须快速修复生产环境问题时使用。该分支的一个优点是，它使你可以快速修复并部署生产环境的问题，而无需中断其他人的工作流，也不必等待下一个发布周期。
 
 将修复合并到 master 分支并进行部署后，应将其合并到 develop 和当前的 release 分支中。这样做是为了确保任何从 develop 分支创建新功能分支的人都具有最新代码。
 
-### 7.4.2.Release 分支
+#### 7.4.2.Release 分支
 在将所有准备发布的功能的代码成功合并到 develop 分支之后，就可以从 develop 分支创建 release 分支了。
 
 Release 分支不包含新功能相关的代码。仅将与发布相关的代码添加到 release 分支。例如，与此版本相关的文档，错误修复和其他关联任务才能添加到此分支。
@@ -1293,7 +1293,7 @@ Release 分支不包含新功能相关的代码。仅将与发布相关的代码
 
 要在 Windows 机器上安装，你需要 下载并安装 git-flow 。安装完成后，运行 git flow init 命令，就可以在项目中使用它了。
 
-## 7.5.Git Fork 工作流
+### 7.5.Git Fork 工作流
 Fork 工作流在使用开源软件的团队中很流行。
 
 该流程通常如下所示：
@@ -1307,8 +1307,8 @@ Fork 工作流在使用开源软件的团队中很流行。
 
 
 
-# 8.问题集
-## 8.1.修改.gitignore后生效
+## 8.问题集
+### 8.1.修改.gitignore后生效
 在使用git的时候我们有时候需要忽略一些文件或者文件夹。我们一般在仓库的根目录创建.gitignore文件
 在提交之前，修改.gitignore文件，添加需要忽略的文件。然后再做add  commit push 等
 但是有时在使用过称中，需要对.gitignore文件进行再次的修改。这次我们需要清除一下缓存cache，才能是.gitignore 生效。
@@ -1321,7 +1321,7 @@ git push origin master #可选，如果需要同步到remote上的话
 ```
 这样就能够使修改后的.gitignore生效。
 
-## 8.2.Git 多平台换行符问题(LF or CRLF)
+### 8.2.Git 多平台换行符问题(LF or CRLF)
 目前，在开发中，使用 Git 作为版本管理工具还是比较流行的，大量的开源项目都在往 Github 迁移。Windows 上有 Git bash 客户端，基于 MinGW，有很多 GNU 工具可用，体验还不错。
 
 在做完工作后，我尝试 git add .，想着这块工作可以告一段落了，而事实是：
@@ -1401,7 +1401,7 @@ $ git config --global core.safecrlf true
 ```
 也就是让代码仓库使用统一的换行符(LF)，如果代码中包含 CRLF 类型的文件时将无法提交，需要用 dos2unix 或者其他工具手动转换文件类型。当然，可以根据自己的需要进行更为合适的配置！
 
-## 8.3.git每次提交都输入密码
+### 8.3.git每次提交都输入密码
 > .gitconfig 文件中添加
 ```
 [credential]    
