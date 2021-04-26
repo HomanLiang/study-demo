@@ -1411,3 +1411,255 @@ $ git config --global core.safecrlf true
 ```
 git config --global credential.helper store
 ```
+
+### 8.4.Git 撤销修改和版本回退
+
+#### 8.4.1.撤销修改
+
+```
+# 撤销修改是指将工作区中的修改撤销
+git checkout [文件名或路径]
+ 
+# 1、撤销工作区中当前目录中的所有修改
+git checkout .
+ 
+# 2、撤销工作区中指定文件的修改
+git checkout -- filename
+```
+
+注意：checkout命令只能撤销工作区中的修改，不能撤销暂存区中的修改
+
+git checkout命令还有一个非常重要的作用就是切换分支，可用于分支管理
+
+```
+# 1、切换到指定分支（如果分支在本地不存在，会自动从远程仓库拉取）
+git checkout dev
+ 
+# 2、切换分支的同时创建分支
+git checkout -b dev
+```
+
+#### 8.4.2.版本回退
+
+```
+# 版本回退是指将版本库从当前版本回退到其他版本
+
+git reset -- hard 版本号
+```
+
+有时，我们需要将Git版本回退（还原）到以前的某个版本，可以使用 git reset 命令
+
+在git中，HEAD指针指向的是当前版本，也就是最新的conmit id，上一个版本是 HEAD^，上上个版本就是 HEAD^^，上50个版本可以写作HEAD~50 。
+
+```
+# 可以使用下面的命令，回退到上一个版本
+
+git reset --hard HEAD^
+```
+
+这时，我们再使用 git log 命令查看版本库被修改的日志。却发现，看不到被回退的版本之后的历史记录了。 如果，想再回到最新的版本，怎么办？
+
+只要刚刚的命令行窗口没有关掉，你就可以顺着往上面找，直到发现最新的版本号（如4b2a0c88a2d03675694013ac6a2bd6f55c830cdc），
+
+```
+# 就可以使用下面的命令还原到指定的版本，版本号（commit id）没必要写全，一般写前七位就够了，Git会自动去匹配：
+
+git reset --hard 4b2a0c8
+```
+
+但是，假如你回退到了某个版本后，把电脑关了。第二天又后悔了，想要恢复到最新版本。
+
+这时，可以使用命令 git reflog 来查看你的每一次操作日志，该命令可以输出对应的版本号的操作记录。这样，我们就可以恢复到任意版本了。
+
+语法：`git reset options`
+
+`git reset` 有很多可用选项，可以使用命令 `git reset -h` 来查看
+
+其中最常用的三个选项是：
+
+- **--mixed： reset HEAD and index。表示重置 HEAD 指针和 index 暂存区，但保持工作区不变。它是默认选项。**
+- **--soft： reset only HEAD。表示仅仅重置 HEAD 指针，即只改变 HEAD 的指向，但保持工作区和暂存区不变。**
+- **--hard： reset HEAD, index and working tree。表示重置 HEAD 指针、index 暂存区和工作区。这个才是完整的版本回退。**
+
+1. **查看版本库的状态**
+
+   语法：`git status`
+
+   `git status` 命令非常有用。它可以查看版本库的当前状态，还可以看到相关操作的提示信息。
+
+2. **查看修改**
+
+   ```
+   # 如果你修改了工作区中的某些文件，想要查看具体更改了什么内容，可以使用 git diff 命令
+   git diff .
+   git diff filename
+   ```
+
+3. **查看工作区和版本库的区别**
+
+   ```
+   # 如果你只是修改了工作区，还没有 git add 到暂存区，想要查看工作区和版本库的区别。
+   # 查看工作区和版本库的区别
+   git diff
+   ```
+
+   上述命令只能查看到工作区中 已经存在的文件的修改，如果是新创建的文件，它追踪不到。如果修改和新文件已经 git add 到了暂存区，就需要使用下面的命令来查看。
+
+4. **查看暂存区和版本库的区别**
+
+   ```
+   # 如果你修改了工作区，已经 git add 到了暂存区，想要查看暂存区和版本库的区别。
+   git diff --cached
+   ```
+
+5. **查看两个版本之间的区别**
+
+   如果你修改了工作区，已经 git add 到了暂存区，并且 git commit 到了版本库。这样 head 指针就指向了最新的版本。想要比较两个版本之间的区别。
+
+   语法： `git diff [版本号1] [版本号2]`
+
+   ```
+   # 比较两个版本之间的差异
+   git diff 4129523 0a7d9af
+    
+   # 4129523：表示上一个版本号
+   # 0a7d9af：当前版本号（最新版本号）
+    
+   # 比较之前的版本和当前版本的差异
+   git diff 4129523 head
+    
+   # 比较某个文件在两个版本之间的差异
+   git diff 09d9b45 head ./config/app.php
+    
+   # 比较之前的版本和当前版本的差异的简写形式
+   git diff 4129523
+   ```
+
+6. **查看本地的两个分支的区别**
+
+   语法：`git diff [branch1] [branch2]`
+
+   ```
+   # 比较develop分支和master分支的区别
+   git diff develop master
+   ```
+
+7. **查看本地分支和远程分支的区别**
+
+   ```
+   # 对比本地的develop分支和远程master分支的区别
+   git diff develop origin/master
+   ```
+
+8. **查看版本库的历史记录**
+
+   如果你想查看版本库提交的历史记录，可以使用 git log 命令。
+
+   ```
+   # 查看版本库的历史记录
+   git log
+    
+   # 查看版本库的历史记录，美化输出
+   git log --pretty=oneline
+    
+   # 查看版本库的历史记录，只显示前 5 条
+   git log -5
+   git log -5 --pretty=oneline
+   ```
+
+#### 8.4.3.revert
+
+首先肯定的是 revert，git revert commit_id 能产生一个 与 commit_id 完全相反的提交，即 commit_id 里是添加， revert 提交里就是删除。
+
+但是使用 git log 查看了提交记录后，我就打消了这种想法，因为提交次数太多了，中途还有几次从其他分支的 merge 操作。”利益于”我们不太干净的提交记录，要完成从 C 版本到 N 版本的 revert，我需要倒序执行 revert 操作几十次，如果其中顺序错了一次，最终结果可能就是不对的。
+
+另外我们知道我们在进行代码 merge 时，也会把 merge 信息产生一次新的提交，而 revert 这次 merge commit 时需要指定 m 参数，以指定 mainline，这个 mainline 是主线，也是我们要保留代码的主分支，从 feature 分支往 develop 分支合并，或由 develop 分支合并到 master 的提交还好确定，但 feature 分支互相合并时，我哪知道哪个是主线啊。
+
+所以 revert 的文案被废弃了。
+
+#### 8.4.4.rebase
+
+只好用搜索引擎继续搜索，看到有人提出可以先使用 rebase 把多个提交合并成一个提交，再使用 revert 产生一次反提交，这种方法的思路非常清晰，把 revert 和 rebase 两个命令搭配得很好，相当于使用 revert 回退的升级版。
+
+先说一下 rebase，rebase 是”变基”的意思，这里的”基”，在我理解是指[多次] commit 形成的 git workflow，使用 rebase，我们可以改变这些历史提交，修改 commit 信息，将多个 commit 进行组合。
+
+介绍 rebase 的文档有很多，我们直接来说用它来进行代码回退的步骤。
+
+- 首先，切出一个新分支 F，使用 git log 查询一下要回退到的 commit 版本 N。
+- 使用命令 `git rebase -i N`， -i 指定交互模式后，会打开 git rebase 编辑界面，形如：
+
+    ```
+    pick 6fa5869 commit1
+    pick 0b84ee7 commit2
+    pick 986c6c8 commit3
+    pick 91a0dcc commit4
+    ```
+
+- 这些 commit 自旧到新由上而下排列，我们只需要在 commit_id 前添加操作命令即可，在合并 commit 这个需求里，我们可以选择 pick(p) 最旧的 commit1，然后在后续的 commit_id 前添加 squash(s) 命令，将这些 commits 都合并到最旧的 commit1 上。
+- 保存 rebase 结果后，再编辑 commit 信息，使这次 rebase 失效，git 会将之前的这些 commit 都删除，并将其更改合并为一个新的 commit5，如果出错了，也可以使用 `git rebase --abort/--continue/--edit-todo` 对之前的编辑进行撤销、继续编辑。
+- 这个时候，主分支上的提交记录是 older, commit1, commit2, commit3, commit4，而 F 分支上的提交记录是 older, commit5，由于 F 分支的祖先节点是 older，明显落后于主分支的 commit4，将 F 分支向主分支合并是不允许的，所以我们需要执行 git merge master 将主分支向 F 分支合并，合并后 git 会发现 commit1 到 commit4 提交的内容和 F 分支上 commit5 的修改内容是完全相同的，会自动进行合并，内容不变，但多了一个 commit5。
+- 再在 F 分支上对 commit5 进行一次 revert 反提交，就实现了把 commit1 到 commit4 的提交全部回退。
+
+这种方法的取巧之处在于巧妙地利用了 rebase 操作历史提交的功能和 git 识别修改相同自动合并的特性，操作虽然复杂，但历史提交保留得还算完整。
+
+rebase 这种修改历史提交的功非常实用，能够很好地解决我们遇到的一个小功能提交了好多次才好使，而把 git 历史弄得乱七八糟的问题，只需要注意避免在多人同时开发的分支使用就行了。
+
+遗憾的是，当天我并没有理解到 rebase 的这种思想，又由于试了几个方法都不行太过于慌乱，在 rebase 完成后，向主分支合并被拒之后对这些方式的可行性产生了怀疑，又加上有同事提出听起来更可行的方式，就中断了操作。
+
+#### 8.4.5.场景分析
+
+**场景一**
+
+- 假如你只是修改了工作区，还没有 git add 到暂存区。可以使用下面的命令撤销工作区中的修改。
+
+    ```
+    # 仅仅是撤销工作区中的修改
+    git checkout .
+    ```
+
+**场景二**
+
+- 假如你修改了工作区，并把工作区中的修改 git add 到了暂存区
+
+    ```
+    # 如果你想撤销工作区和暂存区中的修改。
+    git reset --hard HEAD
+    # 简写为
+    git reset --hard
+     
+    # 如果你仅仅只是想要撤销暂存区中的修改。
+    git reset --mixed
+    # 简写为
+    git reset
+    ```
+
+**场景三**
+
+- 假如你修改了工作区，并把工作区中的修改 git add 到了暂存区，然后又 git commit 提交到了版本库。
+
+    ```
+    # 如果你想回退到上一个版本，可以使用下面的命令。
+    git reset --hard HEAD^
+     
+    # 查看当前的版本号，可以使用。
+    git rev-parse HEAD
+    ```
+
+说明：完整的版本回退，包含三个要素：
+
+- 更改 HEAD 指针的指向（即让 HEAD 指向目标版本）
+- 回退暂存区（即暂存区中的内容也要回退到目标版本）
+- 回退工作区（即工作区中的内容也要回退到目标版本）
+
+
+
+
+
+
+
+
+
+
+
+
+
