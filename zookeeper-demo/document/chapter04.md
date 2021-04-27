@@ -22,3 +22,8 @@ ZooKeeper 从设计模式角度来理解：就是一个基于**观察者模式**
 - Leader根据follower的zxid确定同步点
 - 完成同步后通知follower 已经成为uptodate状态
 - Follower收到uptodate消息后，又可以重新接受client的请求进行服务了
+
+
+
+
+
