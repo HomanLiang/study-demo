@@ -4,7 +4,7 @@
 
 # JDK8 入门指南
 
-## Default Methods for Interfaces(接口的默认方法)
+## 1.Default Methods for Interfaces(接口的默认方法)
 
 Java 8 使我们能够通过使用 `default` 关键字将非抽象方法实现添加到接口。这个功能也被称为虚拟扩展方法。
 
@@ -36,7 +36,7 @@ formula.sqrt(16);           // 4.0
 
 `Formula` 被实现为一个匿名对象。代码非常冗长：用于 `sqrt(a * 100)` 这样简单的计算的 6 行代码。正如我们将在下一节中看到的，在 Java 8 中实现单个方法对象有更好的方法。
 
-## Lambda expressions(Lambda 表达式)
+## 2.Lambda expressions(Lambda 表达式)
 
 让我们从一个简单的例子来说明如何在以前版本的 Java 中对字符串列表进行排序：
 
@@ -75,7 +75,7 @@ names.sort((a, b) -> b.compareTo(a));
 
 列表现在有一个 `sort` 方法。此外，java 编译器知道参数类型，所以你可以不指定入参的数据类型。让我们深入探讨如何使用 lambda 表达式。
 
-## Functional Interfaces(函数接口)
+## 3.Functional Interfaces(函数接口)
 
 lambda 表达式如何适应 Java 的类型系统？每个 lambda 对应一个由接口指定的类型。一个所谓的*函数接口*必须包含一个**抽象方法声明**。该类型的每个 lambda 表达式都将与此抽象方法匹配。由于默认方法不是抽象的，所以你可以自由地添加默认方法到你的函数接口。
 
@@ -95,7 +95,7 @@ System.out.println(converted);    // 123
 
 请记住，如果 `@FunctionalInterface` 注解被省略，代码也是有效的。
 
-## Method and Constructor References(方法和构造器引用)
+## 4.Method and Constructor References(方法和构造器引用)
 
 上面的示例代码可以通过使用静态方法引用进一步简化：
 
@@ -152,11 +152,11 @@ Person person = personFactory.create("Peter", "Parker");
 
 我们通过 `Person::new` 来创建一个 Person 构造器的引用。Java 编译器会根据`PersonFactory.create` 的签名自动匹配正确的构造器。
 
-## Lambda Scopes(Lambda 作用域)
+## 5.Lambda Scopes(Lambda 作用域)
 
 从 lambda 表达式访问外部作用域变量与匿名对象非常相似。您可以访问本地外部作用域的常量以及实例的成员变量和静态变量。
 
-### Accessing local variables(访问本地变量)
+### 5.1.Accessing local variables(访问本地变量)
 
 我们可以访问 lambda 表达式作用域外部的常量：
 
@@ -189,7 +189,7 @@ num = 3;
 
 此外，在 lambda 表达式中对 `num` 做写操作也是被禁止的。
 
-### Accessing fields and static variables(访问成员变量和静态变量)
+### 5.2.Accessing fields and static variables(访问成员变量和静态变量)
 
 与局部变量相比，我们既可以在 lambda 表达式中读写实例的成员变量，也可以读写实例的静态变量。这种行为在匿名对象中是众所周知的。
 
@@ -212,7 +212,7 @@ class Lambda4 {
 }
 ```
 
-### Accessing Default Interface Methods（访问默认的接口方法）
+### 5.3.Accessing Default Interface Methods（访问默认的接口方法）
 
 还记得第一节的 formula 例子吗？ `Formula` 接口定义了一个默认方法 `sqrt`，它可以被每个 formula 实例（包括匿名对象）访问。这个特性不适用于 lambda 表达式。
 
@@ -222,13 +222,13 @@ class Lambda4 {
 Formula formula = (a) -> sqrt(a * 100);
 ```
 
-## Built-in Functional Interfaces(内置函数接口)
+## 6.Built-in Functional Interfaces(内置函数接口)
 
 JDK 1.8 API 包含许多内置的功能接口。它们中的一些在较早的 Java 版本（比如 `Comparator` 或 `Runnable`）中是众所周知的。这些现有的接口通过 `@FunctionalInterfaceannotation` 注解被扩展为支持 Lambda。
 
 但是，Java 8 API 也提供了不少新的函数接口。其中一些新接口在 [Google Guava](https://code.google.com/p/guava-libraries/) 库中是众所周知的。即使您熟悉这个库，也应该密切关注如何通过一些有用的方法扩展来扩展这些接口。
 
-### Predicates
+### 6.1.Predicates
 
 `Predicate` 是只有一个参数的布尔值函数。该接口包含各种默认方法，用于将谓词组合成复杂的逻辑术语（与、或、非）
 
@@ -245,7 +245,7 @@ Predicate<String> isEmpty = String::isEmpty;
 Predicate<String> isNotEmpty = isEmpty.negate();
 ```
 
-### Functions
+### 6.2.Functions
 
 `Function` 接受一个参数并产生一个结果。可以使用默认方法将多个函数链接在一起（compose、andThen）。
 
@@ -256,7 +256,7 @@ Function<String, String> backToString = toInteger.andThen(String::valueOf);
 backToString.apply("123");     // "123"
 ```
 
-### Suppliers
+### 6.3.Suppliers
 
 `Supplier` 产生一个泛型结果。与 `Function` 不同，`Supplier` 不接受参数。
 
@@ -265,7 +265,7 @@ Supplier<Person> personSupplier = Person::new;
 personSupplier.get();   // new Person
 ```
 
-### Consumers
+### 6.4.Consumers
 
 Consumer 表示要在一个输入参数上执行的操作。
 
@@ -274,7 +274,7 @@ Consumer<Person> greeter = (p) -> System.out.println("Hello, " + p.firstName);
 greeter.accept(new Person("Luke", "Skywalker"));
 ```
 
-### Comparators
+### 6.5.Comparators
 
 比较器在老版本的 Java 中是众所周知的。 Java 8 为接口添加了各种默认方法。
 
@@ -288,7 +288,7 @@ comparator.compare(p1, p2);             // > 0
 comparator.reversed().compare(p1, p2);  // < 0
 ```
 
-## Optionals
+## 7.Optionals
 
 `Optional` 不是功能性接口，而是防止 `NullPointerException` 的好工具。这是下一节的一个重要概念，所以让我们快速看看 `Optional` 是如何工作的。
 
@@ -304,7 +304,7 @@ optional.orElse("fallback");    // "bam"
 optional.ifPresent((s) -> System.out.println(s.charAt(0)));     // "b"
 ```
 
-## Streams
+## 8.Streams
 
 `java.util.Stream` 表示可以在其上执行一个或多个操作的元素序列。流操作是中间或终端。当终端操作返回一个特定类型的结果时，中间操作返回流本身，所以你可以链接多个方法调用。流在源上创建，例如一个 `java.util.Collection` 像列表或集合（不支持映射）。流操作既可以按顺序执行，也可以并行执行。
 
@@ -326,7 +326,7 @@ stringCollection.add("ddd1");
 
 Java 8 中的集合已被扩展，因此您可以通过调用 `Collection.stream()` 或`Collection.parallelStream()` 来简单地创建流。以下各节介绍最常见的流操作。
 
-### Filter
+### 8.1.Filter
 
 过滤器接受一个谓词来过滤流的所有元素。这个操作是中间的，使我们能够调用另一个流操作（`forEach`）的结果。 ForEach 接受一个消费者被执行的过滤流中的每个元素。 ForEach 是一个终端操作。它是无效的，所以我们不能调用另一个流操作。
 
@@ -339,7 +339,7 @@ stringCollection
 // "aaa2", "aaa1"
 ```
 
-### Sorted
+### 8.2.Sorted
 
 排序是一个中间操作，返回流的排序视图。元素按自然顺序排序，除非您传递自定义比较器。
 
@@ -360,7 +360,7 @@ System.out.println(stringCollection);
 // ddd2, aaa2, bbb1, aaa1, bbb3, ccc, bbb2, ddd1
 ```
 
-### Map
+### 8.3.Map
 
 中间操作映射通过给定函数将每个元素转换为另一个对象。以下示例将每个字符串转换为大写字母字符串。但是您也可以使用 `map` 将每个对象转换为另一种类型。结果流的泛型类型取决于您传递给 `map` 的函数的泛型类型。
 
@@ -374,7 +374,7 @@ stringCollection
 // "DDD2", "DDD1", "CCC", "BBB3", "BBB2", "AAA2", "AAA1"
 ```
 
-### Match
+### 8.4.Match
 
 可以使用各种匹配操作来检查某个谓词是否与流匹配。所有这些操作都是终端并返回布尔结果。
 
@@ -401,7 +401,7 @@ boolean noneStartsWithZ =
 System.out.println(noneStartsWithZ);      // true
 ```
 
-#### Count
+### 8.5.Count
 
 Count 是一个终端操作，返回流中元素的个数。
 
@@ -415,7 +415,7 @@ long startsWithB =
 System.out.println(startsWithB);    // 3
 ```
 
-### Reduce
+### 8.6.Reduce
 
 该终端操作使用给定的功能对流的元素进行缩减。结果是一个 `Optional` 持有缩小后的值。
 
@@ -430,7 +430,7 @@ reduced.ifPresent(System.out::println);
 // "aaa1##aaa2##bbb1##bbb2##bbb3##ccc##ddd1##ddd2"
 ```
 
-## Parallel Streams
+## 9.Parallel Streams
 
 如上所述，流可以是顺序的也可以是并行的。顺序流上的操作在单个线程上执行，而并行流上的操作在多个线程上同时执行。
 
@@ -449,7 +449,7 @@ for (int i = 0; i < max; i++) {
 
 现在我们测量对这个集合进行排序所花费的时间。
 
-### Sequential Sort
+### 9.1.Sequential Sort
 
 ```
 long t0 = System.nanoTime();
@@ -465,7 +465,7 @@ System.out.println(String.format("sequential sort took: %d ms", millis));
 // sequential sort took: 899 ms
 ```
 
-### Parallel Sort
+### 9.2.Parallel Sort
 
 ```
 long t0 = System.nanoTime();
@@ -483,7 +483,7 @@ System.out.println(String.format("parallel sort took: %d ms", millis));
 
 如你所见，两个代码段差不多，但是并行排序快了近 50%。你所需做的仅仅是将 `stream()` 改为 `parallelStream()` 。
 
-## Maps
+## 10.Maps
 
 如前所述，map 不直接支持流。Map 接口本身没有可用的 `stream()` 方法，但是你可以通过 `map.keySet().stream()` 、 `map.values().stream()` 和 `map.entrySet().stream()` 创建指定的流。
 
@@ -545,11 +545,11 @@ map.get(9);             // val9concat
 
 如果不存在该键的条目，合并或者将键/值放入 map 中；否则将调用合并函数来更改现有值。
 
-## Date API
+## 11.Date API
 
 Java 8 在 `java.time` 包下新增了一个全新的日期和时间 API。新的日期 API 与 [Joda-Time](http://www.joda.org/joda-time/) 库相似，但不一样。以下示例涵盖了此新 API 的最重要部分。
 
-### Clock
+### 11.1.Clock
 
 `Clock` 提供对当前日期和时间的访问。`Clock` 知道一个时区，可以使用它来代替 `System.currentTimeMillis()` ，获取从 **Unix EPOCH** 开始的以毫秒为单位的当前时间。时间线上的某一时刻也由类 `Instant` 表示。 Instants 可以用来创建遗留的 `java.util.Date` 对象。
 
@@ -561,7 +561,7 @@ Instant instant = clock.instant();
 Date legacyDate = Date.from(instant);   // legacy java.util.Date
 ```
 
-### Timezones
+### 11.2.Timezones
 
 时区由 `ZoneId` 表示。他们可以很容易地通过静态工厂方法访问。时区定义了某一时刻和当地日期、时间之间转换的重要偏移量。
 
@@ -578,7 +578,7 @@ System.out.println(zone2.getRules());
 // ZoneRules[currentStandardOffset=-03:00]
 ```
 
-### LocalTime
+### 11.3.LocalTime
 
 `LocalTime` 代表没有时区的时间，例如晚上 10 点或 17:30:15。以下示例为上面定义的时区创建两个本地时间。然后我们比较两次，并计算两次之间的小时和分钟的差异。
 
@@ -610,7 +610,7 @@ LocalTime leetTime = LocalTime.parse("13:37", germanFormatter);
 System.out.println(leetTime);   // 13:37
 ```
 
-### LocalDate
+### 11.4.LocalDate
 
 `LocalDate` 表示不同的日期，例如：2014 年 3 月 11 日。它是不可变的，并且与 `LocalTime` 完全类似。该示例演示如何通过加减日、月或年来计算新日期。请记住，每个操作都会返回一个新的实例。
 
@@ -636,7 +636,7 @@ LocalDate xmas = LocalDate.parse("24.12.2014", germanFormatter);
 System.out.println(xmas);   // 2014-12-24
 ```
 
-### LocalDateTime
+### 11.5.LocalDateTime
 
 LocalDateTime 表示日期时间。它将日期和时间组合成一个实例。 `LocalDateTime` 是不可变的，其作用类似于 `LocalTime` 和 `LocalDate`。我们可以利用方法去获取日期时间中某个单位的值。
 
@@ -680,7 +680,7 @@ System.out.println(string);     // Nov 03, 2014 - 07:13
 
 更多关于日期格式化的内容可以参考[这里](https://docs.oracle.com/javase/8/docs/api/java/time/format/DateTimeFormatter.html).
 
-## Annotations
+## 12.Annotations
 
 Java 8 中的注释是可重复的。让我们直接看一个例子来解决这个问题。
 
@@ -699,14 +699,14 @@ Java 8 中的注释是可重复的。让我们直接看一个例子来解决这�
 
 Java8 允许我们通过使用 `@Repeatable` 注解来引入多个同类型的注解。
 
-### Variant 1: 使用容器注解 (老套路)
+### 12.1.Variant 1: 使用容器注解 (老套路)
 
 ```
 @Hints({@Hint("hint1"), @Hint("hint2")})
 class Person {}
 ```
 
-### Variant 2: 使用 repeatable 注解 (新套路)
+### 12.2.Variant 2: 使用 repeatable 注解 (新套路)
 
 ```
 @Hint("hint1")
@@ -742,7 +742,7 @@ System.out.println(hints2.length);          // 2
 
 ------
 
-## JDK8 升级常见问题
+## 13.JDK8 升级常见问题
 
 > JDK8 发布很久了，它提供了许多吸引人的新特性，能够提高编程效率。
 >
@@ -750,9 +750,9 @@ System.out.println(hints2.length);          // 2
 >
 > 近期，我在工作中遇到一个任务，将部门所有项目的 JDK 版本升级到 1.8 （老版本大多是 1.6）。在这个过程中，遇到一些问题点，并结合在网上看到的坑，在这里总结一下。
 
-### Intellij 中的 JDK 环境设置
+### 13.1.Intellij 中的 JDK 环境设置
 
-#### Settings
+#### 13.1.1.Settings
 
 点击 **File > Settings > Java Compiler**
 
@@ -762,11 +762,11 @@ Project bytecode version 选择 1.8
 
 选择 JDK for importer 为 1.8
 
-#### Projcet Settings
+#### 13.1.2.Projcet Settings
 
 **Project SDK** 选择 1.8
 
-#### Application
+#### 13.1.3.Application
 
 如果 web 应用的启动方式为 Application ，需要修改 JRE
 
@@ -774,9 +774,9 @@ Project bytecode version 选择 1.8
 
 选择 JRE 为 1.8
 
-### Linux 环境修改
+### 13.2.Linux 环境修改
 
-#### 修改环境变量
+#### 13.2.1.修改环境变量
 
 修改 `/etc/profile` 中的 **JAVA_HOME**，设置 为 jdk8 所在路径。
 
@@ -784,7 +784,7 @@ Project bytecode version 选择 1.8
 
 编译、发布脚本中如果有 `export JAVA_HOME` ，需要注意，需要使用 jdk8 的路径。
 
-#### 修改 maven
+#### 13.2.2.修改 maven
 
 settings.xml 中 profile 的激活条件如果是 jdk，需要修改一下 jdk 版本
 
@@ -794,7 +794,7 @@ settings.xml 中 profile 的激活条件如果是 jdk，需要修改一下 jdk �
 </activation>
 ```
 
-#### 修改 server
+#### 13.2.3.修改 server
 
 修改 server 中的 javac 版本，以 resin 为例：
 
@@ -804,7 +804,7 @@ settings.xml 中 profile 的激活条件如果是 jdk，需要修改一下 jdk �
 <javac compiler="internal" args="-source 1.8"/>
 ```
 
-### sun.* 包缺失问题
+### 13.3.sun.* 包缺失问题
 
 JDK8 不再提供 `sun.*` 包供开发者使用，因为这些接口不是公共接口，不能保证在所有 Java 兼容的平台上工作。
 
@@ -814,13 +814,13 @@ JDK8 不再提供 `sun.*` 包供开发者使用，因为这些接口不是公共
 
 需要详细了解为什么不要使用 `sun.*` ，可以参考官方文档：[Why Developers Should Not Write Programs That Call 'sun' Packages](http://www.oracle.com/technetwork/java/faq-sun-packages-142232.html)
 
-### 默认安全策略修改
+### 13.4.默认安全策略修改
 
 升级后估计有些小伙伴在使用不安全算法时可能会发生错误，so，支持不安全算法还是有必要的
 
 找到$JAVA_HOME 下 `jre/lib/security/java.security` ，将禁用的算法设置为空：`jdk.certpath.disabledAlgorithms=` 。
 
-### JVM 参数调整
+### 13.5.JVM 参数调整
 
 在 jdk8 中，PermSize 相关的参数已经不被使用：
 
@@ -848,7 +848,7 @@ JDK8 中再也没有 `PermGen` 了。其中的某些部分，如被 intern 的�
 
 XX:MaxMetaspaceSize=256m
 
-### 字节码问题
+### 13.6.字节码问题
 
 ASM 5.0 beta 开始支持 JDK8
 
@@ -861,23 +861,23 @@ Caused by: java.io.IOException: invalid constant type: 15
 
 - 查找组件用到了 mvel，mvel 为了提高效率进行了字节码优化，正好碰上 JDK8 死穴，所以需要升级。
 
-```
-<dependency>
-  <groupId>org.mvel</groupId>
-  <artifactId>mvel2</artifactId>
-  <version>2.2.7.Final</version>
-</dependency>
-```
+    ```
+    <dependency>
+      <groupId>org.mvel</groupId>
+      <artifactId>mvel2</artifactId>
+      <version>2.2.7.Final</version>
+    </dependency>
+    ```
 
 - javassist
 
-```
-<dependency>
-  <groupId>org.javassist</groupId>
-  <artifactId>javassist</artifactId>
-  <version>3.18.1-GA</version>
-</dependency>
-```
+    ```
+    <dependency>
+      <groupId>org.javassist</groupId>
+      <artifactId>javassist</artifactId>
+      <version>3.18.1-GA</version>
+    </dependency>
+    ```
 
 > **注意**
 >
@@ -885,7 +885,7 @@ Caused by: java.io.IOException: invalid constant type: 15
 
 http://asm.ow2.org/history.html
 
-### Java 连接 redis 启动报错 Error redis clients jedis HostAndPort cant resolve localhost address
+### 13.7.Java 连接 redis 启动报错 Error redis clients jedis HostAndPort cant resolve localhost address
 
 错误环境: 本地 window 开发环境没有问题。上到 Linux 环境,启动出现问题。 错误信息: Error redis clients jedis HostAndPort cant resolve localhost address
 
@@ -900,7 +900,7 @@ template
 
 （2）查看/etc/hosts 文件中是否有 127.0.0.1 对应主机名，如果没有则添加
 
-### Resin 容器指定 JDK 1.8
+### 13.8.Resin 容器指定 JDK 1.8
 
 如果 resin 容器原来版本低于 JDK1.8，运行 JDK 1.8 编译的 web app 时，可能会提示错误：
 

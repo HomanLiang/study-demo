@@ -453,7 +453,7 @@ public class ExceptionOverrideDemo {
 
 当应用程序运行的过程中尝试使用类加载器去加载Class文件的时候，如果没有在classpath中查找到指定的类，就会抛出ClassNotFoundException。一般情况下，当我们使用 `Class.forName()` 或者 `ClassLoader.loadClass` 以及使用 `ClassLoader.findSystemClass()` 在运行时加载类的时候，如果类没有被找到，那么就会导致JVM抛出 `ClassNotFoundException`。
 
-最简单的，当我们使用JDBC去连接数据库的时候，我们一般会使用Class.forName()的方式去加载JDBC的驱动，如果我们没有将驱动放到应用的classpath下，那么会导致运行时找不到类，所以运行Class.forName()会抛出ClassNotFoundException。
+最简单的，当我们使用JDBC去连接数据库的时候，我们一般会使用 `Class.forName()` 的方式去加载JDBC的驱动，如果我们没有将驱动放到应用的classpath下，那么会导致运行时找不到类，所以运行 `Class.forName()` 会抛出ClassNotFoundException。
 
 ```
 public class MainClass {
@@ -499,7 +499,7 @@ public class MainClass {
 }
 ```
 
-首先这里我们先创建一个TempClass，然后编译以后，将TempClass生产的TempClass.class文件删除，然后执行程序，输出：
+首先这里我们先创建一个TempClass，然后编译以后，将TempClass生产的 `TempClass.class` 文件删除，然后执行程序，输出：
 
 ```
 Exception in thread "main" java.lang.NoClassDefFoundError: TempClass
@@ -521,23 +521,36 @@ Caused by: java.lang.ClassNotFoundException: TempClass
 ### 二、try catch finally中放入return
 
 大概考察了几种情况：
+
 一下 i 初始值都是 0
 ![Image](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/java-core-demo/20210321005326.png)
 
 1. **catch中有return，finally中的代码会执行吗？**
+   
    ![Image [2]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/java-core-demo/20210321005335.png)
-   结果很明显会执行：
+   
+结果很明显会执行：
+   
    ![Image [3]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/java-core-demo/20210321005348.png)
-
+   
 2. **catch中有return，finally也有return，怎么执行？**
+
    ![Image [4]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/java-core-demo/20210321005357.png)
+
    结果显示finally中的return会比catch中return先执行
+
    ![Image [5]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/java-core-demo/20210321005406.png)
+
 3. **catch中return变量，finally对变量做计算，返回结果是啥？**
+
    ![Image [6]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/java-core-demo/20210321005413.png)
+
    按照往常的逻辑，输入0 ，经过++i，返回1没毛病呀！ 
+
    ![Image [7]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/java-core-demo/20210321005420.png)
+
    i 赋初值为0，捕获到异常后进入 catch，catch 里有return，但是后边还有 finally，先执行 finally里的，对i+1=1，然后 return。那 return 的是1？事实上不是1，而是0.为何？
+
    ![Image [8]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/java-core-demo/20210321005437.png)
 
    可以清楚的看到i=1；但是返回的确是0？那说明此i非彼i，就是返回的i不是这个i。
@@ -545,9 +558,11 @@ Caused by: java.lang.ClassNotFoundException: TempClass
    因为这里是值传递，在执行return前，保留了一个i的副本，值为0，然后再去执行finally，finally完后，到return的时候，返回的并不是当前的i，而是保留的那个副本，也就是0.所以返回结果是0.
 
 4. **catch、finally同时return变量，返回结果又该是啥？**
+
    ![Image [9]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/java-core-demo/20210321005444.png)
 
    如果finally中有return不会走catch
+
    ![Image [10]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/java-core-demo/20210321005453.png)
 
 总结：

@@ -4,9 +4,9 @@
 
 # Java 容器最佳实践
 
-## 永远不要使用双花括号初始化实例，否则就会OOM！
+## 1.永远不要使用双花括号初始化实例，否则就会OOM！
 
-### 集合初始化
+### 1.1.集合初始化
 
 ```
 List<String> list = new ArrayList<String>() {{
@@ -22,7 +22,7 @@ Map<String, String> map = new HashMap<String, String>() {{
 }};
 ```
 
-### 双花括号初始化分析
+### 1.2.双花括号初始化分析
 以我们这段代码为例：
 ```
 Map<String, String> map = new HashMap() {{
@@ -52,9 +52,9 @@ class DoubleBracket$1 extends HashMap {
 ```
 此时我们可以确认，它就是一个匿名内部类。那么问题来了，匿名内部类为什么会导致内存溢出呢？
 
-### 匿名内部类的“锅”
+### 1.3.匿名内部类的“锅”
 在 Java 语言中非静态内部类会持有外部类的引用，从而导致 GC 无法回收这部分代码的引用，以至于造成内存溢出。
-#### 思考 1：为什么要持有外部类？
+#### 1.3.1.思考 1：为什么要持有外部类？
 这个就要从匿名内部类的设计说起了，在 Java 语言中，非静态匿名内部类的主要作用有两个。
 
 1. 当匿名内部类只在外部类（主类）中使用时，匿名内部类可以让外部不知道它的存在，从而减少了代码的维护工作。
@@ -73,7 +73,7 @@ public class DoubleBracket {
 }
 ```
 从上述代码可以看出在 HashMap 的方法内部，可以直接使用外部类的变量 userName。
-#### 思考 2：它是怎么持有外部类的？
+#### 1.3.2.思考 2：它是怎么持有外部类的？
 关于匿名内部类是如何持久外部对象的，我们可以通过查看匿名内部类的字节码得知，我们使用 `javap -c DoubleBracket\$1.class` 命令进行查看，其中 `$1` 为以匿名类的字节码，字节码的内容如下；
 ```
 javap -c DoubleBracket\$1.class
@@ -101,7 +101,7 @@ class com.example.DoubleBracket$1 extends java.util.HashMap {
       27: return
 }
 ```
-其中，关键代码的在 putfield 这一行，此行表示有一个对 DoubleBracket 的引用被存入到 this$0 中，也就是说这个匿名内部类持有了外部类的引用。
+其中，关键代码的在 putfield 这一行，此行表示有一个对 DoubleBracket 的引用被存入到 `this$0` 中，也就是说这个匿名内部类持有了外部类的引用。
 
 如果您觉得以上字节码不够直观，没关系，我们用下面的实际的代码来证明一下：
 ```
@@ -130,6 +130,7 @@ public class DoubleBracket {
 }
 ```
 当我们开启调试模式时，可以看出 map 中持有了外部对象 DoubleBracket，如下图所示：
+
 ![Image [2]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/java-core-demo/20210321173133.png)
 以上代码的执行结果为：
 
@@ -137,7 +138,7 @@ public class DoubleBracket {
 >
 > 从以上程序输出结果可以看出：匿名内部类持有了外部类的引用，因此我们才可以使用 $0 正常获取到外部类，并输出相关的类信息。
 
-### 什么情况会导致内存泄漏？
+### 1.4.什么情况会导致内存泄漏？
 当我们把以下正常的代码：
 ```
 public void createMap() {
@@ -163,7 +164,7 @@ public Map createMap() {
 为什么用了「可能」而不是「一定」会造成内存泄漏？
 
 这是因为当此 map 被赋值为其他类属性时，可能会导致 GC 收集时不清理此对象，这时候才会导致内存泄漏。
-### 如何保证内存不泄露？
+### 1.5.如何保证内存不泄露？
 要想保证双花扣号不泄漏，办法也很简单，只需要将 map 对象声明为 static 静态类型的就可以了，代码如下：
 ```
 public static Map createMap() {
@@ -206,14 +207,14 @@ class com.example.DoubleBracket$1 extends java.util.HashMap {
 ```
 从这次的代码我们可以看出，已经没有 putfield 关键字这一行了，也就是说静态匿名类不会持有外部对象的引用了。
 
-#### 为什么静态内部类不会持有外部类的引用？
+#### 1.5.1.为什么静态内部类不会持有外部类的引用？
 原因其实很简单，因为匿名内部类是静态的之后，它所引用的对象或属性也必须是静态的了，因此就可以直接从 JVM 的 Method Area（方法区）获取到引用而无需持久外部对象了。
-### 双花括号的替代方案
+### 1.6.双花括号的替代方案
 即使声明为静态的变量可以避免内存泄漏，但依旧不建议这样使用，为什么呢？
 
 原因很简单，项目一般都是需要团队协作的，假如那位老兄在不知情的情况下把你的 static 给删掉呢？这就相当于设置了一个隐形的“坑”，其他不知道的人，一不小心就跳进去了，所以我们可以尝试一些其他的方案，比如 Java8 中的 Stream API 和 Java9 中的集合工厂等。
 
-#### 替代方案 1：Stream
+#### 1.6.1.替代方案 1：Stream
 使用 Java8 中的 Stream API 替代，示例如下。原代码：
 ```
 List<String> list = new ArrayList() {{
@@ -240,12 +241,12 @@ Map map = new HashMap() {{
 Map map = Map.of("map1", "Java", "map2", "Redis");
 ```
 
-### 总结
+### 1.7总结
 本文我们讲了双花括号初始化因为会持有外部类的引用，从而可以会导致内存泄漏的问题，还从字节码以及反射的层面演示了这个问题。
 
 要想保证双花括号初始化不会出现内存泄漏的办法也很简单，只需要被 static 修饰即可，但这样做还是存在潜在的风险，可能会被某人不小心删除掉，于是我们另寻它道，发现了可以使用 Java8 中的 Stream 或 Java9 中的集合工厂 of 方法替代“{{”。
 
-### 使用匿名内部类初始化集合类
+### 1.8.使用匿名内部类初始化集合类
 ```
 List<String> list = new ArrayList<String>(){
             {
@@ -280,7 +281,7 @@ static {
 
 
 
-## ArrayList插入大量数据问题
+## 2.ArrayList插入大量数据问题
 **问题描述：**
 ```
 List<String> temp = new ArrayList() ;
@@ -294,7 +295,7 @@ for(String str : all) {
 
 其实在大部分情况下这都是没啥问题，无非就是循环的往 ArrayList 中写入数据而已。
 
-但在特殊情况下，比如这里的 getData() 返回数据非常巨大时后续 temp.add(str) 就会有问题了。
+但在特殊情况下，比如这里的 `getData()` 返回数据非常巨大时后续 `temp.add(str)` 就会有问题了。
 
 比如我们在 review 代码时发现这里返回的数据有时会高达 2000W，这时 ArrayList 写入的问题就凸显出来了。
 
@@ -316,7 +317,7 @@ temp.add("3");
 
 ![Image [2]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/java-core-demo/20210321173422.png)
 
-之所以是 3 ，是因为新的长度=原有长度 * 1.5
+之所以是 3 ，是因为`新的长度=原有长度 * 1.5`
 
 通过源码我们可以得知 ArrayList 的默认长度为 10.
 
@@ -324,13 +325,13 @@ temp.add("3");
 
 ![Image [4]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/java-core-demo/20210321173448.png)
 
-但其实并不是在初始化的时候就创建了 DEFAULT_CAPACITY=10 的数组。
+但其实并不是在初始化的时候就创建了 `DEFAULT_CAPACITY=10` 的数组。
 
 ![Image [5]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/java-core-demo/20210321173500.png)
 
 而是在往里边 add 第一个数据的时候会扩容到 10.
 
-既然知道了默认的长度为 10 ，那说明后续一旦写入到第九个元素的时候就会扩容为 10*1.5=15。这一步为数组复制，也就是要重新开辟一块新的内存空间存放这 15 个数组。
+既然知道了默认的长度为 10 ，那说明后续一旦写入到第九个元素的时候就会扩容为 `10*1.5=15`。这一步为数组复制，也就是要重新开辟一块新的内存空间存放这 15 个数组。
 
 一旦我们频繁且数量巨大的进行写入时就会导致许多的数组复制，这个效率是极低的。
 
@@ -340,7 +341,7 @@ temp.add("3");
 
 这里强烈建议大家：在有大量数据写入 ArrayList 时，一定要初始化指定长度。
 
-再一个是一定要慎用 add(intindex,E element) 向指定位置写入数据。
+再一个是一定要慎用 `add(intindex,E element)` 向指定位置写入数据。
 
 ![Image [6]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/java-core-demo/20210321173514.png)
 
@@ -350,9 +351,9 @@ temp.add("3");
 
 
 
-## Arrays.asList()使用指南
+## 3.Arrays.asList()使用指南
 
-### 简介
+### 3.1.简介
 Arrays.asList()在平时开发中还是比较常见的，我们可以使用它将一个数组转换为一个List集合。
 ```
 String[] myArray = { "Apple", "Banana", "Orange" }； 
@@ -369,13 +370,14 @@ public static <T> List<T> asList(T... a) {
     return new ArrayList<>(a);
 }
 ```
-### 《阿里巴巴Java 开发手册》对其的描述
+### 3.2.《阿里巴巴Java 开发手册》对其的描述
 Arrays.asList()将数组转换为集合后,底层其实还是数组，《阿里巴巴Java 开发手册》对于这个方法有如下描述：
 ![Image [7]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/java-core-demo/20210321173532.png)
 
-### 使用时的注意事项总结
-#### 传递的数组必须是对象数组，而不是基本类型。
-Arrays.asList()是泛型方法，传入的对象必须是对象数组。  
+### 3.3.使用时的注意事项总结
+#### 3.3.1.传递的数组必须是对象数组，而不是基本类型。
+`Arrays.asList()` 是泛型方法，传入的对象必须是对象数组。  
+
 ```
 int[] myArray = { 1, 2, 3 };
 List myList = Arrays.asList(myArray);
@@ -385,19 +387,22 @@ System.out.println(myList.get(1));//报错：ArrayIndexOutOfBoundsException
 int [] array=(int[]) myList.get(0);
 System.out.println(array[0]);//1
 ```
-当传入一个原生数据类型数组时，Arrays.asList() 的真正得到的参数就不是数组中的元素，而是数组对象本身！此时List 的唯一元素就是这个数组，这也就解释了上面的代码。
+当传入一个原生数据类型数组时，`Arrays.asList()`  的真正得到的参数就不是数组中的元素，而是数组对象本身！此时List 的唯一元素就是这个数组，这也就解释了上面的代码。
+
 我们使用包装类型数组就可以解决这个问题。
+
 ```
 Integer[] myArray = { 1, 2, 3 };
 ```
-#### 使用集合的修改方法:add()、remove()、clear()会抛出异常。
+#### 3.3.2.使用集合的修改方法:add()、remove()、clear()会抛出异常。
 ```
 List myList = Arrays.asList(1, 2, 3);
 myList.add(4);//运行时报错：UnsupportedOperationException
 myList.remove(1);//运行时报错：UnsupportedOperationException
 myList.clear();//运行时报错：UnsupportedOperationException
 ```
-Arrays.asList() 方法返回的并不是 java.util.ArrayList ，而是 java.util.Arrays 的一个内部类,这个内部类并没有实现集合的修改方法或者说并没有重写这些方法。
+`Arrays.asList()` 方法返回的并不是 `java.util.ArrayList` ，而是 `java.util.Arrays` 的一个内部类,这个内部类并没有实现集合的修改方法或者说并没有重写这些方法。
+
 ```
 List myList = Arrays.asList(1, 2, 3);
 System.out.println(myList.getClass());//class java.util.Arrays$ArrayList
@@ -445,14 +450,14 @@ System.out.println(myList.getClass());//class java.util.Arrays$ArrayList
         }
     }
 ```
-我们再看一下java.util.AbstractList的remove()方法，这样我们就明白为啥会抛出UnsupportedOperationException。
+我们再看一下 `java.util.AbstractList` 的 `remove()` 方法，这样我们就明白为啥会抛出`UnsupportedOperationException`。
 ```
 public E remove(int index) {
     throw new UnsupportedOperationException();
 }
 ```
-## 如何正确的将数组转换为ArrayList?
-### 自己动手实现（教育目的）
+## 4.如何正确的将数组转换为ArrayList?
+### 4.1.自己动手实现（教育目的）
 ```
 //JDK1.5+
 static <T> List<T> arrayToList(final T[] array) {
@@ -468,14 +473,14 @@ static <T> List<T> arrayToList(final T[] array) {
 Integer [] myArray = { 1, 2, 3 };
 System.out.println(arrayToList(myArray).getClass());//class java.util.ArrayList
 ```
-### 最简便的方法(推荐)
+### 4.2.最简便的方法(推荐)
 ```
 List list = new ArrayList<>(Arrays.asList("a", "b", "c"))
 ```
 注意：
 1. 这样做生成的list，是定长的。也就是说，如果你对它做add或者remove，都会抛`UnsupportedOperationException`。
 2. 如果修改数组的值，list中的对应值也会改变！
-### 使用 Java8 的Stream(推荐)
+### 4.3.使用 Java8 的Stream(推荐)
 ```
 Integer [] myArray = { 1, 2, 3 };
 List myList = Arrays.stream(myArray).collect(Collectors.toList());
@@ -485,25 +490,25 @@ List myList = Arrays.stream(myArray).collect(Collectors.toList());
 int [] myArray2 = { 1, 2, 3 };
 List myList = Arrays.stream(myArray2).boxed().collect(Collectors.toList());
 ```
-### 使用 Guava(推荐)
-对于不可变集合，你可以使用ImmutableList类及其of()与copyOf()工厂方法：（参数不能为空）
+### 4.4.使用 Guava(推荐)
+对于不可变集合，你可以使用 `ImmutableList` 类及其 `of()` 与 `copyOf()` 工厂方法：（参数不能为空）
 ```
 List<String> il = ImmutableList.of("string", "elements");  // from varargs
 List<String> il = ImmutableList.copyOf(aStringArray);      // from array
 ```
-对于可变集合，你可以使用Lists类及其newArrayList()工厂方法：
+对于可变集合，你可以使用Lists类及其 `newArrayList()` 工厂方法：
 ```
 List<String> l1 = Lists.newArrayList(anotherListOrCollection);    // from collection
 List<String> l2 = Lists.newArrayList(aStringArray);               // from array
 List<String> l3 = Lists.newArrayList("or", "string", "elements"); // from varargs
 ```
-### 使用 Apache Commons Collections
+### 4.5.使用 Apache Commons Collections
 ```
 List<String> list = new ArrayList<String>();
 CollectionUtils.addAll(list, str);
 ```
 
-### 使用 keySet 迭代器迭代 Map，获取对应的 value。
+### 4.6.使用 keySet 迭代器迭代 Map，获取对应的 value。
 反例：
 
 ![Image [8]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/java-core-demo/20210321173549.png)
@@ -512,7 +517,7 @@ CollectionUtils.addAll(list, str);
 
 ![Image [9]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/java-core-demo/20210321173557.png)
 
-解惑：keySet 方式遍历 Map 的性能不如 entrySet 性能好。
+解惑：`keySet` 方式遍历 Map 的性能不如 `entrySet` 性能好。
 
 ![Image [10]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/java-core-demo/20210321173606.png)
 

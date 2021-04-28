@@ -67,11 +67,11 @@ class 父类 {}
 class 子类 extends 父类 {}
 ```
 
-#### 继承类型
+#### 1.2.1.继承类型
 
-![image-20210320145551644](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/java-core-demo/20210320145551.png)](https://
+![image-20210320145551644](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/java-core-demo/20210320145551.png)
 
-#### 继承的特性
+#### 1.2.2.继承的特性
 
 - 子类拥有父类非 private 的属性、方法。
 - 子类可以拥有自己的属性和方法，即子类可以对父类进行扩展。
@@ -79,9 +79,9 @@ class 子类 extends 父类 {}
 - Java 的继承是单继承，但是可以多重继承，单继承就是一个子类只能继承一个父类，多重继承就是，例如 A 类继承 B 类，B 类继承 C 类，所以按照关系就是 C 类是 B 类的父类，B 类是 A 类的父类，这是 Java 继承区别于 C++ 继承的一个特性。
 - 提高了类之间的耦合性（继承的缺点，耦合度高就会造成代码之间的联系越紧密，代码独立性越差）。
 
-#### 继承关键字
+#### 1.2.3.继承关键字
 
-继承可以使用 extends 和 implements 这两个关键字来实现继承，而且所有的类都是继承于 java.lang.Object，当一个类没有继承的两个关键字，则默认继承 object（这个类在 **java.lang** 包中，所以不需要 **import**）祖先类。
+继承可以使用 extends 和 implements 这两个关键字来实现继承，而且所有的类都是继承于 `java.lang.Object`，当一个类没有继承的两个关键字，则默认继承 object（这个类在 **java.lang** 包中，所以不需要 **import**）祖先类。
 
 ### 1.3. 多态
 
@@ -260,7 +260,7 @@ class MultiClass3 {}
 public class MultiClassDemo {}
 ```
 
-执行 `javac MultiClassDemo.java` 命令，本地会生成 MultiClass1.class、MultiClass2.class、MultiClass3.class、MultiClassDemo.class 四个文件。
+执行 `javac MultiClassDemo.java` 命令，本地会生成 `MultiClass1.class`、`MultiClass2.class`、`MultiClass3.class`、`MultiClassDemo.class` 四个文件。
 
 **Java 可运行程序是由一组 .class 文件打包并压缩成的一个 .jar 文件**。Java 解释器负责这些文件的查找、装载和解释。**Java 类库实际上是一组类文件（.java 文件）。**
 
@@ -271,18 +271,18 @@ public class MultiClassDemo {}
 
 Java 中为了解决命名冲突问题，提供了包（`package`）和导入（`import`）机制。
 
-#### package
+#### 5.1.1.package
 
 包（`package`）的原则：
 
 - 包类似于文件夹，文件放在文件夹中，类和接口则放在包中。为了便于组织，文件夹一般是一个**有层次的树形结构**，包也类似。
 - **包名以逗号 `.` 分隔，表示层次结构。**
-- Java 中命名包名的一个惯例是使用域名作为前缀，因为域名是唯一的，一般按照域名的反序来定义包名，比如，域名是：apache.org，包名就以 org.apache 开头。
+- Java 中命名包名的一个惯例是使用域名作为前缀，因为域名是唯一的，一般按照域名的反序来定义包名，比如，域名是：`apache.org`，包名就以 `org.apache` 开头。
 - **包名和文件目录结构必须完全匹配。**Java 解释器运行过程如下：
   - 找出环境变量 CLASSPATH，作为 .class 文件的根目录。
   - 从根目录开始，获取包名称，并将逗号 `.` 替换为文件分隔符（反斜杠 `/`），通过这个路径名称去查找 Java 类。
 
-#### import
+#### 5.1.2.import
 
 同一个包下的类之间互相引用是不需要包名的，可以直接使用。但如果类不在同一个包内，则必须要知道其所在的包，使用有两种方式：
 
@@ -358,7 +358,7 @@ Java 标准库中，比如 `collection` 框架，很多通用部分就被抽取�
 
 ## 8.this 关键字
 
-### 消除字段歧义
+### 8.1.消除字段歧义
 
 我敢赌一毛钱，所有的读者，不管男女老少，应该都知道这种用法，毕竟写构造方法的时候经常用啊。谁要不知道，过来，我给你发一毛钱红包，只要你脸皮够厚。
 
@@ -376,7 +376,7 @@ public class Writer {
 
 Writer 类有两个成员变量，分别是 age 和 name，在使用有参构造函数的时候，如果参数名和成员变量的名字相同，就需要使用 this 关键字消除歧义：this.age 是指成员变量，age 是指构造方法的参数。
 
-### 引用类的其他构造方法
+### 8.2.引用类的其他构造方法
 
 当一个类的构造方法有多个，并且它们之间有交集的话，就可以使用 this 关键字来调用不同的构造方法，从而减少代码量。
 
@@ -420,7 +420,7 @@ public class Writer {
 
 ![image-20210320232056165](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/java-core-demo/20210320232056.png)
 
-### 作为参数传递
+### 8.3.作为参数传递
 
 在下例中，有一个无参的构造方法，里面调用了 `print()` 方法，参数只有一个 this 关键字。
 
@@ -450,7 +450,7 @@ main com.cmower.baeldung.this1.ThisTest@573fd745
 
 从结果中可以看得出来，this 就是我们在 `main()` 方法中使用 new 关键字创建的 ThisTest 对象。
 
-### 链式调用
+### 8.4.链式调用
 
 学过 JavaScript，或者 jQuery 的读者可能对链式调用比较熟悉，类似于 `a.b().c().d()`，仿佛能无穷无尽调用下去。
 
@@ -504,7 +504,7 @@ Writer writer = new Writer.WriterBuilder(18,"沉默王二")
                 .build();
 ```
 
-### 在内部类中访问外部类对象
+### 8.5.在内部类中访问外部类对象
 
 说实话，自从 Java 8 的函数式编程出现后，就很少用到 this 在内部类中访问外部类对象了。来看一个示例：
 
@@ -523,9 +523,9 @@ public class ThisInnerTest {
 
 在内部类 InnerClass 的构造方法中，通过外部类.this 可以获取到外部类对象，然后就可以使用外部类的成员变量了，比如说 name。
 
-## 8.深克隆和浅克隆
+## 9.深克隆和浅克隆
 
-### 基本概念
+### 9.1.基本概念
 **浅复制(浅克隆)**
 
 被复制对象的所有变量都含有与原来的对象相同的值，而所有的对其他对象的引用仍然指向原来的对象。换言之，浅复制仅仅复制所拷贝的对象，而不复制它所引用的对象。
@@ -536,7 +536,7 @@ public class ThisInnerTest {
 
 **实现java深复制和浅复制的最关键的就是要实现Object中的clone()方法。**
 
-### 如何使用clone()方法
+### 9.2.如何使用clone()方法
 首先我们来看一下Cloneable接口：
 官方解释：
 1. 实现此接口则可以使用java.lang.Object 的clone()方法，否则会抛出CloneNotSupportedException 异常
@@ -583,7 +583,7 @@ public class Person implements Cloneable{
 }
 ```
 要注意，必须将克隆方法写在try-catch块中，因为clone方法会把异常抛出，当然程序也要求我们try-catch。
-### java.lang.object规范中对clone方法的约定
+### 9.3.java.lang.object规范中对clone方法的约定
 1. 对任何的对象x，都有x.clone() !=x 因为克隆对象与原对象不是同一个对象
 2. 对任何的对象x，都有x.clone().getClass()= =x.getClass()//克隆对象与原对象的类型一样
 3. 如果对象x的equals()方法定义恰当，那么x.clone().equals(x)应该成立
@@ -591,9 +591,9 @@ public class Person implements Cloneable{
 对于以上三点要注意，这3项约定并没有强制执行，所以如果用户不遵循此约定，那么将会构造出不正确的克隆对象，所以根据effective java的建议：
 > 谨慎的使用clone方法，或者尽量避免使用。
 
-### 深复制实例
+### 9.4.深复制实例
 深拷贝实现的是对所有可变(没有被final修饰的引用变量)引用类型的成员变量都开辟内存空间所以一般深拷贝对于浅拷贝来说是比较耗费时间和内存开销的。
-#### 重写clone方法实现深拷贝
+#### 9.4.1.重写clone方法实现深拷贝
 学生类：
 ```
 public class Student implements Cloneable {
@@ -697,7 +697,7 @@ public class test {
 运行结果：
 克隆前的学生姓名：学生1
 克隆后的学生姓名：我是克隆对象更改后的学生2
-#### 序列化实现深克隆
+#### 9.4.2.序列化实现深克隆
 Teacher:
 ```
 public class Teacher implements Serializable{
@@ -792,8 +792,9 @@ public class test {
 ```
 **当然这些工作都有现成的轮子了，借助于Apache Commons可以直接实现：**
 
-浅克隆：BeanUtils.cloneBean(Object obj);
-深克隆：SerializationUtils.clone(T object);
+**浅克隆**：BeanUtils.cloneBean(Object obj);
+
+**深克隆**：SerializationUtils.clone(T object);
 
 
 

@@ -184,9 +184,9 @@ Java虚拟机栈：
 JVM实例化字符串常量池时
 
 ```
-1String str1 = "hello";
-2String str2 = "hello";
-3System.out.println("str1 == str2" : str1 == str2 ) //true
+String str1 = "hello";
+String str2 = "hello";
+System.out.println("str1 == str2" : str1 == str2 ) //true
 ```
 
 String.intern()
@@ -194,10 +194,10 @@ String.intern()
 通过new操作符创建的字符串对象不指向字符串池中的任何对象，但是可以通过使用字符串的intern()方法来指向其中的某一个。java.lang.String.intern()返回一个保留池字符串，就是一个在全局字符串池中有了一个入口。如果以前没有在全局字符串池中，那么它就会被添加到里面。
 
 ```
-1String s1 = "Hello";
-2String s2 = new String("Hello");
-3String s3 = s2.intern();
-4System.out.println("s1 == s3? " + (s1 == s3)); // true
+String s1 = "Hello";
+String s2 = new String("Hello");
+String s3 = s2.intern();
+System.out.println("s1 == s3? " + (s1 == s3)); // true
 ```
 
 
@@ -247,7 +247,7 @@ Java为了避免产生大量的String对象，设计了一个字符串常量池�
 
 了解了String类的工作原理，回归问题本身：
 
-在String的工作原理中，已经提到了，new一个String对象，是需要先在字符串常量中查找相同值或创建一个字符串常量，然后再在内存中创建一个String对象，所以String str = new String("xyz"); 会创建两个对象。
+在String的工作原理中，已经提到了，new一个String对象，是需要先在字符串常量中查找相同值或创建一个字符串常量，然后再在内存中创建一个String对象，所以 `String str = new String("xyz");` 会创建两个对象。
 
 下面两道Java面试题可以放在留言区回复哟：
 
@@ -698,7 +698,7 @@ final int[] value={1,2,3};
 value[2]=100;  //这时候数组里已经是{1,2,100}
 ```
 
-所以String是不可变，关键是因为设计源代码的工程师，在后面所有String的方法里很小心的没有去动Array里的元素，没有暴露内部成员字段。private final char value[]这一句里，private的私有访问权限的作用都比final大。而且设计师还很小心地把整个String设成final禁止继承，避免被其他人继承后破坏。**所以String是不可变的关键都在底层的实现，而不是一个final。**
+所以String是不可变，关键是因为设计源代码的工程师，在后面所有String的方法里很小心的没有去动Array里的元素，没有暴露内部成员字段。`private final char value[]` 这一句里，private的私有访问权限的作用都比final大。而且设计师还很小心地把整个String设成final禁止继承，避免被其他人继承后破坏。**所以String是不可变的关键都在底层的实现，而不是一个final。**
 
 **不可变有什么好处？**
 
@@ -1521,19 +1521,20 @@ public static void main(String[] args) throws Exception {
 这个例子也比较简单，就是为了证明使用intern()比不使用intern()消耗的内存更少。
 
 先定义一个长度为10的Integer数组，并随机为其赋值，在通过for循环为长度为10万的String对象依次赋值，这些值都来自于Integer数组。两种情况分别运行，可通过 `Window ---> Preferences --> Java --> Installed JREs` 设置JVM启动参数为 `-agentlib:hprof=heap=dump,format=b` ，将程序运行完后的hprof置于工程目录下。再通过MAT插件查看该hprof文件。
+
 两次实验结果如下：
 
 ![20160823152027600](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/java-core-demo/20210320215000.jpg)
 
 ![20160823152041988](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/java-core-demo/20210320215005.jpg)
 
-从运行结果来看，不使用intern()的情况下，程序生成了101762个String对象，而使用了intern()方法时，程序仅生成了1772个String对象。自然也证明了intern()节省内存的结论。
+从运行结果来看，不使用 `intern()` 的情况下，程序生成了101762个String对象，而使用了 `intern()` 方法时，程序仅生成了1772个String对象。自然也证明了 `intern()` 节省内存的结论。
 
-细心的同学会发现使用了intern()方法后程序运行时间有所增加。这是因为程序中每次都是用了new String后又进行intern()操作的耗时时间，但是不使用intern()占用内存空间导致GC的时间是要远远大于这点时间的。 
+细心的同学会发现使用了 `intern()` 方法后程序运行时间有所增加。这是因为程序中每次都是用了new String后又进行 `intern()` 操作的耗时时间，但是不使用 `intern()` 占用内存空间导致GC的时间是要远远大于这点时间的。 
 
 #### 2.深入认识intern()方法
 
-JDK1.7后，常量池被放入到堆空间中，这导致intern()函数的功能不同，具体怎么个不同法，且看看下面代码，这个例子是网上流传较广的一个例子，分析图也是直接粘贴过来的，这里我会用自己的理解去解释这个例子：
+JDK1.7后，常量池被放入到堆空间中，这导致 `intern()` 函数的功能不同，具体怎么个不同法，且看看下面代码，这个例子是网上流传较广的一个例子，分析图也是直接粘贴过来的，这里我会用自己的理解去解释这个例子：
 
 ```
 String s = new String("1");
@@ -1792,7 +1793,7 @@ CONSTANT_Utf8_info {
 
 通过翻阅《规范》，我们可以获悉。u2表示两个字节的无符号数，那么1个字节有8位，2个字节就有16位。
 
-16位无符号数可表示的最大值位2^16 - 1 = 65535。
+16位无符号数可表示的最大值位 `2^16 - 1 = 65535`。
 
 也就是说，Class文件中常量池的格式规定了，其字符串常量的长度不能超过65535。
 
@@ -1932,9 +1933,9 @@ private static final long serialVersionUID = -6849794470754667710L;
 
 其中，n为字符串的长度。
 
-这里，可能有小伙伴会问，为什么是 40 + 2 * n 呢？这是因为40是空字符串占用的内存空间，这个我们上面已经说过了，String类实际上是把数据存储到char[]这个成员变量数组中的，而char[]数组中的一个char类型的数据占用2个字节的空间，所以，只是String中的数据就会占用 2 * n（n为字符串的长度）个字节的空间，再加上空字符串所占用的40个字节空间，最终得出一个字符串所占用的存储空间为： 40 + 2 * n （n为字符串长度）。
+这里，可能有小伙伴会问，为什么是 `40 + 2 * n` 呢？这是因为40是空字符串占用的内存空间，这个我们上面已经说过了，String类实际上是把数据存储到char[]这个成员变量数组中的，而char[]数组中的一个char类型的数据占用2个字节的空间，所以，只是String中的数据就会占用 2 * n（n为字符串的长度）个字节的空间，再加上空字符串所占用的40个字节空间，最终得出一个字符串所占用的存储空间为： `40 + 2 * n` （n为字符串长度）。
 
-注：40 + 2 * n 这个公式我们可以看成是计算String对象占用多大内存空间的通用公式。
+注：`40 + 2 * n` 这个公式我们可以看成是计算String对象占用多大内存空间的通用公式。
 
 因此在代码中大量使用String对象时，应考虑内存的实际占用情况。
 

@@ -611,7 +611,7 @@ Java 动态代理基于经典代理模式，引入了一个 `InvocationHandler`�
 
 在 Java 的动态代理机制中，有两个重要的类（接口），一个是 `InvocationHandler` 接口、另一个则是 `Proxy` 类，这一个类和一个接口是实现我们动态代理所必须用到的。
 
-#### InvocationHandler 接口
+#### 4.2.1.InvocationHandler 接口
 
 `InvocationHandler` 接口定义：
 
@@ -638,7 +638,7 @@ Object invoke(Object proxy, Method method, Object[] args) throws Throwable
 
 如果不是很明白，等下通过一个实例会对这几个参数进行更深的讲解。
 
-#### Proxy 类
+#### 4.2.2.Proxy 类
 
 `Proxy` 这个类的作用就是用来动态创建一个代理对象的类，它提供了许多的方法，但是我们用的最多的就是 `newProxyInstance` 这个方法：
 
@@ -654,7 +654,7 @@ public static Object newProxyInstance(ClassLoader loader, Class<?>[] interfaces,
 - **interfaces** - 一个 `Class<?>` 对象的数组，表示的是我将要给我需要代理的对象提供一组什么接口，如果我提供了一组接口给它，那么这个代理对象就宣称实现了该接口(多态)，这样我就能调用这组接口中的方法了
 - **h** - 一个 `InvocationHandler` 对象，表示的是当我这个动态代理对象在调用方法的时候，会关联到哪一个 `InvocationHandler` 对象上
 
-#### JDK 动态代理实例
+#### 4.2.3.JDK 动态代理实例
 
 上面的内容介绍完这两个接口(类)以后，我们来通过一个实例来看看我们的动态代理模式是什么样的：
 
@@ -795,7 +795,7 @@ public abstract java.lang.String io.github.dunwu.javacore.reflect.InvocationHand
 
 正好就是我们的 Subject 接口中的两个方法，这也就证明了当我通过代理对象来调用方法的时候，起实际就是委托由其关联到的 handler 对象的 invoke 方法中来调用，并不是自己来真实调用，而是通过代理的方式来调用的。
 
-#### JDK 动态代理小结
+#### 4.2.4.JDK 动态代理小结
 
 代理类与委托类实现同一接口，主要是通过代理类实现 `InvocationHandler` 并重写 `invoke` 方法来进行动态代理的，在 `invoke` 方法中将对方法进行处理。
 

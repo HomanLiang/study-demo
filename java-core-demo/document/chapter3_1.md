@@ -183,7 +183,7 @@ Java 中所有类都默认继承 `java.lang.Object` 类，在 `java.lang.Object`
 
 ### 2.5. fail-fast
 
-#### fail-fast 的要点
+#### 2.5.1.fail-fast 的要点
 
 Java 容器（如：ArrayList、HashMap、TreeSet 等待）的 javadoc 中常常提到类似的描述：
 
@@ -255,7 +255,7 @@ public class FailFastDemo {
 
 执行后，会抛出 `java.util.ConcurrentModificationException` 异常。
 
-#### 解决 fail-fast
+#### 2.5.2.解决 fail-fast
 
 fail-fast 有两种解决方案：
 

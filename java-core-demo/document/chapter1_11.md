@@ -338,9 +338,9 @@ public class SafeVarargsAnnotationDemo {
 
 需要注意的是，如果一个接口符合"函数式接口"定义，不加 `@FunctionalInterface` 也没关系；但如果编写的不是函数式接口，却使用 `@FunctionInterface`，那么编译器会报错。
 
-什么是函数式接口？
+**什么是函数式接口？**
 
-**函数式接口(Functional Interface)就是一个有且仅有一个抽象方法，但是可以有多个非抽象方法的接口**。函数式接口可以被隐式转换为 lambda 表达式。
+函数式接口(Functional Interface)就是一个有且仅有一个抽象方法，但是可以有多个非抽象方法的接口。函数式接口可以被隐式转换为 lambda 表达式。
 
 函数式接口的特点：
 

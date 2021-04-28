@@ -264,17 +264,17 @@ TreeSet判断两个对象不相等的方式是两个对象通过equals方法返�
 
 - **自然排序**
 
-  自然排序使用要排序元素的CompareTo（Object obj）方法来比较元素之间大小关系，然后将元素按照升序排列。
+  自然排序使用要排序元素的 `CompareTo（Object obj）`方法来比较元素之间大小关系，然后将元素按照升序排列。
 
-  Java提供了一个Comparable接口，该接口里定义了一个compareTo(Object obj)方法，该方法返回一个整数值，实现了该接口的对象就可以比较大小。
+  Java提供了一个Comparable接口，该接口里定义了一个 `compareTo(Object obj)` 方法，该方法返回一个整数值，实现了该接口的对象就可以比较大小。
 
-  obj1.compareTo(obj2)方法如果返回0，则说明被比较的两个对象相等，如果返回一个正数，则表明obj1大于obj2，如果是 负数，则表明obj1小于obj2。
+  `obj1.compareTo(obj2)` 方法如果返回0，则说明被比较的两个对象相等，如果返回一个正数，则表明obj1大于obj2，如果是 负数，则表明obj1小于obj2。
 
   如果我们将两个对象的equals方法总是返回true，则这两个对象的compareTo方法返回应该返回0
 
 - **定制排序**
 
-  自然排序是根据集合元素的大小，以升序排列，如果要定制排序，应该使用Comparator接口，实现 int compare(T o1,T o2)方法
+  自然排序是根据集合元素的大小，以升序排列，如果要定制排序，应该使用Comparator接口，实现 `int compare(T o1,T o2)` 方法
 
 
 

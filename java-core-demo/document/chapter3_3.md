@@ -145,7 +145,7 @@ public abstract class Dictionary<K,V> {}
 
 ### 2.2. HashMap 原理
 
-#### HashMap 数据结构
+#### 2.2.1.HashMap 数据结构
 
 `HashMap` 的核心字段：
 
@@ -172,7 +172,7 @@ public class HashMap<K,V> extends AbstractMap<K,V>
 }
 ```
 
-#### HashMap 构造方法
+#### 2.2.2.HashMap 构造方法
 
 ```
 public HashMap(); // 默认加载因子0.75
@@ -181,7 +181,7 @@ public HashMap(int initialCapacity, float loadFactor); // 以 initialCapacity �
 public HashMap(Map<? extends K, ? extends V> m) // 默认加载因子0.75
 ```
 
-#### put 方法的实现
+#### 2.2.3.put 方法的实现
 
 put 方法大致的思路为：
 
@@ -189,7 +189,7 @@ put 方法大致的思路为：
 - 如果没有哈希碰撞，直接放到桶里；如果有哈希碰撞，以链表的形式存在桶后。
 - 如果哈希碰撞导致链表过长(大于等于 `TREEIFY_THRESHOLD`，数值为 8)，就把链表转换成红黑树；
 - 如果节点已经存在就替换旧值
-- 桶数量超过容量*负载因子（即 `load factor * current capacity`），HashMap 调用 `resize` 自动扩容一倍
+- 桶数量超过`容量*负载因子`（即 `load factor * current capacity`），HashMap 调用 `resize` 自动扩容一倍
 
 具体代码的实现如下：
 
@@ -256,19 +256,19 @@ final V putVal(int hash, K key, V value, boolean onlyIfAbsent,
 
 为什么计算 hash 使用 hashcode 无符号位移 16 位。
 
-假设要添加两个对象 a 和 b，如果数组长度是 16，这时对象 a 和 b 通过公式 (n - 1) & hash 运算，也就是 (16-1)＆a.hashCode 和 (16-1)＆b.hashCode，15 的二进制为 0000000000000000000000000001111，假设对象 A 的 hashCode 为 1000010001110001000001111000000，对象 B 的 hashCode 为 0111011100111000101000010100000，你会发现上述与运算结果都是 0。这样的哈希结果就太让人失望了，很明显不是一个好的哈希算法。
+假设要添加两个对象 a 和 b，如果数组长度是 16，这时对象 a 和 b 通过公式 `(n - 1) & hash` 运算，也就是 `(16-1)＆a.hashCode` 和 `(16-1)＆b.hashCode`，15 的二进制为 0000000000000000000000000001111，假设对象 A 的 hashCode 为 1000010001110001000001111000000，对象 B 的 hashCode 为 0111011100111000101000010100000，你会发现上述与运算结果都是 0。这样的哈希结果就太让人失望了，很明显不是一个好的哈希算法。
 
 但如果我们将 hashCode 值右移 16 位（h >>> 16 代表无符号右移 16 位），也就是取 int 类型的一半，刚好可以将该二进制数对半切开，并且使用位异或运算（如果两个数对应的位置相反，则结果为 1，反之为 0），这样的话，就能避免上面的情况发生。这就是 hash() 方法的具体实现方式。**简而言之，就是尽量打乱 hashCode 真正参与运算的低 16 位。**
 
-#### get 方法的实现
+#### 2.2.4.get 方法的实现
 
 在理解了 put 之后，get 就很简单了。大致思路如下：
 
-- 对 key 的 hashCode() 做 hash 计算，然后根据 hash 值再计算桶的 index
+- 对 key 的 `hashCode()` 做 hash 计算，然后根据 hash 值再计算桶的 index
 - 如果桶中的第一个节点命中，直接返回；
 - 如果有冲突，则通过 `key.equals(k)` 去查找对应的 entry
-  - 若为树，则在红黑树中通过 `key.equals(k)` 查找，O(logn)；
-  - 若为链表，则在链表中通过 `key.equals(k)` 查找，O(n)。
+  - 若为树，则在红黑树中通过 `key.equals(k)` 查找，`O(logn)`；
+  - 若为链表，则在链表中通过 `key.equals(k)` 查找，`O(n)`。
 
 具体代码的实现如下：
 
@@ -303,7 +303,7 @@ final Node<K,V> getNode(int hash, Object key) {
 }
 ```
 
-#### hash 方法的实现
+#### 2.2.5.hash 方法的实现
 
 HashMap **计算桶下标（index）公式：`key.hashCode() ^ (h >>> 16)`**。
 
@@ -340,14 +340,14 @@ static final int hash(Object key) {
 
 之前已经提过，在获取 HashMap 的元素时，基本分两步：
 
-1. 首先根据 hashCode()做 hash，然后确定 bucket 的 index；
-2. 如果 bucket 的节点的 key 不是我们需要的，则通过 keys.equals()在链中找。
+1. 首先根据 `hashCode()` 做 hash，然后确定 bucket 的 index；
+2. 如果 bucket 的节点的 key 不是我们需要的，则通过 `keys.equals()` 在链中找。
 
 在 JDK8 之前的实现中是用链表解决冲突的，在产生碰撞的情况下，进行 get 时，两步的时间复杂度是 O(1)+O(n)。因此，当碰撞很厉害的时候 n 很大，O(n)的速度显然是影响速度的。
 
-因此在 JDK8 中，利用红黑树替换链表，这样复杂度就变成了 O(1)+O(logn)了，这样在 n 很大的时候，能够比较理想的解决这个问题，在 JDK8：HashMap 的性能提升一文中有性能测试的结果。
+因此在 JDK8 中，利用红黑树替换链表，这样复杂度就变成了 `O(1)+O(logn)`了，这样在 n 很大的时候，能够比较理想的解决这个问题，在 JDK8：HashMap 的性能提升一文中有性能测试的结果。
 
-#### resize 的实现
+#### 2.2.6.resize 的实现
 
 当 `put` 时，如果发现目前的 bucket 占用程度已经超过了 Load Factor 所希望的比例，那么就会发生 resize。在 resize 的过程，简单的说就是把 bucket 扩充为 2 倍，之后重新计算 index，把节点再放到新的 bucket 中。
 
@@ -454,7 +454,7 @@ final Node<K,V>[] resize() {
 
 ### 2.3 HashMap默认容量的选择，背后的思考
 
-#### 什么是容量
+#### 2.3.1.什么是容量
 
 在Java中，保存数据有两种比较简单的数据结构：数组和链表。数组的特点是：寻址容易，插入和删除困难；而链表的特点是：寻址困难，插入和删除容易。HashMap就是将数组和链表组合在一起，发挥了两者的优势，我们可以将其理解为链表的数组。
 
@@ -496,7 +496,7 @@ capacity : 16、size : 1
 
 通过前面的例子，我们发现了，当我们创建一个HashMap的时候，如果没有指定其容量，那么会得到一个默认容量为16的Map，那么，这个容量是怎么来的呢？又为什么是这个数字呢？
 
-#### 容量与哈希
+#### 2.3.2.容量与哈希
 
 要想讲清楚这个默认容量的缘由，我们要首先要知道这个容量有什么用？
 
@@ -510,11 +510,11 @@ capacity : 16、size : 1
 
 如果真的是这么简单的话，那HashMap的容量设置就会简单很多了，但是考虑到效率等问题，HashMap的hash方法实现还是有一定的复杂的。
 
-#### hash的实现
+#### 2.3.3.hash的实现
 
 接下来就介绍下HashMap中hash方法的实现原理。
 
-具体实现上，由两个方法int hash(Object k)和int indexFor(int h, int length)来实现。
+具体实现上，由两个方法 `int hash(Object k)` 和 `int indexFor(int h, int length)` 来实现。
 
 > hash ：该方法主要是将Object转换成一个整型。
 >
@@ -524,13 +524,11 @@ capacity : 16、size : 1
 
 ```
 static int indexFor(int h, int length) {
-
     return h & (length-1);
-
 }
 ```
 
-indexFor方法其实主要是将hashcode换成链表数组中的下标。其中的两个参数h表示元素的hashcode值，length表示HashMap的容量。那么return h & (length-1) 是什么意思呢？
+indexFor方法其实主要是将hashcode换成链表数组中的下标。其中的两个参数h表示元素的hashcode值，length表示HashMap的容量。那么 `return h & (length-1)` 是什么意思呢？
 
 其实，他就是取模。Java之所有使用位运算(&)来代替取模运算(%)，最主要的考虑就是效率。
 
@@ -560,11 +558,11 @@ X % 2^n = X & (2^n – 1)
 
 ![640 (2)](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/java-core-demo/20210321163930.webp)
 
-所以，return h & (length-1);只要保证length的长度是2^n 的话，就可以实现取模运算了。
+所以，`return h & (length-1);` 只要保证length的长度是 `2^n` 的话，就可以实现取模运算了。
 
-所以，因为位运算直接对内存数据进行操作，不需要转成十进制，所以位运算要比取模运算的效率更高，所以HashMap在计算元素要存放在数组中的index的时候，使用位运算代替了取模运算。之所以可以做等价代替，前提是要求HashMap的容量一定要是2^n 。
+所以，因为位运算直接对内存数据进行操作，不需要转成十进制，所以位运算要比取模运算的效率更高，所以HashMap在计算元素要存放在数组中的index的时候，使用位运算代替了取模运算。之所以可以做等价代替，前提是要求HashMap的容量一定要是 `2^n` 。
 
-那么，既然是2^n ，为啥一定要是16呢？为什么不能是4、8或者32呢？
+那么，既然是 `2^n` ，为啥一定要是16呢？为什么不能是4、8或者32呢？
 
 关于这个默认容量的选择，JDK并没有给出官方解释，笔者也没有在网上找到关于这个任何有价值的资料。（如果哪位有相关的权威资料或者想法，可以留言交流）
 
@@ -580,7 +578,7 @@ X % 2^n = X & (2^n – 1)
 
 关于这部分，HashMap在两个可能改变其容量的地方都做了兼容处理，分别是指定容量初始化时以及扩容时。
 
-#### 指定容量初始化
+#### 2.3.4.指定容量初始化
 
 当我们通过HashMap(int initialCapacity)设置初始容量的时候，HashMap并不一定会直接采用我们传入的数值，而是经过计算，得到一个新值，目的是提高hash的效率。(1->1、3->4、7->8、9->16)
 
@@ -670,17 +668,17 @@ Step 1 怎么理解呢？其实是对一个二进制数依次向右移位，然�
 
 总之，HashMap根据用户传入的初始化容量，利用无符号右移和按位或运算等方式计算出第一个大于该数的2的幂。
 
-#### 扩容
+#### 2.3.5.扩容
 
 除了初始化的时候会指定HashMap的容量，在进行扩容的时候，其容量也可能会改变。
 
 HashMap有扩容机制，就是当达到扩容条件时会进行扩容。HashMap的扩容条件就是当HashMap中的元素个数（size）超过临界值（threshold）时就会自动扩容。
 
-在HashMap中，threshold = loadFactor * capacity。
+在HashMap中，`threshold = loadFactor * capacity`。
 
 loadFactor是装载因子，表示HashMap满的程度，默认值为0.75f，设置成0.75有一个好处，那就是0.75正好是3/4，而capacity又是2的幂。所以，两个数的乘积都是整数。
 
-对于一个默认的HashMap来说，默认情况下，当其size大于12(16*0.75)时就会触发扩容。
+对于一个默认的HashMap来说，默认情况下，当其size大于`12(16*0.75)`时就会触发扩容。
 
 下面是HashMap中的扩容方法(resize)中的一段：
 
@@ -700,7 +698,7 @@ if ((newCap = oldCap << 1) < MAXIMUM_CAPACITY &&
 
 所以，通过保证初始化容量均为2的幂，并且扩容时也是扩容到之前容量的2倍，所以，保证了HashMap的容量永远都是2的幂。
 
-#### 总结
+#### 2.3.6.总结
 
 HashMap作为一种数据结构，元素在put的过程中需要进行hash运算，目的是计算出该元素存放在hashMap中的具体位置。
 
@@ -733,7 +731,7 @@ hash运算的过程其实就是对目标元素的Key进行hashcode，再对Map�
 
 ### 3.2. LinkedHashMap 要点
 
-#### LinkedHashMap 数据结构
+#### 3.2.1.LinkedHashMap 数据结构
 
 **`LinkedHashMap` 通过维护一对 `LinkedHashMap.Entry<K,V>` 类型的头尾指针，以双链表形式，保存所有数据**。
 
@@ -767,7 +765,7 @@ TreeMap 不是线程安全的。
 
 ### 4.2. TreeMap 原理
 
-#### put 方法
+#### 4.2.1.put 方法
 
 ```java
 public V put(K key, V value) {
@@ -830,7 +828,7 @@ public V put(K key, V value) {
 }
 ```
 
-#### get 方法
+#### 4.2.2.get 方法
 
 ```
 public V get(Object key) {
@@ -1767,7 +1765,7 @@ threshold = (int)(capacity * loadFactor);
 
 ![640](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/java-core-demo/20210321170949.png)
 
-### get操作源码
+#### get操作源码
 
 - 首先计算hash值，定位到该table索引位置，如果是首节点符合就返回
 - 如果遇到扩容的时候，会调用标志正在扩容节点ForwardingNode的find方法，查找该节点，匹配就返回
