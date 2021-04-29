@@ -129,7 +129,7 @@ public class RunnableDemo {
 
 为了解决这个问题，Java 1.5 后，提供了 `Callable` 接口和 `Future` 接口，通过它们，可以在线程执行结束后，返回执行结果。
 
-#### Callable
+#### 2.3.1.Callable
 
 Callable 接口只声明了一个方法，这个方法叫做 call()：
 
@@ -155,7 +155,7 @@ Future<?> submit(Runnable task);
 
 第一个 submit 方法里面的参数类型就是 Callable。
 
-#### Future
+#### 2.3.2.Future
 
 Future 就是对于具体的 Callable 任务的执行结果进行取消、查询是否完成、获取结果。必要时可以通过 get 方法获取执行结果，该方法会阻塞直到任务返回结果。
 
@@ -170,7 +170,7 @@ public interface Future<V> {
 }
 ```
 
-#### FutureTask
+#### 2.3.3.FutureTask
 
 FutureTask 类实现了 RunnableFuture 接口，RunnableFuture 继承了 Runnable 接口和 Future 接口。
 
@@ -190,7 +190,7 @@ public interface RunnableFuture<V> extends Runnable, Future<V> {
 
 事实上，FutureTask 是 Future 接口的一个唯一实现类。
 
-#### Callable + Future + FutureTask 示例
+#### 2.3.4.Callable + Future + FutureTask 示例
 
 通过实现 `Callable` 接口创建线程的步骤：
 
@@ -234,9 +234,9 @@ public class CallableDemo {
 }
 ```
 
-### 2.4 三种创建方式比较
+### 2.4.三种创建方式比较
 
-**1、采用实现Runnable、Callable接口的方式创建多线程时**
+**2.4.1.采用实现Runnable、Callable接口的方式创建多线程时**
 
 **优势是：**
 
@@ -248,25 +248,21 @@ public class CallableDemo {
 
 编程稍微复杂，如果要访问当前线程，则必须使用 `Thread.currentThread()` 方法。
 
-**2、使用继承Thread类的方式创建多线程时**
+**2.4.2.使用继承Thread类的方式创建多线程时**
 
-**优势是：**
+**优势是：**编写简单，如果需要访问当前线程，则无需使用 `Thread.currentThread()` 方法，直接使用this即可获得当前线程。
 
-编写简单，如果需要访问当前线程，则无需使用 `Thread.currentThread()` 方法，直接使用this即可获得当前线程。
+**劣势是：**线程类已经继承了Thread类，所以不能再继承其他父类。
 
-**劣势是：**
+**2.4.3.Runnable和Callable的区别**
 
-线程类已经继承了Thread类，所以不能再继承其他父类。
+- Callable规定（重写）的方法是call()，Runnable规定（重写）的方法是run()。
 
-**3、Runnable和Callable的区别**
+- Callable的任务执行后可返回值，而Runnable的任务是不能返回值的。
 
-(1) Callable规定（重写）的方法是call()，Runnable规定（重写）的方法是run()。
+- call方法可以抛出异常，run方法不可以。
 
-(2) Callable的任务执行后可返回值，而Runnable的任务是不能返回值的。
-
-(3) call方法可以抛出异常，run方法不可以。
-
-(4) 运行Callable任务可以拿到一个Future对象，表示异步计算的结果。它提供了检查计算是否完成的方法，以等待计算的完成，并检索计算的结果。通过Future对象可以了解任务执行情况，可取消任务的执行，还可获取执行结果。
+- 运行Callable任务可以拿到一个Future对象，表示异步计算的结果。它提供了检查计算是否完成的方法，以等待计算的完成，并检索计算的结果。通过Future对象可以了解任务执行情况，可取消任务的执行，还可获取执行结果。
 
 
 
@@ -873,11 +869,11 @@ SecondThread: 4
 
 ### 4.6 Condition
 
-Condition是在java 1.5中出现的，它用来替代传统的Object的 `wait()/notify()` 实现线程间的协作，它的使用依赖于 Lock，Condition、Lock 和 Thread 三者之间的关系如下图所示。相比使用Object的wait()/notify()，使用Condition的await()/signal()这种方式能够更加安全和高效地实现线程间协作。Condition是个接口，基本的方法就是await()和signal()方法。Condition依赖于Lock接口，生成一个Condition的基本代码是lock.newCondition() 。 必须要注意的是，Condition 的 await()/signal() 使用都必须在lock保护之内，也就是说，必须在lock.lock()和lock.unlock之间才可以使用。事实上，Conditon的await()/signal() 与 Object的wait()/notify() 有着天然的对应关系：
+Condition是在java 1.5中出现的，它用来替代传统的Object的 `wait()/notify()` 实现线程间的协作，它的使用依赖于 Lock，Condition、Lock 和 Thread 三者之间的关系如下图所示。相比使用Object的 `wait()/notify()`，使用Condition的 `await()/signal()` 这种方式能够更加安全和高效地实现线程间协作。Condition是个接口，基本的方法就是 `await()` 和 `signal()` 方法。Condition依赖于Lock接口，生成一个Condition的基本代码是 `lock.newCondition() `。 必须要注意的是，Condition 的 `await()/signal()` 使用都必须在lock保护之内，也就是说，必须在lock.lock()和lock.unlock之间才可以使用。事实上，Conditon的 `await()/signal()` 与 Object的 `wait()/notify()` 有着天然的对应关系：
 
-- Conditon中的await()对应Object的wait()；
-- Condition中的signal()对应Object的notify()；
-- Condition中的signalAll()对应Object的notifyAll()。
+- Conditon中的 `await()` 对应Object的 `wait()`；
+- Condition中的 `signal()` 对应Object的 `notify()`；
+- Condition中的 `signalAll()` 对应Object的 `notifyAll()`。
 
 ![20170519154927256](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/java-core-demo/20210323220507.png)
 
@@ -1165,7 +1161,7 @@ public class StartAndRunMethod {
 
 **start 方法源码分析**
 
-#### 源码
+#### 6.5.1.源码
 
 ```java
 public synchronized void start() {
@@ -1290,7 +1286,7 @@ public void run() {
 - 使用stop方法强行终止，但是不推荐这个方法，因为stop和suspend及resume一样都是过期作废的方法。
 - 使用interrupt方法中断线程。
 
-**1. 停止不了的线程**
+**6.7.1. 停止不了的线程**
 
 `interrupt()` 方法的使用效果并不像 `for+break` 语句那样，马上就停止循环。调用 `interrupt` 方法是在当前线程中打了一个停止标志，并不是真的停止线程。
 
@@ -1331,7 +1327,7 @@ i=499999
 i=500000
 ```
 
-**2. 判断线程是否停止状态**
+**6.7.2. 判断线程是否停止状态**
 
 Thread.java类中提供了两种方法：
 
@@ -1435,7 +1431,7 @@ stop 2??true
 
 isInterrupted()并为清除状态，所以打印了两个true。
 
-**3. 能停止的线程--异常法**
+**6.7.3. 能停止的线程--异常法**
 
 有了前面学习过的知识点，就可以在线程中用for语句来判断一下线程是否是停止状态，如果是停止状态，则后面的代码不再运行即可：
 
@@ -1549,9 +1545,9 @@ java.lang.InterruptedException
     at thread.MyThread.run(MyThread.java:13)
 ```
 
-**4. 在沉睡中停止**
+**6.7.4. 在沉睡中停止**
 
-如果线程在sleep()状态下停止线程，会是什么效果呢？
+如果线程在 `sleep()` 状态下停止线程，会是什么效果呢？
 
 ```
 public class MyThread extends Thread {
@@ -1624,7 +1620,7 @@ java.lang.InterruptedException: sleep interrupted
     at thread.MyThread.run(MyThread.java:15)
 ```
 
-**5. 能停止的线程---暴力停止**
+**6.7.5. 能停止的线程---暴力停止**
 
 使用stop()方法停止线程则是非常暴力的。
 
@@ -1672,9 +1668,9 @@ i=9
 Process finished with exit code 0
 ```
 
-**6.方法stop()与java.lang.ThreadDeath异常**
+**6.7.6.方法 `stop()` 与 `java.lang.ThreadDeath` 异常**
 
-调用stop()方法时会抛出java.lang.ThreadDeath异常，但是通常情况下，此异常不需要显示地捕捉。
+调用 `stop()` 方法时会抛出 `java.lang.ThreadDeath` 异常，但是通常情况下，此异常不需要显示地捕捉。
 
 ```
 public class MyThread extends Thread {
@@ -1698,11 +1694,11 @@ public class Run {
 }
 ```
 
-stop()方法以及作废，因为如果强制让线程停止有可能使一些清理性的工作得不到完成。另外一个情况就是对锁定的对象进行了解锁，导致数据得不到同步的处理，出现数据不一致的问题。
+`stop()` 方法以及作废，因为如果强制让线程停止有可能使一些清理性的工作得不到完成。另外一个情况就是对锁定的对象进行了解锁，导致数据得不到同步的处理，出现数据不一致的问题。
 
-**7. 释放锁的不良后果**
+**6.7.7. 释放锁的不良后果**
 
-使用stop()释放锁将会给数据造成不一致性的结果。如果出现这样的情况，程序处理的数据就有可能遭到破坏，最终导致程序执行的流程错误，一定要特别注意：
+使用 `stop()` 释放锁将会给数据造成不一致性的结果。如果出现这样的情况，程序处理的数据就有可能遭到破坏，最终导致程序执行的流程错误，一定要特别注意：
 
 ```
 public class SynchronizedObject {
@@ -1765,11 +1761,11 @@ public class Run {
 b  aa
 ```
 
-由于stop()方法以及在JDK中被标明为“过期/作废”的方法，显然它在功能上具有缺陷，所以不建议在程序张使用stop()方法。
+由于 `stop()` 方法以及在JDK中被标明为“过期/作废”的方法，显然它在功能上具有缺陷，所以不建议在程序张使用`stop()` 方法。
 
-**8. 使用return停止线程**
+**6.7.8. 使用return停止线程**
 
-将方法interrupt()与return结合使用也能实现停止线程的效果：
+将方法 `interrupt()` 与 return 结合使用也能实现停止线程的效果：
 
 ```
 public class MyThread extends Thread {
@@ -1820,7 +1816,7 @@ ok，大家看到这个题，可以先理解下，这里启动了两个线程，
 
 ok，我们下面开始分析解法。
 
-#### 可见性保证
+#### 6.8.1.可见性保证
 
 程序里定义了一个全局变量，var = 1；线程a会修改这个变量为2，线程b则在变量为2时，执行自己的业务逻辑。
 
@@ -1830,11 +1826,9 @@ ok，我们下面开始分析解法。
 public static volatile int var = 1;
 ```
 
-#### 解法分析
+#### 6.8.2.解法分析
 
-经过前面的可见性保证的分析，我们知道，要想达到目的，其实就是要保证：
-
-**a中的对var+1的操作，需要先于b执行。**
+经过前面的可见性保证的分析，我们知道，要想达到目的，其实就是要保证：**a中的对var+1的操作，需要先于b执行。**
 
 但是，现在的问题是，两个线程同时启动，不知道谁先谁后，怎么保证a先执行，b后执行呢？
 
@@ -1842,13 +1836,13 @@ public static volatile int var = 1;
 
 大概有：
 
-- synchronized，取不到锁时，阻塞
-- java.util.concurrent.locks.ReentrantLock#lock，取不到锁时，阻塞
-- object.wait，取到synchronized了，但是因为一些条件不满足，执行不下去，调用wait，将释放锁，并进入等待队列，线程暂停运行
-- java.util.concurrent.locks.Condition.await，和object.wait类似，只不过object.wait在jvm层面，使用c++实现，Condition.await在jdk层面使用java语言实现
-- threadA.join()，等待对应的线程threadA执行完成后，本线程再继续运行；threadA没结束，则当前线程阻塞；
-- CountDownLatch#await，在对应的state不为0时，阻塞
-- Semaphore#acquire()，在state为0时（即剩余令牌为0时），阻塞
+- `synchronized`，取不到锁时，阻塞
+- `java.util.concurrent.locks.ReentrantLock#lock`，取不到锁时，阻塞
+- `object.wait`，取到synchronized了，但是因为一些条件不满足，执行不下去，调用wait，将释放锁，并进入等待队列，线程暂停运行
+- `java.util.concurrent.locks.Condition.await`，和 `object.wait` 类似，只不过 `object.wait` 在jvm层面，使用c++实现，`Condition.await` 在jdk层面使用java语言实现
+- `threadA.join()`，等待对应的线程threadA执行完成后，本线程再继续运行；threadA没结束，则当前线程阻塞；
+- `CountDownLatch#await` ，在对应的state不为0时，阻塞
+- `Semaphore#acquire()`，在state为0时（即剩余令牌为0时），阻塞
 - 其他阻塞队列、FutureTask等等
 
 如果不让线程进入阻塞，则一般可以让线程进入一个while循环，循环的退出条件，可以由线程a来修改，线程a修改后，线程b跳出循环。
