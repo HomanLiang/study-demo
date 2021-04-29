@@ -13,6 +13,7 @@
 9. [Linux 安全](https://github.com/HomanLiang/study-demo/blob/main/linux-demo/document/chapter09.md)
 10. [Linux 常用命令](https://github.com/HomanLiang/study-demo/blob/main/linux-demo/document/chapter10.md)
 11. [Linux 特殊符号](https://github.com/HomanLiang/study-demo/blob/main/linux-demo/document/chapter11.md)
+12. [Linux 内存使用情况分析](https://github.com/HomanLiang/study-demo/blob/main/linux-demo/document/chapter12.md)
 
 
 

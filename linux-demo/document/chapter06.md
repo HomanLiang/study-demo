@@ -232,9 +232,9 @@ Alpha AXP 处理器没有物理寻址模式。相反，它将内存空间划分�
 
 Linux 假定页表分为三个级别。访问的每个页表都包含下一级页表
 
-![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/linux-demo/20210411115631.png)
+![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/linux-demo/20210429211349.png)
 
-图中的 PDG 表示全局页表，当创建一个新的进程时，都要为新进程创建一个新的页面目录，即 PGD。
+图中的 PDG 表示全局页表，当创建一个新的进程时，都要为新进程创建一个新的页面目录，即 PGD。	
 
 要将虚拟地址转换为物理地址，处理器必须获取每个级别字段的内容，将其转换为包含页表的物理页的偏移量，并读取下一级页表的页框号。这样重复三次，直到找到包含虚拟地址的物理页面的页框号为止。
 
