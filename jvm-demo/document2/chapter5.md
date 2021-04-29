@@ -525,7 +525,7 @@ java -jar xxx.jar -classpath lib/*
 
 ### 4.2. 加载类错误
 
-#### ClassNotFoundException
+#### 4.2.1.ClassNotFoundException
 
 `ClassNotFoundException` 异常出镜率极高。**`ClassNotFoundException` 表示当前 `classpath` 下找不到指定类**。
 
@@ -551,7 +551,7 @@ public class ClassNotFoundExceptionDemo {
 
 解决方法：检查 `classpath` 下有没有相应的 class 文件。
 
-#### NoClassDefFoundError
+#### 4.2.2.NoClassDefFoundError
 
 常见问题原因：
 
@@ -560,7 +560,7 @@ public class ClassNotFoundExceptionDemo {
 
 解决方法：现代 Java 项目，一般使用 `maven`、`gradle` 等构建工具管理项目，仔细检查找不到的类所在的 jar 包是否已添加为依赖。
 
-#### UnsatisfiedLinkError
+#### 4.2.3.UnsatisfiedLinkError
 
 这个异常倒不是很常见，但是出错的话，通常是在 JVM 启动的时候如果一不小心将在 JVM 中的某个 lib 删除了，可能就会报这个错误了。
 
@@ -592,7 +592,7 @@ java.lang.UnsatisfiedLinkError: no NoLib in java.library.path
 	at io.github.dunwu.javacore.jvm.classloader.exception.UnsatisfiedLinkErrorDemo.<clinit>(UnsatisfiedLinkErrorDemo.java:12)
 ```
 
-#### ClassCastException
+#### 4.2.4.ClassCastException
 
 `ClassCastException` 异常通常是在程序中强制类型转换失败时出现。
 
