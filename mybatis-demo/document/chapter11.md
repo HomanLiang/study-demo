@@ -533,3 +533,164 @@ public class Chapter39ApplicationTests {
 
 }
 ```
+
+## 3.当MyBatis 3.5.X遇上JDK8竟然出现了性能问题
+
+最近，有金融客户使用 TiDB 适网贷核算场批处理场景，合同表数量在数亿级。对于相同数据量，TiDB 处理耗时 35 分钟，Oracle 处理耗时只有 15 分钟，足足相差 20 分钟。从之前的经验来看，在批处理场景上 TiDB 的性能是要好过 Oracle 的，这让我们感到困惑。经过一番排查最终定位是批处理程序问题。调整后，在应用服务器有性能瓶颈、数据库压力依然不高且没有进行参数优化的情况下，TiDB 处理时间缩短到 16 分钟，与 Oracle 几乎持平。
+
+### 3.1.远程排查
+
+通过 Grafana 发现程序运行时集群的资源使用率非常低。判断应用发来的压力较小，将并发数从 40 提高到 100，资源使用率和 QPS 指标几乎没有变化。通过 connection count 监控看到，随着并发数的增加，连接数也同样增加了，确认并发数的修改是生效的。但奇怪的是执行 show processlist 发现大部分连接是空闲状态。简单走查了程序代码，是 Spring batch + MyBatis 架构。因为 Spring batch 设置并发的方式很简单，所以考虑线程数的调整应该是生效且可以正常工作的。
+
+虽然还没有搞清资源使用率低的问题，但还是有其他收获。应用服务器和 TiDB 集群的网络延迟达到了 2~3 ms。为了排除高网络延迟的干扰，将应用部署到 TiDB 集群内部运行，批处理耗时从 35 分钟下降到 27 分钟，但依然和 Oracle 有较大差距。因为数据库本身没有压力，所以当时的情况调整数据库参数也没什么意义。
+
+这时考虑线程可能造成了阻塞，但苦于没有证据，于是想了这样的场景来简单验证到底是应用的问题还是数据库的问题：在 TiDB 集群中创建两个完全相同的 Database：d1 和 d2。使用两个完全相同的批处理应用分别对 d1、d2 进行批处理，等同于双倍压力写入 TiDB 集群，预期结果是对于双倍的数据量，同样可以在 27 分钟处理完，同时数据库资源使用率应大于一个应用的。测试结果符合预期，证明应用没有真正的提高并发。
+
+客户反馈给我们可能的几种情况：
+
+1. 应用并发太高，CPU 繁忙导致应用性能瓶颈。
+
+   应用服务器的 CPU 消耗只有 6%，不应该存在性能瓶颈。
+
+2. Spring batch 内部有一些元数据表，同时更新元数据表的同一条数据会造成阻塞。
+
+   这种情况应该是阻塞在数据库造成锁等待或锁超时，不应该阻塞在应用端。
+
+客户的解决思路：
+
+1. 多应用部署并发运行，性能随应用部署数线性提升。
+
+   不能解决单机应用性能瓶颈问题，对于业务高峰时的拓展也很不方便。
+
+2. 采用异步处理的方案，提高应用吞吐。
+
+   目前是有些异步访问数据库的技术如 R2DBC，但成熟度低，强烈不建议使用。
+
+### 3.2.现场排查
+
+为了弄清问题根本原因，来到客户现场。
+
+- 使用 JDBC 编写了一个 Demo 对问题集群进行压测，发现数据库资源使用率随着 demo 并发数提高而增长，证明提高并发数可以给数据库制造更高的压力，此时完全排除数据库问题的可能。
+- 通过 VisualVM 发现，应用程序的大量线程处于 Monitor 状态，这种情况线程开的多其实也没用上，实锤性能瓶颈来自应用。
+
+![å¾ç](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mybatis-demo/20210501232831.webp)
+
+大量线程处于 Monitor 状态
+
+- 走查应用代码，发现虽然有用到同步等加锁逻辑，但应该不会造成严重的线程阻塞问题。
+- 通过 dump 发现线程都阻塞在了 MyBatis 的堆栈中
+
+```
+Locked ownable synchronizers:
+    - <0x000000008523ca00> (a java.util.concurrent.ThreadPoolExecutor$worker)
+
+"taskExecutorForHb-197" #342 prio=5 os_prio=0 tid=0x0007f5d7c72f800 nid=0x182c waiting for monitor entry [0x00007f5ccd6d4000]
+    java.lang.thread.State: BLOCKED (on  object monitor)
+    - waiting to lock <0x0000000080a772d8> (a java.util.concurrent.ConcurrentHashMap$Node)
+    at org.apache.ibatis.reflection.DefaultReflection.DefaultReflectorFactory.fineForClass(DefaultReflectorFactory.java:1674)
+```
+
+是在源码的这个位置，DefaultReflectorFactory.java
+
+```
+public Reflector findForClass(Class<?> type) {
+  if (classCacheEnabled) { 
+    // synchronized (type) removed see issue #461 
+    return reflectorMap.computeIfAbsent(type, Reflector::new);  
+    } else { 
+    return new Reflector(type);   
+    }
+}
+```
+
+这里大致是这样，MyBatis 在进行参数处理、结果映射等操作时，会涉及大量的反射操作。Java 中的反射虽然功能强大，但是代码编写起来比较复杂且容易出错，为了简化反射操作的相关代码， MyBatis 提供了专门的反射模块，它对常见的反射操作做了进一步封装，提供了更加简洁方便的反射 API 。DefaultReflectorFactory 提供的 findForClass() 会为指定的 Class 创建 Reflector 对象，并将 Reflector 对象缓存到 reflectorMap 中，造成线程阻塞的就在对 reflectorMap 的操作上。
+
+因为 MyBatis 支持对 ReflectorFactory 自定义实现，所以当时的思路是绕过缓存的步骤，也就是将 classCacheEnabled 设为 false，走 return new Reflector(type) 的逻辑。但依然会在其他调用 ConcurrentHashmap.computeIfAbsent 的地方被阻塞。
+
+到这看起来是一个通用问题，于是将注意力放到 concurrentHashmap 的 computerIfAbsent 上。computerIfAbsent 是 JDK8 中 为 map 提供的新方法
+
+```
+public V computeIfAbsent(K key, Function<? super K,? extends V> mappingFunction)
+```
+
+它首先判断缓存 map 中是否存在指定 key 的值，如果不存在，会自动调用 mappingFunction (key) 计算 key 的 value，然后将 key = value 放入到缓存 Map。ConcurrentHashMap 中重写了 computeIfAbsent 方法确保 mappingFunction 中的操作是线程安全的。
+
+官方说明中一段：
+
+> The entire method invocation is performed atomically, so the function is applied at most once per key. Some attempted update operations on this map by other threads may be blocked while computation is in progress, so the computation should be short and simple, and must not attempt to update any other mappings of this map.
+
+可以看到，为了保证原子性，当对相同 key 进行修改时，可能造成线程阻塞。显而易见这会造成比较严重的性能问题，在 Java 官方 Jira，也有用户提到了同样的问题。
+
+`[JDK-8161372] ConcurrentHashMap.computeIfAbsent(k,f) locks bin when k present`
+
+很多开发者都以为 computeIfAbsent 是不会造成线程 block 的，但事实却是相反的。而 Java 官方当时认为这个方法的设计没问题。但反思之后也觉得，在性能还不错的 concurrenthashmap 中有这么个拉胯兄弟确实不太合适。所以，官方在 JDK9 中修复了这个问题。
+
+### 3.3.验证
+
+将现场 JDK 版本升级到 9 ，应用在 500 并发，并排除网络延迟干扰的情况下，批处理耗时 16 分钟。应用服务器 CPU 达到 85% 左右使用率，出现性能瓶颈。理论上，提高应用服务器配置、优化数据库参数都可以进一步提升性能。
+
+![图片](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mybatis-demo/20210501233005.webp)
+
+### 3.4.当时的结论
+
+MyBatis 3.5.X 在缓存反射对象用到的 computerIfAbsent 方法在 JDK8 中性能不理想。需要升级 jdk9 及以上版本解决这个问题。对于 MyBatis 本身，没有针对 JDK8 中的 computerIfAbsent 性能问题进行特殊处理，所以升级 MyBatis 版本也不能解决问题。
+
+但可以降级（在 MyBatis 3.4.X 中，还没有引入这个函数，所以理论上可以规避这个问题。
+
+```
+	@Override  
+  	public Reflector findForClass(Class<?> type) { 
+  		if (classCacheEnabled) {  
+    		// synchronized (type) removed see issue #461  
+   	 		Reflector cached = reflectorMap.get(type);  
+    		if (cached == null) {  
+      			cached = new Reflector(type);  
+      			reflectorMap.put(type, cached); 
+    		}     
+    		return cached;  
+    	} else {  
+    		return new Reflector(type);  
+    	} 
+  	}
+```
+
+### 3.5.现在的结论
+
+MyBatis 官方在收到我们的反馈后，非常效率地修复了这个问题。手动点赞
+
+![å¾ç](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mybatis-demo/20210501233138.png)
+
+![å¾ç](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mybatis-demo/20210501233145.png)
+
+可以看到 MyBatis 官方对 computerIfAbsent 进行了一层封装，如果 value 已存在，则直接 return，这样操作相同 key 的线程阻塞问题就被绕过去了。MyBatis 会在 3.5.7 版本中合入这个 PR。
+
+```
+public class MapUtil { 
+	/**
+	* A temporary workaround for Java 8 specific performance issue JDK-8161372 .<br>  
+	* This class should be removed once we drop Java 8 support.  
+	*  
+	* @see <a href="https://bugs.openjdk.java.net/browse/JDK-8161372">https://bugs.openjdk.java.net/browse/JDK-8161372</a>   
+	*/  
+	public static <K, V> V computeIfAbsent(Map<K, V> map, K key, Function<K, V> mappingFunction) {   
+  		V value = map.get(key);
+  		if (value != null) {  
+    		return value; 
+  		}   
+    	return map.computeIfAbsent(key, mappingFunction::apply); 
+  	}
+  
+  	private MapUtil() { 
+    	super();  
+    }
+}
+```
+
+
+
+
+
+
+
+
+
