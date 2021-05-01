@@ -72,8 +72,8 @@
 14. [分布式缓存 - 常见问题](https://github.com/HomanLiang/study-demo/blob/main/project-design/document/chapter4_14.md)
 15. 分布式消息队列
 16. [分布式消息队列 - 常见问题](https://github.com/HomanLiang/study-demo/blob/main/project-design/document/chapter4_16.md)
-17. 
-18. 
+17. [分布式唯一ID生成策略](https://github.com/HomanLiang/study-demo/blob/main/project-design/document/chapter4_17.md)
+18. 分布式限流](https://github.com/HomanLiang/study-demo/blob/main/project-design/document/chapter4_18.md)
 
 
 
