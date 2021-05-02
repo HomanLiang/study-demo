@@ -17,6 +17,20 @@ Docker Swarm集群中有三个角色：manager（管理者）；worker（实际�
 
 > Swarm 是 Docker 公司在2014年12月初发布的一套用来管理 Docker 集群的较为简单的工具，由于 Swarm 使用标准的Docker API接口作为其前端访问入口，所以各种形式的Docker Client(dockerclient in go, docker_py, docker等)都可以直接与Swarm通信。老的 Docker Swarm 使用独立的外部KV存储（比如Consul、etcd、zookeeper），搭建独立运行的Docker主机集群，用户像操作单台Docker 机器一样操作整个集群，Docker Swarm 把多台 Docker 主机当做一台 Docker 主机来管理。新的 Swarm mode 是在docker 1.12版本中集成到 Docker 引擎中的，引入服务的概念，提供了众多的新特性，比如：具有容错能力的去中心化设计、内置服务发现、负载均衡、路由网格、动态伸缩、滚动更新、安全传输等。使得 Docker 原生的 Swarm mode 集群具备与 Mesos、Kubernetes 叫板的实力。
 
+- 对比Docker
+
+  前面我们介绍过Docker可以理解成是一个我们的服务的独立运行的容器，那么在实际工作中，我们的系统可能是一个微服务应用，系统中根据业务拆分成多个模块，可以理解一个模块对应一组运行着相同镜像的的Docker容器，这就是单个Docker，而Swarm就是这个系统中，能够管理所有的容器之间的路由、负载均衡、服务发现，以及容器的伸缩（可以理解为我们一个服务进行扩/缩容）、日志、配置文件的编排工具。
+
+- 对比Docker-Compose
+
+  Docker-Compose类似与我们生活中的管家，它仅仅能够管理一个主机上的所有容器，他可以一次性启动多个容器。而Docker-Swarm可以跨主机去管理多个容器，并且当一个容器状态异常时候可以快速在其他机器上启动容器，保证服务的高可用！
+
+- 对比Kubernetes
+
+  Kubernetes它本身的角色定位是和Docker Swarm 是一样的，也就是说他们负责的工作在容器领域来说是相同的部分，都是一个跨主机的容器管理平台，当然也有自己一些不一样的特点，k8s是谷歌公司根据自身的多年的运维经验研发的一款容器管理平台。而Docker Swarm则是由Docker 公司研发的。Kubernetes在Docker基础上封装了一层概念，所以他的功能相对于Swarm更强大，但是运维更复杂，Swarm则更容易上手。
+
+综上所述大家应该知道Docker就是一个容器，Docker-Compose是一个单主机的编排工具，Docker-Swarm是一个多主机的编排工具！
+
 这里通过一个案例来展示Docker Swarm集群的配置。
 
 ## 2.环境准备
@@ -201,6 +215,10 @@ Swarm群集会产生两种不同类型的流量：
 
 - `overlay networks`： 管理Swarm中docker守护进程间的通信。可以将容器附加到一个或多个已存在的overlay网络上，使容器与容器之间能够通信；
 
+  使用host也可以实现跨主机进行通信，直接使用这个物理的ip地址就可以进行通信。overlay它会虚拟出一个网络比如10.0.9.3这个ip地址，在这个overlay网络模式里面，有一个类似于服务网关的地址，然后把这个包转发到物理服务器这个地址，最终通过路由和交换，到达另一个服务器的ip地址。 Docker里实现采用会有一个服务发现consul，，会定义一个ip地址池，比如10.0.9.0/24之类的，上面会有容器，容器的ip地址会从上面去获取，获取完了后，会通过eth1进行通信，这实现跨主机的东西。
+
+  ![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/docker-demo/20210502233819.webp)
+
 - `ingress network`： 是一个特殊的 overlay 网络，用于服务节点间的负载均衡。当任何 Swarm 节点在发布的端口上接收到请求时，它将该请求交给一个名为 IPVS 的模块。IPVS 跟踪参与该服务的所有IP地址，选择其中的一个，并通过 ingress 网络将请求路由到它；
 
   初始化或加入 Swarm 集群时会自动创建 ingress 网络，大多数情况下，用户不需要自定义配置，但是 docker 17.05 和更高版本允许你自定义。
@@ -213,7 +231,7 @@ Swarm群集会产生两种不同类型的流量：
 
 ![Image [7]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/docker-demo/20210413221520.png)
 
-除了Swarm群集默认创建的两个网络以外，我们还可以自定义创建overlay网络，连接到此网络的容器，即可互相通信，但是需要注意，除了在docker01这个manager上可以查看创建的overlay网络外，其他节点在没有加入此网络前，执行“docker network ls”命令是查看不到的。
+除了Swarm群集默认创建的两个网络以外，我们还可以自定义创建overlay网络，连接到此网络的容器，即可互相通信，但是需要注意，除了在docker01这个manager上可以查看创建的overlay网络外，其他节点在没有加入此网络前，执行`docker network ls`命令是查看不到的。
 
 ### 10.1.创建自定义overlay网络并验证
 ```
