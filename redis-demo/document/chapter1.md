@@ -2,7 +2,7 @@
 
 # Redis 简介
 
-## Redis 简介
+## 1.Redis 简介
 Redis 是完全开源免费的，遵守 BSD 协议，是一个高性能的 key - value 数据库
 Redis 与 其他 key - value 缓存产品有以下三个特点：
 - Redis 支持数据持久化，可以将内存中的数据保存在磁盘中，重启的时候可以再次加载进行使用。
@@ -11,7 +11,7 @@ Redis 与 其他 key - value 缓存产品有以下三个特点：
 
 
 
-## Redis 优势
+## 2.Redis 优势
 
 - 性能极高 – Redis 读的速度是 110000 次 /s, 写的速度是 81000 次 /s 。
 - 丰富的数据类型 - Redis 支持二进制案例的 Strings, Lists, Hashes, Sets 及 Ordered Sets 数据类型操作。

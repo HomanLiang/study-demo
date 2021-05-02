@@ -139,7 +139,7 @@ Redis事务不像DB的事务这么“安全”，也不支持回滚，所以不�
 - 备份时推荐在slave节点上做，不影响master性能
 - 不开启AOF或开启AOF配置为每秒刷盘，避免磁盘IO消耗降低Redis性能
 - 当实例设置了内存上限，需要调大内存上限时，先调整slave再调整master，否则会导致主从节点数据不一致
-- 对Redis增加监控，监控采集info信息时，使用长连接，频繁的短连接也会影响Redis性能，[redis性能监控指标](http://mp.weixin.qq.com/s?__biz=MzI0MDQ4MTM5NQ==&mid=2247495171&idx=2&sn=b1097b73768ae4fb5c2b7e8747e2fae7&chksm=e9188b1fde6f0209e70af9066722e097941ac30214b02e6ad4fdb88ddc62c39d4f203ae9d610&scene=21#wechat_redirect)，参考这个文章
+- 对Redis增加监控，监控采集info信息时，使用长连接，频繁的短连接也会影响Redis性能
 - 线上扫描整个实例数时，记得设置休眠时间，避免扫描时QPS突增对Redis产生性能抖动
 - 做好Redis的运行时监控，尤其是expired_keys、evicted_keys、latest_fork_usec指标，短时间内这些指标值突增可能会阻塞整个实例，引发性能问题
 
