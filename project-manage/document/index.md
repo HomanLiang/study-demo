@@ -6,6 +6,7 @@
 2. [Code Review](https://github.com/HomanLiang/study-demo/blob/main/project-manage/document/chapter1_02.md)
 3. [日志规范](https://github.com/HomanLiang/study-demo/blob/main/project-manage/document/chapter1_03.md)
 4. [编码规范](https://github.com/HomanLiang/study-demo/blob/main/project-manage/document/chapter1_04.md)
+5. 代码重构](https://github.com/HomanLiang/study-demo/blob/main/project-manage/document/chapter1_05.md)
 
 ## 项目管理工具
 
