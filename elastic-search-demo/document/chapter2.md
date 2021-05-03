@@ -237,7 +237,119 @@ ip        heap.percent ram.percent cpu  node.role  master name
 head插件可以用来快速查看elasticsearch中的数据概况以及非全量的数据，也支持控件化查询和rest请求，但是体验都不是很好。
  一般就用它来看各个索引的数据量以及分片的状态。
 
+### 2.1.elasticsearch-head插件的作用
 
+ealsticsearch是一个分布式、RESTful 风格的搜索和数据分析引擎，所有的数据都是后台服务存储着，类似于Mysql服务器，因此如果我们需要直观的查看数据，就需要使用可视化工具了。elasticsearch-head是Web前端，用于浏览和与Elastic Search集群进行交互，可用于集群管理、数据可视化、增删改查工具Elasticsearch语句可视化等。
+
+### 2.2.elasticsearch-head插件的安装
+
+- 下载elasticsearch-head插件，地址：https://github.com/mobz/elasticsearch-head
+
+- 进入elasticsearch-head源码目录中，执行 `npm install`
+
+  在运行npm install时，可能会存在Head插件phantomjs权限问题
+
+  ```
+  npm WARN deprecated phantomjs-prebuilt@2.1.16: this package is now deprecated
+  npm WARN deprecated request@2.88.2: request has been deprecated, see https://github.com/request/request/issues/3142
+  npm WARN deprecated har-validator@5.1.5: this
+  npm WARN deprecated fsevents@1.2.13: fsevents 1 will break on node v14+ and could be using insecure binaries. Upgrade to fsevents 2.
+  
+  > phantomjs-prebuilt@2.1.16 install E:\JavaDevelopment\elasticsearch\elasticsearch-head-master\node_modules\phantomjs-prebuilt
+  > node install.js
+  
+  PhantomJS not found on PATH
+  Downloading https://github.com/Medium/phantomjs/releases/download/v2.1.1/phantomjs-2.1.1-windows.zip
+  Saving to C:\Users\ysxx\AppData\Local\Temp\phantomjs\phantomjs-2.1.1-windows.zip
+  Receiving...
+  
+  Error making request.
+  Error: connect ETIMEDOUT 140.82.114.4:443
+      at TCPConnectWrap.afterConnect [as oncomplete] (net.js:1107:14)
+  
+  Please report this full log at https://github.com/Medium/phantomjs
+  npm WARN elasticsearch-head@0.0.0 license should be a valid SPDX license expression
+  npm WARN optional SKIPPING OPTIONAL DEPENDENCY: fsevents@1.2.13 (node_modules\fsevents):
+  npm WARN notsup SKIPPING OPTIONAL DEPENDENCY: Unsupported platform for fsevents@1.2.13: wanted {"os":"darwin","arch":"any"} (current: {"os":"win32","arch":"x64"})
+  
+  npm ERR! code ELIFECYCLE
+  npm ERR! errno 1
+  npm ERR! phantomjs-prebuilt@2.1.16 install: `node install.js`
+  npm ERR! Exit status 1
+  npm ERR!
+  npm ERR! Failed at the phantomjs-prebuilt@2.1.16 install script.
+  npm ERR! This is probably not a problem with npm. There is likely additional logging output above.
+  
+  npm ERR! A complete log of this run can be found in:
+  npm ERR!     C:\Users\ysxx\AppData\Roaming\npm-cache\_logs\2020-12-28T01_28_03_195Z-debug.log
+  ```
+
+  解决方案：在npm install命令后加 -g 参数
+
+  ```
+  npm install -g
+  ```
+
+- 在install成功之后，执行 `npm run start` 启动head插件
+
+  ```
+  > elasticsearch-head@0.0.0 start E:\JavaDevelopment\elasticsearch\elasticsearch-head-master
+  > grunt server
+  
+  >> Local Npm module "grunt-contrib-jasmine" not found. Is it installed?
+  
+  Running "connect:server" (connect) task
+  Waiting forever...
+  Started connect web server on http://localhost:9100
+  ```
+
+  在cmd命令行可以看到 **web server** 地址，在浏览器访问该地址 `http://localhost:9100`，**如果出现elasticsearch-head插件连不上elasticsearch服务，需要在elasticsearch安装目录下的config文件夹，找到elasticsearch.yml文件，添加两行配置**：
+
+  ```
+  #表示是否支持跨域，默认为false
+  http.cors.enabled: true
+  #当设置允许跨域，默认为*,表示支持所有域名
+  http.cors.allow-origin: "*"
+  ```
+
+### 2.3.elasticsearch-head插件的使用
+
+- 界面概览
+
+  ![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/elastic-search-demo/20210503232132.png)
+
+  集群健康值的颜色说明：
+
+  | 颜色 | 说明                                                         |
+  | :--- | :----------------------------------------------------------- |
+  | 绿色 | 最健康的状态，代表所有的分片包括备份都可用                   |
+  | 黄色 | 基本的分片可用，但是备份不可用（也可能是没有备份）           |
+  | 红色 | 部分的分片可用，表明分片有一部分损坏。执行查询部分数据仍然可以查到，遇到这种情况，还是赶快解决比较好 |
+  | 灰色 | 未连接到elasticsearch服务                                    |
+
+- 数据概览
+
+  ![img](https://img2020.cnblogs.com/blog/1257244/202103/1257244-20210304113645154-17050014.png)
+
+- 基本查询
+
+  选择一个索引，然后再选择不同的查询条件，勾选“显示查询语句”，点击搜索，可以看到具体的查询json和查询结果，点击“显示原始JSON”，可以看到未经格式化的查询json
+
+  ![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/elastic-search-demo/20210503232239.png)
+
+- 复合查询
+
+  可以使用json进行复杂的查询，也可发送put请求新增及跟新索引，使用delete请求删除索引等等。
+
+  ![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/elastic-search-demo/20210503232309.png)
+
+  使用json进行复杂的查询，也可发送put请求新增及跟新索引，使用delete请求删除索引等等。
+
+### 2.4.总结
+
+elasticsearch-head插件是较早支持Elasticsearch的可视化客户端工具之一，目前功能还是能够使用，界面美感有些不足，在elasticsearch-head插件的GitHub上发布版本的时间（2018年4月）来看，应该属于功能基本停更的状态，这也是其使用上的不足之处吧。
+
+elasticsearch-head插件可以对数据进行增删改查操作，故生产环境尽量不要使用，如果要使用，最少要限制IP地址。
 
 
 
