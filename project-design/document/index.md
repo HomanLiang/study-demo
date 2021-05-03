@@ -51,6 +51,7 @@
    4. [电商 - 快递鸟API对接](https://github.com/HomanLiang/study-demo/blob/main/project-design/document/chapter3_02_04.md)
    5. [电商 - 积分兑换](https://github.com/HomanLiang/study-demo/blob/main/project-design/document/chapter3_02_05.md)
    6. [电商 - 淘宝商品和类目体系](https://github.com/HomanLiang/study-demo/blob/main/project-design/document/chapter3_02_06.md)
+   7. 电商 - 促销后台](https://github.com/HomanLiang/study-demo/blob/main/project-design/document/chapter3_02_07.md)
 5. 异常监控
    1. [异常监控方式](https://github.com/HomanLiang/study-demo/blob/main/project-design/document/chapter3_03_01.md)
 
