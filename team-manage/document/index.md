@@ -4,6 +4,7 @@
 
 1. [沟通技巧](https://github.com/HomanLiang/study-demo/blob/main/team-manage/document/chapter1_01.md)
 2. [技术人沟通中常见问题分析和解答](https://github.com/HomanLiang/study-demo/blob/main/team-manage/document/chapter1_02.md)
+3. [“技术公司跨部门间沟通”问题及解决方案](https://github.com/HomanLiang/study-demo/blob/main/team-manage/document/chapter1_03.md)
 
 ## 领导力
 
@@ -14,4 +15,20 @@
 1. [团队管理日常工作](https://github.com/HomanLiang/study-demo/blob/main/team-manage/document/chapter3_01.md)
 2. [管理技巧](https://github.com/HomanLiang/study-demo/blob/main/team-manage/document/chapter3_02.md)
 3. [一个技术总监的忠告：精通那么多技术，你为何还是受不到重用？](https://github.com/HomanLiang/study-demo/blob/main/team-manage/document/chapter3_03.md)
+4. [如何快速降低一个员工的积极性？](https://github.com/HomanLiang/study-demo/blob/main/team-manage/document/chapter3_04.md)
+
+## 写作技能
+
+1. [如何写出一篇技术博客](https://github.com/HomanLiang/study-demo/blob/main/team-manage/document/chapter4_01.md)
+
+## 学习方法
+
+1. [工作能力强的人有哪些共同特征？](https://github.com/HomanLiang/study-demo/blob/main/team-manage/document/chapter5_01.md)
+
+2. [如何构建个人知识体系？](https://github.com/HomanLiang/study-demo/blob/main/team-manage/document/chapter5_02.md)
+3. [如何一步一步建立自己的技术影响力](https://github.com/HomanLiang/study-demo/blob/main/team-manage/document/chapter5_03.md)
+
+
+
+
 
