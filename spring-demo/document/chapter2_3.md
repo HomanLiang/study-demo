@@ -1629,11 +1629,123 @@ Spring Boot中大量使用了这些注解，常见的注解如下：
 
 `@Conditional`注解在Spring Boot中演变的注解很多，需要着重了解，特别是后期框架整合的时候会大量涉及。
 
+## 7.@ConfigurationProperties
 
+读取默认配置文件（application.properties、application.yml）
 
+实现方式一 @ConfigurationProperties + @Component作用于类上
 
+```java
+@ConfigurationProperties(prefix="person")
+@Componment
+@Data     // lombok，用于自动生成getter、setter
+public class Person {
+    private String name；
+}
 
+@RestController
+@RequestMapping("/db")
+public class TestController {
+    @Autowired
+    private Person person;
 
+    @GetMapping("/person")
+    public String parsePerson() {
+        return person.getName();
+    }
+}
+```
+
+实现方式二 @ConfigurationProperties + @Bean作用在配置类的bean方法上
+
+```java
+@Data
+public class Person {
+    private String name；
+}
+
+@Configuration
+public class PersonConf{
+    @Bean
+    @ConfigurationProperties(prefix="person")
+    public Person person(){
+        return new Person();
+    }  
+} 
+
+@RestController
+@RequestMapping("/db")
+public class TestController {
+    @Autowired
+    private Person person;
+    @GetMapping("/person")
+    public String parsePerson() {
+        return person.getName();
+    }
+}
+```
+
+实现方式三 @ConfigurationProperties注解到普通类、 @EnableConfigurationProperties注解定义为bean
+
+```java
+@ConfigurationProperties(prefix="person")
+@Data
+public class Person {
+    private String name；
+}
+// 说明： @EnableConfigurationProperties可以直接注到启动类上，也可以放在自定义配置类，自定义配置类使用@Configuration标注
+@SpringBootApplication
+@EnableConfigurationProperties(Person.class)
+public class DbApplication {
+    public static void main(String[] args) {
+        SpringApplication.run(DbApplication.class, args);
+    }
+}
+
+@RestController
+@RequestMapping("/db")
+public class TestController {
+    @Autowired
+    private Person person;
+
+    @GetMapping("/person")
+    public String parsePerson() {
+        return person.getName();
+    }
+}
+```
+
+实现方式四 @Value作用属性上
+
+```java
+@RestController
+@RequestMapping("/db")
+public class TestController {
+    @Value("${person.name}")
+    private String name;
+
+    @GetMapping("/person")
+    public String parsePerson() {
+        return name;
+    }
+}
+```
+
+实现方式五 使用自带的Environment对象
+
+```java
+@RestController
+@RequestMapping("/db")
+public class TestController {
+    @Autowired
+    private Environment environment;
+
+    @GetMapping("/person")
+    public String parsePerson() {
+        return environment.getProperty("person.name");
+    }
+}
+```
 
 
 
