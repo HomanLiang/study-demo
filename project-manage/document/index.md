@@ -11,10 +11,11 @@
 ## 项目管理工具
 
 1. [Git](https://github.com/HomanLiang/study-demo/blob/main/project-manage/document/chapter2_01.md)
-2. 
+2. Jenkins
 
-项目管理规范
+## 项目管理规范
 
 1. [开发流程](https://github.com/HomanLiang/study-demo/blob/main/project-manage/document/chapter3_01.md)
 2. [为什么项目开发永远缺乏合理的时间？](https://github.com/HomanLiang/study-demo/blob/main/project-manage/document/chapter3_02.md)
+3. [TDD（测试驱动开发）](https://github.com/HomanLiang/study-demo/blob/main/project-manage/document/chapter3_03.md)
 
