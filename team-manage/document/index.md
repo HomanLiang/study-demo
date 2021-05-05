@@ -16,6 +16,7 @@
 2. [管理技巧](https://github.com/HomanLiang/study-demo/blob/main/team-manage/document/chapter3_02.md)
 3. [一个技术总监的忠告：精通那么多技术，你为何还是受不到重用？](https://github.com/HomanLiang/study-demo/blob/main/team-manage/document/chapter3_03.md)
 4. [如何快速降低一个员工的积极性？](https://github.com/HomanLiang/study-demo/blob/main/team-manage/document/chapter3_04.md)
+5. [快速成长从写一份走心的周报开始](https://github.com/HomanLiang/study-demo/blob/main/team-manage/document/chapter3_05.md)
 
 ## 写作技能
 
@@ -28,7 +29,10 @@
 2. [如何构建个人知识体系？](https://github.com/HomanLiang/study-demo/blob/main/team-manage/document/chapter5_02.md)
 3. [如何一步一步建立自己的技术影响力](https://github.com/HomanLiang/study-demo/blob/main/team-manage/document/chapter5_03.md)
 
+## 面试&能力评估
 
+1. [如何判断一个人的能力](https://github.com/HomanLiang/study-demo/blob/main/team-manage/document/chapter6_01.md)
+2. [一个不错的技术面试官是怎么样的？](https://github.com/HomanLiang/study-demo/blob/main/team-manage/document/chapter6_02.md)
 
 
 
