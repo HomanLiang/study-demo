@@ -670,17 +670,91 @@ try {
 }
 ```
 
+## 6.double转string
+
+- double转string方式一：Double.toString(d)
+
+  ```
+  public class DoubleConvertToString {
+  
+      public static void doubleToString(double d){
+          String s = Double.toString(d);
+          System.out.println(s);
+          if(s.equals("2016010")){
+              System.out.println("yes!");
+          }else {
+              System.out.println("no!");
+          }
+      }
+  
+      public static void main(String[] args) {
+          doubleToString(2016010);
+      }
+  }
+  //整数情况下，低于8位输出结果是
+  //2016010.0
+  //no!
+  //大于等于8位数时，显示成科学计数法的形式
+  //2.0160101E7
+  //no!
+  ```
+
+  toString()方式使用时存在此坑，尽量不要使用；
+
+- double转string方式二：BigDecimal(d);
+
+  ```
+  public static void doubleToString2(double d){
+          BigDecimal bd = new BigDecimal(d);
+          String s = bd.toString();
+          System.out.println(s);
+      }
+  //这个方法数据是整数时，都能正常转换成字符串，但是当数据为小数时，精度会更加准确，后面会展示更多小数位数，如：
+  //doubleToString2(20160.00333);
+  //20160.0033299999995506368577480316162109375
+  ```
+
+- double转string方式三：NumberFormat.format(d);
+
+  ```
+  public static void doubleToString3(double d){
+          NumberFormat nf = NumberFormat.getInstance();
+          nf.setGroupingUsed(false);
+          String format = nf.format(d);
+          System.out.println(format);
+      }
+  //此方法的输出格式和输入的格式一样
+  ```
+
+- double转string方法四：DecimalFormat().format(d);
+
+  ```
+  public static void doubleToString4(double d){
+          DecimalFormat df = new DecimalFormat();
+          df.setGroupingUsed(false);
+          String format = df.format(d);
+          System.out.println(format);
+      }
+  //DecimalFormat是NumberFormat的子类
+  ```
+
+  
 
 
 
 
-## 面试题
 
-### 一、说说基本类型和包装类型的区别
+
+
+
+
+## X.面试题
+
+### X.1.说说基本类型和包装类型的区别
 
 Java 的每个基本类型都对应了一个包装类型，比如说 int 的包装类型为 Integer，double 的包装类型为 Double。基本类型和包装类型的区别主要有以下 4 点。
 
-#### 1、包装类型可以为 null，而基本类型不可以
+#### X.1.1.包装类型可以为 null，而基本类型不可以
 
 别小看这一点区别，它使得包装类型可以应用于 POJO 中，而基本类型则不行。
 
@@ -719,7 +793,7 @@ class Writer {
 
 > 数据库的查询结果可能是 null，如果使用基本类型的话，因为要自动拆箱（将包装类型转为基本类型，比如说把 Integer 对象转换成 int 值），就会抛出 `NullPointerException` 的异常。
 
-#### 2、包装类型可用于泛型，而基本类型不可以
+#### X.1.2.包装类型可用于泛型，而基本类型不可以
 
 泛型不能使用基本类型，因为使用基本类型时会编译出错。
 
@@ -730,7 +804,7 @@ List<Integer> list = new ArrayList<>();
 
 为什么呢？因为泛型在编译时会进行类型擦除，最后只保留原始类型，而原始类型只能是 Object 类及其子类——基本类型是个特例。
 
-#### 3、基本类型比包装类型更高效
+#### X.1.3.基本类型比包装类型更高效
 
 基本类型在栈中直接存储的具体数值，而包装类型则存储的是堆中的引用。
 
@@ -738,7 +812,7 @@ List<Integer> list = new ArrayList<>();
 
 很显然，相比较于基本类型而言，包装类型需要占用更多的内存空间。假如没有基本类型的话，对于数值这类经常使用到的数据来说，每次都要通过 new 一个包装类型就显得非常笨重。
 
-#### 4、两个包装类型的值可以相同，但却不相等
+#### X.1.4.两个包装类型的值可以相同，但却不相等
 
 两个包装类型的值可以相同，但却不相等——这句话怎么理解呢？来看一段代码就明明白白了。
 
@@ -772,7 +846,7 @@ public boolean equals(Object obj) {
 
 
 
-### 二、BigDecimal一定不会丢失精度吗？
+### X.2.BigDecimal一定不会丢失精度吗？
 
 我们基本已经形成了常识，需要用到金钱的地方要用BigDecimal而不是其他，而我们也都知道浮点型变量在进行计算的时候会出现丢失精度的问题。
 
@@ -805,7 +879,7 @@ System.out.println(123.3 / 100);
 
 Java中float的精度为6-7位有效数字。double的精度为15-16位。
 
-**1、API**
+**X.2.1.API**
 
 构造器：
 
@@ -834,7 +908,7 @@ intValue()            将BigDecimal对象中的值以整数返回。
 
 由于一般的数值类型，例如double不能准确的表示16位以上的数字。
 
-**2、BigDecimal精度也丢失**
+**X.2.2.BigDecimal精度也丢失**
 
 我们在使用BigDecimal时，使用它的BigDecimal(String)构造器创建对象才有意义。其他的如BigDecimal b = new BigDecimal(1)这种，还是会发生精度丢失的问题。如下代码：
 
@@ -895,7 +969,7 @@ public BigDecimal(double val) {
 
 第二段则说，如果要想准确计算这个值，那么需要把double类型的参数转化为String类型的。并且使用BigDecimal(String)这个构造方法进行构造。去获取结果。
 
-**3、正确运用BigDecimal**
+**X.2.3.正确运用BigDecimal**
 
 另外，BigDecimal所创建的是对象，我们不能使用传统的+、-、*、/等算术运算符直接对其对象进行数学运算，而必须调用其相对应的方法。方法中的参数也必须是BigDecimal的对象，由刚才我们所罗列的API也可看出。
 
@@ -943,9 +1017,9 @@ publicclass BigDecimalUtil {
 
 
 
-### 三、商业计算怎样才能保证精度不丢失
+### X.3.商业计算怎样才能保证精度不丢失
 
-#### 前言
+#### X.3.1.前言
 
 很多系统都有「处理金额」的需求，比如电商系统、财务系统、收银系统，等等。只要和钱扯上关系，就不得不打起十二万分精神来对待，一分一毫都不能出错，否则对系统和用户来说都是灾难。
 
@@ -961,11 +1035,11 @@ double money = 1.0 - 0.9;
 
 这个运算结果谁都知道该为 `0.1`，然而实际结果却是 `0.09999999999999998`。出现这个现象是因为计算机底层是二进制运算，而二进制并不能精准表示十进制小数。所以在商业计算等精确计算中要使用其他数据类型来保证精度不丢失，一定不要使用浮点数。
 
-#### 解决方案
+#### X.3.2.解决方案
 
 有两种数据类型可以满足商业计算的需求，第一个自然是专为商业计算而设计的 **Decimal** 类型，第二个则是**定长整数**。
 
-##### 1、Decimal
+##### X.3.2.1.Decimal
 
 关于数据类型的选择，一要考虑数据库，二要考虑编程语言。即数据库中用什么类型来**存储数据**，代码中用什么类型来**处理数据**。
 
@@ -1076,7 +1150,7 @@ System.out.println(d1.compareTo(d2) == 0); // true
 
 `BigDecimal` 的用法就介绍到这，我们接下来看第二种解决方案。
 
-##### 2、定长整数
+##### X.3.2.2.定长整数
 
 定长整数，顾名思义就是固定（小数）长度的整数。它只是一个概念，并不是新的数据类型，我们使用的还是普通的整数。
 

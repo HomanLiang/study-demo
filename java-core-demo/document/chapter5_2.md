@@ -373,3 +373,187 @@ BIO 与 NIO 最重要的区别是数据打包和传输的方式：**BIO 以流�
 **NIO 模式：**
 
 ![687474703a2f2f64756e77752e746573742e757063646e2e6e65742f736e61702f32303230303633303231323234382e706e67](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/java-core-demo/20210321195121.png)
+
+## 6.Java File MMAP
+
+### 6.1.什么是 Java File MMAP
+
+尽管从**JDK 1.4**版本开始，Java 内存映射文件（Memory Mapped Files）就已经在`java.nio`包中，但它对很多程序开发者来说仍然是一个相当新的概念。引入 NIO 后，Java IO 已经相当快，而且内存映射文件提供了 Java 有可能达到的最快 IO 操作，这也是为什么那些高性能 Java 应用应该使用内存映射文件来持久化数据。
+作为 NIO 的一个重要的功能，MMAP 方法为我们提供了将文件的部分或全部映射到内存地址空间的能力，同当这块内存区域被写入数据之后会变成脏页，操作系统会用一定的算法把这些数据写入到文件中，而我们的 Java 程序不需要去关心这些。这就是内存映射文件的一个关键优势，即使你的程序在刚刚写入内存后就挂了，操作系统仍然会将内存中的数据写入文件系统。
+另外一个更突出的优势是**共享内存**，内存映射文件可以被多个进程同时访问，起到一种低时延共享内存的作用。
+
+### 6.2.Java File MMAP 与直接操作文件性能对比
+
+```
+package com.github.hashZhang.scanfold.jdk.file;
+import java.io.RandomAccessFile;
+import java.nio.ByteBuffer;
+import java.nio.MappedByteBuffer;
+import java.nio.channels.FileChannel;
+import java.util.Random;
+
+public class FileMmapTest {
+    public static void main(String[] args) throws Exception {
+        //记录开始时间
+        long start = System.currentTimeMillis();
+        //通过RandomAccessFile的方式获取文件的Channel，这种方式针对随机读写的文件较为常用，我们用文件一般是随机读写
+        RandomAccessFile randomAccessFile = new RandomAccessFile("./FileMmapTest.txt", "rw");
+        FileChannel channel = randomAccessFile.getChannel();
+        System.out.println("FileChannel初始化时间：" + (System.currentTimeMillis() - start) + "ms");
+
+        //内存映射文件，模式是READ_WRITE，如果文件不存在，就会被创建
+        MappedByteBuffer mappedByteBuffer1 = channel.map(FileChannel.MapMode.READ_WRITE, 0, 128 * 1024 * 1024);
+        MappedByteBuffer mappedByteBuffer2 = channel.map(FileChannel.MapMode.READ_WRITE, 0, 128 * 1024 * 1024);
+
+        System.out.println("MMAPFile初始化时间：" + (System.currentTimeMillis() - start) + "ms");
+
+        start = System.currentTimeMillis();
+        testFileChannelSequentialRW(channel);
+        System.out.println("FileChannel顺序读写时间：" + (System.currentTimeMillis() - start) + "ms");
+
+        start = System.currentTimeMillis();
+        testFileMMapSequentialRW(mappedByteBuffer1, mappedByteBuffer2);
+        System.out.println("MMAPFile顺序读写时间：" + (System.currentTimeMillis() - start) + "ms");
+
+        start = System.currentTimeMillis();
+        try {
+            testFileChannelRandomRW(channel);
+            System.out.println("FileChannel随机读写时间：" + (System.currentTimeMillis() - start) + "ms");
+        } finally {
+            randomAccessFile.close();
+        }
+
+        //文件关闭不影响MMAP写入和读取
+        start = System.currentTimeMillis();
+        testFileMMapRandomRW(mappedByteBuffer1, mappedByteBuffer2);
+        System.out.println("MMAPFile随机读写时间：" + (System.currentTimeMillis() - start) + "ms");
+    }
+
+
+    public static void testFileChannelSequentialRW(FileChannel fileChannel) throws Exception {
+            byte[] bytes = "测试字符串1测试字符串1测试字符串1测试字符串1测试字符串1测试字符串1测试字符串1测试字符串1测试字符串1测试字符串1测试字符串1".getBytes();
+            byte[] to = new byte[bytes.length];
+            //分配直接内存，减少复制
+            ByteBuffer byteBuffer = ByteBuffer.allocateDirect(bytes.length);
+            //顺序写入
+            for (int i = 0; i < 100000; i++) {
+                byteBuffer.put(bytes);
+                byteBuffer.flip();
+                fileChannel.write(byteBuffer);
+                byteBuffer.flip();
+            }
+
+            fileChannel.position(0);
+            //顺序读取
+            for (int i = 0; i < 100000; i++) {
+                fileChannel.read(byteBuffer);
+                byteBuffer.flip();
+                byteBuffer.get(to);
+                byteBuffer.flip();
+            }
+    }
+
+    public static void testFileMMapSequentialRW(MappedByteBuffer mappedByteBuffer1, MappedByteBuffer mappedByteBuffer2) throws Exception {
+        byte[] bytes = "测试字符串2测试字符串2测试字符串2测试字符串2测试字符串2测试字符串2测试字符串2测试字符串2测试字符串2测试字符串2测试字符串2".getBytes();
+        byte[] to = new byte[bytes.length];
+
+        //顺序写入
+        for (int i = 0; i < 100000; i++) {
+            mappedByteBuffer1.put(bytes);
+        }
+        //顺序读取
+        for (int i = 0; i < 100000; i++) {
+            mappedByteBuffer2.get(to);
+        }
+    }
+
+    public static void testFileChannelRandomRW(FileChannel fileChannel) throws Exception {
+        try {
+            byte[] bytes = "测试字符串1测试字符串1测试字符串1测试字符串1测试字符串1测试字符串1测试字符串1测试字符串1测试字符串1测试字符串1测试字符串1".getBytes();
+            byte[] to = new byte[bytes.length];
+            //分配直接内存，减少复制
+            ByteBuffer byteBuffer = ByteBuffer.allocateDirect(bytes.length);
+            //随机写入
+            for (int i = 0; i < 100000; i++) {
+                byteBuffer.put(bytes);
+                byteBuffer.flip();
+                fileChannel.position(new Random(i).nextInt(bytes.length*100000));
+                fileChannel.write(byteBuffer);
+                byteBuffer.flip();
+            }
+            //随机读取
+            for (int i = 0; i < 100000; i++) {
+                fileChannel.position(new Random(i).nextInt(bytes.length*100000));
+                fileChannel.read(byteBuffer);
+                byteBuffer.flip();
+                byteBuffer.get(to);
+                byteBuffer.flip();
+            }
+        } finally {
+            fileChannel.close();
+        }
+    }
+
+    public static void testFileMMapRandomRW(MappedByteBuffer mappedByteBuffer1, MappedByteBuffer mappedByteBuffer2) throws Exception {
+        byte[] bytes = "测试字符串2测试字符串2测试字符串2测试字符串2测试字符串2测试字符串2测试字符串2测试字符串2测试字符串2测试字符串2测试字符串2".getBytes();
+        byte[] to = new byte[bytes.length];
+
+        //随机写入
+        for (int i = 0; i < 100000; i++) {
+            mappedByteBuffer1.position(new Random(i).nextInt(bytes.length*100000));
+            mappedByteBuffer1.put(bytes);
+        }
+        //随机读取
+        for (int i = 0; i < 100000; i++) {
+            mappedByteBuffer2.position(new Random(i).nextInt(bytes.length*100000));
+            mappedByteBuffer2.get(to);
+        }
+    }
+}
+```
+
+在这里，我们初始化了一个文件，并把它映射到了128M的内存中。分FileChannel还有MMAP的方式，通过顺序或随机读写，写了一些内容并读取一部分内容。
+
+运行结果是：
+
+```
+FileChannel初始化时间：7ms
+MMAPFile初始化时间：8ms
+FileChannel顺序读写时间：420ms
+MMAPFile顺序读写时间：20ms
+FileChannel随机读写时间：860ms
+MMAPFile随机读写时间：45ms
+```
+
+可以看到，通过MMAP内存映射文件的方式操作文件，更加快速，并且性能提升的相当明显。
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

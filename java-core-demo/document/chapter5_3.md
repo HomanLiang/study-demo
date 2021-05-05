@@ -759,29 +759,29 @@ System.out.println(student1.getUserId());
 
 
 
-## 面试题
+## X.面试题
 
-### 1.序列化的底层是怎么实现的？
+### X.1.序列化的底层是怎么实现的？
 
 本文第六小节可以回答这个问题，如回答Serializable关键字作用，序列化标志啦，源码中，它的作用啦~~还有，可以回答writeObject几个核心方法，如直接写入基本类型，获取obj类型数据，循环递归写入，哈哈~~
 
-### 2.序列化时，如何让某些成员不要序列化？
+### X.2.序列化时，如何让某些成员不要序列化？
 
 可以用transient关键字修饰，它可以阻止修饰的字段被序列化到文件中，在被反序列化后，transient 字段的值被设为初始值，比如int型的值会被设置为 0，对象型初始值会被设置为null。
 
-### 3.在 Java 中,Serializable 和 Externalizable 有什么区别
+### X.3.在 Java 中,Serializable 和 Externalizable 有什么区别
 
 Externalizable继承了Serializable，给我们提供 writeExternal() 和 readExternal() 方法, 让我们可以控制 Java的序列化机制, 不依赖于Java的默认序列化。正确实现 Externalizable 接口可以显著提高应用程序的性能。
 
-### 4.serialVersionUID有什么用？
+### X.4.serialVersionUID有什么用？
 
 JAVA序列化的机制是通过判断类的serialVersionUID来验证版本是否一致的。在进行反序列化时，JVM会把传来的字节流中的serialVersionUID和本地相应实体类的serialVersionUID进行比较，如果相同，反序列化成功，如果不相同，就抛出InvalidClassException异常。
 
-### 5.是否可以自定义序列化过程, 或者是否可以覆盖 Java 中的默认序列化过程？
+### X.5.是否可以自定义序列化过程, 或者是否可以覆盖 Java 中的默认序列化过程？
 
 可以的。我们都知道,对于序列化一个对象需调用 ObjectOutputStream.writeObject(saveThisObject), 并用 ObjectInputStream.readObject() 读取对象, 但 Java 虚拟机为你提供的还有一件事, 是定义这两个方法。如果在类中定义这两种方法, 则 JVM 将调用这两种方法, 而不是应用默认序列化机制。同时，可以声明这些方法为私有方法，以避免被继承、重写或重载。
 
-### 6.在 Java 序列化期间,哪些变量未序列化？
+### X.6.在 Java 序列化期间,哪些变量未序列化？
 
 static静态变量和transient 修饰的字段是不会被序列化的。静态（static）成员变量是属于类级别的，而序列化是针对对象的。transient关键字修字段饰，可以阻止该字段被序列化到文件中。
 

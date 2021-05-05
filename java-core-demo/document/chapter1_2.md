@@ -204,9 +204,9 @@ System.out.println("s1 == s3? " + (s1 == s3)); // true
 
 
 
-## 面试题
+## X.面试题
 
-### 一、String s = new String("xyz");产生了几个对象？
+### X.1.String s = new String("xyz");产生了几个对象？
 
 面试官Q1：请问 `String s = new String("xyz");` 产生了几个对象？
 
@@ -258,7 +258,7 @@ String str2 = new String("ABC") + "ABC" ; 会创建多少个对象?
 
 
 
-### 二、请问StringBuffer和StringBuilder有什么区别？
+### X.2.请问StringBuffer和StringBuilder有什么区别？
 
 这是一个老生常谈的话题，笔者前几年每次面试都会被问到，作为基础面试题，被问到的概率百分之八九十。下面我们从面试需要答到的几个知识点来总结一下两者的区别有哪些？
 
@@ -473,7 +473,7 @@ public class TestStringBuilderAndStringBuffer {
 
 
 
-### 三、请问 equals() 和 "==" 有什么区别？
+### X.3.请问 equals() 和 "==" 有什么区别？
 
 **面试官：请问 equals() 和 "==" 有什么区别？**
 
@@ -630,7 +630,7 @@ user1==user2：false
 
 
 
-### 四、String为什么是不可变的？
+### X.4.String为什么是不可变的？
 
 **什么是不可变对象？**
 
@@ -732,7 +732,7 @@ String two = "someString";
 
 
 
-### 五、String拼接字符串效率低，你知道原因吗？
+### X.5.String拼接字符串效率低，你知道原因吗？
 
 **面试官Q1：请问为什么String用"+"拼接字符串效率低下，最好能从JVM角度谈谈吗？**
 
@@ -1131,7 +1131,7 @@ public class StringTest {
 
 
 
-### 六、你真的了解String的常见API吗？
+### X.6.你真的了解String的常见API吗？
 
 String是我们开发中使用频率最高的类，它有哪些方法，大家一定不会陌生，例如：
 
@@ -1231,7 +1231,7 @@ public String concat(String str) {
 
 
 
-### 七、Java中的substring真的会引起内存泄露么？
+### X.7.Java中的substring真的会引起内存泄露么？
 
 在Java中开发，String是我们开发程序可以说必须要使用的类型，String有一个substring方法用来截取字符串，我们想必也常常使用。但是你知道么，关于Java 6中的substring是否会引起内存泄露，在国外的论坛和社区有着一些讨论，以至于Java官方已经将其标记成bug，并且为此Java 7 还重新进行了实现。读到这里可能你的问题就来了，substring怎么会引起内存泄露呢？那么我们就带着问题，走进小黑屋，看看substring有没有内存泄露，又是怎么导致所谓的内存泄露。
 
@@ -1450,9 +1450,9 @@ trim和subSequence都存在调用substring的操作。Java 6和Java 7 substring�
 
 
 
-### 八、你真的了解String类的intern()方法吗
+### X.8.你真的了解String类的intern()方法吗
 
-#### 0.引言
+#### X.8.0.引言
 
 什么都先不说，先看下面这个引入的例子：
 
@@ -1487,7 +1487,7 @@ false
 
 是不是感觉莫名其妙，新定义的str2好像和str1没有半毛钱的关系，怎么会影响到有关str1的输出结果呢？其实这都是intern()方法搞的鬼！看完这篇文章，你就会明白。o(∩_∩)o 
 
-#### 1.为什么要介绍intern()方法
+#### X.8.1.为什么要介绍intern()方法
 
 intern()方法设计的初衷，就是重用String对象，以节省内存消耗。这么说可能有点抽象，那么就用例子来证明。
 
@@ -1532,7 +1532,7 @@ public static void main(String[] args) throws Exception {
 
 细心的同学会发现使用了 `intern()` 方法后程序运行时间有所增加。这是因为程序中每次都是用了new String后又进行 `intern()` 操作的耗时时间，但是不使用 `intern()` 占用内存空间导致GC的时间是要远远大于这点时间的。 
 
-#### 2.深入认识intern()方法
+#### X.8.2.深入认识intern()方法
 
 JDK1.7后，常量池被放入到堆空间中，这导致 `intern()` 函数的功能不同，具体怎么个不同法，且看看下面代码，这个例子是网上流传较广的一个例子，分析图也是直接粘贴过来的，这里我会用自己的理解去解释这个例子：
 
@@ -1579,7 +1579,7 @@ JDK1.7以及以上：false false
 
 下面依据上面代码对intern()方法进行分析：
 
-**2.1 JDK1.6**
+**X.8.2.1 JDK1.6**
 
 ![image-20210320215551906](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/java-core-demo/20210320215552.png)
 
@@ -1589,7 +1589,7 @@ JDK1.7以及以上：false false
 
 intern()方法在JDK1.6中的作用是：比如`String s = new String("SEU_Calvin")`，再调用`s.intern()`，此时返回值还是字符串"SEU_Calvin"，表面上看起来好像这个方法没什么用处。但实际上，在JDK1.6中它做了个小动作：检查字符串池里是否存在"SEU_Calvin"这么一个字符串，如果存在，就返回池里的字符串；如果不存在，该方法会把"SEU_Calvin"添加到字符串池中，然后再返回它的引用。然而在JDK1.7中却不是这样的，后面会讨论。
 
-**2.2 JDK1.7**
+**X.8.2.2 JDK1.7**
 
 针对JDK1.7以及以上的版本，我们将上面两段代码分开讨论。先看第一段代码的情况：
 
@@ -1661,7 +1661,7 @@ System.out.println(s3 == s4);
 
 结果就是 s3 和 s4 的引用地址明显不同。因此返回了false。
 
-#### 3.总结
+#### X.8.3.总结
 
 终于要做Ending了。现在再来看一下开篇给的引入例子，是不是就很清晰了呢。
 
@@ -1687,13 +1687,13 @@ System.out.println(str1 == "SEUCalvin");
 
 
 
-### 九、String字符串拼接问题，到底什么时候会走StringBuilder？
+### X.9.String字符串拼接问题，到底什么时候会走StringBuilder？
 
-#### 前言
+#### X.9.1.前言
 
 > 最近在突然想到了String字符串拼接问题，于是做了一个demo测试了一下，到底String类型的字符串在拼接的时候，哪种情况下会走会走StringBulider进行字符串拼接，而哪种情况编译器会对代码进行优化？话不多说，先看demo
 
-#### 问题
+#### X.9.2.问题
 
 **案例1**
 
@@ -1707,7 +1707,7 @@ System.out.println(str1 == "SEUCalvin");
 
 这时候，两个字符串对比的结果为true。
 
-#### 探究问题
+#### X.9.3.探究问题
 
 这时候，疑问就来了，为什么结果会不一致呢？利用在cmd窗口输入`javap -c TestDemo.class`命令，对字节码文件进行反编译，发现了问题所在？
 
@@ -1719,14 +1719,14 @@ System.out.println(str1 == "SEUCalvin");
 
 而案例2中，对class文件进行反编译，发现代码出现了一点变化，并没有走StringBuilder进行字符串拼接。
 
-#### 总结
+#### X.9.4.总结
 
 1. **案例1中**，通过变量和字符串拼接，java是需要先到内存找变量对应的值，才能进行完成字符串拼接的工作，这种方式java编译器没法优化，只能走`StringBuilder`进行拼接字符串，然后调用toString方法，当然返回的结果和常量池中的`111`这个字符串的内存地址是**不一样**的，因此结果为false。
 2. **案例2中**，直接在表达式里写值，java不用根据变量去内存里找对应的值，可以在编译的时候直接对这个表达式进行优化，优化后的表达式从 `"111" + ""` 直接变成了 `"111"` ，两个String类型的变量都指向了常量池的111字符串，因此结果为true;
 
 
 
-### 十、Java中的String有没有长度限制
+### X.10.Java中的String有没有长度限制
 
 **String的长度限制**
 
@@ -1874,9 +1874,9 @@ for (int i = 0; i <100000 ; i++) {
 
 
 
-### 十一、Java中的String到底占用多大的内存空间？
+### X.11.Java中的String到底占用多大的内存空间？
 
-#### Java对象的结构
+#### X.11.1.Java对象的结构
 
 首先，我们来下Java对象在虚拟机中的结构，这里，以HotSpot虚拟机为例。
 
@@ -1896,7 +1896,7 @@ for (int i = 0; i <100000 ; i++) {
 - 引用（reference）：4 个字节
 - 填充符（padding）
 
-#### Java中的String类型
+#### X.11.2.Java中的String类型
 
 **空String占用的空间**
 
@@ -1939,7 +1939,7 @@ private static final long serialVersionUID = -6849794470754667710L;
 
 因此在代码中大量使用String对象时，应考虑内存的实际占用情况。
 
-#### 验证结论
+#### X.11.3.验证结论
 
 接下来，我们就一起来验证下我们上面的结论。首先，创建一个UUIDUtils类用来生成32位的UUID，如下所示。
 

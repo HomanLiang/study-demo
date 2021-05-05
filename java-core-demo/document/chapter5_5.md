@@ -254,7 +254,7 @@ RESTful提倡，通过HTTP请求对应的POST、GET、PUT、DELETE来完成对�
 
 所以本文介绍一下通过GET获取数据和POST提交数据的实现方法。
 
-**发送HttpGet**
+**5.1.1.发送HttpGet**
 先介绍发送HttpGet请求
 
 	/**
@@ -292,7 +292,7 @@ RESTful提倡，通过HTTP请求对应的POST、GET、PUT、DELETE来完成对�
 		}
 		return result;
 	}
-**发送HttpPost**
+**5.1.2.发送HttpPost**
 
 发送HttpPost的方法和发送HttpGet很类似，只是将请求类型给位HttpPost即可。
 
@@ -325,7 +325,7 @@ RESTful提倡，通过HTTP请求对应的POST、GET、PUT、DELETE来完成对�
 		}
 		return result;
 	}
-**带参数的HttpPost**
+**5.1.3.带参数的HttpPost**
 
 发送带参数的HttpPost
 
@@ -368,6 +368,136 @@ HttpClient通过UrlEncodedFormEntity，来提交带参数的请求
 		}
 		return result;
 	}
+
+### 5.2.HttpClient忽略SSL证书
+
+今天公司项目请求一个接口地址是ip格式的，如：https://120.20.xx.xxx/xx/xx，报一个SSL的错：
+
+由于之前请求的接口地址都是域名地址，如：https://www.xxx.com/xxx/xxx，
+
+使用HttpClient工具，忽略SSL认证代码如下：
+
+```
+package com.allchips.common.util;
+
+import org.apache.http.StatusLine;
+import org.apache.http.client.config.RequestConfig;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
+import org.apache.http.conn.ssl.TrustStrategy;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.ssl.SSLContextBuilder;
+import org.apache.http.util.EntityUtils;
+
+import javax.net.ssl.SSLContext;
+import java.io.InputStream;
+import java.nio.charset.Charset;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
+
+/**
+ * @description:
+ * @author: Homan Liang
+ * @time: 2021/3/30 16:43
+ */
+public class HttpTest {
+
+    public static void main(String[] args) throws Exception {
+//        SapHttpUtil.httpGet("https://www.cnblogs.com/spll/p/11856610.html", null);
+//
+//        String httpGet = RestTemplateUtil.httpGet("https://www.cnblogs.com/spll/p/11856610.html", null);
+
+
+        testPostNoSSL("https://test.allchips.com/", "", "");
+    }
+
+    public static String testPostNoSSL(String postUrl, String paramJson,String token) {
+        String resultStr = "";  //返回结果
+        try {
+
+//            1、创建httpClient
+            CloseableHttpClient buildSSLCloseableHttpClient = buildSSLCloseableHttpClient();
+
+            System.setProperty("jsse.enableSNIExtension", "false");
+            HttpPost httpPost = new HttpPost(postUrl);
+
+
+            httpPost.setHeader("Authorization", "Bearer " +token);
+
+
+
+            // 设置请求和传输超时时间
+            RequestConfig requestConfig = RequestConfig.custom()
+                    .setSocketTimeout(60*1000)
+                    .setConnectTimeout(60*1000).build();
+
+            httpPost.setConfig(requestConfig);
+
+            httpPost.setHeader("Content-Type","application/json;charset=UTF-8");
+
+            //放入请求参数
+            StringEntity data = new StringEntity(paramJson, Charset.forName("UTF-8"));
+            httpPost.setEntity(data);
+            //发送请求，接收结果
+            CloseableHttpResponse response = buildSSLCloseableHttpClient.execute(httpPost);
+
+            //4.获取响应对象中的响应码
+            StatusLine statusLine = response.getStatusLine();//获取请求对象中的响应行对象
+            int responseCode = statusLine.getStatusCode();//从状态行中获取状态码
+
+            System.out.println(responseCode);
+
+            if (responseCode == 200) {
+                // 打印响应内容
+                resultStr = EntityUtils.toString(response.getEntity(), "UTF-8");
+
+                //5.  可以接收和发送消息
+                org.apache.http.HttpEntity entity = response.getEntity();
+                //6.从消息载体对象中获取操作的读取流对象
+                InputStream input = entity.getContent();
+
+            } else {
+                System.out.println("响应失败! : " + response.toString());
+            }
+            buildSSLCloseableHttpClient.close();
+
+
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
+        return resultStr;
+    }
+
+    /**
+     * ============忽略证书
+     */
+    private static CloseableHttpClient buildSSLCloseableHttpClient()
+            throws Exception {
+        SSLContext sslContext = new SSLContextBuilder().loadTrustMaterial(null,
+                new TrustStrategy() {
+                    // 信任所有
+                    @Override
+                    public boolean isTrusted(X509Certificate[] chain,
+                                             String authType) throws CertificateException {
+                        return true;
+                    }
+                }).build();
+        // ALLOW_ALL_HOSTNAME_VERIFIER:这个主机名验证器基本上是关闭主机名验证的,实现的是一个空操作，并且不会抛出javax.net.ssl.SSLException异常。
+        SSLConnectionSocketFactory sslsf = new SSLConnectionSocketFactory(
+                sslContext, new String[] { "TLSv1" }, null,
+                SSLConnectionSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
+        return HttpClients.custom().setSSLSocketFactory(sslsf).build();
+    }
+
+
+}
+```
+
 
 
 ## 6.Java RMI
@@ -541,7 +671,7 @@ public static Registry getRegistry(String host, int port,
 ### 6.4.RMI 的优劣
 
 1. 优势
-    
+   
     给分布计算的系统设计、编程都带来了极大的方便。只要按照RMI规则设计程序，可以不必再过问在RMI之下的网络细节了，如：TCP和Socket等等。任意两台计算机之间的通讯完全由RMI负责。调用远程计算机上的对象就像本地对象一样方便。
     
 2. 劣势

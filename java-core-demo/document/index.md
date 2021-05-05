@@ -13,7 +13,8 @@
 9. [Java 泛型](https://github.com/HomanLiang/study-demo/blob/main/java-core-demo/document/chapter1_9.md)
 10. [Java 反射](https://github.com/HomanLiang/study-demo/blob/main/java-core-demo/document/chapter1_10.md)
 11. [Java 注解](https://github.com/HomanLiang/study-demo/blob/main/java-core-demo/document/chapter1_11.md)
-12. [Java 基础面试题](https://github.com/HomanLiang/study-demo/blob/main/java-core-demo/document/chapter1_11.md)
+12. [Java 日期时间](https://github.com/HomanLiang/study-demo/blob/main/java-core-demo/document/chapter1_12.md)
+13. [Java 基础面试题](https://github.com/HomanLiang/study-demo/blob/main/java-core-demo/document/chapter1_XX.md)
 
 ## Java 高级
 
@@ -21,7 +22,8 @@
 2. [Java 正则从入门到精通](https://github.com/HomanLiang/study-demo/blob/main/java-core-demo/document/chapter2_2.md)
 3. [Java 编码和加密](https://github.com/HomanLiang/study-demo/blob/main/java-core-demo/document/chapter2_3.md)
 4. [Java 本地化](https://github.com/HomanLiang/study-demo/blob/main/java-core-demo/document/chapter2_4.md)
-5. [JDK8 入门指南](https://github.com/HomanLiang/study-demo/blob/main/java-core-demo/document/chapter2_4.md)
+5. [JDK8 入门指南](https://github.com/HomanLiang/study-demo/blob/main/java-core-demo/document/chapter2_5.md)
+6. [字符编码](https://github.com/HomanLiang/study-demo/blob/main/java-core-demo/document/chapter2_6.md)
 
 ## Java 容器
 
