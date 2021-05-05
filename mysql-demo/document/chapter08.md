@@ -4,9 +4,9 @@
 
 > 声明：如果没有说明具体的数据库和存储引擎，默认指的是MySQL中的InnoDB存储引擎
 
-## 数据页
+## 1.数据页
 
-### Mysql的基本存储结构是页(记录都存在页里边)
+### 1.1.Mysql的基本存储结构是页(记录都存在页里边)
 
 ![Image](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mysql-demo/20210307111301.png)
 ![Image [2]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mysql-demo/20210307111305.png)
@@ -26,13 +26,13 @@
 
 很明显，在数据量很大的情况下这样查找会很慢！
 
-### 数据页长啥样？
+### 1.2.数据页长啥样？
 
 数据页长下面这样：
 
 ![image-20210313005635837](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mysql-demo/20210313005635.png)
 
-### 什么是数据区？
+### 1.3.什么是数据区？
 
 在MySQL的设定中，同一个表空间内的一组连续的数据页为一个extent（区），默认区的大小为1MB，页的大小为16KB。16*64=1024，也就是说一个区里面会有64个连续的数据页。连续的256个数据区为一组数据区。
 
@@ -46,7 +46,7 @@
 
 约定好了数据的组织方式，那MySQL的作用不就是：按照约定数据规则将数据文件中的数据加载进内存，然后展示给用户看，以及提供其他能力吗？
 
-### 数据页分裂问题
+### 1.4.数据页分裂问题
 
 假设你现在已经有两个数据页了。并且你正在往第二个数据页中写数据。
 
@@ -74,9 +74,9 @@
 
 
 
-## B树和B+树
+## 2.B树和B+树
 
-### B树
+### 2.1.B树
 
 B-Tree，即B树或者B-树。
 ![image-20210310211359381](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mysql-demo/20210312211453.png)
@@ -98,7 +98,7 @@ B-Tree，即B树或者B-树。
 
 从上图可以看出，key 为 50 的节点就在第一层，B-树只需要一次磁盘 IO 即可完成查找。所以说B-树的查询最好时间复杂度是 O(1)。
 
-### B+树
+### 2.2.B+树
 
 ![image-20210310211614907](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mysql-demo/image-20210310211614907.png)
 
@@ -138,7 +138,7 @@ B+树是一颗`多路平衡查找树`，所有节点称为`页`，页就是一�
 
 数据库索引的B+树的显著特点是`高扇出`，也就是说一个页存放的数据多，这样的好处是树的`高度小`，大概在2到4层，`高度越小，查找的IO次数越少`。
 
-### 总结
+### 2.3.总结
 
 ![image-20210310211700352](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mysql-demo/image-20210310211700352.png)
 通过以上的叙述和上面这张图，基本可以知道B树和B+树的区别：
@@ -151,7 +151,7 @@ B+树是一颗`多路平衡查找树`，所有节点称为`页`，页就是一�
 事实上，例如oracle、MongoDB这样使用B树的数据，肯定是可以范围查询的，因为他们使用的B树也是在叶子节点存储行的位置信息，数据在逻辑上是连续的。其实，B+树就是 B树的改进版。
 
 
-## 索引有哪些类型
+## 3.索引有哪些类型
 
 ![图片](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mysql-demo/20210312125233.png)
 
@@ -177,18 +177,18 @@ B+树是一颗`多路平衡查找树`，所有节点称为`页`，页就是一�
 
 
 
-## B+树索引
+## 4.B+树索引
 
-### 1、 MyISAM引擎索引实现
+### 4.1.MyISAM引擎索引实现
 
 在MyISAM中，主索引和辅助索引（Secondary key）在结构上没有任何区别，只是主索引要求key是唯一的，而辅助索引的key可以重复。
 
-#### 1.1 主键索引
+#### 4.1.1.主键索引
 
 ![image-20210310212046061](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mysql-demo/image-20210310212046061.png)
 MyISAM引擎使用B+树作为索引结构，叶节点的data域存放的是数据记录的地址。
 
-#### 1.2 辅助索引
+#### 4.1.2.辅助索引
 
 ![image-20210310212224244](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mysql-demo/image-20210310212224244.png)
 
@@ -196,18 +196,18 @@ MyISAM引擎使用B+树作为索引结构，叶节点的data域存放的是数�
 
 MyISAM的索引方式也叫做“非聚集”的，之所以这么称呼是为了与InnoDB的聚集索引区分（可以发现和Oracle的B树类似）
 
-### 2、 InnoDB引擎索引实现
+### 4.2.InnoDB引擎索引实现
 
 Innodb是索引组织表。在InnoDB中，表数据文件本身就是按B+树组织的一个索引结构（就是索引组织表），这棵树的叶节点data域保存了完整的数据记录。
 
 聚簇索引的每一个叶子节点都包含了主键值、事务ID、用于事务和MVCC的回滚指针以及**所有的剩余列**。假设我们以col1为主键，则下图是一个InnoDB表的聚簇索引（主键索引）（Primary key）示意。
 
-#### 2.1 主键索引
+#### 4.2.1.主键索引
 
 ![image-20210310212253528](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mysql-demo/image-20210310212253528.png)
 因为InnoDB的数据文件本身要按主键聚集（聚集索引），所以InnoDB要求表必须有主键（MyISAM可以没有），如果没有显式指定，则MySQL会自动选择一个可以唯一标识数据记录的列作为主键，如果不存在这种列，则MySQL自动为InnoDB表生成一个隐含字段作为主键，这个字段长度为6个字节，类型为长整型。
 
-#### 2.2 辅助索引
+#### 4.2.2.辅助索引
 
 ![image-20210310212317844](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mysql-demo/image-20210310212317844.png)
 
@@ -221,7 +221,7 @@ Innodb是索引组织表。在InnoDB中，表数据文件本身就是按B+树组
 
 
 
-### 3、为什么要用B+树
+### 4.3.为什么要用B+树
 
 1. **为什么不用有序数组**
 
@@ -253,7 +253,7 @@ Innodb是索引组织表。在InnoDB中，表数据文件本身就是按B+树组
    - 非叶子节点只存放key值（也就是列值），这使得一页可以存更多的数据，这是高扇出的保证
 
 
-## 哈希索引
+## 5.哈希索引
 
 除了B+树之外，还有一种常见的是哈希索引。
 
@@ -268,15 +268,15 @@ Innodb是索引组织表。在InnoDB中，表数据文件本身就是按B+树组
 - 在有大量重复键值情况下，哈希索引的效率也是极低的---->哈希碰撞问题。
 - 不支持范围查询
 
-### InnoDB支持哈希索引吗？
+### 5.1.InnoDB支持哈希索引吗？
 
 主流的还是使用B+树索引比较多，对于哈希索引，InnoDB是自适应哈希索引的（hash索引的创建由InnoDB存储引擎引擎自动优化创建，我们干预不了）！
 ![Image [7]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mysql-demo/20210307111801.png)
 
 
-## 聚集索引和非聚集索引
+## 6.聚集索引和非聚集索引
 
-### 聚集索引
+### 6.1.聚集索引
 
 `聚集索引（Clustered index)` 也叫聚簇索引、主键索引。他的显著特点是`其叶子节点包含行数据（表中的一行）`，没错，InnoDB存储引擎表数据存在索引中，表是`索引组织表`。显然表数据不可能有多份，但是必须有一份，所以聚集索引在一张表有且仅有一个。
 
@@ -334,7 +334,7 @@ insert into t values
 
 
 
-### 非聚集索引
+### 6.2.非聚集索引
 
 `非聚集索引（Secondary Index)`也叫辅助索引、二级索引、非主键索引。非主键列创建的索引就是这种索引。他的显著特点是`叶子节点不包括完整的行数据`（如果包括，这是一件多么恐怖的事啊！），而是包含行记录对应的`主键key`。
 
@@ -377,7 +377,7 @@ insert into t values
 
 
 
-### 聚集和非聚集索引比较
+### 6.3.聚集和非聚集索引比较
 
 简单概括：
 - 聚集索引就是以主键创建的索引
@@ -407,7 +407,7 @@ insert into t values
 
 
 
-## 联合索引
+## 7.联合索引
 
 联合索引就是索引`包含多个列`的情况，此时的B+树每个key包含了几个部分，而不是单一值。
 
@@ -472,7 +472,7 @@ insert into t values
 
 
 
-## 覆盖索引
+## 8.覆盖索引
 
 覆盖的意思就是`包含`的意思，覆盖索引就是说`索引里包含了你需要的数据`。
 
@@ -504,9 +504,9 @@ c的索引不包含b列，所以当c列索引查b列时就需要回表了
 
 
 
-## 索引的优缺点
+## 9.索引的优缺点
 
-### 索引提高检索速度
+### 9.1.索引提高检索速度
 
 其实就是将无序的数据变成有序(相对)：
 ![Image [3]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mysql-demo/20210307111501.png)
@@ -521,7 +521,7 @@ c的索引不包含b列，所以当c列索引查b列时就需要回表了
 
 
 
-### 索引降低增删改的速度
+### 9.2.索引降低增删改的速度
 
 B+树是平衡树的一种。
 > 平衡树：它是一棵空树或它的左右两个子树的高度差的绝对值不超过1，并且左右两个子树都是一棵平衡二叉树。
@@ -535,9 +535,9 @@ B+树是平衡树的一种，是不会退化成链表的，树的高度都是相
 
 
 
-## 索引下推
+## 10.索引下推
 
-### 低版本操作
+### 10.1.低版本操作
 
 其实在 Mysql 5.6 版本之前是没有索引下推这个功能的，从 5.6 版本后才加上了这个优化项。所以在引出索引下推前还是先回顾下没有这个功能时是怎样一种处理方式。
 
@@ -559,7 +559,7 @@ SQL 实现起来很简单：
 
 看到了吧，低版本中需要每条数据都进行回表，增加了树的搜索次数。如果遇到所要查找的数据量很大的话，性能必然有所缺失。
 
-### 高版本操作
+### 10.2.高版本操作
 
 知道了痛点，那么怎么解决。很简单，只有符合条件了再进行回表。结合我们的例子来说就是当满足了性别 sex = 1 了，再回表查找。这样原本可能需要进行回表查找 4 次，现在可能只需要 2 次就可以了。
 
@@ -567,7 +567,7 @@ SQL 实现起来很简单：
 
 所以本质来说，索引下推就是只有符合条件再进行回表，对索引中包含的字段先进行判断，不符合条件的跳过。减少了不必要的回表操作。
 
-### 总结
+### 10.3.总结
 
 **回表操作**
 
@@ -579,202 +579,7 @@ SQL 实现起来很简单：
 
 
 
-## MySQL索引使用策略及优化实例
-
-MySQL的优化主要分为结构优化（Scheme optimization）和查询优化（Query optimization）。本章讨论的高性能索引策略主要属于`结构优化`范畴。
-
-### 【1】示例数据库
-
-为了讨论索引策略，需要一个数据量不算小的数据库作为示例。本文选用MySQL官方文档中提供的示例数据库之一：employees。这个数据库关系复杂度适中，且数据量较大。下图是这个数据库的E-R关系图（引用自MySQL官方手册）：
-![image-20210311000336928](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mysql-demo/image-20210311000336928.png)
-
-MySQL官方文档中关于此数据库的页面为http://dev.mysql.com/doc/employee/en/employee.html (目前不可访问)。里面详细介绍了此数据库，并提供了下载地址和导入方法，如果有兴趣导入此数据库到自己的MySQL可以参考文中内容。
-
-### 【2】最左前缀原理与相关优化
-
-高效使用索引的首要条件是知道什么样的查询会使用到索引，这个问题和B+Tree中的`“最左前缀原理”`有关，下面通过例子说明最左前缀原理。
-
-这里先说一下联合索引的概念。在上文中，我们都是假设索引只引用了单个的列，实际上，`MySQL中的索引可以以一定顺序引用多个列，这种索引叫做联合索引`，一般的，一个联合索引是一个有序元组`<a1, a2, …, an>`，其中各个元素均为数据表的一列，实际上要严格定义索引需要用到关系代数，但是这里我不想讨论太多关系代数的话题，因为那样会显得很枯燥，所以这里就不再做严格定义。另外，单列索引可以看成联合索引元素数为1的特例。
-
-以employees.titles表为例，下面先查看其上都有哪些索引：
-
-![image-20210311000440987](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mysql-demo/image-20210311000440987.png)
-从结果中可以到titles表的主索引为`<emp_no, title, from_date>`，还有一个辅助索引`<emp_no>`。为了避免多个索引使事情变复杂（MySQL的SQL优化器在多索引时行为比较复杂），这里我们将辅助索引drop掉：
-
-```
-ALTER TABLE employees.titles DROP INDEX emp_no;
-```
-
-这样就可以专心分析索引PRIMARY的行为了。
-
-**① 全列匹配**
-
-![image-20210311000511100](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mysql-demo/image-20210311000511100.png)
-
-很明显，当按照索引中所有列进行精确匹配（这里精确匹配指“=”或“IN”匹配）时，索引可以被用到。这里有一点需要注意，理论上索引对顺序是敏感的，但是由于MySQL的查询优化器会自动调整where子句的条件顺序以使用适合的索引，例如我们将where中的条件顺序颠倒：
-
-![image-20210311000534857](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mysql-demo/image-20210311000534857.png)
-
-会发现效果是一样的。
-
-------
-
-**② 最左前缀匹配**
-
-![image-20210311000553071](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mysql-demo/image-20210311000553071.png)
-
-当查询条件精确匹配索引的左边连续一个或几个列时，如`<emp_no>或<emp_no, title>`，索引可以被用到，但是只能用到一部分，即条件所组成的最左前缀。上面的查询从分析结果看用到了PRIMARY索引，但是key_len为4，说明只用到了索引的第一列前缀。
-
-**③ 查询条件用到了索引中列的精确匹配，但是中间某个条件未提供**
-
-![image-20210311000638264](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mysql-demo/image-20210311000638264.png)
-
-此时索引使用情况和情况二相同，因为title未提供，所以查询只用到了索引的第一列，而后面的`from_date`虽然也在索引中，但是由于title不存在而无法和左前缀连接，因此需要对结果进行扫描过滤`from_date`（这里由于emp_no唯一，所以不存在扫描）。如果想让`from_date`也使用索引而不是where过滤，可以增加一个辅助索引`<emp_no, from_date>`，此时上面的查询会使用这个索引。
-
-除此之外，还可以使用一种称之为`“隔离列”`的优化方法，将`emp_no与from_date之间的“坑”`填上。首先我们看下title一共有几种不同的值：
-
-![image-20210311000701410](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mysql-demo/image-20210311000701410.png)
-
-只有7种。在这种成为“坑”的列值比较少的情况下，可以考虑用“IN”来填补这个“坑”从而形成最左前缀：
-
-![image-20210311000724130](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mysql-demo/image-20210311000724130.png)
-
-这次key_len为59，说明索引被用全了，但是从type和rows看出IN实际上执行了一个range查询，这里检查了7个key。看下两种查询的性能比较：
-
-![image-20210311000743166](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mysql-demo/image-20210311000743166.png)
-
-`“填坑”`后性能提升了一点。如果经过emp_no筛选后余下很多数据，则后者性能优势会更加明显。当然，如果title的值很多，用填坑就不合适了，必须建立辅助索引。
-
-------
-
-**④ 查询条件没有指定索引第一列**
-
-![image-20210311000806381](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mysql-demo/image-20210311000806381.png)
-由于不是最左前缀，索引这样的查询显然用不到索引。
-
-**⑤ 匹配某列的前缀字符串**
-
-![image-20210311000827187](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mysql-demo/image-20210311000827187.png)
-
-如果通配符%不出现在开头，则可以用到索引，但根据具体情况不同可能只会用其中一个前缀。即只有`XXX%`会使用到索引，`%XXX%`或`%XXX`都不会使用到索引。
-
-**⑥ 范围查询**
-
-![image-20210311000856753](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mysql-demo/image-20210311000856753.png)
-
-范围列可以用到索引（必须是最左前缀），但是范围列后面的列无法用到索引。同时，索引最多用于一个范围列，因此如果查询条件中有两个范围列则无法全用到索引。
-
-![image-20210311000942157](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mysql-demo/image-20210311000942157.png)
-
-可以看到索引对第二个范围索引无能为力。这里特别要说明MySQL一个有意思的地方，那就是仅用explain可能无法区分范围索引和多值匹配，因为在type中这两者都显示为range。同时，用了“between”并不意味着就是范围查询，例如下面的查询：
-
-![image-20210311001025873](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mysql-demo/image-20210311001025873.png)
-
-看起来是用了两个范围查询，但作用于emp_no上的“BETWEEN”实际上相当于“IN”，也就是说emp_no实际是多值精确匹配。可以看到这个查询用到了索引全部三个列。因此在MySQL中要谨慎地区分多值匹配和范围匹配，否则会对MySQL的行为产生困惑。
-
-------
-
-**⑦ 查询条件中含有函数或表达式**
-
-很不幸，如果查询条件中含有函数或表达式，则MySQL不会为这列使用索引（虽然某些在数学意义上可以使用）。例如：
-
-![image-20210311001057019](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mysql-demo/image-20210311001057019.png)
-
-虽然这个查询和情况五中功能相同，但是由于使用了函数left，则无法为title列应用索引，而情况五中用LIKE则可以。再如：
-
-![image-20210311001113208](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mysql-demo/image-20210311001113208.png)
-
-显然这个查询等价于查询emp_no为10001的函数，但是由于查询条件是一个表达式，MySQL无法为其使用索引。看来MySQL还没有智能到自动优化常量表达式的程度，因此在写查询语句时尽量避免表达式出现在查询中，而是先手工私下代数运算，转换为无表达式的查询语句。
-
-------
-
-### 【3】索引选择性与前缀索引
-
-既然索引可以加快查询速度，那么是不是只要是查询语句需要，就建上索引？答案是否定的。因为索引虽然加快了查询速度，但索引也是有代价的：索引文件本身要消耗存储空间，同时索引会加重插入、删除和修改记录时的负担。另外，MySQL在运行时也要消耗资源维护索引，因此索引并不是越多越好。
-
-**一般两种情况下不建议建索引：**
-
-- 第一种情况是表记录比较少，例如一两千条甚至只有几百条记录的表，没必要建索引，让查询做全表扫描就好了。至于多少条记录才算多，我个人的经验是以2000作为分界线，记录数不超过 2000可以考虑不建索引，超过2000条可以酌情考虑索引。
-- 另一种不建议建索引的情况是索引的选择性较低。所谓索引的选择性(Selectivity)，是指不重复的索引值(也叫基数，Cardinality)与表记录数(#T)的比值：
-
-```
-Index Selectivity = Cardinality / #T
-```
-
-显然选择性的取值范围为(0, 1]，选择性越高的索引价值越大，这是由B+Tree的性质决定的。
-
-例如，上文用到的employees.titles表，如果title字段经常被单独查询，是否需要建索引，我们看一下它的选择性：
-![image-20210311001209607](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mysql-demo/image-20210311001209607.png)
-title的选择性不足0.0001（精确值为0.00001579），所以实在没有什么必要为其单独建索引。
-
-------
-
-**前缀索引**
-
-有一种与索引选择性有关的索引优化策略叫做前缀索引，就是用列的前缀代替整个列作为索引key，当前缀长度合适时，可以做到既使得前缀索引的选择性接近全列索引，同时因为索引key变短而减少了索引文件的大小和维护开销。
-
-下面以employees.employees表为例介绍前缀索引的选择和使用。
-
-从下图可以看到employees表只有一个索引`<emp_no>`，那么如果我们想按名字搜索一个人，就只能全表扫描了：
-
-![image-20210311001252916](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mysql-demo/image-20210311001252916.png)
-
-如果频繁按名字搜索员工，这样显然效率很低，因此我们可以考虑建索引。有两种选择，建`<first_name>或<first_name, last_name>`，看下两个索引的选择性：
-![image-20210311001313213](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mysql-demo/image-20210311001313213.png)
-`<first_name>`显然选择性太低，`<first_name, last_name>`选择性很好，但是`first_name和last_name`加起来长度为30，有没有兼顾长度和选择性的办法？可以考虑用`first_name和last_name的前几个字符`建立索引，例如`<first_name, left(last_name, 3)>`，看看其选择性：
-![image-20210311001336057](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mysql-demo/image-20210311001336057.png)
-选择性还不错，但离0.9313还是有点距离，那么把last_name前缀加到4：
-![image-20210311001349792](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mysql-demo/image-20210311001349792.png)
-这时选择性已经很理想了，而这个索引的长度只有18，比`<first_name, last_name>`短了接近一半，我们把这个前缀索引 建上：
-
-```
-ALTER TABLE employees.employees
-ADD INDEX `first_name_last_name4` (first_name, last_name(4));
-12
-```
-
-此时再执行一遍按名字查询，比较分析一下与建索引前的结果：
-![image-20210311001406101](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mysql-demo/image-20210311001406101.png)
-性能的提升是显著的，查询速度提高了120多倍。
-
-前缀索引兼顾索引大小和查询速度，但是其缺点是不能用于ORDER BY和GROUP BY操作，也不能用于Covering index（即当索引本身包含查询所需全部数据时，不再访问数据文件本身）。
-
-------
-
-### 【4】InnoDB的主键选择与插入优化
-
-在使用InnoDB存储引擎时，如果没有特别的需要，请永远使用一个与业务无关的自增字段作为主键。
-
-上文讨论过InnoDB的索引实现，InnoDB使用聚集索引，数据记录本身被存于主索引（一颗B+Tree）的叶子节点上。这就要求同一个叶子节点内（大小为一个内存页或磁盘页）的各条数据记录按主键顺序存放，因此每当有一条新的记录插入时，MySQL会根据其主键将其插入适当的节点和位置，如果页面达到装载因子（InnoDB默认为15/16），则开辟一个新的页（节点）。
-
-如果表使用自增主键，那么每次插入新的记录，记录就会顺序添加到当前索引节点的后续位置，当一页写满，就会自动开辟一个新的页。如下图所示：
-
-![image-20210311001455283](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mysql-demo/image-20210311001455283.png)
-
-这样就会形成一个紧凑的索引结构，近似顺序填满。由于每次插入时也不需要移动已有数据，因此效率很高，也不会增加很多开销在维护索引上。
-
-如果使用非自增主键（如果身份证号或学号等），由于每次插入主键的值近似于随机，因此每次新纪录都要被插到现有索引页得中间某个位置：
-
-![image-20210311001514919](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mysql-demo/image-20210311001514919.png)
-
-此时MySQL不得不为了将新记录插到合适位置而移动数据，甚至目标页面可能已经被回写到磁盘上而从缓存中清掉，此时又要从磁盘上读回来，这增加了很多开销，同时频繁的移动、分页操作造成了大量的碎片，得到了不够紧凑的索引结构，后续不得不通过OPTIMIZE TABLE来重建表并优化填充页面。
-
-**因此，只要可以，请尽量在InnoDB上采用自增字段做主键。**
-
-### 【5】总结
-
-**索引失效的条件**
-
-- 不在索引列上做任何操作（计算、函数、（自动or手动）类型转换），会导致索引失效而转向全表扫描
-- 存储引擎不能使用索引范围条件右边的列
-- 尽量使用覆盖索引（只访问索引的查询（索引列和查询列一致）），减少select *
-- mysql在使用不等于（！=或者<>）的时候无法使用索引会导致全表扫描
-- is null,is not null也无法使用索引
-- like以通配符开头（’%abc…’）mysql索引失效会变成全表扫描的操作。
-
-
-
-## 建索引的几大原则
+## 11.建索引的几大原则
 
 1. **选择唯一性索引**
 
@@ -828,7 +633,7 @@ ADD INDEX `first_name_last_name4` (first_name, last_name(4));
 
 
 
-## Cardinality
+## 12.Cardinality
 
 使用 `show index from 表名` 时， 可以看到有一个Cardinality列，这个列是衡量我们`索引有效性`的方式。他的含义是索引列中不重复的行数，Cardinality除以表行数称为`索引的选择性`，`选择性越高越好`，选择性小于30%通常认为这个索引建的不好。
 
@@ -842,11 +647,177 @@ Cardinality是一个`采样估计值`，会随机选择若干页计算平均不�
 2. show table status
 3. show index
 
+## 13.全文索引
+
+ MySQL 从 5.7.6 版本开始，MySQL就内置了ngram全文解析器，用来支持中文、日文、韩文分词。在 MySQL 5.7.6 版本之前，全文索引只支持英文全文索引，不支持中文全文索引，需要利用分词器把中文段落预处理拆分成单词，然后存入数据库。本篇文章测试的时候，采用的 Mysql 5.7.6 ，InnoDB数据库引擎。
+
+### 13.1.全文解析器ngram
+
+ngram就是一段文字里面连续的n个字的序列。ngram全文解析器能够对文本进行分词，每个单词是连续的n个字的序列。 例如，用ngram全文解析器对“你好世界”进行分词:
+
+```javascript
+n=1: '你', '好', '世', '界' 
+n=2: '你好', '好世', '世界' 
+n=3: '你好世', '好世界' 
+n=4: '你好世界'
+```
+
+MySQL 中使用全局变量 ngram_token_size 来配置 ngram 中 n 的大小，它的取值范围是1到10，默认值是 2。通常ngram_token_size设置为要查询的单词的最小字数。如果需要搜索单字，就要把ngram_token_size设置为 1。在默认值是 2 的情况下，搜索单字是得不到任何结果的。因为中文单词最少是两个汉字，推荐使用默认值 2。
+
+咱们看一下Mysql默认的ngram_token_size大小：
+
+```javascript
+show variables like 'ngram_token_size'
+```
+
+![g13vsz91iu](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mysql-demo/20210505103820.png)
+
+ngram_token_size 变量的两种设置方式：
+
+- 启动mysqld命令时指定 
+
+    ```javascript
+    mysqld --ngram_token_size=2
+    ```
+
+- 修改mysql配置文件 
+
+    ```javascript
+    [mysqld] 
+    ngram_token_size=2
+    ```
+
+### 13.2.全文索引
+
+以某文书数据为例，新建数据表 t_wenshu ，并且针对文书内容字段创建全文索引，导入10w条测试数据。
+
+![nqtcojorh6](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mysql-demo/20210505103920.png)
+
+- 建表时创建全文索引
+
+    ```javascript
+    CREATE TABLE `t_wenshu` (
+      `province` varchar(255) DEFAULT NULL,
+      `caseclass` varchar(255) DEFAULT NULL,
+      `casenumber` varchar(255) DEFAULT NULL,
+      `caseid` varchar(255) DEFAULT NULL,
+      `types` varchar(255) DEFAULT NULL,
+      `title` varchar(255) DEFAULT NULL,
+      `content` longtext,
+      `updatetime` varchar(255) DEFAULT NULL,
+      FULLTEXT KEY `content` (`content`) WITH PARSER `ngram`
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+    ```
+
+- 通过 alter table 方式
+
+    ```javascript
+    ALTER TABLE t_wenshu ADD FULLTEXT INDEX content_index (content) WITH PARSER ngram;
+    ```
+
+- 通过 create index 方式
+
+    ```javascript
+    CREATE FULLTEXT INDEX content_index ON t_wenshu (content) WITH PARSER ngram;
+    ```
+
+### 13.3.检索模式
+
+**自然语言检索**
+
+（IN NATURAL LANGUAGE MODE）自然语言模式是 MySQL 默认的全文检索模式。自然语言模式不能使用操作符，不能指定关键词必须出现或者必须不能出现等复杂查询。
+
+**布尔检索**
+
+（IN BOOLEAN MODE）剔除一半匹配行以上都有的词，例如，每行都有this这个词的话，那用this去查时，会找不到任何结果，这在记录条数特别多时很有用，原因是数据库认为把所有行都找出来是没有意义的，这时，this几乎被当作是stopword(中断词)；布尔检索模式可以使用操作符，可以支持指定关键词必须出现或者必须不能出现或者关键词的权重高还是低等复杂查询。
+
+```javascript
+   ● IN BOOLEAN MODE的特色： 
+      ·不剔除50%以上符合的row。 
+      ·不自动以相关性反向排序。 
+      ·可以对没有FULLTEXT index的字段进行搜寻，但会非常慢。 
+      ·限制最长与最短的字符串。 
+      ·套用Stopwords。
+
+   ● 搜索语法规则：
+     +   一定要有(不含有该关键词的数据条均被忽略)。 
+     -   不可以有(排除指定关键词，含有该关键词的均被忽略)。 
+     >   提高该条匹配数据的权重值。 
+     <   降低该条匹配数据的权重值。
+     ~   将其相关性由正转负，表示拥有该字会降低相关性(但不像-将之排除)，只是排在较后面权重值降低。 
+     *   万用字，不像其他语法放在前面，这个要接在字符串后面。 
+     " " 用双引号将一段句子包起来表示要完全相符，不可拆字。
+```
+
+**查询扩展检索**
+
+注释：（WITH QUERY EXPANSION）由于查询扩展可能带来许多非相关性的查询，谨慎使用！
+
+### 13.4.检索查询
+
+- 查询 content 中包含“盗窃罪”的记录，查询语句如下
+
+    ```javascript
+    select caseid,content, MATCH ( content) AGAINST ('盗窃罪') as score from t_wenshu where MATCH ( content) AGAINST ('盗窃罪' IN NATURAL LANGUAGE MODE)
+    ```
+    
+    ![run88a8651](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mysql-demo/20210505104150.png)
+
+- 查询 content 中包含“寻衅滋事”的记录，查询语句如下
+
+    ```javascript
+    select caseid,content, MATCH ( content) AGAINST ('寻衅滋事') as score from t_wenshu where MATCH ( content) AGAINST ('寻衅滋事' IN NATURAL LANGUAGE MODE) ;
+    ```
+    
+    ![xnnc1ahu7p](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mysql-demo/20210505104329.png)
+    
+- 单个汉字，查询 content 中包含“我”的记录，查询语句如下
+
+    ```javascript
+    select caseid,content, MATCH ( content) AGAINST ('我') as score from t_wenshu where MATCH ( content) AGAINST ('我' IN NATURAL LANGUAGE MODE) ;
+    ```
+
+    ![nukd7jmr2s](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mysql-demo/20210505104343.png)
+
+    备注：因为设置的全局变量 ngram_token_size 的值为 2。如果想查询单个汉字，需要在配置文件 my.ini 中修改 ngram_token_size = 1 ，并重启 mysqld 服务，此处不做尝试了。
+
+- 查询字段 content 中包含 “危险驾驶”和“寻衅滋事”的语句如下：
+
+    ```javascript
+    select caseid,content, MATCH (content) AGAINST ('+危险驾驶 +寻衅滋事') as score from t_wenshu where MATCH (content) AGAINST ('+危险驾驶 +寻衅滋事' IN BOOLEAN MODE);
+    ```
+
+    ![p6g7ldw9g4](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mysql-demo/20210505104403.png)
+
+- 查询字段 content 中包含 “危险驾驶”，但不包含“寻衅滋事”的语句如下：
+
+    ```javascript
+    select caseid,content, MATCH (content) AGAINST ('+危险驾驶 -寻衅滋事') as score from t_wenshu where MATCH (content) AGAINST ('+危险驾驶 -寻衅滋事' IN BOOLEAN MODE);
+    ```
+
+    ![7qtjzyexpj](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mysql-demo/20210505104419.png)
+
+- 查询字段 conent 中包含“危险驾驶”或者“寻衅滋事”的语句如下：
+
+    ```javascript
+    select caseid,content, MATCH (content) AGAINST ('危险驾驶 寻衅滋事') as score from t_wenshu where MATCH (content) AGAINST ('危险驾驶 寻衅滋事' IN BOOLEAN MODE);
+    ```
+
+    ![ngmw9e1x3g](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mysql-demo/20210505104432.png)
+
+### 13.5.总结
+
+- 使用 Mysql 全文索引之前，搞清楚各版本支持情况；
+- 全文索引比 like + % 快 N 倍，但是可能存在精度问题；
+- 如果需要全文索引的是大量数据，建议先添加数据，再创建索引； 
+- 对于中文，可以使用 MySQL 5.7.6 之后的版本，或者 Sphinx、Lucene 等第三方的插件；
+- MATCH()函数使用的字段名，必须要与创建全文索引时指定的字段名一致，且只能是同一个表的字段不能跨表； 
 
 
-## 问题
 
-### 一、SELECT COUNT(*) 会造成全表扫描？
+## X.常见问题
+
+### X.1.SELECT COUNT(*) 会造成全表扫描？
 **前言**
 
 上篇 SQL 进阶技巧（下) 中提到使用以下 sql 会导致慢查询
@@ -1020,9 +991,9 @@ SET optimizer_trace="enabled=off";
 
 
 
-### 二、为什么我使用了索引，查询还是慢？
+### X.2.为什么我使用了索引，查询还是慢？
 
-#### 案例剖析
+#### X.2.1.案例剖析
 
 言归正传，为了实验，我创建了如下表：
 
@@ -1059,7 +1030,7 @@ CREATE TABLE `T`(
 
 所以我们可以得出一个结论：**是否使用索引和是否进入慢查询之间并没有必然的联系。使用索引只是表示了一个SQL语句的执行过程，而是否进入到慢查询是由它的执行时间决定的，而这个执行时间，可能会受各种外部因素的影响。换句话来说，使用了索引你的语句可能依然会很慢。**
 
-#### 全索引扫描的不足
+#### X.2.2.全索引扫描的不足
 
 那如果我们在更深层次的看这个问题，其实他还潜藏了一个问题需要澄清，就是什么叫做使用了索引。
 
@@ -1081,7 +1052,7 @@ CREATE TABLE `T`(
 - 也可以用全索引扫描，来说明像 `select a from t;` 这样的查询，他扫描了整个普通索引树；
 - 而 `select * from t where id=2` 这样的语句，才是我们平时说的使用了索引。他表示的意思是，我们使用了索引的快速搜索功能，并且有效的减少了扫描行数。
 
-#### 索引的过滤性要足够好
+#### X.2.3.索引的过滤性要足够好
 
 根据以上解剖，我们知道全索引扫描会让查询变慢，接下来就要来谈谈索引的过滤性。
 
@@ -1105,7 +1076,7 @@ CREATE TABLE `T`(
 
 像刚才这个例子的age，它的过滤性就不够好，在设计表结构的时候，我们要让所有的过滤性足够好，也就是区分度足够高。
 
-#### 回表的代价
+#### X.2.4.回表的代价
 
 那么过滤性好了，是不是表示查询的扫描行数就一定少呢？
 
@@ -1139,7 +1110,7 @@ t_people表上有一个索引是姓名和年龄的联合索引，那这个联合
 
 这个过程跟上面的差别，是在遍历联合索引的过程中，将年龄等于8的条件下推到所有遍历的过程中，减少了回表的次数，假设全国名字第1个字是张的人里面，有100万个是8岁的小朋友，那么这个查询过程中在联合索引里要遍历8000万次，而回表只需要100万次。
 
-#### 虚拟列
+#### X.2.5.虚拟列
 
 可以看到这个优化的效果还是很不错的，但是这个优化还是没有绕开最左前缀原则的限制，因此在联合索引你还是要扫描8000万行，那有没有更进一步的优化方法呢？
 
@@ -1165,7 +1136,7 @@ CREATE TABLE `t_people`(
 
 这样这个语句的执行过程，就只需要扫描联合索引的100万行，并回表100万次，这个优化的本质是我们创建了一个更紧凑的索引，来加速了查询的过程。
 
-#### 总结
+#### X.2.6.总结
 
 本文给你介绍了索引的基本结构和一些查询优化的基本思路，你现在知道了，使用索引的语句也有可能是慢查询，我们的查询优化的过程，往往就是减少扫描行数的过程。
 
@@ -1178,7 +1149,206 @@ CREATE TABLE `t_people`(
 
 
 
-### 三、mysql 索引过长1071-max key length is 767 byte
+
+
+### X.3.MySQL索引使用策略及优化实例
+
+MySQL的优化主要分为结构优化（Scheme optimization）和查询优化（Query optimization）。本章讨论的高性能索引策略主要属于`结构优化`范畴。
+
+#### X.3.1.示例数据库
+
+为了讨论索引策略，需要一个数据量不算小的数据库作为示例。本文选用MySQL官方文档中提供的示例数据库之一：employees。这个数据库关系复杂度适中，且数据量较大。下图是这个数据库的E-R关系图（引用自MySQL官方手册）：
+![image-20210311000336928](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mysql-demo/image-20210311000336928.png)
+
+MySQL官方文档中关于此数据库的页面为http://dev.mysql.com/doc/employee/en/employee.html (目前不可访问)。里面详细介绍了此数据库，并提供了下载地址和导入方法，如果有兴趣导入此数据库到自己的MySQL可以参考文中内容。
+
+#### X.3.2.最左前缀原理与相关优化
+
+高效使用索引的首要条件是知道什么样的查询会使用到索引，这个问题和B+Tree中的`“最左前缀原理”`有关，下面通过例子说明最左前缀原理。
+
+这里先说一下联合索引的概念。在上文中，我们都是假设索引只引用了单个的列，实际上，`MySQL中的索引可以以一定顺序引用多个列，这种索引叫做联合索引`，一般的，一个联合索引是一个有序元组`<a1, a2, …, an>`，其中各个元素均为数据表的一列，实际上要严格定义索引需要用到关系代数，但是这里我不想讨论太多关系代数的话题，因为那样会显得很枯燥，所以这里就不再做严格定义。另外，单列索引可以看成联合索引元素数为1的特例。
+
+以employees.titles表为例，下面先查看其上都有哪些索引：
+
+![image-20210311000440987](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mysql-demo/image-20210311000440987.png)
+从结果中可以到titles表的主索引为`<emp_no, title, from_date>`，还有一个辅助索引`<emp_no>`。为了避免多个索引使事情变复杂（MySQL的SQL优化器在多索引时行为比较复杂），这里我们将辅助索引drop掉：
+
+```
+ALTER TABLE employees.titles DROP INDEX emp_no;
+```
+
+这样就可以专心分析索引PRIMARY的行为了。
+
+**① 全列匹配**
+
+![image-20210311000511100](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mysql-demo/image-20210311000511100.png)
+
+很明显，当按照索引中所有列进行精确匹配（这里精确匹配指“=”或“IN”匹配）时，索引可以被用到。这里有一点需要注意，理论上索引对顺序是敏感的，但是由于MySQL的查询优化器会自动调整where子句的条件顺序以使用适合的索引，例如我们将where中的条件顺序颠倒：
+
+![image-20210311000534857](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mysql-demo/image-20210311000534857.png)
+
+会发现效果是一样的。
+
+------
+
+**② 最左前缀匹配**
+
+![image-20210311000553071](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mysql-demo/image-20210311000553071.png)
+
+当查询条件精确匹配索引的左边连续一个或几个列时，如`<emp_no>或<emp_no, title>`，索引可以被用到，但是只能用到一部分，即条件所组成的最左前缀。上面的查询从分析结果看用到了PRIMARY索引，但是key_len为4，说明只用到了索引的第一列前缀。
+
+**③ 查询条件用到了索引中列的精确匹配，但是中间某个条件未提供**
+
+![image-20210311000638264](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mysql-demo/image-20210311000638264.png)
+
+此时索引使用情况和情况二相同，因为title未提供，所以查询只用到了索引的第一列，而后面的`from_date`虽然也在索引中，但是由于title不存在而无法和左前缀连接，因此需要对结果进行扫描过滤`from_date`（这里由于emp_no唯一，所以不存在扫描）。如果想让`from_date`也使用索引而不是where过滤，可以增加一个辅助索引`<emp_no, from_date>`，此时上面的查询会使用这个索引。
+
+除此之外，还可以使用一种称之为`“隔离列”`的优化方法，将`emp_no与from_date之间的“坑”`填上。首先我们看下title一共有几种不同的值：
+
+![image-20210311000701410](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mysql-demo/image-20210311000701410.png)
+
+只有7种。在这种成为“坑”的列值比较少的情况下，可以考虑用“IN”来填补这个“坑”从而形成最左前缀：
+
+![image-20210311000724130](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mysql-demo/image-20210311000724130.png)
+
+这次key_len为59，说明索引被用全了，但是从type和rows看出IN实际上执行了一个range查询，这里检查了7个key。看下两种查询的性能比较：
+
+![image-20210311000743166](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mysql-demo/image-20210311000743166.png)
+
+`“填坑”`后性能提升了一点。如果经过emp_no筛选后余下很多数据，则后者性能优势会更加明显。当然，如果title的值很多，用填坑就不合适了，必须建立辅助索引。
+
+------
+
+**④ 查询条件没有指定索引第一列**
+
+![image-20210311000806381](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mysql-demo/image-20210311000806381.png)
+由于不是最左前缀，索引这样的查询显然用不到索引。
+
+**⑤ 匹配某列的前缀字符串**
+
+![image-20210311000827187](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mysql-demo/image-20210311000827187.png)
+
+如果通配符%不出现在开头，则可以用到索引，但根据具体情况不同可能只会用其中一个前缀。即只有`XXX%`会使用到索引，`%XXX%`或`%XXX`都不会使用到索引。
+
+**⑥ 范围查询**
+
+![image-20210311000856753](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mysql-demo/image-20210311000856753.png)
+
+范围列可以用到索引（必须是最左前缀），但是范围列后面的列无法用到索引。同时，索引最多用于一个范围列，因此如果查询条件中有两个范围列则无法全用到索引。
+
+![image-20210311000942157](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mysql-demo/image-20210311000942157.png)
+
+可以看到索引对第二个范围索引无能为力。这里特别要说明MySQL一个有意思的地方，那就是仅用explain可能无法区分范围索引和多值匹配，因为在type中这两者都显示为range。同时，用了“between”并不意味着就是范围查询，例如下面的查询：
+
+![image-20210311001025873](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mysql-demo/image-20210311001025873.png)
+
+看起来是用了两个范围查询，但作用于emp_no上的“BETWEEN”实际上相当于“IN”，也就是说emp_no实际是多值精确匹配。可以看到这个查询用到了索引全部三个列。因此在MySQL中要谨慎地区分多值匹配和范围匹配，否则会对MySQL的行为产生困惑。
+
+------
+
+**⑦ 查询条件中含有函数或表达式**
+
+很不幸，如果查询条件中含有函数或表达式，则MySQL不会为这列使用索引（虽然某些在数学意义上可以使用）。例如：
+
+![image-20210311001057019](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mysql-demo/image-20210311001057019.png)
+
+虽然这个查询和情况五中功能相同，但是由于使用了函数left，则无法为title列应用索引，而情况五中用LIKE则可以。再如：
+
+![image-20210311001113208](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mysql-demo/image-20210311001113208.png)
+
+显然这个查询等价于查询emp_no为10001的函数，但是由于查询条件是一个表达式，MySQL无法为其使用索引。看来MySQL还没有智能到自动优化常量表达式的程度，因此在写查询语句时尽量避免表达式出现在查询中，而是先手工私下代数运算，转换为无表达式的查询语句。
+
+------
+
+#### X.3.3.索引选择性与前缀索引
+
+既然索引可以加快查询速度，那么是不是只要是查询语句需要，就建上索引？答案是否定的。因为索引虽然加快了查询速度，但索引也是有代价的：索引文件本身要消耗存储空间，同时索引会加重插入、删除和修改记录时的负担。另外，MySQL在运行时也要消耗资源维护索引，因此索引并不是越多越好。
+
+**一般两种情况下不建议建索引：**
+
+- 第一种情况是表记录比较少，例如一两千条甚至只有几百条记录的表，没必要建索引，让查询做全表扫描就好了。至于多少条记录才算多，我个人的经验是以2000作为分界线，记录数不超过 2000可以考虑不建索引，超过2000条可以酌情考虑索引。
+- 另一种不建议建索引的情况是索引的选择性较低。所谓索引的选择性(Selectivity)，是指不重复的索引值(也叫基数，Cardinality)与表记录数(#T)的比值：
+
+```
+Index Selectivity = Cardinality / #T
+```
+
+显然选择性的取值范围为(0, 1]，选择性越高的索引价值越大，这是由B+Tree的性质决定的。
+
+例如，上文用到的employees.titles表，如果title字段经常被单独查询，是否需要建索引，我们看一下它的选择性：
+![image-20210311001209607](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mysql-demo/image-20210311001209607.png)
+title的选择性不足0.0001（精确值为0.00001579），所以实在没有什么必要为其单独建索引。
+
+------
+
+**前缀索引**
+
+有一种与索引选择性有关的索引优化策略叫做前缀索引，就是用列的前缀代替整个列作为索引key，当前缀长度合适时，可以做到既使得前缀索引的选择性接近全列索引，同时因为索引key变短而减少了索引文件的大小和维护开销。
+
+下面以employees.employees表为例介绍前缀索引的选择和使用。
+
+从下图可以看到employees表只有一个索引`<emp_no>`，那么如果我们想按名字搜索一个人，就只能全表扫描了：
+
+![image-20210311001252916](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mysql-demo/image-20210311001252916.png)
+
+如果频繁按名字搜索员工，这样显然效率很低，因此我们可以考虑建索引。有两种选择，建`<first_name>或<first_name, last_name>`，看下两个索引的选择性：
+![image-20210311001313213](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mysql-demo/image-20210311001313213.png)
+`<first_name>`显然选择性太低，`<first_name, last_name>`选择性很好，但是`first_name和last_name`加起来长度为30，有没有兼顾长度和选择性的办法？可以考虑用`first_name和last_name的前几个字符`建立索引，例如`<first_name, left(last_name, 3)>`，看看其选择性：
+![image-20210311001336057](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mysql-demo/image-20210311001336057.png)
+选择性还不错，但离0.9313还是有点距离，那么把last_name前缀加到4：
+![image-20210311001349792](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mysql-demo/image-20210311001349792.png)
+这时选择性已经很理想了，而这个索引的长度只有18，比`<first_name, last_name>`短了接近一半，我们把这个前缀索引 建上：
+
+```
+ALTER TABLE employees.employees
+ADD INDEX `first_name_last_name4` (first_name, last_name(4));
+12
+```
+
+此时再执行一遍按名字查询，比较分析一下与建索引前的结果：
+![image-20210311001406101](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mysql-demo/image-20210311001406101.png)
+性能的提升是显著的，查询速度提高了120多倍。
+
+前缀索引兼顾索引大小和查询速度，但是其缺点是不能用于ORDER BY和GROUP BY操作，也不能用于Covering index（即当索引本身包含查询所需全部数据时，不再访问数据文件本身）。
+
+------
+
+#### X.3.4.InnoDB的主键选择与插入优化
+
+在使用InnoDB存储引擎时，如果没有特别的需要，请永远使用一个与业务无关的自增字段作为主键。
+
+上文讨论过InnoDB的索引实现，InnoDB使用聚集索引，数据记录本身被存于主索引（一颗B+Tree）的叶子节点上。这就要求同一个叶子节点内（大小为一个内存页或磁盘页）的各条数据记录按主键顺序存放，因此每当有一条新的记录插入时，MySQL会根据其主键将其插入适当的节点和位置，如果页面达到装载因子（InnoDB默认为15/16），则开辟一个新的页（节点）。
+
+如果表使用自增主键，那么每次插入新的记录，记录就会顺序添加到当前索引节点的后续位置，当一页写满，就会自动开辟一个新的页。如下图所示：
+
+![image-20210311001455283](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mysql-demo/image-20210311001455283.png)
+
+这样就会形成一个紧凑的索引结构，近似顺序填满。由于每次插入时也不需要移动已有数据，因此效率很高，也不会增加很多开销在维护索引上。
+
+如果使用非自增主键（如果身份证号或学号等），由于每次插入主键的值近似于随机，因此每次新纪录都要被插到现有索引页得中间某个位置：
+
+![image-20210311001514919](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mysql-demo/image-20210311001514919.png)
+
+此时MySQL不得不为了将新记录插到合适位置而移动数据，甚至目标页面可能已经被回写到磁盘上而从缓存中清掉，此时又要从磁盘上读回来，这增加了很多开销，同时频繁的移动、分页操作造成了大量的碎片，得到了不够紧凑的索引结构，后续不得不通过OPTIMIZE TABLE来重建表并优化填充页面。
+
+**因此，只要可以，请尽量在InnoDB上采用自增字段做主键。**
+
+#### X.3.5.总结
+
+**索引失效的条件**
+
+- 不在索引列上做任何操作（计算、函数、（自动or手动）类型转换），会导致索引失效而转向全表扫描
+- 存储引擎不能使用索引范围条件右边的列
+- 尽量使用覆盖索引（只访问索引的查询（索引列和查询列一致）），减少select *
+- mysql在使用不等于（！=或者<>）的时候无法使用索引会导致全表扫描
+- is null,is not null也无法使用索引
+- like以通配符开头（’%abc…’）mysql索引失效会变成全表扫描的操作。
+
+
+
+
+
+### X.4.mysql 索引过长1071-max key length is 767 byte
 
 问题：create table: Specified key was too long; max key length is 767 bytes
 原因：数据库表采用utf8编码，其中varchar(255)的column进行了唯一键索引，而mysql默认情况下单个列的索引不能超过767位(不同版本可能存在差异)，于是utf8字符编码下，255*3 byte 超过限制
@@ -1198,7 +1368,7 @@ innodb_large_prefix=on
 
 
 
-### 四、长字段的索引调优
+### X.5.长字段的索引调优
 
 `selelct * from  employees where first_name = ' Facello'`  假设 `first_name` 的字段长度很长，如大于200个字符，那么索引占用的空间也会很大，作用在超长字段的索引查询效率也不高。
 
@@ -1261,7 +1431,7 @@ select count(distinct left(first_name,``12``)) / count(*) from employees; -- 返
 
 
 
-### 五、亿级大表在线不锁表变更字段与索引
+### X.6.亿级大表在线不锁表变更字段与索引
 
 https://www.cnblogs.com/huaweiyun/p/14291566.html
 
