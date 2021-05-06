@@ -1730,9 +1730,163 @@ JVM启动参数设置：
 
 总结：其实发生OOM的线程一般情况下会死亡，也就是会被终结掉，该线程持有的对象占用的heap都会被gc了，释放内存。因为发生OOM之前要进行gc，就算其他线程能够正常工作，也会因为频繁gc产生较大的影响。
 
+### X.7.用 DEBUG 的方式看线程运行原理
 
+通过 DEBUG 这段代码来看下线程的运行原理：
 
+![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/jvm-demo/20210506204534.png)
 
+上述代码的逻辑非常简单，main 方法调用了 method1 方法，而 method1 方法又调用了 method2 方法。
+
+看下图，我们打了一个断点：
+
+![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/jvm-demo/20210506204545.png)
+
+OK，以 DEBUG 的方式运行 Test.main()，虽然这里我们没有显示的创建线程，但是 main 函数的调用本身就是一个线程，也被称为主线程（main 线程），所以我们一启动这个程序，就会给这个主线程分配一个虚拟机栈内存。
+
+![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/jvm-demo/20210506204551.png)
+
+上文我们也说了，**虚拟机栈内存其实就是个壳儿，里面真正存储数据的，其实是一个一个的栈帧，每个方法都对应着一个栈帧**。
+
+所以当主线程调用 main 方法的时候，就会为 main 方法生成一个栈帧，其中存储了局部变量表、操作数栈、动态链接、方法的返回地址等信息。
+
+各位现在可以看看 DEBUG 窗口显示的界面：
+
+![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/jvm-demo/20210506204555.png)
+
+左边的 Frames 就是栈帧的意思，可以看见现在主线程中只有一个 main 栈帧；
+
+右边的 Variables 就是该栈帧存储的局部变量表，可以看到现在 main 栈帧中只有一个局部变量，也就是方法参数 args。
+
+接下来 DEBUG 进入下一步，我们先来看看 DEBUG 界面上的每个按钮都是啥意思，总共五个按钮（已经了解的各位可以跳过这里）：
+
+- `Step Over`：F8
+
+  ![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/jvm-demo/20210506204644.png)
+
+  程序向下执行一行，如果当前行有方法调用，这个方法将被执行完毕并返回，然后到下一行
+
+- `Step Into`：F7
+
+  ![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/jvm-demo/20210506204648.png)
+
+  程序向下执行一行，如果该行有自定义方法，则运行进入自定义方法（不会进入官方类库的方法）
+
+- `Force Step Into`：Alt + Shift + F7
+
+  ![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/jvm-demo/20210506204651.png)
+
+  程序向下执行一行，如果该行有自定义方法或者官方类库方法，则运行进入该方法（也就是可以进入任何方法）
+
+- `Step Out`：Shift + F8
+
+  ![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/jvm-demo/20210506204657.png)
+
+  如果在调试的时候你进入了一个方法，并觉得该方法没有问题，你就可以使用 Step Out 直接执行完该方法并跳出，返回到该方法被调用处的下一行语句。
+
+- Drop frame
+
+  ![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/jvm-demo/20210506204700.png)
+
+  点击该按钮后，你将返回到当前方法的调用处重新执行，并且所有上下文变量的值也回到那个时候。只要调用链中还有上级方法，可以跳到其中的任何一个方法。
+
+  OK，我们点击 Step Into 进入 method1 方法，可以看到，虚拟机栈内存中又多出了一个 method1 栈帧：
+
+  ![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/jvm-demo/20210506204723.png)
+
+  再点击 Step Into 直到进入 method2 方法，于是虚拟机栈内存中又多出了一个 method2 栈帧：
+
+  ![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/jvm-demo/20210506204730.png)
+
+  当我们 Step Into 走到 method2 方法中的 return n 语句后，n 指向的堆中的地址就会被返回给 method1 中的 m，并且，满足栈后进先出的原则，method2 栈帧会从虚拟机栈内存中被销毁。
+
+  ![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/jvm-demo/20210506204738.png)
+
+  然后点击 `Step Over` 执行完输出语句（`Step Into` 会进入 println 方法，`Force Step Into` 会进入 Object.toString 方法）
+
+  至此，method1 的使命全部完成，method1 栈帧会从虚拟机栈内存中被销毁。
+
+  ![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/jvm-demo/20210506204747.png)
+
+  最后再往下走一步，main 栈帧也会被销毁，这里就不再贴图了。
+
+#### X.7.1.线程运行原理详细图解
+
+上面写了这么多，其实也就是教会了大家栈帧这个东西，接下来我们通过图解的方式，来带大家详细看看线程运行时，Java 运行时数据区域的各种变化。
+
+首先第一步，类加载。
+
+《深入理解 Java 虚拟机：JVM 高级实践与最佳实战 - 第 2 版》中是这样解释类加载的：虚拟机把描述类的数据从 Class 文件（字节码文件）加载到内存，并对数据进行校验、转换解析和初始化，最终形成可以被虚拟机直接使用的 Java 类型，这就是虚拟机的类加载机制。
+
+而**加载进来的这些字节码信息，就存储在方法区中**。看下图，这里为了各位理解方便，我就不写字节码了，直接按照代码来，大家知道这里存的其实是字节码就行：
+
+![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/jvm-demo/20210506204801.png)
+
+主线程调用 main 方法，于是为该方法生成一个 main 栈帧：
+
+![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/jvm-demo/20210506204805.png)
+
+那么这个参数 args 的值从哪里来呢？没错，就是从堆中 new 出来的：
+
+![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/jvm-demo/20210506204811.png)
+
+而 main 方法的返回地址就是程序的退出地址。
+
+再来看程序计数器，如果线程正在执行的是一个 Java 方法，程序计数器中记录的就是正在执行的虚拟机字节码指令的地址，也就是说**此时 `method1(10)` 对应的字节码指令的地址会被放入程序计数器**，图片中我们仍然以具体的代码代替哈，大家知道就好：
+
+![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/jvm-demo/20210506204820.png)
+
+OK，CPU 根据程序计数器的指示，进入 method1 方法，自然，method1 栈帧就被创建出来了：
+
+![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/jvm-demo/20210506204828.png)
+
+局部变量表和方法返回地址安顿好后，就可以开始具体的方法调用了，首先 10 会被传给 x，然后走到 y 被赋值成 x + 1 这步，也就是程序计数器会被修改成这步代码对应的字节码指令的地址：
+
+![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/jvm-demo/20210506204833.png)
+
+走到 `Object m = method2();` 这一步的时候，又会创建一个 method2 栈帧：
+
+![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/jvm-demo/20210506204838.png)
+
+可以看到，method2 方法的第一行代码会在堆中创建一个 Object 对象：
+
+![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/jvm-demo/20210506204843.png)
+
+随后，走到 method2 方法中的 `return n;` 语句，n 指向的堆中的地址就会被返回给 method1 中的 m，并且，满足栈后进先出的原则，method2 栈帧会从虚拟机栈内存中被销毁：
+
+![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/jvm-demo/20210506204849.png)根据 method2 栈帧指向的方法返回地址，我们接着执行 `System.out.println(m.toString())` 这条输出语句，执行完后，method1 栈帧也被销毁了：
+
+![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/jvm-demo/20210506204854.png)
+
+再根据 method1 栈帧指向的方法返回地址，发现我们的程序已走到了生命的尽头，main 栈帧于是也被销毁了，就不再贴图了。
+
+#### X.7.2.用 DEBUG 的方式看多线程运行原理
+
+上面说的是只有一个线程的情况，其实多线程的原理也差不多，因为虚拟机栈是每个线程私有的，大家互不干涉，这里我就简单的提一嘴。
+
+分别在如下两个位置打上 Thread 类型的断点：
+
+![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/jvm-demo/20210506204902.png)
+
+然后以 DEBUG 方式运行，你就会发现存在两个互不干涉的虚拟机栈空间：
+
+![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/jvm-demo/20210506204908.png)
+
+当然，使用多线程就不可避免的会遇到一个问题，那就是**线程的上下文切换**（Thread Context Switch），就是说因为某些原因导致 CPU 不再执行当前的线程，转而执行另一个线程。
+
+导致线程上下文切换的原因大概有以下几种：
+
+- 线程的 CPU 时间片用完
+
+- 发生了垃圾回收
+
+- 有更高优先级的线程需要运行
+
+- 线程自己调用了 sleep、yield、wait、join、park、synchronized、lock 等方法
+
+当线程的上下文切换发生时，也就是从一个线程 A 转而执行另一个线程 B 时，需要由操作系统保存当前线程 A 的状态（为了以后还能顺利回来接着执行），并恢复另一个线程 B 的状态。
+
+这个状态就包括每个线程私有的程序计数器和虚拟机栈中每个栈帧的信息等，显然，每次操作系统都需要存储这么多的信息，**频繁的线程上下文切换势必会影响程序的性能**。
 
 
 

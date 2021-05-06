@@ -306,7 +306,9 @@ Git本地有三个工作区域：工作目录（Working Directory）、暂存区
 git的工作流程一般是这样的：
 
 １. 在工作目录中添加、修改文件；
+
 ２. 将需要进行版本管理的文件放入暂存区域；
+
 ３. 将暂存区域的文件提交到git仓库。
 
 因此，git管理的文件有三种状态：已修改（modified）,已暂存（staged）,已提交(committed)
@@ -950,11 +952,7 @@ $ git branch -dr [remote/branch]
 
 2. 列表所有远程分支使用 `$ git branch -r`
 
-  ![Image [84]](C:\Users\hmliang\Desktop\temp\Image [84].png)
-
 3. 列出所有本地分支和远程分支使用 `$ git branch -a`
-
-  ![Image [85]](C:\Users\hmliang\Desktop\temp\Image [85].png)
 
 #### 4.4.3.分支合并
 合并指定分支到当前分支使用指令 `$ git merge [branch]`
@@ -976,6 +974,103 @@ $ git branch -dr [remote/branch]
 合并后在master上查看file11.txt文件内容与dev6上的内容就一样了，合并后dev6中多出的提交在master也拥有了。
 
 ![Image [90]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/project-manage/20210425232143.png)
+
+**git merge --ff/--no-ff/--ff-only 三种选项参数的区别**
+
+- Fast-forward
+
+  我们从一个正常开发流程来看看：
+
+  开发者小王接到需求任务，从 master 分支中创建功能分支，git 指令如下：
+
+  ```
+  git checkout -b feature556
+  Switched to a new branch 'feature556'
+  ```
+
+  小王在 feature556 分支上完成的功能开发工作，然后产生1次 commit
+
+  ```
+  git commit -m 'Create pop up effects'
+  [feature556 6104106] create pop up effects
+   3 files changed, 75 insertions(+)
+  ```
+
+  我们再更新一下 README 自述文件，让版本差异更明显一些
+
+  ```
+  git commit -m `updated md`
+  ```
+
+  这时候我们看看当前分支的 git 历史记录，输入 `git log --online -all` 可以看到全部分支的历史线：
+
+  ```
+  f2c9c7f (HEAD -> feature556) updated md
+  6104106 create pop up effects
+  a1ec682 (origin/main, origin/HEAD, main) import dio
+  c5848ff update this readme
+  8abff90 update this readme
+  ```
+
+  直接看下图可能会更好理解一些
+
+  ![git-flow-fast-forward](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/project-manage/20210506195908.png)
+
+  功能完成后自然要上线，我们把代码合并，完成上线动作，代码如下
+
+  ```
+  git checkout master
+  git merge feautre556
+  Updating a1ec682..38348cc
+  Fast-forward
+    .......  | 2+++
+   1 file changed, 2 insertions(+)
+  ```
+
+  如果你注意上面的文字的话，你会发现 git 帮你自动执行了 `Fast-forward` 操作，那么什么是 `Fast-forward` ？
+  `Fast-forward` 是指 Master 合并 Feature 时候发现 Master 当前节点一直和 Feature 的根节点相同，没有发生改变，那么 Master 快速移动头指针到 Feature 的位置，所以 **Fast-forward 并不会发生真正的合并**，只是通过移动指针造成合并的假象，这也体现 git 设计的巧妙之处。合并后的分支指针如下：
+
+  ![merge-Fast-forward](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/project-manage/20210506195944.png)
+
+  通常功能分支（feature556） 合并 master 后会被删除，通过下图可以看到，通过 `Fast-forward` 模式产生的合并可以产生**干净并且线性的历史记录**：
+
+  ![remove-feature556](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/project-manage/20210506195959.png)
+
+- non-Fast-forward
+
+  刚说了会产生 `Fast-forward` 的情况，现在再说说什么情况会产生 `non-Fast-forward`，通常，当合并的分支跟 master 不存在共同祖先节点的时候，这时候在 merge 的时候 git 默认无法使用 `Fast-forward` 模式，
+  我们先看看下图的模型：
+
+  ![non-Fast-forward](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/project-manage/20210506200022.png)
+
+  可以看到 master 分支已经比 feature001 快了2个版本，master 已经没办法通过移动头指针来完成 `Fast-forward`，所以在 master 合并 feature001 的时候就不得不做出真正的合并，真正的合并会让 git 多做很多工作，具体合并的动作如下：
+
+  - 找出 master 和 feature001 的公共祖先，节点 c1，c6, c3 三个节点的版本 （如果有冲突需要处理）
+  - 创建新的节点 c7，并且将三个版本的差异合并到 c7，并且创建 commit
+  - 将 master 和 HEAD 指针移动到 c7
+
+  补充：大家在 `git log` 看到很多类似：`Merge branch 'feature001' into master` 的 commit 就是 non-Fast-forward 产生的。
+  执行完以上动作，最终分支流程图如下：
+
+  ![merge-non-fast-forward](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/project-manage/20210506200037.png)
+
+- 如何手动设置合并模式 ？
+
+  先简单介绍一下 `git merge` 的三个合并参数模式：
+
+  - -ff 自动合并模式：当合并的分支为当前分支的后代的，那么会自动执行 `--ff (Fast-forward)` 模式，如果不匹配则执行 `--no-ff（non-Fast-forward）` 合并模式
+  - --no-ff 非 Fast-forward 模式：在任何情况下都会创建新的 commit 进行多方合并（及时被合并的分支为自己的直接后代）
+  - --ff-onlu Fast-forward 模式：只会按照 `Fast-forward` 模式进行合并，如果不符合条件（并非当前分支的直接后代），则会拒绝合并请求并且推出
+
+- 总结：
+
+  三种 merge 模式没有好坏和优劣之分，只有根据你团队的需求和实际情况选择合适的合并模式才是最优解，那么应该怎么选择呢？ 我给出以下推荐：
+
+  - 如果你是小型团队，并且追求干净线性 git 历史记录，那么我推荐使用 `git merge --ff-only` 方式保持主线模式开发是一种不错的选择
+  - 如果你团队不大不小，并且也不追求线性的 git 历史记录，要体现相对真实的 merge 记录，那么默认的 `git --ff` 比较合适
+  - 如果你是大型团队，并且要严格监控每个功能分支的合并情况，那么使用 `--no-ff` 禁用 `Fast-forward` 是一个不错的选择
+
+
 
 #### 4.4.4.解决冲突
 如果同一个文件在合并分支时都被修改了则会引起冲突，如下所示：
