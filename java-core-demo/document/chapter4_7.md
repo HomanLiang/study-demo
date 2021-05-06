@@ -383,7 +383,7 @@ addWorker方法的下半部分：
 ![640 (1)](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/java-core-demo/20210323231324.webp)
 
 - 创建Worker对象，同时也会实例化一个Thread对象。
-- 启动启动这个线程
+- 启动这个线程
 
 **3、再到Worker里看看其实现**
 
@@ -683,7 +683,7 @@ public void run() {
 }
 ```
 
-在 FutureTask 对象的 run() 方法中，该任务抛出的异常被捕获，然后在setException(ex); 方法中，抛出的异常会被放到 outcome 对象中，这个对象就是 submit() 方法会返回的 FutureTask 对象执行 get() 方法得到的结果。
+在 FutureTask 对象的 `run()` 方法中，该任务抛出的异常被捕获，然后在 `setException(ex); ` 方法中，抛出的异常会被放到 outcome 对象中，这个对象就是 `submit() ` 方法会返回的 FutureTask 对象执行 `get()`  方法得到的结果。
 
 但是在线程池中，并没有获取执行子线程的结果，所以异常也就没有被抛出来，即被“吞掉”了。
 
@@ -704,7 +704,7 @@ ThreadFactory namedThreadFactory = new ThreadFactoryBuilder()
 
 ## 7.CompletionService
 
-### ExecutorService VS CompletionService
+### 7.1.ExecutorService VS CompletionService
 
 假设我们有 4 个任务(A, B, C, D)用来执行复杂的计算，每个任务的执行时间随着输入参数的不同而不同，如果将任务提交到 ExecutorService， 相信你已经可以“信手拈来”
 
@@ -762,7 +762,7 @@ for (int i=0; i<futures.size(); i++) {
 
 > 那 CompletionService 是怎么做到获取最先执行完的任务结果的呢？
 
-### 远看CompletionService 轮廓
+### 7.2.远看CompletionService 轮廓
 
 如果你使用过消息队列，你应该秒懂我要说什么了，CompletionService 实现原理很简单
 
@@ -781,7 +781,7 @@ for (int i=0; i<futures.size(); i++) {
 
 带着这些线索，我们走进 **CompletionService** 源码看一看
 
-### 近看 CompletionService 源码
+### 7.3.近看 CompletionService 源码
 
 `CompletionService` 是一个接口，它简单的只有 5 个方法：
 
@@ -808,7 +808,7 @@ Future<V> poll(long timeout, TimeUnit unit) throws InterruptedException;
 
 `CompletionService` 只是接口，`ExecutorCompletionService` 是该接口的唯一实现类
 
-#### ExecutorCompletionService 源码分析
+#### 7.3.1.ExecutorCompletionService 源码分析
 
 先来看一下类结构, 实现类里面并没有多少内容
 
@@ -911,7 +911,7 @@ protected void done() {
 
 相信到这里，CompletionService 在你面前应该没什么秘密可言了
 
-### CompletionService 的主要用途
+### 7.4.CompletionService 的主要用途
 
 在 JDK docs 上明确给了两个例子来说明 CompletionService 的用途：
 
@@ -976,7 +976,7 @@ void solve(Executor e,
 
 范式没有说明 Executor 的使用，使用 ExecutorCompletionService，需要自己创建线程池，看上去虽然有些麻烦，但好处是你可以让多个 ExecutorCompletionService 的线程池隔离，这种隔离性能避免几个特别耗时的任务拖垮整个应用的风险 （这也是我们反复说过多次的，**不要所有业务共用一个线程池**）
 
-### 总结
+### 7.4.总结
 
 CompletionService 的应用场景还是非常多的，比如
 
