@@ -13,17 +13,17 @@ Tomcat是非常流行的Web Server，它还是一个满足Servlet规范的容器
 
 1. 提供Socket服务
 
-  Tomcat的启动，必然是Socket服务，只不过它支持HTTP协议而已！
+   Tomcat的启动，必然是Socket服务，只不过它支持HTTP协议而已！
 
-  这里其实可以扩展思考下，Tomcat既然是基于Socket，那么是基于BIO or NIO or AIO呢？
+   这里其实可以扩展思考下，Tomcat既然是基于Socket，那么是基于BIO or NIO or AIO呢？
 
 2. 进行请求的分发
 
-  要知道一个Tomcat可以为多个Web应用提供服务，那么很显然，Tomcat可以把URL下发到不同的Web应用。
+   要知道一个Tomcat可以为多个Web应用提供服务，那么很显然，Tomcat可以把URL下发到不同的Web应用。
 
 3. 需要把请求和响应封装成request/response
 
-  我们在Web应用这一层，可从来没有封装过request/response的，我们都是直接使用的，这就是因为Tomcat已经为你做好了！
+   我们在Web应用这一层，可从来没有封装过request/response的，我们都是直接使用的，这就是因为Tomcat已经为你做好了！
 
 话不多说，先来看一眼工程截图：
 
@@ -143,15 +143,15 @@ server.xml的整体结构如下：
 server.xml文件中的元素可以分为以下4类：
 1. 顶层元素：`<Server>` 和 `<Service>`
 
-  `<Server>` 元素是整个配置文件的根元素，`<Service>` 元素则代表一个Engine元素以及一组与之相连的Connector元素。
+    `<Server>` 元素是整个配置文件的根元素，`<Service>` 元素则代表一个Engine元素以及一组与之相连的Connector元素。
 
 2. 连接器：`<Connector>`
 
-  `<Connector>`代表了外部客户端发送请求到特定Service的接口；同时也是外部客户端从特定Service接收响应的接口。
+   `<Connector>`代表了外部客户端发送请求到特定Service的接口；同时也是外部客户端从特定Service接收响应的接口。
 
 3. 容器：`<Engine><Host><Context>`
 
-  容器的功能是处理Connector接收进来的请求，并产生相应的响应。Engine、Host和Context都是容器，但它们不是平行的关系，而是父子关系：Engine包含Host，Host包含Context。一个Engine组件可以处理Service中的所有请求，一个Host组件可以处理发向一个特定虚拟主机的所有请求，一个Context组件可以处理一个特定Web应用的所有请求。
+   容器的功能是处理Connector接收进来的请求，并产生相应的响应。Engine、Host和Context都是容器，但它们不是平行的关系，而是父子关系：Engine包含Host，Host包含Context。一个Engine组件可以处理Service中的所有请求，一个Host组件可以处理发向一个特定虚拟主机的所有请求，一个Context组件可以处理一个特定Web应用的所有请求。
 
 4. 内嵌组件：可以内嵌到容器中的组件。实际上，Server、Service、Connector、Engine、Host和Context是最重要的最核心的Tomcat组件，其他组件都可以归为内嵌组件。
 
@@ -248,7 +248,7 @@ Engine组件在Service组件中有且只有一个；Engine是Service组件中的
    通过配置deployOnStartup和autoDeploy可以开启虚拟主机自动部署Web应用；实际上，自动部署依赖于检查是否有新的或更改过的Web应用，而Host元素的appBase和xmlBase设置了检查Web应用更新的目录。
 
    其中，appBase属性指定Web应用所在的目录，默认值是webapps，这是一个相对路径，代表Tomcat根目录下webapps文件夹。
-     xmlBase属性指定Web应用的XML配置文件所在的目录，默认值为conf/<engine_name>/<host_name>，例如第一部分的例子中，主机localhost的xmlBase的默认值是$TOMCAT_HOME/conf/Catalina/localhost。
+     xmlBase属性指定Web应用的XML配置文件所在的目录，默认值为`conf/<engine_name>/<host_name>`，例如第一部分的例子中，主机localhost的xmlBase的默认值是 `$TOMCAT_HOME/conf/Catalina/localhost`。
 
    **检查Web应用更新**
 
@@ -318,21 +318,21 @@ Engine、Host和Context都是容器，且 Engine包含Host，Host包含Context�
 当请求被发送到Tomcat所在的主机时，如何确定最终哪个Web应用来处理该请求呢？
 1. 根据协议和端口号选定Service和Engine
 
-  Service中的Connector组件可以接收特定端口的请求，因此，当Tomcat启动时，Service组件就会监听特定的端口。在第一部分的例子中，Catalina这个Service监听了8080端口（基于HTTP协议）和8009端口（基于AJP协议）。当请求进来时，Tomcat便可以根据协议和端口号选定处理请求的Service；Service一旦选定，Engine也就确定。
+   Service中的Connector组件可以接收特定端口的请求，因此，当Tomcat启动时，Service组件就会监听特定的端口。在第一部分的例子中，Catalina这个Service监听了8080端口（基于HTTP协议）和8009端口（基于AJP协议）。当请求进来时，Tomcat便可以根据协议和端口号选定处理请求的Service；Service一旦选定，Engine也就确定。
 
-  通过在Server中配置多个Service，可以实现通过不同的端口号来访问同一台机器上部署的不同应用。
+   通过在Server中配置多个Service，可以实现通过不同的端口号来访问同一台机器上部署的不同应用。
 
 2. 根据域名或IP地址选定Host
 
-  Service确定后，Tomcat在Service中寻找名称与域名/IP地址匹配的Host处理该请求。如果没有找到，则使用Engine中指定的defaultHost来处理该请求。在第一部分的例子中，由于只有一个Host（name属性为localhost），因此该Service/Engine的所有请求都交给该Host处理。
+   Service确定后，Tomcat在Service中寻找名称与域名/IP地址匹配的Host处理该请求。如果没有找到，则使用Engine中指定的defaultHost来处理该请求。在第一部分的例子中，由于只有一个Host（name属性为localhost），因此该Service/Engine的所有请求都交给该Host处理。
 
 3. 根据URI选定Context/Web应用
 
-  这一点在Context一节有详细的说明：Tomcat根据应用的 path属性与URI的匹配程度来选择Web应用处理相应请求，这里不再赘述。
+   这一点在Context一节有详细的说明：Tomcat根据应用的 path属性与URI的匹配程度来选择Web应用处理相应请求，这里不再赘述。
 
 4. 举例
 
-  以请求http://localhost:8080/app1/index.html为例，首先通过协议和端口号（http和8080）选定Service；然后通过主机名（localhost）选定Host；然后通过uri（/app1/index.html）选定Web应用。
+   以请求http://localhost:8080/app1/index.html为例，首先通过协议和端口号（http和8080）选定Service；然后通过主机名（localhost）选定Host；然后通过uri（/app1/index.html）选定Web应用。
 
 #### 2.3.3.如何配置多个服务
 通过在Server中配置多个Service服务，可以实现通过不同的端口号来访问同一台机器上部署的不同Web应用。
@@ -472,7 +472,7 @@ AccessLogValve的作用是通过日志记录其所在的容器中处理的所有
 
 4. suffix：指定了日志文件的后缀。通过directory、prefix和suffix的配置，在$TOMCAT_HOME/logs目录下，可以看到如下所示的日志文件。
 
-  ![Image [16]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/jvm-demo/20210506214142.png)
+   ![Image [16]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/jvm-demo/20210506214142.png)
 
 5. pattern：指定记录日志的格式，本例中各项的含义如下：
 
@@ -501,7 +501,7 @@ AccessLogValve的作用是通过日志记录其所在的容器中处理的所有
 ## 3.详解tomcat的连接数与线程池
 ### 3.1.前言
 在使用tomcat时，经常会遇到连接数、线程数之类的配置问题，要真正理解这些概念，必须先了解Tomcat的连接器（Connector）。
-在前面的文章 详解Tomcat配置文件server.xml 中写到过：Connector的主要功能，是接收连接请求，创建Request和Response对象用于和请求端交换数据；然后分配线程让Engine（也就是Servlet容器）来处理这个请求，并把产生的Request和Response对象传给Engine。当Engine处理完请求后，也会通过Connector将响应返回给客户端。
+在前面的文章 详解Tomcat配置文件 `server.xml` 中写到过：Connector的主要功能，是接收连接请求，创建Request和Response对象用于和请求端交换数据；然后分配线程让Engine（也就是Servlet容器）来处理这个请求，并把产生的Request和Response对象传给Engine。当Engine处理完请求后，也会通过Connector将响应返回给客户端。
 
 可以说，Servlet容器处理请求，是需要Connector进行调度和控制的，Connector是Tomcat处理请求的主干，因此Connector的配置和使用对Tomcat的性能有着重要的影响。这篇文章将从Connector入手，讨论一些与Connector有关的重要问题，包括NIO/BIO模式、线程池、连接数等。
 
@@ -514,13 +514,12 @@ Connector在处理HTTP请求时，会使用不同的protocol。不同的Tomcat�
 BIO是Blocking IO，顾名思义是阻塞的IO；NIO是Non-blocking IO，则是非阻塞的IO。而APR是Apache Portable Runtime，是Apache可移植运行库，利用本地库可以实现高可扩展性、高性能；Apr是在Tomcat上运行高并发应用的首选模式，但是需要安装apr、apr-utils、tomcat-native等包。
 
 #### 3.2.2.如何指定protocol
-Connector使用哪种protocol，可以通过<connector>元素中的protocol属性进行指定，也可以使用默认值。
-指定的protocol取值及对应的协议如下：
-- HTTP/1.1：默认值，使用的协议与Tomcat版本有关
-- org.apache.coyote.http11.Http11Protocol：BIO
-- org.apache.coyote.http11.Http11NioProtocol：NIO
-- org.apache.coyote.http11.Http11Nio2Protocol：NIO2
-- org.apache.coyote.http11.Http11AprProtocol：APR
+Connector使用哪种protocol，可以通过 `<connector>` 元素中的protocol属性进行指定，也可以使用默认值。指定的protocol取值及对应的协议如下：
+- `HTTP/1.1`：默认值，使用的协议与Tomcat版本有关
+- `org.apache.coyote.http11.Http11Protocol`：BIO
+- `org.apache.coyote.http11.Http11NioProtocol`：NIO
+- `org.apache.coyote.http11.Http11Nio2Protocol`：NIO2
+- `org.apache.coyote.http11.Http11AprProtocol`：APR
 
 如果没有指定protocol，则使用默认值HTTP/1.1，其含义如下：在Tomcat7中，自动选取使用BIO或APR（如果找到APR需要的本地库，则使用APR，否则使用BIO）；在Tomcat8中，自动选取使用NIO或APR（如果找到APR需要的本地库，则使用APR，否则使用NIO）。
 #### 3.2.3.BIO/NIO有何不同
@@ -528,7 +527,7 @@ Connector使用哪种protocol，可以通过<connector>元素中的protocol属�
 
 在accept队列中接收连接（当客户端向服务器发送请求时，如果客户端与OS完成三次握手建立了连接，则OS将该连接放入accept队列）；在连接中获取请求的数据，生成request；调用servlet容器处理请求；返回response。为了便于后面的说明，首先明确一下连接与请求的关系：连接是TCP层面的（传输层），对应socket；请求是HTTP层面的（应用层），必须依赖于TCP的连接实现；一个TCP连接中可能传输多个HTTP请求。
 
-在BIO实现的Connector中，处理请求的主要实体是JIoEndpoint对象。JIoEndpoint维护了Acceptor和Worker：Acceptor接收socket，然后从Worker线程池中找出空闲的线程处理socket，如果worker线程池没有空闲线程，则Acceptor将阻塞。其中Worker是Tomcat自带的线程池，如果通过<Executor>配置了其他线程池，原理与Worker类似。
+在BIO实现的Connector中，处理请求的主要实体是JIoEndpoint对象。JIoEndpoint维护了Acceptor和Worker：Acceptor接收socket，然后从Worker线程池中找出空闲的线程处理socket，如果worker线程池没有空闲线程，则Acceptor将阻塞。其中Worker是Tomcat自带的线程池，如果通过 `<Executor>` 配置了其他线程池，原理与Worker类似。
 
 在NIO实现的Connector中，处理请求的主要实体是NIoEndpoint对象。NIoEndpoint中除了包含Acceptor和Worker外，还使用了Poller，处理流程如下图所示
 
@@ -540,7 +539,7 @@ Acceptor接收socket后，不是直接使用Worker中的线程处理请求，而
 
 目前大多数HTTP请求使用的是长连接（HTTP/1.1默认keep-alive为true），而长连接意味着，一个TCP的socket在当前请求结束后，如果没有新的请求到来，socket不会立马释放，而是等timeout后再释放。如果使用BIO，“读取socket并交给Worker中的线程”这个过程是阻塞的，也就意味着在socket等待下一个请求或等待释放的过程中，处理这个socket的工作线程会一直被占用，无法释放；因此Tomcat可以同时处理的socket数目不能超过最大线程数，性能受到了极大限制。而使用NIO，“读取socket并交给Worker中的线程”这个过程是非阻塞的，当socket在等待下一个请求或等待释放时，并不会占用工作线程，因此Tomcat可以同时处理的socket数目远大于最大线程数，并发性能大大提高。
 
-### 3.3.3个参数：acceptCount、maxConnections、maxThreads
+### 3.3.  3个参数：acceptCount、maxConnections、maxThreads
 再回顾一下Tomcat处理请求的过程：在accept队列中接收连接（当客户端向服务器发送请求时，如果客户端与OS完成三次握手建立了连接，则OS将该连接放入accept队列）；在连接中获取请求的数据，生成request；调用servlet容器处理请求；返回response。
 相对应的，Connector中的几个参数功能如下：
 #### 3.3.1.acceptCount
@@ -599,7 +598,7 @@ ps –e | grep java
 
 可以看到，只打印了一个进程的信息；27989是进程id，java是指执行的java命令。这是因为启动一个tomcat，内部所有的工作都在这一个进程里完成，包括主线程、垃圾回收线程、Acceptor线程、请求处理线程等等。
 
-通过如下命令，可以看到该进程内有多少个线程；其中，nlwp含义是number of light-weight process。
+通过如下命令，可以看到该进程内有多少个线程；其中， `nlwp` 含义是 `number of light-weight process`。
 
 ```
 ps –o nlwp 27989
@@ -620,7 +619,7 @@ ps -eLo pid ,stat | grep 27989 | grep running | wc -l
 ## 4.调优
 ### 4.1.tomcat 启动慢
 #### 4.1.1.tomcat 获取随机值阻塞
-tomcat的启动需要产生session id，这个产生需要通过java.security.SecureRandom生成随机数来实现，随机数算法使用的是”SHA1PRNG”，但这个算法依赖于操作系统的提供的随机数据，在linux系统中，这个值又依赖于/dev/random 和/dev/urandom
+tomcat的启动需要产生 `session id`，这个产生需要通过 `java.security.SecureRandom` 生成随机数来实现，随机数算法使用的是”SHA1PRNG”，但这个算法依赖于操作系统的提供的随机数据，在linux系统中，这个值又依赖于 `/dev/random` 和 `/dev/urandom`
 ```
 /dev/random :阻塞型，读取它就会产生随机数据，但该数据取决于熵池噪声，当熵池空了，对/dev/random 的读操作也将会被阻塞。
 /dev/urandom: 非阻塞的随机数产生器，它会重复使用熵池中的数据以产生伪随机数据。这表示对/dev/urandom的读取操作不会产生阻塞，但其输出的熵可能小于/dev/random的。它可以作为生成较低强度密码的伪随机数生成器，不建议用于生成高强度长期密码。
@@ -630,19 +629,19 @@ tomcat的启动需要产生session id，这个产生需要通过java.security.Se
 解决方法：
 1. **更换产生随机数的源**
 
-    因为/dev/urandom 是非阻塞的随机数产生器，所以我们可以从这边获取，但是生产的随机数的随机性比较低。我们可以在 我们的tomcat启动脚本(catalina.sh)里面添加
+    因为 `/dev/urandom` 是非阻塞的随机数产生器，所以我们可以从这边获取，但是生产的随机数的随机性比较低。我们可以在 我们的tomcat启动脚本(catalina.sh)里面添加
 
     ```
     JAVA_OPTS="$JAVA_OPTS -Djava.security.egd=file:/dev/./urandom"
     ```
 
-    或者是更改java的java.security 文件，将securerandom.source=file:/dev/random
+    或者是更改java的 `java.security` 文件，将 `securerandom.source=file:/dev/random`
 
     ```
     securerandom.source=file:/dev/./urandom
     ```
 
-    注意一下，为什么我们这里使用的路径是"/dev/./urandom",而不是 "/dev/urandom",是因为在java 8之前的版本设置了/dev/urandom ，但是实际还是使用/dev/random，设置为"/dev/./urandom"才能正常使用 "/dev/urandom" ， 这个bug在java8版本已经修复了，如果你是java7版本的话，需要按照上面设置，java8的话可以不用加 "./"。
+    注意一下，为什么我们这里使用的路径是 `/dev/./urandom` ,而不是  `/dev/urandom` ,是因为在java 8之前的版本设置了 `/dev/urandom` ，但是实际还是使用 `/dev/random`，设置为 `/dev/./urandom` 才能正常使用 `/dev/urandom` ， 这个bug在java8版本已经修复了，如果你是java7版本的话，需要按照上面设置，java8的话可以不用加 `./`。
 
 2. **增大熵池 的值**
 
@@ -727,7 +726,7 @@ AJP协议在tomcat中的作用就是将该服务与其它HTTP服务器集成，�
 #### X.1.1.Tomcat 7
 对于Tomcat 7及以前的版本,使用的编码格式是：iso8859-1,所以不能显示中文.Tomcat 8及以后版本默认编码为UTF-8.对于Tomcat 7作出以下修改,使得Tomcat 7在处理get请求时使用UTF-8编码:
 
-找到Tomcat的解压目录,例如:D:\apache-tomcat-8.5.41\conf,打开其中的server.xml,找到如下代码:
+找到Tomcat的解压目录,例如: `D:\apache-tomcat-8.5.41\conf` ,打开其中的server.xml,找到如下代码:
 
 ![Image [23]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/jvm-demo/20210506214258.png)
 
@@ -742,7 +741,7 @@ AJP协议在tomcat中的作用就是将该服务与其它HTTP服务器集成，�
 
 ![Image [25]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/jvm-demo/20210506214308.png)
 
-修改D:\apache-tomcat-8.5.41\conf\logging.properties,添加语句:
+修改 `D:\apache-tomcat-8.5.41\conf\logging.properties` ,添加语句:
 
 ```
 java.util.logging.ConsoleHandler.encoding = GBK
@@ -756,11 +755,11 @@ java.util.logging.ConsoleHandler.encoding = GBK
 
 ### X.2.解决catalina.out文件过大的问题
 #### X.2.1.前言
-有用Tomcat的人，绝对都会遇到这样一个问题：catalina.out文件过大。
+有用Tomcat的人，绝对都会遇到这样一个问题：`catalina.out` 文件过大。
 
 它是Tomcat默认生成的日志文件，会随着时间的推移，逐渐增大，不断的增长，甚至达到几G，几十G的大小。由于文件过大，不仅占系统的存储，我们还将无法使用过常规的编辑工具进行查看，严重影响系统的维护工作。
 
-对此，出现了以下几种解决catalina.out文件过大的方案。
+对此，出现了以下几种解决 `catalina.out` 文件过大的方案。
 
 #### X.2.2.简洁型
 ##### X.2.2.1.手动版
@@ -779,7 +778,7 @@ vim qin_catalina.out.sh
 ```
 #### X.2.3.技术型
 ##### X.2.3.1.cronolog
-使用cronolog日志切分工具切分Tomcat的catalina.out日志文件
+使用cronolog日志切分工具切分Tomcat的 `catalina.out` 日志文件
 1. 下载cronolog，并进行安装
 
     ```
@@ -798,7 +797,7 @@ vim qin_catalina.out.sh
 
 2. 配置
 
-    在tomcat/bin/catalian.sh中
+    在 `tomcat/bin/catalian.sh` 中
 
     ```
     org.apache.catalina.startup.Bootstrap "$@" start \ >> "$CATALINA_BASE"/logs/catalina.out 2&1 &

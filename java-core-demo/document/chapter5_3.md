@@ -298,7 +298,7 @@ public class SerializeDemo03 {
 // name: Jack, age: 30, sex: MALE
 ```
 
-在 `writeObject()` 方法中会先调用 `ObjectOutputStream` 中的 `defaultWriteObject()` 方法，该方法会执行默认的序列化机制，如上节所述，此时会忽略掉 age 字段。然后再调用 writeInt() 方法显示地将 age 字段写入到 `ObjectOutputStream` 中。readObject() 的作用则是针对对象的读取，其原理与 writeObject() 方法相同。
+在 `writeObject()` 方法中会先调用 `ObjectOutputStream` 中的 `defaultWriteObject()` 方法，该方法会执行默认的序列化机制，如上节所述，此时会忽略掉 age 字段。然后再调用 writeInt() 方法显示地将 age 字段写入到 `ObjectOutputStream` 中。`readObject()` 的作用则是针对对象的读取，其原理与 `writeObject()` 方法相同。
 
 > 🔔 注意：`writeObject()` 与 `readObject()` 都是 `private` 方法，那么它们是如何被调用的呢？毫无疑问，是使用反射。详情可见 `ObjectOutputStream` 中的 `writeSerialData` 方法，以及 `ObjectInputStream` 中的 `readSerialData` 方法。
 
@@ -447,7 +447,7 @@ Java 的序列化能保证对象状态的持久保存，但是遇到一些对象
 
 ## 8.序列化底层
 
-### Serializable底层
+### 8.1.Serializable底层
 
 Serializable接口，只是一个空的接口，没有方法或字段，为什么这么神奇，实现了它就可以让对象序列化了？
 
@@ -475,7 +475,7 @@ Exception in thread "main" java.io.NotSerializableException: com.example.demo.St
 
 **原来底层是这样：**ObjectOutputStream 在序列化的时候，会判断被序列化的Object是哪一种类型，String？array？enum？还是 Serializable，如果都不是的话，抛出 NotSerializableException异常。所以呀，**Serializable真的只是一个标志，一个序列化标志**~
 
-### writeObject（Object）
+### 8.2.writeObject（Object）
 
 序列化的方法就是writeObject，基于以上的demo，我们来分析一波它的核心方法调用链吧~（建议大家也去debug看一下这个方法，感兴趣的话）
 
@@ -491,7 +491,7 @@ public final void writeObject(Object obj) throws IOException {
 }
 ```
 
-writeObject0 主要实现是对象的不同类型，调用不同的方法写入序列化数据，这里面如果对象实现了Serializable接口，就调用writeOrdinaryObject()方法~
+`writeObject0` 主要实现是对象的不同类型，调用不同的方法写入序列化数据，这里面如果对象实现了Serializable接口，就调用`writeOrdinaryObject()` 方法~
 
 ```
 private void writeObject0(Object obj, boolean unshared)
@@ -522,7 +522,7 @@ private void writeObject0(Object obj, boolean unshared)
     ......
 ```
 
-writeOrdinaryObject()会先调用writeClassDesc(desc)，写入该类的生成信息，然后调用writeSerialData方法,写入序列化数据
+`writeOrdinaryObject()` 会先调用 `writeClassDesc(desc)`，写入该类的生成信息，然后调用writeSerialData方法,写入序列化数据
 
 ```
     private void writeOrdinaryObject(Object obj,
@@ -544,7 +544,7 @@ writeOrdinaryObject()会先调用writeClassDesc(desc)，写入该类的生成信
     }
 ```
 
-writeSerialData（）实现的就是写入被序列化对象的字段数据
+`writeSerialData()` 实现的就是写入被序列化对象的字段数据
 
 ```
   private void writeSerialData(Object obj, ObjectStreamClass desc)
@@ -562,7 +562,7 @@ writeSerialData（）实现的就是写入被序列化对象的字段数据
     }
 ```
 
-defaultWriteFields（）方法，获取类的基本数据类型数据，直接写入底层字节容器；获取类的obj类型数据，循环递归调用writeObject0()方法，写入数据~
+`defaultWriteFields()` 方法，获取类的基本数据类型数据，直接写入底层字节容器；获取类的obj类型数据，循环递归调用`writeObject0()` 方法，写入数据~
 
 ```
    private void defaultWriteFields(Object obj, ObjectStreamClass desc)
@@ -599,7 +599,7 @@ defaultWriteFields（）方法，获取类的基本数据类型数据，直接�
 - 如果某个序列化类的成员变量是对象类型，则该对象类型的类必须实现序列化
 - 子类实现了序列化，父类没有实现序列化，父类中的字段丢失问题
 
-### static静态变量和transient 修饰的字段是不会被序列化的
+### 9.1.static静态变量和transient 修饰的字段是不会被序列化的
 
 static静态变量和transient 修饰的字段是不会被序列化的,我们来看例子分析一波~ Student类加了一个类变量gender和一个transient修饰的字段specialty
 
@@ -644,7 +644,7 @@ public class Student implements Serializable {
 - 1）序列化前的静态变量性别明明是‘男’，序列化后再在程序中修改，反序列化后却变成‘女’了，**what**？显然这个静态属性并没有进行序列化。其实，**静态（static）成员变量是属于类级别的，而序列化是针对对象的~所以不能序列化哦**。
 - 2）经过序列化和反序列化过程后，specialty字段变量值由'计算机专业'变为空了，为什么呢？其实是因为transient关键字，**它可以阻止修饰的字段被序列化到文件中**，在被反序列化后，transient 字段的值被设为初始值，比如int型的值会被设置为 0，对象型初始值会被设置为null。
 
-### serialVersionUID问题
+### 9.2.serialVersionUID问题
 
 serialVersionUID 表面意思就是**序列化版本号ID**，其实每一个实现Serializable接口的类，都有一个表示序列化版本标识符的静态变量，或者默认等于1L，或者等于对象的哈希码。
 
@@ -683,7 +683,7 @@ private static final long serialVersionUID = -6564022808907262054L;
 
 ![68747470733a2f2f757365722d676f6c642d63646e2e786974752e696f2f323032302f342f31392f313731386637386162303961313763643f773d39323526683d31343026663d706e6726733d3339383237](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/java-core-demo/20210321202154.png)
 
-### 如果某个序列化类的成员变量是对象类型，则该对象类型的类必须实现序列化
+### 9.3.如果某个序列化类的成员变量是对象类型，则该对象类型的类必须实现序列化
 
 给Student类添加一个Teacher类型的成员变量，其中Teacher是没有实现序列化接口的
 
@@ -718,7 +718,7 @@ Exception in thread "main" java.io.NotSerializableException: com.example.demo.Te
 
 ![68747470733a2f2f757365722d676f6c642d63646e2e786974752e696f2f323032302f342f31392f313731386661393238613666663137383f773d38353226683d34313526663d706e6726733d3532313535](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/java-core-demo/20210321202210.png)
 
-### 子类实现了Serializable，父类没有实现Serializable接口的话，父类不会被序列化。
+### 9.4.子类实现了Serializable，父类没有实现Serializable接口的话，父类不会被序列化。
 
 子类Student实现了Serializable接口，父类User没有实现Serializable接口
 
