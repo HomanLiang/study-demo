@@ -12,6 +12,8 @@
 
 [尚硅谷2020最新版宋红康JVM教程(java虚拟机详解，jvm从入门到精通)--学习笔记](https://github.com/HomanLiang/study-demo/blob/main/jvm-demo/document/index.md)
 
+[JVM 学习笔记](https://github.com/HomanLiang/study-demo/blob/main/jvm-demo/document2/index.md)
+
 
 
 ## Netty
