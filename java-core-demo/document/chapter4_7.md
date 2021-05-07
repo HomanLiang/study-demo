@@ -56,8 +56,7 @@ Executor 框架核心 API 如下：
 
 - `ExecutorService` - 扩展了`Executor`接口。扩展能力：
 - 支持有返回值的线程；
-  - 支持管理线程的生命周期。
-  
+- 支持管理线程的生命周期。
 - `ScheduledExecutorService` - 扩展了 `ExecutorService` 接口。扩展能力：支持定期执行任务。
 
 - `AbstractExecutorService` - `ExecutorService` 接口的默认实现。
@@ -181,30 +180,32 @@ private static final int TERMINATED =  3 << COUNT_BITS;
 参数说明：
 
 - `ctl` - 用于控制线程池的运行状态和线程池中的有效线程数量。它包含两部分的信息：
-- 线程池的运行状态 (`runState`)
-  - 线程池内有效线程的数量 (`workerCount`)
-  - 可以看到，`ctl` 使用了 `Integer` 类型来保存，高 3 位保存 `runState`，低 29 位保存 `workerCount`。`COUNT_BITS` 就是 29，`CAPACITY`就是 1 左移 29 位减 1（29 个 1），这个常量表示 `workerCount` 的上限值，大约是 5 亿。
-  
-- 运行状态 - 线程池一共有五种运行状态：
+  - 线程池的运行状态 (`runState`)
+    
+    - 线程池内有效线程的数量 (`workerCount`)
+    
+    - 可以看到，`ctl` 使用了 `Integer` 类型来保存，高 3 位保存 `runState`，低 29 位保存 `workerCount`。`COUNT_BITS` 就是 29，`CAPACITY`就是 1 左移 29 位减 1（29 个 1），这个常量表示 `workerCount` 的上限值，大约是 5 亿。
+    
+  - 运行状态 - 线程池一共有五种运行状态：
 
-  - `RUNNING` - **运行状态**。接受新任务，并且也能处理阻塞队列中的任务。
+    - `RUNNING` - **运行状态**。接受新任务，并且也能处理阻塞队列中的任务。
 
-  - `SHUTDOWN` - 关闭状态。不接受新任务，但可以处理阻塞队列中的任务。
+    - `SHUTDOWN` - 关闭状态。不接受新任务，但可以处理阻塞队列中的任务。
 
-    - 在线程池处于 `RUNNING` 状态时，调用 `shutdown` 方法会使线程池进入到该状态。
-    - `finalize` 方法在执行过程中也会调用 `shutdown` 方法进入该状态。
+      - 在线程池处于 `RUNNING` 状态时，调用 `shutdown` 方法会使线程池进入到该状态。
 
-  - `STOP` - **停止状态**。不接受新任务，也不处理队列中的任务。会中断正在处理任务的线程。在线程池处于 `RUNNING` 或 `SHUTDOWN` 状态时，调用 `shutdownNow` 方法会使线程池进入到该状态。
+      - `finalize` 方法在执行过程中也会调用 `shutdown` 方法进入该状态。
 
-  - `TIDYING` - **整理状态**。如果所有的任务都已终止了，`workerCount` (有效线程数) 为 0，线程池进入该状态后会调用 `terminated` 方法进入 `TERMINATED` 状态。
+    - `STOP` - **停止状态**。不接受新任务，也不处理队列中的任务。会中断正在处理任务的线程。在线程池处于 `RUNNING` 或 `SHUTDOWN` 状态时，调用 `shutdownNow` 方法会使线程池进入到该状态。
 
-  - `TERMINATED` - 已终止状态。在`terminated`方法执行完后进入该状态。默认`terminated`方法中什么也没有做。进入`TERMINATED`的条件如下：
+    - `TIDYING` - **整理状态**。如果所有的任务都已终止了，`workerCount` (有效线程数) 为 0，线程池进入该状态后会调用 `terminated` 方法进入 `TERMINATED` 状态。
 
-    - 线程池不是 `RUNNING` 状态；
-    - 线程池状态不是 `TIDYING` 状态或 `TERMINATED` 状态；
-    - 如果线程池状态是 `SHUTDOWN` 并且 `workerQueue` 为空；
-    - `workerCount` 为 0；
-    - 设置 `TIDYING` 状态成功。
+    - `TERMINATED` - 已终止状态。在`terminated`方法执行完后进入该状态。默认`terminated`方法中什么也没有做。进入`TERMINATED`的条件如下：
+      - 线程池不是 `RUNNING` 状态；
+      - 线程池状态不是 `TIDYING` 状态或 `TERMINATED` 状态；
+      - 如果线程池状态是 `SHUTDOWN` 并且 `workerQueue` 为空；
+      - `workerCount` 为 0；
+      - 设置 `TIDYING` 状态成功。
 
 ![687474703a2f2f64756e77752e746573742e757063646e2e6e65742f63732f6a6176612f6a617661636f72652f636f6e63757272656e742f6a6176612d7468726561642d706f6f6c5f322e706e67](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/java-core-demo/20210322222532.png)
 
@@ -704,7 +705,7 @@ ThreadFactory namedThreadFactory = new ThreadFactoryBuilder()
 
 ## 7.CompletionService
 
-### ExecutorService VS CompletionService
+### 7.1.ExecutorService VS CompletionService
 
 假设我们有 4 个任务(A, B, C, D)用来执行复杂的计算，每个任务的执行时间随着输入参数的不同而不同，如果将任务提交到 ExecutorService， 相信你已经可以“信手拈来”
 
@@ -762,7 +763,7 @@ for (int i=0; i<futures.size(); i++) {
 
 > 那 CompletionService 是怎么做到获取最先执行完的任务结果的呢？
 
-### 远看CompletionService 轮廓
+### 7.2.远看CompletionService 轮廓
 
 如果你使用过消息队列，你应该秒懂我要说什么了，CompletionService 实现原理很简单
 
@@ -781,7 +782,7 @@ for (int i=0; i<futures.size(); i++) {
 
 带着这些线索，我们走进 **CompletionService** 源码看一看
 
-### 近看 CompletionService 源码
+### 7.3.近看 CompletionService 源码
 
 `CompletionService` 是一个接口，它简单的只有 5 个方法：
 
@@ -808,7 +809,7 @@ Future<V> poll(long timeout, TimeUnit unit) throws InterruptedException;
 
 `CompletionService` 只是接口，`ExecutorCompletionService` 是该接口的唯一实现类
 
-#### ExecutorCompletionService 源码分析
+#### 7.3.1.ExecutorCompletionService 源码分析
 
 先来看一下类结构, 实现类里面并没有多少内容
 
@@ -911,7 +912,7 @@ protected void done() {
 
 相信到这里，CompletionService 在你面前应该没什么秘密可言了
 
-### CompletionService 的主要用途
+### 7.4.CompletionService 的主要用途
 
 在 JDK docs 上明确给了两个例子来说明 CompletionService 的用途：
 
@@ -976,7 +977,7 @@ void solve(Executor e,
 
 范式没有说明 Executor 的使用，使用 ExecutorCompletionService，需要自己创建线程池，看上去虽然有些麻烦，但好处是你可以让多个 ExecutorCompletionService 的线程池隔离，这种隔离性能避免几个特别耗时的任务拖垮整个应用的风险 （这也是我们反复说过多次的，**不要所有业务共用一个线程池**）
 
-### 总结
+### 7.5.总结
 
 CompletionService 的应用场景还是非常多的，比如
 

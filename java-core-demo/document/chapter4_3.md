@@ -139,7 +139,7 @@ class Account {
 
 在这段代码中，临界区内有两个资源，分别是转出账户的余额 this.balance 和转入账户的余额 target.balance，并且用的是一把锁 this，符合我们前面提到的，多个资源可以用一把锁来保护，这看上去完全正确呀。真的是这样吗？可惜，这个方案仅仅是看似正确，为什么呢？
 
-问题就出在 this 这把锁上，this 这把锁可以保护自己的余额 this.balance，却保护不了别人的余额 target.balance，就像你不能用自家的锁来保护别人家的资产，也不能用自己的票来保护别人的座位一样。
+问题就出在 this 这把锁上，this 这把锁可以保护自己的余额 `this.balance`，却保护不了别人的余额 `target.balance`，就像你不能用自家的锁来保护别人家的资产，也不能用自己的票来保护别人的座位一样。
 
 ![687474703a2f2f64756e77752e746573742e757063646e2e6e65742f736e61702f32303230303730313133353235372e706e67](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/java-core-demo/20210322211058.png)
 
@@ -716,7 +716,7 @@ public class Singleton {
 }  
 ```
 
-编译这段代码后，观察有volatile关键字和没有volatile关键字时的instance所生成的汇编代码发现，有volatile关键字修饰时，会多出一个lock addl $0x0,(%esp)，即多出一个lock前缀指令
+编译这段代码后，观察有volatile关键字和没有volatile关键字时的instance所生成的汇编代码发现，有volatile关键字修饰时，会多出一个 `lock addl $0x0,(%esp)`，即多出一个lock前缀指令
 
 ```
 0x01a3de0f: mov    $0x3375cdb0,%esi   ;...beb0cd75 33  
@@ -842,7 +842,7 @@ J.U.C 包中提供了 `AtomicBoolean`、`AtomicInteger`、`AtomicLong` 分别针
 
 所谓自旋锁，是指线程反复检查锁变量是否可用，直到成功为止。由于线程在这一过程中保持执行，因此是一种忙等待。一旦获取了自旋锁，线程会一直保持该锁，直至显式释放自旋锁。
 
-示例：非线程安全示例
+**示例：非线程安全示例**
 
 ```
 public class AtomicReferenceDemo {
@@ -891,7 +891,7 @@ pool-1-thread-2 卖出了第 1 张票
 
 很明显，出现了重复售票的情况。
 
-【示例】使用自旋锁来保证线程安全
+**【示例】使用自旋锁来保证线程安全**
 
 可以通过自旋锁这种非阻塞同步来保证线程安全，下面使用 `AtomicReference` 来实现一个自旋锁。
 
@@ -1150,7 +1150,7 @@ public class ThreadLocalDemo {
 #### 5.2.1 存储结构
 **方案一**
 
-我们大胆猜想一下，既然每个访问 ThreadLocal 变量的线程都有自己的一个“本地”实例副本。一个可能的方案是 ThreadLocal 维护一个 Map，Key 是当前线程，Value是ThreadLocal在当前线程内的实例。这样，线程通过该 ThreadLocal 的 get() 方案获取实例时，只需要以线程为键，从 Map 中找出对应的实例即可。该方案如下图所示
+我们大胆猜想一下，既然每个访问 ThreadLocal 变量的线程都有自己的一个“本地”实例副本。一个可能的方案是 ThreadLocal 维护一个 Map，Key 是当前线程，Value是ThreadLocal在当前线程内的实例。这样，线程通过该 ThreadLocal 的 `get()` 方案获取实例时，只需要以线程为键，从 Map 中找出对应的实例即可。该方案如下图所示
 
 ![VarMap](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/java-core-demo/20210406174404.webp)
 
@@ -1236,17 +1236,17 @@ static class Entry extends WeakReference<ThreadLocal<?>> {
 
 ```
 public T get() {
-  Thread t = Thread.currentThread();
-  ThreadLocalMap map = getMap(t);
-  if (map != null) {
-    ThreadLocalMap.Entry e = map.getEntry(this);
-    if (e != null) {
-      @SuppressWarnings("unchecked")
-      T result = (T)e.value;
-      return result;
-    }
-  }
-  return setInitialValue();
+	Thread t = Thread.currentThread();
+	ThreadLocalMap map = getMap(t);
+	if (map != null) {
+		ThreadLocalMap.Entry e = map.getEntry(this);
+		if (e != null) {
+			@SuppressWarnings("unchecked")
+			T result = (T)e.value;
+			return result;
+    	}
+	}
+	return setInitialValue();
 }
 ```
 
@@ -1254,7 +1254,7 @@ public T get() {
 
 ```
 ThreadLocalMap getMap(Thread t) {
-  return t.threadLocals;
+  	return t.threadLocals;
 }
 ```
 
@@ -1268,14 +1268,14 @@ ThreadLocalMap getMap(Thread t) {
 
 ```
 private T setInitialValue() {
-  T value = initialValue();
-  Thread t = Thread.currentThread();
-  ThreadLocalMap map = getMap(t);
-  if (map != null)
-    map.set(this, value);
-  else
-    createMap(t, value);
-  return value;
+  	T value = initialValue();
+  	Thread t = Thread.currentThread();
+  	ThreadLocalMap map = getMap(t);
+  	if (map != null)
+    	map.set(this, value);
+  	else
+    	createMap(t, value);
+  	return value;
 }
 ```
 
@@ -1293,12 +1293,12 @@ private T setInitialValue() {
 
 ```
 public void set(T value) {
-  Thread t = Thread.currentThread();
-  ThreadLocalMap map = getMap(t);
-  if (map != null)
-    map.set(this, value);
-  else
-    createMap(t, value);
+  	Thread t = Thread.currentThread();
+  	ThreadLocalMap map = getMap(t);
+  	if (map != null)
+    	map.set(this, value);
+  	else
+    	createMap(t, value);
 }
 ```
 
@@ -1312,32 +1312,32 @@ public void set(T value) {
 
 ```
 private void set(ThreadLocal<?> key, Object value) {
-  Entry[] tab = table;
-  int len = tab.length;
-  int i = key.threadLocalHashCode & (len-1);
+  	Entry[] tab = table;
+  	int len = tab.length;
+  	int i = key.threadLocalHashCode & (len-1);
 
-  for (Entry e = tab[i]; e != null; e = tab[i = nextIndex(i, len)]) {
-    ThreadLocal<?> k = e.get();
-    if (k == key) {
-      e.value = value;
-      return;
-    }
-    if (k == null) {
-      replaceStaleEntry(key, value, i);
-      return;
-    }
-  }
-  tab[i] = new Entry(key, value);
-  int sz = ++size;
-  if (!cleanSomeSlots(i, sz) && sz >= threshold)
-    rehash();
+  	for (Entry e = tab[i]; e != null; e = tab[i = nextIndex(i, len)]) {
+    	ThreadLocal<?> k = e.get();
+    	if (k == key) {
+      		e.value = value;
+      	return;
+    	}
+   		if (k == null) {
+      		replaceStaleEntry(key, value, i);
+      		return;
+        }
+  	}
+  	tab[i] = new Entry(key, value);
+  	int sz = ++size;
+  	if (!cleanSomeSlots(i, sz) && sz >= threshold)
+    	rehash();
 }
 ```
 
 ##### 5.2.3.6 ThreadLocal正确的使用方法
 
 - 每次使用完ThreadLocal都调用它的remove()方法清除数据
-- 将ThreadLocal变量定义成private static，这样就一直存在ThreadLocal的强引用，也就能保证任何时候都能通过ThreadLocal的弱引用访问到Entry的value值，进而清除掉 。
+- 将ThreadLocal变量定义成 `private static`，这样就一直存在ThreadLocal的强引用，也就能保证任何时候都能通过ThreadLocal的弱引用访问到Entry的value值，进而清除掉 。
 
 
 
@@ -1429,7 +1429,7 @@ server.tomcat.max-threads=1
 
 ## 6.TimeUnit枚举
 
-TimeUnit是java.util.concurrent包下面的一个枚举类，TimeUnit提供了可读性更好的线程暂停操作。
+TimeUnit是 `java.util.concurrent` 包下面的一个枚举类，TimeUnit提供了可读性更好的线程暂停操作。
 
 在JDK5之前，一般我们暂停线程是这样写的：
 
