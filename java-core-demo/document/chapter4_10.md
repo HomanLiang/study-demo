@@ -30,7 +30,7 @@ Future API 是非常好的 Java 异步编程进阶，但是它缺乏一些非常
 
 ### 1.3.Future 的局限性
 
-1. 不能手动完成 当你写了一个函数，用于通过一个远程API获取一个电子商务产品最新价格。因为这个 API 太耗时，你把它允许在一个独立的线程中，并且从你的函数中返回一个 Future。现在假设这个API服务宕机了，这时你想通过该产品的最新缓存价格手工完成这个Future 。你会发现无法这样做。
+1. 不能手动完成。当你写了一个函数，用于通过一个远程API获取一个电子商务产品最新价格。因为这个 API 太耗时，你把它允许在一个独立的线程中，并且从你的函数中返回一个 Future。现在假设这个API服务宕机了，这时你想通过该产品的最新缓存价格手工完成这个Future 。你会发现无法这样做。
 2. Future 的结果在非阻塞的情况下，不能执行更进一步的操作 Future 不会通知你它已经完成了，它提供了一个阻塞的 `get()` 方法通知你结果。你无法给 Future 植入一个回调函数，当 Future 结果可用的时候，用该回调函数自动的调用 Future 的结果。
 3. 多个 Future 不能串联在一起组成链式调用 有时候你需要执行一个长时间运行的计算任务，并且当计算任务完成的时候，你需要把它的计算结果发送给另外一个长时间运行的计算任务等等。你会发现你无法使用 Future 创建这样的一个工作流。
 4. 不能组合多个 Future 的结果 假设你有10个不同的Future，你想并行的运行，然后在它们运行未完成后运行一些函数。你会发现你也无法使用 Future 这样做。
@@ -342,7 +342,7 @@ CompletableFuture<Double> combinedFuture = weightInKgFuture
 System.out.println("Your BMI is - " + combinedFuture.get());
 ```
 
-当两个Future都完成的时候，传给``thenCombine()的回调函数将被调用。
+当两个Future都完成的时候，传给 `thenCombine()` 的回调函数将被调用。
 
 ### 1.7.组合多个CompletableFuture
 
@@ -626,7 +626,7 @@ ForkJoin是由JDK1.7之后提供的多线程并发处理框架。ForkJoin框架�
 
 Fork/Join 是一个并行计算的框架，主要就是用来支持分治任务模型的，这个计算框架里的**Fork 对应的是分治任务模型里的任务分解，Join 对应的是结果合并**。Fork/Join 计算框架主要包含两部分，一部分是**分治任务的线程池 ForkJoinPool**，另一部分是**分治任务 ForkJoinTask**。这两部分的关系类似于 ThreadPoolExecutor 和 Runnable 的关系，都可以理解为提交任务到线程池，只不过分治任务有自己独特类型 ForkJoinTask。
 
-ForkJoinTask 是一个抽象类，它的方法有很多，最核心的是 fork() 方法和 join() 方法，其中 fork() 方法会异步地执行一个子任务，而 join() 方法则会阻塞当前线程来等待子任务的执行结果。ForkJoinTask 有两个子类——RecursiveAction 和 RecursiveTask，通过名字你就应该能知道，它们都是用递归的方式来处理分治任务的。这两个子类都定义了抽象方法 compute()，不过区别是 RecursiveAction 定义的 compute() 没有返回值，而 RecursiveTask 定义的 compute() 方法是有返回值的。这两个子类也是抽象类，在使用的时候，需要你定义子类去扩展。
+ForkJoinTask 是一个抽象类，它的方法有很多，最核心的是 `fork() `方法和 `join()` 方法，其中 `fork()` 方法会异步地执行一个子任务，而 join() 方法则会阻塞当前线程来等待子任务的执行结果。ForkJoinTask 有两个子类——RecursiveAction 和 RecursiveTask，通过名字你就应该能知道，它们都是用递归的方式来处理分治任务的。这两个子类都定义了抽象方法 `compute()`，不过区别是 RecursiveAction 定义的 `compute()` 没有返回值，而 RecursiveTask 定义的 `compute()` 方法是有返回值的。这两个子类也是抽象类，在使用的时候，需要你定义子类去扩展。
 
 ### 3.1. ForkJoinPool 工作原理
 

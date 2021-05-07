@@ -384,7 +384,7 @@ addWorker方法的下半部分：
 ![640 (1)](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/java-core-demo/20210323231324.webp)
 
 - 创建Worker对象，同时也会实例化一个Thread对象。
-- 启动启动这个线程
+- 启动这个线程
 
 **3、再到Worker里看看其实现**
 
@@ -684,7 +684,7 @@ public void run() {
 }
 ```
 
-在 FutureTask 对象的 run() 方法中，该任务抛出的异常被捕获，然后在setException(ex); 方法中，抛出的异常会被放到 outcome 对象中，这个对象就是 submit() 方法会返回的 FutureTask 对象执行 get() 方法得到的结果。
+在 FutureTask 对象的 `run()` 方法中，该任务抛出的异常被捕获，然后在 `setException(ex); ` 方法中，抛出的异常会被放到 outcome 对象中，这个对象就是 `submit() ` 方法会返回的 FutureTask 对象执行 `get()`  方法得到的结果。
 
 但是在线程池中，并没有获取执行子线程的结果，所以异常也就没有被抛出来，即被“吞掉”了。
 
