@@ -4,7 +4,7 @@
 
 # 运行时数据区概述及线程
 
-## 概述
+## 1.概述
 
 ![image-20210105144852725](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/jvm-demo/image-20210105144852725.png)
 
@@ -27,7 +27,7 @@ Java 虚拟机定义了若干种程序运行期间会使用到的运行时数据
 
 ![image-20210105145745787](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/jvm-demo/image-20210105145745787.png)
 
-### 关于线程间共享的说明
+### 1.1.关于线程间共享的说明
 
 ![image-20210105150327882](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/jvm-demo/image-20210105150327882.png)
 
@@ -35,14 +35,14 @@ Java 虚拟机定义了若干种程序运行期间会使用到的运行时数据
 
 
 
-## 线程
+## 2.线程
 
 - 线程是一个程序里的运行单元。JVM 允许一个应用有多个线程并行的执行。
 - 在 Hotspot JVM 里，每个线程都与操作系统的本地线程直接映射。
   - 当一个 Java 线程准备好执行以后，此时一个操作系统的本地线程也同时创建。Java 线程执行终止后，本地线程也会回收。
 - 操作系统负责所有线程的安排调度到任何一个可用的 CPU 上。一旦本地线程初始化成功，它就会调用 Java 线程种的 run() 方法
 
-### JVM 系统线程
+### 2.1.JVM 系统线程
 
 - 如果你使用 JConsole 或者是任何一个调试工具，都能看到在后台有许多线程在运行。这些后台线程不包括调用 `public static void main(String []) `的 main 线程以及所有这个 main 线程自己创建的线程。
 - 这些主要的后台系统线程在 Hotspot JVM 里主要是以下几个：

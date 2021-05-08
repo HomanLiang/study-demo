@@ -6,7 +6,7 @@
 
 ![image-20210108115017409](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/jvm-demo/image-20210108115017409.png)
 
-## 什么是本地方法？
+## 1.什么是本地方法？
 
 简单地讲，一个 Native Method 就是一个 Java 调用非 Java 代码的接口。一个 Native Method 是这样一个 Java 方法：该方法的实现由非 Java 语言实现，比如 C。这个特征并非 Java 所特有，很多其它的编程语言都有这一机制，比如再 C++ 中，你可以用 extern "C" 告知 C++ 编译器去调用一个 C 的函数。
 
@@ -26,7 +26,7 @@
 
 
 
-## 为什么要使用 Native Method？
+## 2.为什么要使用 Native Method？
 
 Java 使用起来非常方便，然而有些层次的任务用 Java 实现起来不容易，或者我们对程序的效率很在意时，问题来了。
 
@@ -46,7 +46,7 @@ Java 使用起来非常方便，然而有些层次的任务用 Java 实现起来
 
 
 
-## 现状
+## 3.现状
 
 目前该方法使用的越来越少了，除非是与硬件有关的应用，比如通过 Java 程序驱动打印机或者 Java 系统管理生产设备，在企业级应用中已经比较少见。因为现在的异构领域间的通信很发达，比如可以使用 Socket 通信，也可以使用 Web Service 等等
 

@@ -4,7 +4,7 @@
 
 # String Table
 
-## String 的基本特性
+## 1.String 的基本特性
 
 - String：字符串，使用一对""引起来表示。
 - String 声明为 final 的，不可被继承
@@ -25,7 +25,7 @@
 
 
 
-### String 在 JDK9 中存储结构变更
+### 1.1.String 在 JDK9 中存储结构变更
 
 ![image-20210202000853523](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/jvm-demo/image-20210202000853523.png)
 
@@ -33,7 +33,7 @@
 
 
 
-## String 的内存分配
+## 2.String 的内存分配
 
 - 在 Java 语言中有 8 种基本类型和一种比较特殊的类型 String。这些类型为了使它们在运行过程中速度更快、更节省内存，都提供了一种常量池的概念。
 
@@ -58,13 +58,13 @@
 
 ![image-20210202221316313](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/jvm-demo/image-20210202221316313.png)
 
-### StringTable 为什么调整
+### 2.1.StringTable 为什么调整
 
 ![image-20210202221357066](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/jvm-demo/image-20210202221357066.png)
 
 
 
-## String 的基本操作
+## 3.String 的基本操作
 
 Java 语言规范里要求完全相同的字符串字面量，应该包含同样的 Unicode 字符序列（包含同一份码点序列的常量），并且必须是指向同一个String类实例。
 
@@ -78,7 +78,7 @@ Java 语言规范里要求完全相同的字符串字面量，应该包含同样
 
 
 
-## 字符串拼接操作
+## 4.字符串拼接操作
 
 1. 常量与常量的拼接结果在常量池，原理是编译期优化
 2. 常量池中不会存在相同内容的常量
@@ -95,7 +95,7 @@ Java 语言规范里要求完全相同的字符串字面量，应该包含同样
 
 
 
-## intern()的使用
+## 5.intern()的使用
 
 ![image-20210202230744014](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/jvm-demo/image-20210202230744014.png)
 
@@ -108,7 +108,7 @@ Java 语言规范里要求完全相同的字符串字面量，应该包含同样
 
 ![image-20210202231856711](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/jvm-demo/image-20210202231856711.png)
 
-### intern() 的使用：JDK 6 VS JDK 7/8
+### 5.1.intern() 的使用：JDK 6 VS JDK 7/8
 
 ![image-20210202232032380](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/jvm-demo/image-20210202232032380.png)
 
@@ -125,7 +125,7 @@ Java 语言规范里要求完全相同的字符串字面量，应该包含同样
 
 
 
-### intern() 的使用：练习1
+### 5.2.intern() 的使用：练习1
 
 ![image-20210202233601525](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/jvm-demo/image-20210202233601525.png)
 
@@ -135,7 +135,7 @@ Java 语言规范里要求完全相同的字符串字面量，应该包含同样
 
 
 
-### 面试题
+### 5.3.面试题
 
 - new String("ab") 会创建几个对象？
 - new String("a") + new String("b") 呢？
@@ -144,7 +144,7 @@ Java 语言规范里要求完全相同的字符串字面量，应该包含同样
 
 
 
-### intern() 的效率测试：空间角度
+### 5.4.intern() 的效率测试：空间角度
 
 ![image-20210202233949757](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/jvm-demo/image-20210202233949757.png)
 
@@ -152,7 +152,7 @@ Java 语言规范里要求完全相同的字符串字面量，应该包含同样
 
 
 
-## StringTable的垃圾回收
+## 6.StringTable的垃圾回收
 
 ![image-20210203213844074](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/jvm-demo/image-20210203213844074.png)
 
@@ -160,7 +160,7 @@ Java 语言规范里要求完全相同的字符串字面量，应该包含同样
 
 
 
-## G1 中的 String 去重操作
+## 7.G1 中的 String 去重操作
 
 ![image-20210203213931228](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/jvm-demo/image-20210203213931228.png)
 

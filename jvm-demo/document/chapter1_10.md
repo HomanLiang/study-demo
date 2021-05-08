@@ -1,8 +1,10 @@
+[toc]
+
 # 对象的实例化、内存布局与访问定位
 
-## 对象的实例化
+## 1.对象的实例化
 
-### 大厂面试题
+### 1.1.大厂面试题
 
 - 美团：
 
@@ -14,11 +16,11 @@
 
   二面：Java 对象头里有什么？
 
-### 对象的实例化
+### 1.2.对象的实例化
 
 ![image-20210118214721589](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/jvm-demo/image-20210118214721589.png)
 
-### 创建对象的步骤
+### 1.3.创建对象的步骤
 
 前面所述是从字节码角度看待对象的创建过程，现在从执行步骤的角度来分析：
 
@@ -26,7 +28,7 @@
 
 
 
-## 对象的内存布局
+## 2.对象的内存布局
 
 ![image-20210118215025610](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/jvm-demo/image-20210118215025610.png)
 
@@ -36,7 +38,7 @@
 
 
 
-## 对象的访问定位
+## 3.对象的访问定位
 
 ![image-20210118215142504](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/jvm-demo/image-20210118215142504.png)
 
