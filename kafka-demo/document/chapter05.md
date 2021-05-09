@@ -2,14 +2,14 @@
 
 # Kafka 生产者
 
-## 生产者分区策略
+## 1.生产者分区策略
 
-### 分区的原因
+### 1.1.分区的原因
 
 1. **方便在集群中扩展**，每个 Partition 可以通过调整以适应它所在的机器，而一个 topic又可以有多个 Partition 组成，因此整个集群就可以适应适合的数据了；
 2. **可以提高并发**，因为可以以 Partition 为单位读写了。（联想到ConcurrentHashMap在高并发环境下读写效率比HashTable的高效）
 
-### 分区的原则
+### 1.2.分区的原则
 
 我们需要将 producer 发送的数据封装成一个 `ProducerRecord` 对象。
 
@@ -21,7 +21,7 @@
 
 
 
-## 生产者ISR
+## 2.生产者ISR
 
 为保证 producer 发送的数据，能可靠的发送到指定的 topic， topic 的每个 partition 收到producer 发送的数据后，都需要向 producer 发送 ack（acknowledgement 确认收到），如果producer 收到 ack， 就会进行下一轮的发送，否则重新发送数据。
 
@@ -35,7 +35,7 @@
   - 半数以上的follower同步完成，即可发送ack继续发送重新发送
   - 全部的follower同步完成，才可以发送ack
 
-### 副本数据同步策略
+### 2.1.副本数据同步策略
 
 | 序号 | 方案                          | 优点                                                         | 缺点                                                         |
 | ---- | ----------------------------- | ------------------------------------------------------------ | ------------------------------------------------------------ |
@@ -47,7 +47,7 @@ Kafka 选择了第二种方案，原因如下：
 1. 同样为了容忍 n 台节点的故障，第一种方案需要 2n+1 个副本，而第二种方案只需要 n+1 个副本，而 Kafka 的每个分区都有大量的数据， 第一种方案会造成大量数据的冗余。
 2. 虽然第二种方案的网络延迟会比较高，但网络延迟对 Kafka 的影响较小。
 
-### ISR
+### 2.2.ISR
 
 采用第二种方案之后，设想以下情景： leader 收到数据，所有 follower 都开始同步数据，但有一个 follower，因为某种故障，迟迟不能与 leader 进行同步，那 leader 就要一直等下去，直到它完成同步，才能发送 ack。这个问题怎么解决呢？
 
@@ -55,7 +55,7 @@ Leader 维护了一个动态的 **in-sync replica set** (ISR)，意为和 leader
 
 
 
-## 生产者ACK机制
+## 3.生产者ACK机制
 
 对于某些不太重要的数据，对数据的可靠性要求不是很高，能够容忍数据的少量丢失，所以没必要等 ISR 中的 follower 全部接收成功。
 
@@ -76,14 +76,14 @@ Leader 维护了一个动态的 **in-sync replica set** (ISR)，意为和 leader
 
 
 
-## 数据一致性问题
+## 4.数据一致性问题
 
 ![12](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/kafka-demo/20210317212832.png)
 
 - LEO：（Log End Offset）每个副本的最后一个offset
 - HW：（High Watermark）高水位，指的是消费者能见到的最大的 offset， ISR 队列中最小的 LEO
 
-### follower 故障和 leader 故障
+### 4.1.follower 故障和 leader 故障
 
 - **follower 故障**：follower 发生故障后会被临时踢出 ISR，待该 follower 恢复后， follower 会读取本地磁盘记录的上次的 HW，并将 log 文件高于 HW 的部分截取掉，从 HW 开始向 leader 进行同步。等该 follower 的 LEO 大于等于该 Partition 的 HW，即 follower 追上 leader 之后，就可以重新加入 ISR 了。
 - **leader 故障**：leader 发生故障之后，会从 ISR 中选出一个新的 leader，之后，为保证多个副本之间的数据一致性， 其余的 follower 会先将各自的 log 文件高于 HW 的部分截掉，然后从新的 leader同步数据。
@@ -92,7 +92,7 @@ Leader 维护了一个动态的 **in-sync replica set** (ISR)，意为和 leader
 
 
 
-## ExactlyOnce
+## 5.ExactlyOnce
 
 将服务器的 ACK 级别设置为-1（all），可以保证 Producer 到 Server 之间不会丢失数据，即 **At Least Once** 语义。
 
@@ -117,7 +117,7 @@ At Least Once + 幂等性 = Exactly Once
 
 但是 PID 重启就会变化，同时不同的 Partition 也具有不同主键，所以幂等性无法保证跨分区跨会话的 Exactly Once。
 
-### 幂等为什么不支持跨会话和多分区
+### 5.1.幂等为什么不支持跨会话和多分区
 
 **跨会话**
 

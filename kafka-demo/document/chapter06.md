@@ -4,9 +4,9 @@
 
 # Kafka 消费者
 
-## 消费者分区分配策略
+## 1.消费者分区分配策略
 
-### 消费方式
+### 1.1.消费方式
 
 **consumer 采用 pull（拉） 模式从 broker 中读取数据**。
 
@@ -16,7 +16,7 @@
 
 
 
-### 分区分配策略
+### 1.2.分区分配策略
 
 一个 consumer group 中有多个 consumer，一个 topic 有多个 partition，所以必然会涉及到 partition 的分配问题，即确定那个 partition 由哪个 consumer 来消费。
 
@@ -25,7 +25,7 @@ Kafka 有两种分配策略：
 - round-robin循环
 - range
 
-#### Round Robin
+#### 1.2.1.Round Robin
 
 关于Roudn Robin重分配策略，其主要采用的是一种轮询的方式分配所有的分区，该策略主要实现的步骤如下。这里我们首先假设有三个topic：t0、t1和t2，这三个topic拥有的分区数分别为1、2和3，那么总共有六个分区，这六个分区分别为：t0-0、t1-0、t1-1、t2-0、t2-1和t2-2。这里假设我们有三个consumer：C0、C1和C2，它们订阅情况为：C0订阅t0，C1订阅t0和t1，C2订阅t0、t1和t2。那么这些分区的分配步骤如下：
 
@@ -55,7 +55,7 @@ Kafka 有两种分配策略：
 
 从上面的步骤分析可以看出，轮询的策略就是简单的将所有的partition和consumer按照字典序进行排序之后，然后依次将partition分配给各个consumer，如果当前的consumer没有订阅当前的partition，那么就会轮询下一个consumer，直至最终将所有的分区都分配完毕。但是从上面的分配结果可以看出，轮询的方式会导致每个consumer所承载的分区数量不一致，从而导致各个consumer压力不均一。
 
-#### Range
+#### 1.2.2.Range
 
 所谓的Range重分配策略，就是首先会计算各个consumer将会承载的分区数量，然后将指定数量的分区分配给该consumer。这里我们假设有两个consumer：C0和C1，两个topic：t0和t1，这两个topic分别都有三个分区，那么总共的分区有六个：t0-0、t0-1、t0-2、t1-0、t1-1和t1-2。那么Range分配策略将会按照如下步骤进行分区的分配：
 
@@ -73,7 +73,7 @@ Kafka 有两种分配策略：
 
 
 
-## 消费者offset的存储
+## 2.消费者offset的存储
 
 由于 consumer 在消费过程中可能会出现断电宕机等故障， consumer 恢复后，需要从故障前的位置的继续消费，所以 **consumer 需要实时记录自己消费到了哪个 offset**，以便故障恢复后继续消费。
 
@@ -88,13 +88,13 @@ Kafka 有两种分配策略：
 
 
 
-## 消费者组案例
+## 3.消费者组案例
 
-### 需求
+### 3.1.需求
 
 测试同一个消费者组中的消费者， **同一时刻只能有一个**消费者消费。
 
-### 操作步骤
+### 3.2.操作步骤
 
 1.修改`%KAFKA_HOME\config\consumer.properties%`文件中的`group.id`属性。
 

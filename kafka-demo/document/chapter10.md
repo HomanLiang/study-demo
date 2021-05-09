@@ -4,7 +4,7 @@
 
 # Kafka 监控
 
-## Kafka Eagle
+## 1.Kafka Eagle
 
 在Kafka的监控系统中有很多优秀的开源监控系统。比如Kafka-manager，open-faclcon，zabbix等主流监控工具均可直接监控kafka。Kafka集群性能监控可以从消息网络传输，消息传输流量，请求次数等指标来衡量集群性能。这些指标数据可以通过访问kafka集群的JMX接口获取。
 

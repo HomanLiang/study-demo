@@ -2,9 +2,9 @@
 
 # Kafka API
 
-## 生产者
+## 1.生产者
 
-### 生产者API流程
+### 1.1.生产者API流程
 
 Kafka 的 Producer 发送消息采用的是异步发送的方式。在消息发送的过程中，涉及到了两个线程——main 线程和 Sender 线程，以及一个线程共享变量——RecordAccumulator。 main 线程将消息发送给 RecordAccumulator， Sender 线程不断从 RecordAccumulator 中拉取消息发送到 Kafka broker。
 
@@ -12,12 +12,12 @@ Kafka 的 Producer 发送消息采用的是异步发送的方式。在消息发�
 
 相关参数：
 
-- **batch.size**： 只有数据积累到 batch.size 之后， sender 才会发送数据。
-- **linger.ms**： 如果数据迟迟未达到 batch.size， sender 等待 linger.time 之后就会发送数据。
+- **batch.size**： 只有数据积累到 `batch.size` 之后， sender 才会发送数据。
+- **linger.ms**： 如果数据迟迟未达到 `batch.size`， sender 等待 `linger.time` 之后就会发送数据。
 
 
 
-### 异步发送API-普通生产者
+### 1.2.异步发送API-普通生产者
 
 **导入依赖**
 
@@ -35,9 +35,9 @@ pom.xml
 
 需要用到的类：
 
-- KafkaProducer：需要创建一个生产者对象，用来发送数据
-- ProducerConfig：获取所需的一系列配置参数
-- ProducerRecord：每条数据都要封装成一个 ProducerRecord 对象
+- `KafkaProducer`：需要创建一个生产者对象，用来发送数据
+- `ProducerConfig`：获取所需的一系列配置参数
+- `ProducerRecord`：每条数据都要封装成一个 `ProducerRecord` 对象
 
 CustomProducer.java
 
@@ -81,7 +81,7 @@ public class CustomProducer {
 
 
 
-### 异步发送API-带回调函数的生产者
+### 1.3.异步发送API-带回调函数的生产者
 
 回调函数会在 producer 收到 ack 时调用，为异步调用， 该方法有两个参数，分别是 RecordMetadata 和 Exception，如果 Exception 为 null，说明消息发送成功，如果Exception 不为 null，说明消息发送失败。
 
@@ -136,7 +136,7 @@ public class CallBackProducer {
 
 
 
-### 自定义分区器
+### 1.4.自定义分区器
 
 MyPartitioner.java
 
@@ -181,7 +181,7 @@ Producer<String, String> producer = new KafkaProducer<>(props);
 
 
 
-### 同步发送API
+### 1.5.同步发送API
 
 同步发送的意思就是，一条消息发送之后，会阻塞当前线程， 直至返回 ack。
 
@@ -203,31 +203,31 @@ for (int i = 0; i < 100; i++) {
 
 
 
-### 拦截器
+### 1.6.拦截器
 
-#### 拦截器原理
+#### 1.6.1.拦截器原理
 
 Producer 拦截器(interceptor)是在 Kafka 0.10 版本被引入的，主要用于实现 clients 端的定制化控制逻辑。
 
 对于 producer 而言， interceptor 使得用户在消息发送前以及 producer 回调逻辑前有机会对消息做一些定制化需求，比如`修改消息`等。同时， producer 允许用户指定多个 interceptor按序作用于同一条消息从而形成一个拦截链(interceptor chain)。 Intercetpor 的实现接口是`org.apache.kafka.clients.producer.ProducerInterceptor`，其定义的方法包括：
 
 - `configure(configs)`：获取配置信息和初始化数据时调用。
-- `onSend(ProducerRecord)`：该方法封装进 KafkaProducer.send 方法中，即它运行在用户主线程中。 Producer 确保**在消息被序列化以及计算分区前**调用该方法。 用户可以在该方法中对消息做任何操作，但最好保证不要修改消息所属的 topic 和分区， 否则会影响目标分区的计算。
+- `onSend(ProducerRecord)`：该方法封装进 `KafkaProducer.send` 方法中，即它运行在用户主线程中。 Producer 确保**在消息被序列化以及计算分区前**调用该方法。 用户可以在该方法中对消息做任何操作，但最好保证不要修改消息所属的 topic 和分区， 否则会影响目标分区的计算。
 - `onAcknowledgement(RecordMetadata, Exception)`：**该方法会在消息从 RecordAccumulator 成功发送到 Kafka Broker 之后，或者在发送过程中失败时调用**。 并且通常都是在 producer 回调逻辑触发之前。 onAcknowledgement 运行在producer 的 IO 线程中，因此不要在该方法中放入很重的逻辑，否则会拖慢 producer 的消息发送效率。
 - `close()`：关闭 interceptor，主要用于执行一些**资源清理**工作
 
 如前所述， interceptor 可能被运行在多个线程中，因此在具体实现时用户需要自行确保线程安全。另外**倘若指定了多个 interceptor，则 producer 将按照指定顺序调用它们**，并仅仅是捕获每个 interceptor 可能抛出的异常记录到错误日志中而非在向上传递。这在使用过程中要特别留意。
 
-#### 自定义拦截器（代码实现）
+#### 1.6.2.自定义拦截器（代码实现）
 
-##### 需求
+**1.6.2.1.需求**
 
 实现一个简单的双 interceptor 组成的拦截链。
 
 - 第一个 interceptor 会在消息发送前将时间戳信息加到消息 value 的最前部；
 - 第二个 interceptor 会在消息发送后更新成功发送消息数或失败发送消息数。
 
-##### 案例实操
+**1.6.2.2.案例实操**
 
 **增加时间戳拦截器**
 
@@ -373,9 +373,9 @@ public class InterceptorProducer {
 
 
 
-## 消费者
+## 2.消费者
 
-### 简单消费者API
+### 2.1.简单消费者API
 
 - **KafkaConsumer**： 需要创建一个消费者对象，用来消费数据
 - **ConsumerConfig**： 获取所需的一系列配置参数
@@ -428,7 +428,7 @@ public class CustomConsumer {
 
 
 
-### 重置offset
+### 2.2.重置offset
 
 Consumer 消费数据时的可靠性是很容易保证的，因为数据在 Kafka 中是持久化的，故不用担心数据丢失问题。
 
@@ -450,7 +450,7 @@ KafkaConsumer<String, String> consumer = new KafkaConsumer<>(props);
 
 
 
-### 自动提交offset
+### 2.3.自动提交offset
 
 ```java
 props.put("enable.auto.commit", "true");
@@ -460,7 +460,7 @@ PS.我将Offset提交类比成数据库事务的提交。
 
 
 
-### 手动提交offset
+### 2.4.手动提交offset
 
 虽然自动提交 offset 十分便利，但由于其是基于时间提交的， 开发人员难以把握offset 提交的时机。因此 **Kafka 还提供了手动提交 offset 的 API**。
 
@@ -473,7 +473,7 @@ PS.我将Offset提交类比成数据库事务的提交。
 
 **不同点**是，commitSync 阻塞当前线程，一直到提交成功，并且会自动失败重试（由不可控因素导致，也会出现提交失败）；而 commitAsync 则没有失败重试机制，故有可能提交失败。
 
-#### 同步提交offset
+#### 2.4.1.同步提交offset
 
 由于同步提交 offset 有失败重试机制，故更加可靠，以下为同步提交 offset 的示例。
 
@@ -505,7 +505,7 @@ public class SyncCommitOffset {
 }
 ```
 
-#### 异步提交offset
+#### 2.4.2.异步提交offset
 
 虽然同步提交 offset 更可靠一些，但是由于其会阻塞当前线程，直到提交成功。因此吞吐量会收到很大的影响。因此更多的情况下，会选用异步提交 offset 的方式。
 
@@ -542,11 +542,11 @@ public class AsyncCommitOffset {
 }
 ```
 
-#### 数据漏消费和重复消费分析
+#### 2.4.3.数据漏消费和重复消费分析
 
 无论是同步提交还是异步提交 offset，都有可能会造成数据的漏消费或者重复消费。先提交 offset 后消费，有可能造成数据的漏消费；而先消费后提交 offset，有可能会造成数据的重复消费。
 
-#### 自定义存储 offset
+#### 2.4.4.自定义存储 offset
 
 Kafka 0.9 版本之前， offset 存储在 zookeeper， 0.9 版本及之后，默认将 offset 存储在 Kafka的一个内置的 topic 中。除此之外， Kafka 还可以选择自定义存储 offset。
 
@@ -620,8 +620,8 @@ public class CustomSaveOffset {
 
 
 
-## 原生
-### Maven
+## 3.原生
+### 3.1.Maven
 ```
 dependency>
     <groupId>org.apache.kafka</groupId>
@@ -629,8 +629,8 @@ dependency>
     <version>2.2.0</version>
 </dependency>
 ```
-### Producer
-#### 配置项
+### 3.2.Producer
+#### 3.2.1.配置项
 |                 名称                  |                             说明                             |         默认值          |                有效值                |  重要性  |
 | :-----------------------------------: | :----------------------------------------------------------: | :---------------------: | :----------------------------------: | :------: |
 |           bootstrap.servers           |   kafka集群的broker-list，如：hadoop01:9092,hadoop02:9092    |           无            |                                      |   必选   |
@@ -660,7 +660,7 @@ dependency>
 |         reconnect.backoff.ms          | 连接失败时，当我们重新连接时的等待时间。这避免了客户端反复重连 |           10            |                                      |          |
 |           retry.backoff.ms            | 在试图重试失败的produce请求之前的等待时间。避免陷入发送-失败的死循环中 |           100           |                                      |          |
 
-#### Producer简单使用
+#### 3.2.2.Producer简单使用
 ```
 Properties properties = new Properties();
 properties.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG,"k8s-n1:9092");
@@ -672,7 +672,7 @@ for (int i = 0; i < 100; i++)
 	producer.send(new ProducerRecord<String, String>("mytest", Integer.toString(i), Integer.toString(i)));
 producer.close();
 ```
-#### 带回调函数的生产者
+#### 3.2.3.带回调函数的生产者
 ```
         Properties properties = new Properties();
         //设置kafka集群
@@ -720,7 +720,7 @@ producer.close();
 发送成功: 9,3,179
 ```
 数据不均等的分配到0-3 号分区上
-#### 事务模式
+#### 3.2.4.事务模式
 事务模式要求数据发送必须包含在事务中，在事务中可以向多个topic发送数据，消费者端最好也使用事务模式读，保证一次能将整个事务的数据全部读取过来。当然消费者也可以不设置为事务读的模式。
 ```
 @Test
@@ -748,7 +748,7 @@ public void transactional(){
 	producer.close();
 }
 ```
-#### 自定义分区发送
+#### 3.2.5.自定义分区发送
 ```
 public class CustomProducer implements Partitioner {
     public int partition(String topic, Object key, byte[] keyBytes, Object value, byte[] valueBytes, Cluster cluster) {
@@ -797,8 +797,8 @@ for ( int i = 0; i < 12; i++) {
 producer.close();
 ```
 
-#### producer 拦截器(interceptor)
-##### 拦截器原理
+#### 3.2.6.producer 拦截器(interceptor)
+##### 3.2.6.1.拦截器原理
 Producer 拦截器(interceptor)是在 Kafka 0.10 版本被引入的，主要用于实现 clients 端的定
 制化控制逻辑。
 
@@ -808,25 +808,30 @@ Producer 拦截器(interceptor)是在 Kafka 0.10 版本被引入的，主要用�
 org.apache.kafka.clients.producer.ProducerInterceptor，其定义的方法包括：
 
 1. configure(configs)
-获取配置信息和初始化数据时调用。
+
+  获取配置信息和初始化数据时调用。
+
 2. onSend(ProducerRecord)：
-该方法封装进 KafkaProducer.send 方法中，即它运行在用户主线程中。Producer 确保在
-消息被序列化以及计算分区前调用该方法。用户可以在该方法中对消息做任何操作，但最好
-保证不要修改消息所属的 topic 和分区，否则会影响目标分区的计算
+
+  该方法封装进 KafkaProducer.send 方法中，即它运行在用户主线程中。Producer 确保在
+  消息被序列化以及计算分区前调用该方法。用户可以在该方法中对消息做任何操作，但最好
+  保证不要修改消息所属的 topic 和分区，否则会影响目标分区的计算
+
 3. onAcknowledgement(RecordMetadata, Exception)：
-该方法会在消息被应答或消息发送失败时调用，并且通常都是在 producer 回调逻辑触
-发之前。onAcknowledgement 运行在 producer 的 IO 线程中，因此不要在该方法中放入很重
-的逻辑，否则会拖慢 producer 的消息发送效率
+
+  该方法会在消息被应答或消息发送失败时调用，并且通常都是在 producer 回调逻辑触
+  发之前。onAcknowledgement 运行在 producer 的 IO 线程中，因此不要在该方法中放入很重
+  的逻辑，否则会拖慢 producer 的消息发送效率
+
 4. close
-关闭 interceptor，主要用于执行一些资源清理工作
 
-如前所述，interceptor 可能被运行在多个线程中，因此在具体实现时用户需要自行确保
-线程安全。另外倘若指定了多个 interceptor，则 producer 将按照指定顺序调用它们，并仅仅
-是捕获每个 interceptor 可能抛出的异常记录到错误日志中而非在向上传递。这在使用过程中
-要特别留意。
+  关闭 interceptor，主要用于执行一些资源清理工作
 
-##### 拦截器案例
-###### 需求
+如前所述，interceptor 可能被运行在多个线程中，因此在具体实现时用户需要自行确保线程安全。另外倘若指定了多个 interceptor，则 producer 将按照指定顺序调用它们，并仅仅是捕获每个 interceptor 可能抛出的异常记录到错误日志中而非在向上传递。这在使用过程中要特别留意。
+
+##### 3.2.6.2.拦截器案例
+**需求**
+
 实现一个简单的双 interceptor 组成的拦截链。第一个 interceptor 会在消息发送前将时间
 戳信息加到消息 value 的最前部；第二个 interceptor 会在消息发送后更新成功发送消息数或
 失败发送消息数。
@@ -834,7 +839,8 @@ org.apache.kafka.clients.producer.ProducerInterceptor，其定义的方法包括
 Kafka拦截器
 ![Image](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/kafka-demo/20210317225736.png)
 
-##### 案例实操
+**案例实操**
+
 ```
 package com.atlxl.producer;
 
@@ -982,7 +988,7 @@ public class CountIntercetor implements ProducerInterceptor<String,String> {
 
 
 
-### Consumer
+### 3.3.Consumer
 kafka的消费者API提供从kafka服务端拉取消息的能力，kafka引入了消费者组的概念，不同消费者组之间互不影响，独自拥有一份数据，而同一个消费者组内的消费者则有如下规律：
 - 分区数=消费者数：一个消费者拉取一个分区的数据
 - 分区数>消费者数：同一个消费者可能拉取不同分区的数据
@@ -1010,7 +1016,7 @@ kafka Consumer提供两套Java API：高级Consumer API、和低级Consumer API�
 - 缺点：
     - 过于复杂，需要自行控制offset，连接哪个分区，找分区leader等。
 
-#### 消费者高级API
+#### 3.3.1.消费者高级API
 ```
 Properties properties = new Properties();
 //设置kafka集群
@@ -1036,13 +1042,13 @@ while (true){
 	}
 }
 ```
-#### 消费者低级API
-##### 消费者使用低级API的主要步骤
+#### 3.3.2.消费者低级API
+##### 3.3.2.1.消费者使用低级API的主要步骤
 1. 根据指定分区从topic元数据中找到leader
 2. 获取分区最新的消费进度
 3. 从主副本中拉取分区消息
 4. 识别主副本的变化，重试
-##### 方法描述：
+##### 3.3.2.2.方法描述：
 |      方法       |                         描述                         |
 | :-------------: | :--------------------------------------------------: |
 |  findLeader()   |  客户端向种子阶段发送主题元数据，将副本加入备用节点  |
@@ -1050,7 +1056,7 @@ while (true){
 |      run()      |             消费者低级API拉取消息的方法              |
 | findNewLeader() | 当分区主副本节点发生故障时，客户端将要找出新的主副本 |
 
-##### 修改pom
+##### 3.3.2.3.修改pom
 ```
 <dependency>
     <groupId>org.apache.kafka</groupId>
@@ -1148,7 +1154,7 @@ public class LowerConsumer {
 ```
 这个低级API在最新的kafka版本中已经不再提供了。
 
-### 管理 topic
+### 3.4.管理 topic
 ```
 package com.example.demo.topic;
 
@@ -1259,7 +1265,7 @@ public class KafkaTopic {
 
 
 
-### kafka通过java api 获取当前消费组offset/logsize/lag信息，实现消费延迟监控
+### 3.5.kafka通过java api 获取当前消费组offset/logsize/lag信息，实现消费延迟监控
 注意此篇是针对使用旧版消费的方案， 旧版（0.8之前）offset信息存在zk，新版（0.9以后）存在topic中。如果不知道自己是什么版本的
 
 一般监控kafka消费情况我们可以使用现成的工具来查看，但如果发生大量延迟不能及时知道。所以问题就来了，怎么用java api 进行kafka的监控呢？
@@ -1267,7 +1273,9 @@ public class KafkaTopic {
 用过kafka都该知道 延迟量 lag = logSize(topic记录量) - offset(消费组消费进度) 
 
 所以我们获取到logSize / offset 就可以了。
-#### pom
+
+**pom**
+
 ```
 <groupId>org.apache.kafka</groupId>
 <artifactId>kafka_2.11</artifactId>
@@ -1421,10 +1429,10 @@ public class KafkaOffsetTools {
 }
 ```
 
-## Spring boot 集成
+## 4.Spring boot 集成
 [官方文档](https://docs.spring.io/spring-kafka/docs/2.2.0.RELEASE/reference/html/_reference.html)
 
-### 手动提交
+### 4.1.手动提交
 ```
 @Bean
 public KafkaListenerContainerFactory<ConcurrentMessageListenerContainer<String, String>> kafkaListenerContainerFactory(ConsumerFactory<String, String> consumerFactory) {

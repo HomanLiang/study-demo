@@ -4,13 +4,13 @@
 
 # Kafka 简介
 
-## 相关网站
+## 1.相关网站
  [官网](https://kafka.apache.org/)
  [Kafka中文文档1.0](http://kafka.apachecn.org/intro.html)
 
 
 
-## 概述
+## 2.概述
 Kafka是最初由Linkedin公司开发，是一个分布式、分区的、多副本的、多订阅者，基于zookeeper协调的分布式日志系统（也可以当做MQ系统），常见可以用于web/nginx日志、访问日志，消息服务等等，Linkedin于2010年贡献给了Apache基金会并成为顶级开源项目。
 
 主要应用场景是：日志收集系统和消息系统。
@@ -24,15 +24,15 @@ Kafka主要设计目标如下：
 
 
 
-## 消息队列
+## 3.消息队列
 
 一个消息系统负责将数据从一个应用传递到另外一个应用，应用只需关注于数据，无需关注数据在两个或多个应用间是如何传递的。分布式消息传递基于可靠的消息队列，在客户端应用和消息系统之间异步传递消息。有两种主要的消息传递模式：点对点传递模式、发布-订阅模式。大部分的消息系统选用发布-订阅模式。Kafka就是一种发布-订阅模式。
 
-### 传统消息队列的应用场景
+### 3.1.传统消息队列的应用场景
 
 ![01](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/kafka-demo/20210316225522.png)
 
-### 使用消息队列的好处
+### 3.2.使用消息队列的好处
 
 1. 解耦（类似Spring的IOC）
    - 允许你独立的扩展或修改两边的处理过程，只要确保它们遵守同样的接口约束。
@@ -47,11 +47,11 @@ Kafka主要设计目标如下：
 
 
 
-## 消费模式
+## 4.消费模式
 
 消息队列的两种模式
 
-### 点对点模式
+### 4.1.点对点模式
 
 **一对一，消费者主动拉取数据，消息收到后消息清除**
 
@@ -59,7 +59,7 @@ Kafka主要设计目标如下：
 
 ![02](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/kafka-demo/20210316225704.png)
 
-### 发布/订阅模式
+### 4.2.发布/订阅模式
 
 **一对多，消费者消费数据之后不会清除消息**
 
@@ -67,7 +67,7 @@ Kafka主要设计目标如下：
 
 ![03](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/kafka-demo/20210316225721.png)
 
-## Kafka的优点
+## 5.Kafka的优点
 - **高吞吐，低延迟**
 
   Kafka每秒可以处理几十万条消息，它的延迟最低只有几毫秒
@@ -96,9 +96,9 @@ Kafka主要设计目标如下：
 
 
 
-## 常用Message Queue对比
+## 6.常用Message Queue对比
 
-### 资料文档
+### 6.1.资料文档
 
 Kafka：中。有kafka作者自己写的书，网上资料也有一些。
 
@@ -110,7 +110,7 @@ rocketmq：少。没有专门写rocketmq的书，网上的资料良莠不齐，�
 
 activemq：多。没有专门写activemq的书，网上资料多。
 
-### 开发语言
+### 6.2.开发语言
 
 Kafka：Scala 
 
@@ -122,7 +122,7 @@ rocketmq：java
 
 activemq：java
 
-### 支持的协议
+### 6.3.支持的协议
 
 Kafka：自己定义的一套…（基于TCP） 
 
@@ -134,7 +134,7 @@ rocketmq：自己定义的一套…
 
 activemq：OpenWire、STOMP、REST、XMPP、AMQP
 
-### 消息存储
+### 6.4.消息存储
 
 - Kafka：内存、磁盘、数据库。支持大量堆积。
 
@@ -156,7 +156,7 @@ activemq：OpenWire、STOMP、REST、XMPP、AMQP
 
 - activemq：内存、磁盘、数据库。支持少量堆积。
 
-### 消息事务
+### 6.5.消息事务
 
 Kafka：支持 
 
@@ -168,7 +168,7 @@ rocketmq：支持
 
 activemq：支持
 
-### 负载均衡
+### 6.6.负载均衡
 
 - Kafka：支持负载均衡。
   - 一个broker通常就是一台服务器节点。对于同一个Topic的不同分区，Kafka会尽力将这些分区分布到不同的Broker服务器上，zookeeper保存了broker、主题和分区的元数据信息。分区首领会处理来自客户端的生产请求，kafka分区首领会被分配到不同的broker服务器上，让不同的broker服务器共同分担任务。
@@ -228,7 +228,7 @@ activemq：支持
 
 - activemq：支持负载均衡。可以基于zookeeper实现负载均衡。
 
-### 集群方式
+### 6.7.集群方式
 
 - Kafka：天然的‘Leader-Slave’无状态集群，每台服务器既是Master也是Slave。
 
@@ -260,11 +260,11 @@ activemq：支持
 
   一个topic有多个队列，这些队列会均匀地分布在不同的broker服务器上。rocketmq队列的概念和kafka的分区概念是基本一致的，kafka同一个topic的分区尽可能地分布在不同的broker上，分区副本也会分布在不同的broker上。
 
-- rocketmq集群的slave会从master拉取数据备份，master分布在不同的broker上。
+  rocketmq集群的slave会从master拉取数据备份，master分布在不同的broker上。
 
 - activemq：支持简单集群模式，比如'主-备'，对高级集群模式支持不好。
 
-### 管理界面
+### 6.8.管理界面
 
 Kafka：一般 
 
@@ -276,7 +276,7 @@ rocketmq：无
 
 activemq：一般
 
-### 可用性
+### 6.9.可用性
 
 Kafka：非常高（分布式） 
 
@@ -288,7 +288,7 @@ rocketmq：非常高（分布式）
 
 activemq：高（主从）
 
-### 消息重复
+### 6.10.消息重复
 
 Kafka：支持at least once、at most once
 
@@ -300,7 +300,7 @@ rocketmq：支持at least once
 
 activemq：支持at least once
 
-### 吞吐量TPS
+### 6.11.吞吐量TPS
 
 Kafka：极大 Kafka按批次发送消息和消费消息。发送端将多个小消息合并，批量发向Broker，消费端每次取出一个批次的消息批量处理。
 
@@ -312,7 +312,7 @@ rocketmq：大 rocketMQ接收端可以批量消费消息，可以配置每次消
 
 activemq：比较大
 
-### 订阅形式和消息分发
+### 6.12.订阅形式和消息分发
 
 - Kafka：基于topic以及按照topic进行正则匹配的发布订阅模式。
 
@@ -383,7 +383,7 @@ activemq：比较大
 
       发布/订阅模式：对于已经创建了的topic，消费端要指定订阅哪一个topic的消息。
 
-### 顺序消息
+### 6.13.顺序消息
 
 - Kafka：支持。
 
@@ -401,7 +401,7 @@ activemq：比较大
 
 - activemq：不支持
 
-### 消息确认
+### 6.14.消息确认
 
 - Kafka：支持。
   - 发送方确认机制
@@ -431,7 +431,7 @@ activemq：比较大
 
 - activemq：支持。
 
-### 消息回溯
+### 6.15.消息回溯
 
 - Kafka：支持指定分区offset位置的回溯。
 - rabbitmq：不支持 
@@ -439,7 +439,7 @@ activemq：比较大
 - rocketmq：支持指定时间点的回溯。
 - activemq：不支持
 
-### 消息重试
+### 6.16.消息重试
 
 - Kafka：不支持，但是可以实现。
 
@@ -474,7 +474,7 @@ activemq：比较大
 
 - activemq：不支持
 
-### 并发度
+### 6.17.并发度
 
 - Kafka：高
 
@@ -510,7 +510,7 @@ activemq：比较大
 
 
 
-## 使用场景
+## 7.使用场景
 
 1. **日志收集**
 

@@ -4,11 +4,11 @@
 
 # Kafka 性能调优
 
-## 核心配置
-### producer核心配置
+## 1.核心配置
+### 1.1.producer核心配置
 1. `acks` ：发送应答（默认值：1）
 
-  生产者在考虑完成请求之前要求leader收到的确认的数量。这控制了发送的记录的持久性。允许以下设置:
+     生产者在考虑完成请求之前要求leader收到的确认的数量。这控制了发送的记录的持久性。允许以下设置:
 
    - `acks=0`：设置为0，则生产者将完全不等待来自服务器的任何确认。记录将立即添加到socket缓冲区，并被认为已发送。在这种情况下，不能保证服务器已经收到记录，重试配置将不会生效(因为客户机通常不会知道任何失败)。每个记录返回的偏移量总是-1。
    - `acks=1`：leader会将记录写到本地日志中，但不会等待所有follower的完全确认。在这种情况下，如果leader在记录失败后立即失败，但在追随者复制记录之前失败，那么记录就会丢失。
@@ -16,50 +16,51 @@
 
 2. `batch.size`：批量发送大小（默认：16384，16K）
 
-  缓存到本地内存，批量发送大小，意思每次发送16K到broke。当多个记录被发送到同一个分区时，生产者将尝试将记录批处理成更少的请求。这有助于客户机和服务器上的性能。此配置以字节为单位控制默认批处理大小。
+   缓存到本地内存，批量发送大小，意思每次发送16K到broke。当多个记录被发送到同一个分区时，生产者将尝试将记录批处理成更少的请求。这有助于客户机和服务器上的性能。此配置以字节为单位控制默认批处理大小。
 
 3. `bootstrap.servers`：服务器地址
 
-  broke服务器地址，多个用逗号割开。
+   broke服务器地址，多个用逗号割开。
 
 4. `buffer.memory`：生产者最大可用缓存 (默认：33554432，32M)
 
-  生产者可以用来缓冲等待发送到服务器的记录的总内存字节。如果记录被发送的速度超过了它们可以被发送到服务器的速度，那么生产者将阻塞max.block。然后它会抛出一个异常。
+   生产者可以用来缓冲等待发送到服务器的记录的总内存字节。如果记录被发送的速度超过了它们可以被发送到服务器的速度，那么生产者将阻塞max.block。然后它会抛出一个异常。
 
-  该设置应该大致与生成器将使用的总内存相对应，但不是硬绑定，因为生成器使用的并非所有内存都用于缓冲。一些额外的内存将用于压缩(如果启用了压缩)以及维护飞行中的请求。
-  生产者产生的消息缓存到本地，每次批量发送batch.size大小到服务器。
+   该设置应该大致与生成器将使用的总内存相对应，但不是硬绑定，因为生成器使用的并非所有内存都用于缓冲。一些额外的内存将用于压缩(如果启用了压缩)以及维护飞行中的请求。
+
+   生产者产生的消息缓存到本地，每次批量发送 `batch.size` 大小到服务器。
 
 5. `client.id`：生产者ID(默认“”)
 
-  请求时传递给服务器的id字符串。这样做的目的是通过允许在服务器端请求日志中包含逻辑应用程序名称，从而能够跟踪ip/端口之外的请求源。
+   请求时传递给服务器的id字符串。这样做的目的是通过允许在服务器端请求日志中包含逻辑应用程序名称，从而能够跟踪ip/端口之外的请求源。
 
 6. `compression.type`：压缩类型（默认值：producer）
 
-  指定给定主题的最终压缩类型。此配置接受标准压缩编解码器(“gzip”、“snappy”、“lz4”、“zstd”)。它还接受“未压缩”，相当于没有压缩;以及“生产者”，即保留生产者设置的原始压缩编解码器。
+   指定给定主题的最终压缩类型。此配置接受标准压缩编解码器(`gzip`、`snappy`、`lz4`、`zstd`)。它还接受“未压缩”，相当于没有压缩;以及“生产者”，即保留生产者设置的原始压缩编解码器。
 
-  `gzip`：压缩效率高，适合高内存、CPU
+   `gzip`：压缩效率高，适合高内存、CPU
 
-  `snappy`：适合带宽敏感性，压缩力度大
+   `snappy`：适合带宽敏感性，压缩力度大
 
 7. `retries`：失败重试次数（默认：2147483647）
 
-  异常是RetriableException类型或者TransactionManager允许重试；
+   异常是RetriableException类型或者TransactionManager允许重试；
 
-  `transactionManager.canRetry()`后面会分析；先看看哪些异常是RetriableException类型异常。
+   `transactionManager.canRetry()`后面会分析；先看看哪些异常是RetriableException类型异常。
 
-  ![Image [3]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/kafka-demo/20210317225133.png)
+   ![Image [3]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/kafka-demo/20210317225133.png)
 
-  允许重试，但不需要设置 `max.in.flight.requests.per.connection`（单个连接上发送的未确认请求的最大数量）。连接到1可能会改变记录的顺序，因为如果将两个批发送到单个分区，第一个批处理失败并重试，但是第二个批处理成功，那么第二个批处理中的记录可能先出现。
+   允许重试，但不需要设置 `max.in.flight.requests.per.connection`（单个连接上发送的未确认请求的最大数量）。连接到1可能会改变记录的顺序，因为如果将两个批发送到单个分区，第一个批处理失败并重试，但是第二个批处理成功，那么第二个批处理中的记录可能先出现。
 
-  通过 `delivery.timeout.ms` 也可以控制重试次数，如果重试次数没有用尽，传输超时也会停止。
+   通过 `delivery.timeout.ms` 也可以控制重试次数，如果重试次数没有用尽，传输超时也会停止。
 
-  `retry.backoff.ms`：重试阻塞时间（默认：100）
+   `retry.backoff.ms`：重试阻塞时间（默认：100）
 
-  这避免了在某些失败场景下以紧密循环的方式重复发送请求。
+   这避免了在某些失败场景下以紧密循环的方式重复发送请求。
 
 8. `delivery.timeout.ms`：传输时间（默认：120000，2分钟）
 
-  生产者发送完请求接受服务器ACk的时间，该时间允许重试 ，该配置应该大于`request.timeout.ms + linger.ms`。
+   生产者发送完请求接受服务器ACk的时间，该时间允许重试 ，该配置应该大于`request.timeout.ms + linger.ms`。
 
 9. `connections.max.idle.ms`：关闭空闲连接时间（默认：540000）
 
@@ -67,7 +68,7 @@
 
 10. `enable.idempotence`：开启幂等（默认:false）
 
-    当设置为“true”时，生产者将确保在流中准确地写入每个消息的副本。如果“false”，则由于代理失败而导致生产者重试，等等，可能会在流中写入重试消息的副本。请注意，启用幂等需要使用`max.in.flight.requests.per.connection`，连接小于或等于5，重试大于0且ack必须为“all”。如果用户没有显式地设置这些值，将选择合适的值。如果设置了不兼容的值，就会抛出ConfigException。
+    当设置为“true”时，生产者将确保在流中准确地写入每个消息的副本。如果 `false` ，则由于代理失败而导致生产者重试，等等，可能会在流中写入重试消息的副本。请注意，启用幂等需要使用`max.in.flight.requests.per.connection`，连接小于或等于5，重试大于0且ack必须为 `all`。如果用户没有显式地设置这些值，将选择合适的值。如果设置了不兼容的值，就会抛出ConfigException。
 
 11. `max.in.flight.requests.per.connection`：单个连接上发送的未确认请求的最大数量（默认：5）
 
@@ -121,42 +122,42 @@
 
      这避免了在某些失败场景下以紧密循环的方式重复发送请求。
 
-### consumer核心配置
+### 1.2.consumer核心配置
 1. `enable.auto.commit`：开启自动提交（默认:true）
 
-  如果为true，consumer的偏移量将在后台定期提交。
+   如果为true，consumer的偏移量将在后台定期提交。
 
 2. `auto.commit.interval.ms`：自动提交频率（默认：5000）
 
-  如果 `enable.auto.commit` 设置为true，则使用者偏移量自动提交到Kafka的频率(毫秒)。
+   如果 `enable.auto.commit` 设置为true，则使用者偏移量自动提交到Kafka的频率(毫秒)。
 
 3. `client.id`：客户ID
 
-  便于跟踪日志。
+   便于跟踪日志。
 
 4. `check.crcs`：是否开启数据校验（默认：true）
 
-  自动检查消耗的记录的CRC32。这确保不会发生对消息的在线或磁盘损坏。此检查增加了一些开销，因此在寻求极端性能的情况下可能禁用此检查。
+   自动检查消耗的记录的CRC32。这确保不会发生对消息的在线或磁盘损坏。此检查增加了一些开销，因此在寻求极端性能的情况下可能禁用此检查。
 
 5. `bootstrap.servers`：服务器配置
 
-  多个用都好隔开。
+   多个用都好隔开。
 
 6. `connections.max.idle.ms`：关闭空间连接时间（默认：540000）
 
-  在此配置指定的毫秒数之后关闭空闲连接。
+   在此配置指定的毫秒数之后关闭空闲连接。
 
 7. `group.id`：群组（默认：“”）
 
-  唯一标识用户群组，同一个group每个partition只会分配到一个consumer。
+   唯一标识用户群组，同一个group每个partition只会分配到一个consumer。
 
 8. `max.poll.records`：拉起最大记录（默认：500）
 
-  单次轮询()调用中返回的记录的最大数量。
+   单次轮询()调用中返回的记录的最大数量。
 
 9. `max.poll.interval.ms`：拉取记录间隔（默认：300000，5分钟）
 
-  使用消费者组管理时轮询()调用之间的最大延迟。这为使用者在获取更多记录之前空闲的时间设置了上限。如果在此超时过期之前没有调用poll()，则认为使用者失败，组将重新平衡，以便将分区重新分配给另一个成员。
+   使用消费者组管理时轮询()调用之间的最大延迟。这为使用者在获取更多记录之前空闲的时间设置了上限。如果在此超时过期之前没有调用poll()，则认为使用者失败，组将重新平衡，以便将分区重新分配给另一个成员。
 
 10. `request.timeout.ms`：请求超时时间（默认：30000 ，30S）
 
@@ -218,46 +219,46 @@
 
     控制如何以事务方式读取写入的消息。如果设置为 `read_committed` , `consumer.poll()` 将只返回已提交的事务消息。如果设置为 `read_uncommitted`(默认)，`consumer.poll()` 将返回所有消息，甚至是已经中止的事务消息。在任何一种模式下，非事务性消息都将无条件返回。
 
-### broker配置--server.properties配置文件
+### 1.3.broker配置--server.properties配置文件
 1. `zookeeper.connect`：zk地址
 
-  多个用逗号隔开。
+   多个用逗号隔开。
 
 2. `advertised.host.name`（默认：null）
 
-  不赞成使用:
+   不赞成使用:
 
-  在 `server.properties` 里还有另一个参数是解决这个问题的， `advertised.host.name` 参数用来配置返回的 `host.name` 值，把这个参数配置为外网IP地址即可。
+   在 `server.properties` 里还有另一个参数是解决这个问题的， `advertised.host.name` 参数用来配置返回的 `host.name` 值，把这个参数配置为外网IP地址即可。
 
-  这个参数默认没有启用，默认是返回的 `java.net.InetAddress.getCanonicalHostName` 的值，在我的 `mac` 上这个值并不等于 `hostname` 的值而是返回IP，但在linux上这个值就是hostname的值。
+   这个参数默认没有启用，默认是返回的 `java.net.InetAddress.getCanonicalHostName` 的值，在我的 `mac` 上这个值并不等于 `hostname` 的值而是返回IP，但在linux上这个值就是hostname的值。
 
 3. `advertised.listeners`
 
-  hostname和端口注册到zk给生产者和消费者使用的，如果没有设置，将会使用listeners的配置，如果listeners也没有配置，将使用 `java.net.InetAddress.getCanonicalHostName()` 来获取这个hostname和port，对于ipv4，基本就是localhost了。
+   hostname和端口注册到zk给生产者和消费者使用的，如果没有设置，将会使用listeners的配置，如果listeners也没有配置，将使用 `java.net.InetAddress.getCanonicalHostName()` 来获取这个hostname和port，对于ipv4，基本就是localhost了。
 
 4. `auto.create.topics.enable`（自动创建topic，默认：true）
 
-  第一次发动消息时，自动创建topic。
+   第一次发动消息时，自动创建topic。
 
 5. `auto.leader.rebalance.enable`：自动rebalance(默认：true)
 
-  支持自动领导平衡。如果需要，后台线程定期检查并触发leader balance。
+   支持自动领导平衡。如果需要，后台线程定期检查并触发leader balance。
 
 6. `background.threads`：处理线程（默认：10）
 
-  用于各种后台处理任务的线程数。
+   用于各种后台处理任务的线程数。
 
 7. `broker.id` 默认：-1
 
-  此服务器的broke id。如果未设置，将生成唯一的代理id。为了避免zookeeper生成的broke id和用户配置的broke id之间的冲突，生成的代理id从 `reserve .broker.max` 开始id + 1。
+   此服务器的broke id。如果未设置，将生成唯一的代理id。为了避免zookeeper生成的broke id和用户配置的broke id之间的冲突，生成的代理id从 `reserve .broker.max` 开始id + 1。
 
 8. `compression.type`：压缩类型，默认：producer
 
-  指定给定主题的最终压缩类型。此配置接受标准压缩编解码器(`gzip`、`snappy`、`lz4`、`zstd`)。它还接受“未压缩”，相当于没有压缩;以及“producer”，即保留producer设置的原始压缩编解码器。
+   指定给定主题的最终压缩类型。此配置接受标准压缩编解码器(`gzip`、`snappy`、`lz4`、`zstd`)。它还接受“未压缩”，相当于没有压缩;以及“producer”，即保留producer设置的原始压缩编解码器。
 
 9. `delete.topic.enable` 删除topic(默认：true)
 
-  允许删除主题。如果关闭此配置，则通过管理工具删除主题将无效。
+   允许删除主题。如果关闭此配置，则通过管理工具删除主题将无效。
 
 10. `leader.imbalance.check.interval.seconds`（rebalance检测频率，默认：300）
 
@@ -315,7 +316,7 @@
 
 25. `message.max.bytes`： 最大batch size 默认：1000012，0.9M
 
-    Kafka允许的最大记录batch size。如果增加了这个值，并且存在大于0.10.2的使用者，那么还必须增加consumer的fetch大小，以便他们能够获取这么大的记录批。在最新的消息格式版本中，记录总是按批进行分组，以提高效率。在以前的消息格式版本中，未压缩记录没有分组成批，这种限制只适用于单个记录。可以使用主题级别max.message设置每个主题。字节的配置。
+    Kafka允许的最大记录batch size。如果增加了这个值，并且存在大于0.10.2的使用者，那么还必须增加consumer的fetch大小，以便他们能够获取这么大的记录批。在最新的消息格式版本中，记录总是按批进行分组，以提高效率。在以前的消息格式版本中，未压缩记录没有分组成批，这种限制只适用于单个记录。可以使用主题级别 `max.message` 设置每个主题。字节的配置。
 
 26. `min.insync.replicas`：（insync中最小副本值）
 
@@ -405,7 +406,7 @@
 
 
 
-## API 配置示例
+## 2.API 配置示例
 
 ```
 Properties props = new Properties();
@@ -424,7 +425,7 @@ KafkaProducer<String, String> producer = new KafkaProducer<String, String>(props
 ```
 
 
-## 内存缓冲的大小
+## 3.内存缓冲的大小
 
 Kafka的客户端发送数据到服务器，一般都是要经过缓冲的，也就是说，你通过KafkaProducer发送出去的消息都是先进入到客户端本地的内存缓冲里，然后把很多消息收集成一个一个的Batch，再发送到Broker上去的。
 
@@ -448,7 +449,7 @@ Kafka的客户端发送数据到服务器，一般都是要经过缓冲的，也
 
 
 
-## 多少数据打包为一个Batch合适？
+## 4.多少数据打包为一个Batch合适？
 
 这个东西是决定了你的每个Batch要存放多少数据就可以发送出去了。
 
@@ -468,7 +469,7 @@ Kafka的客户端发送数据到服务器，一般都是要经过缓冲的，也
 
 
 
-## 要是一个Batch迟迟无法凑满怎么办？
+## 5.要是一个Batch迟迟无法凑满怎么办？
 
 要是一个Batch迟迟无法凑满，此时就需要引入另外一个参数了，“linger.ms”
 
@@ -488,27 +489,27 @@ Kafka的客户端发送数据到服务器，一般都是要经过缓冲的，也
 
 举个例子，首先假设你的Batch是32KB，那么你得估算一下，正常情况下，一般多久会凑够一个Batch，比如正常来说可能20ms就会凑够一个Batch。
 
-那么你的linger.ms就可以设置为25ms，也就是说，正常来说，大部分的Batch在20ms内都会凑满，但是你的linger.ms可以保证，哪怕遇到低峰时期，20ms凑不满一个Batch，还是会在25ms之后强制Batch发送出去。
+那么你的 `linger.ms` 就可以设置为25ms，也就是说，正常来说，大部分的Batch在20ms内都会凑满，但是你的 `linger.ms` 可以保证，哪怕遇到低峰时期，20ms凑不满一个Batch，还是会在25ms之后强制Batch发送出去。
 
-如果要是你把linger.ms设置的太小了，比如说默认就是0ms，或者你设置个5ms，那可能导致你的Batch虽然设置了32KB，但是经常是还没凑够32KB的数据，5ms之后就直接强制Batch发送出去，这样也不太好其实，会导致你的Batch形同虚设，一直凑不满数据。
+如果要是你把 `linger.ms` 设置的太小了，比如说默认就是0ms，或者你设置个5ms，那可能导致你的Batch虽然设置了32KB，但是经常是还没凑够32KB的数据，5ms之后就直接强制Batch发送出去，这样也不太好其实，会导致你的Batch形同虚设，一直凑不满数据。
 
 
 
-## 最大请求大小
+## 6.最大请求大小
 
 `max.request.size` 这个参数决定了每次发送给Kafka服务器请求的最大大小，同时也会限制你一条消息的最大大小也不能超过这个参数设置的值，这个其实可以根据你自己的消息的大小来灵活的调整。
 
 给大家举个例子，你们公司发送的消息都是那种大的报文消息，每条消息都是很多的数据，一条消息可能都要20KB。
 
-此时你的batch.size是不是就需要调节大一些？比如设置个512KB？然后你的buffer.memory是不是要给的大一些？比如设置个128MB？
+此时你的 `batch.size` 是不是就需要调节大一些？比如设置个512KB？然后你的 `buffer.memory` 是不是要给的大一些？比如设置个128MB？
 
-只有这样，才能让你在大消息的场景下，还能使用Batch打包多条消息的机制。但是此时“max.request.size”是不是也得同步增加？
+只有这样，才能让你在大消息的场景下，还能使用Batch打包多条消息的机制。但是此时 `max.request.size` 是不是也得同步增加？
 
 因为可能你的一个请求是很大的，默认他是1MB，你是不是可以适当调大一些，比如调节到5MB？
 
 
 
-## 重试机制
+## 7.重试机制
 
 `retries` 和 `retries.backoff.ms` 决定了重试机制，也就是如果一个请求失败了可以重试几次，每次重试的间隔是多少毫秒。
 
