@@ -43,7 +43,7 @@ GC 优化的基本原则是：将不同的 GC 参数应用到两个及以上的�
 
 Full GC 相对来说会比 Minor GC 更耗时。减少进入老年代的对象数量可以显著降低 Full GC 的频率。
 
-**减少创建大对象：\**如果\**对象占用内存过大，在 Eden 区被创建后会直接被传入老年代**。在平常的业务场景中，我们习惯一次性从数据库中查询出一个大对象用于 web 端显示。例如，我之前碰到过一个一次性查询出 60 个字段的业务操作，这种大对象如果超过年轻代最大对象阈值，会被直接创建在老年代；即使被创建在了年轻代，由于年轻代的内存空间有限，通过 Minor GC 之后也会进入到老年代。这种大对象很容易产生较多的 Full GC。
+**减少创建大对象：**如果**对象占用内存过大，在 Eden 区被创建后会直接被传入老年代**。在平常的业务场景中，我们习惯一次性从数据库中查询出一个大对象用于 web 端显示。例如，我之前碰到过一个一次性查询出 60 个字段的业务操作，这种大对象如果超过年轻代最大对象阈值，会被直接创建在老年代；即使被创建在了年轻代，由于年轻代的内存空间有限，通过 Minor GC 之后也会进入到老年代。这种大对象很容易产生较多的 Full GC。
 
 我们可以将这种大对象拆解出来，首次只查询一些比较重要的字段，如果还需要其它字段辅助查看，再通过第二次查询显示剩余的字段。
 
@@ -175,9 +175,9 @@ Full GC 回收日志:
 
 定位步骤：
 
-（1）执行 top -c 命令，找到 cpu 最高的进程的 id
+（1）执行 `top -c` 命令，找到 cpu 最高的进程的 id
 
-（2）jstack PID 导出 Java 应用程序的线程堆栈信息。
+（2）`jstack PID` 导出 Java 应用程序的线程堆栈信息。
 
 示例：
 
@@ -474,49 +474,50 @@ address 即为远程 debug 的监听端口。
 JVM给出了3种选择：**串行收集器**、**并行收集器**、**并发收集器**。串行收集器只适用于小数据量的情况，所以生产环境的选择主要是并行收集器和并发收集器。默认情况下JDK5.0以前都是使用串行收集器，如果想使用其他收集器需要在启动时加入相应参数。JDK5.0以后，JVM会根据当前系统配置进行智能判断。
 
 **串行收集器**
--XX:+UseSerialGC：设置串行收集器。
+`-XX:+UseSerialGC`：设置串行收集器。
 
 **并行收集器（吞吐量优先）**
--XX:+UseParallelGC：设置为并行收集器。此配置仅对年轻代有效。即年轻代使用并行收集，而年老代仍使用串行收集。
 
--XX:ParallelGCThreads=20：配置并行收集器的线程数，即：同时有多少个线程一起进行垃圾回收。此值建议配置与CPU数目相等。
+`-XX:+UseParallelGC`：设置为并行收集器。此配置仅对年轻代有效。即年轻代使用并行收集，而年老代仍使用串行收集。
 
--XX:+UseParallelOldGC：配置年老代垃圾收集方式为并行收集。JDK6.0开始支持对年老代并行收集。
+`-XX:ParallelGCThreads=20`：配置并行收集器的线程数，即：同时有多少个线程一起进行垃圾回收。此值建议配置与CPU数目相等。
 
--XX:MaxGCPauseMillis=100：设置每次年轻代垃圾回收的最长时间（单位毫秒）。如果无法满足此时间，JVM会自动调整年轻代大小，以满足此时间。
+`-XX:+UseParallelOldGC`：配置年老代垃圾收集方式为并行收集。JDK6.0开始支持对年老代并行收集。
 
--XX:+UseAdaptiveSizePolicy：设置此选项后，并行收集器会自动调整年轻代Eden区大小和Survivor区大小的比例，以达成目标系统规定的最低响应时间或者收集频率等指标。此参数建议在使用并行收集器时，一直打开。
+`-XX:MaxGCPauseMillis=100`：设置每次年轻代垃圾回收的最长时间（单位毫秒）。如果无法满足此时间，JVM会自动调整年轻代大小，以满足此时间。
+
+`-XX:+UseAdaptiveSizePolicy`：设置此选项后，并行收集器会自动调整年轻代Eden区大小和Survivor区大小的比例，以达成目标系统规定的最低响应时间或者收集频率等指标。此参数建议在使用并行收集器时，一直打开。
 并发收集器（响应时间优先）
 
 **并行收集器**
 
--XX:+UseConcMarkSweepGC：即CMS收集，设置年老代为并发收集。CMS收集是JDK1.4后期版本开始引入的新GC算法。它的主要适合场景是对响应时间的重要性需求大于对吞吐量的需求，能够承受垃圾回收线程和应用线程共享CPU资源，并且应用中存在比较多的长生命周期对象。CMS收集的目标是尽量减少应用的暂停时间，减少Full GC发生的几率，利用和应用程序线程并发的垃圾回收线程来标记清除年老代内存。
+`-XX:+UseConcMarkSweepGC`：即CMS收集，设置年老代为并发收集。CMS收集是JDK1.4后期版本开始引入的新GC算法。它的主要适合场景是对响应时间的重要性需求大于对吞吐量的需求，能够承受垃圾回收线程和应用线程共享CPU资源，并且应用中存在比较多的长生命周期对象。CMS收集的目标是尽量减少应用的暂停时间，减少Full GC发生的几率，利用和应用程序线程并发的垃圾回收线程来标记清除年老代内存。
 
--XX:+UseParNewGC：设置年轻代为并发收集。可与CMS收集同时使用。JDK5.0以上，JVM会根据系统配置自行设置，所以无需再设置此参数。
+`-XX:+UseParNewGC`：设置年轻代为并发收集。可与CMS收集同时使用。JDK5.0以上，JVM会根据系统配置自行设置，所以无需再设置此参数。
 
--XX:CMSFullGCsBeforeCompaction=0：由于并发收集器不对内存空间进行压缩和整理，所以运行一段时间并行收集以后会产生内存碎片，内存使用效率降低。此参数设置运行0次Full GC后对内存空间进行压缩和整理，即每次Full GC后立刻开始压缩和整理内存。
+`-XX:CMSFullGCsBeforeCompaction=0`：由于并发收集器不对内存空间进行压缩和整理，所以运行一段时间并行收集以后会产生内存碎片，内存使用效率降低。此参数设置运行0次Full GC后对内存空间进行压缩和整理，即每次Full GC后立刻开始压缩和整理内存。
 
--XX:+UseCMSCompactAtFullCollection：打开内存空间的压缩和整理，在Full GC后执行。可能会影响性能，但可以消除内存碎片。
+`-XX:+UseCMSCompactAtFullCollection`：打开内存空间的压缩和整理，在Full GC后执行。可能会影响性能，但可以消除内存碎片。
 
--XX:+CMSIncrementalMode：设置为增量收集模式。一般适用于单CPU情况。
+`-XX:+CMSIncrementalMode`：设置为增量收集模式。一般适用于单CPU情况。
 
--XX:CMSInitiatingOccupancyFraction=70：表示年老代内存空间使用到70%时就开始执行CMS收集，以确保年老代有足够的空间接纳来自年轻代的对象，避免Full GC的发生。
+`-XX:CMSInitiatingOccupancyFraction=70`：表示年老代内存空间使用到70%时就开始执行CMS收集，以确保年老代有足够的空间接纳来自年轻代的对象，避免Full GC的发生。
 
 **其它垃圾回收参数**
 
--XX:+ScavengeBeforeFullGC：年轻代GC优于Full GC执行。
+`-XX:+ScavengeBeforeFullGC`：年轻代GC优于Full GC执行。
 
--XX:-DisableExplicitGC：不响应 System.gc() 代码。
+`-XX:-DisableExplicitGC`：不响应 System.gc() 代码。
 
--XX:+UseThreadPriorities：启用本地线程优先级API。即使 java.lang.Thread.setPriority() 生效，不启用则无效。
+`-XX:+UseThreadPriorities`：启用本地线程优先级API。即使 java.lang.Thread.setPriority() 生效，不启用则无效。
 
--XX:SoftRefLRUPolicyMSPerMB=0：软引用对象在最后一次被访问后能存活0毫秒（JVM默认为1000毫秒）。
+`-XX:SoftRefLRUPolicyMSPerMB=0`：软引用对象在最后一次被访问后能存活0毫秒（JVM默认为1000毫秒）。
 
--XX:TargetSurvivorRatio=90：允许90%的Survivor区被占用（JVM默认为50%）。提高对于Survivor区的使用率。
+`-XX:TargetSurvivorRatio=90`：允许90%的Survivor区被占用（JVM默认为50%）。提高对于Survivor区的使用率。
 
 ### 4.6.JVM参数优先级
 
--Xmn，-XX:NewSize/-XX:MaxNewSize，-XX:NewRatio 3组参数都可以影响年轻代的大小，混合使用的情况下，优先级是什么？
+`-Xmn`，-`XX:NewSize/-XX:MaxNewSize`，`-XX:NewRatio` 3组参数都可以影响年轻代的大小，混合使用的情况下，优先级是什么？
 
 答案如下：
 
@@ -543,7 +544,7 @@ public class T01_HelloGC {
 }
 ```
 
-1.java -XX:+PrintCommandLineFlags HelloGC
+1.`java -XX:+PrintCommandLineFlags HelloGC`
 
 ```
 [root@localhost courage]# java -XX:+PrintCommandLineFlags T01_HelloGC
@@ -606,10 +607,10 @@ PrintGCDetails PrintGCTimeStamps PrintGCCauses
 -XX:+UseParNewGC
 ```
 
-1. java -XX:+PrintFlagsInitial 默认参数值
-2. java -XX:+PrintFlagsFinal 最终参数值
-3. java -XX:+PrintFlagsFinal | grep xxx 找到对应的参数
-4. java -XX:+PrintFlagsFinal -version |grep GC
+1. `java -XX:+PrintFlagsInitial` 默认参数值
+2. `java -XX:+PrintFlagsFinal` 最终参数值
+3. `java -XX:+PrintFlagsFinal | grep xxx` 找到对应的参数
+4. `java -XX:+PrintFlagsFinal -version |grep GC`
 
 
 
@@ -685,11 +686,10 @@ JVM调优,设计到三个大的方面,在服务器出现问题之前要先根据
      >
      > ​	主要打印针对JVM启动的时候的相对时间，相对来说前者更消耗内存。
 
-     
-
      或者每天产生一个日志文件
 
   7. 观察日志情况
-     日志有分析工具,可视化分析工具有[GCeasy](https://gceasy.io/)和[GCViewer](https://github.com/chewiebug/GCViewer)。
-
-     ### 
+   
+  8. 日志有分析工具,可视化分析工具有[GCeasy](https://gceasy.io/)和[GCViewer](https://github.com/chewiebug/GCViewer)。
+  
+   

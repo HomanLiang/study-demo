@@ -89,7 +89,7 @@ public static final int value = 123;
 
   假设一个类变量的定义为：`public static int value = 3`；
 
-  那么变量 value 在准备阶段过后的初始值为 0，而不是 3，因为这时候尚未开始执行任何 Java 方法，而把 value 赋值为 3 的`public static`指令是在程序编译后，存放于类构造器`（）`方法之中的，所以把 value 赋值为 3 的动作将在初始化阶段才会执行。
+  那么变量 value 在准备阶段过后的初始值为 0，而不是 3，因为这时候尚未开始执行任何 Java 方法，而把 value 赋值为 3 的`public static`指令是在程序编译后，存放于`类构造器（）`方法之中的，所以把 value 赋值为 3 的动作将在初始化阶段才会执行。
   
   这里还需要注意如下几点：
   
@@ -238,7 +238,7 @@ public class StaticInnerSingleton {
 }
 ```
 
-看这个例子，单例模式静态内部类实现方式。我们可以看到单例实例使用final定义，但在编译时无法确定下来，所以在第一次使用StaticInnerSingleton.getInstance()方法时，才会触发静态内部类的加载，也就是延迟加载。
+看这个例子，单例模式静态内部类实现方式。我们可以看到单例实例使用final定义，但在编译时无法确定下来，所以在第一次使用`StaticInnerSingleton.getInstance()` 方法时，才会触发静态内部类的加载，也就是延迟加载。
 
 **这里想指出，如果final定义的变量在编译时无法确定，则在使用时还是会进行类的初始化。**
 
@@ -266,7 +266,7 @@ class ClassLoaderTest {
 //Tester类的静态初始化块
 ```
 
-从输出证明：**ClassLoader只会对类进行加载，不会进行初始化；****使用Class.forName()会强制导致类的初始化。**
+从输出证明：**ClassLoader只会对类进行加载，不会进行初始化；使用Class.forName()会强制导致类的初始化。**
 
 ### 2.6. 结束生命周期
 
@@ -407,12 +407,12 @@ null
 
 从上面的结果可以看出，并没有获取到 `ExtClassLoader` 的父 Loader，原因是 `Bootstrap Loader`（引导类加载器）是用 C 语言实现的，找不到一个确定的返回父 Loader 的方式，于是就返回 null。
 
-双亲委派模型的工作流程是：如果一个类加载器收到了类加载的请求，它首先不会自己去尝试加载这个类，而是把请求委托给父加载器去完成，依次向上，因此，所有的类加载请求最终都应该被传递到顶层的启动类加载器中，只有当父加载器在它的搜索范围中没有找到所需的类时，即无法完成该加载，子加载器才会尝试自己去加载该类。
+**双亲委派模型的工作流程**是：如果一个类加载器收到了类加载的请求，它首先不会自己去尝试加载这个类，而是把请求委托给父加载器去完成，依次向上，因此，所有的类加载请求最终都应该被传递到顶层的启动类加载器中，只有当父加载器在它的搜索范围中没有找到所需的类时，即无法完成该加载，子加载器才会尝试自己去加载该类。
 
 双亲委派机制:
 
 - 1、当 `AppClassLoader`加载一个class时，它首先不会自己去尝试加载这个类，而是把类加载请求委派给父类加载器`ExtClassLoader`去完成。
-- 2、当 `ExtClassLoader`加载一个class时，它首先也不会自己去尝试加载这个类，而是把类加载请求委派给BootStrapClassLoader```去完成。
+- 2、当 `ExtClassLoader`加载一个class时，它首先也不会自己去尝试加载这个类，而是把类加载请求委派给 `BootStrapClassLoader`去完成。
 - 3、如果 `BootStrapClassLoader`加载失败（例如在 `$JAVA_HOME/jre/lib`里未查找到该class），会使用 `ExtClassLoader`来尝试加载；
 - 4、若ExtClassLoader也加载失败，则会使用 `AppClassLoader`来加载，如果 `AppClassLoader`也加载失败，则会报出异常 `ClassNotFoundException`。
 

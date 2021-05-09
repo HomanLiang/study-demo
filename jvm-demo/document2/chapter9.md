@@ -179,9 +179,9 @@ dm-1              0.00     0.00    0.00    0.00     0.00     0.00    16.95     0
 
 网络超时问题大部分出在应用层面。超时大体可以分为连接超时和读写超时，某些使用连接池的客户端框架还会存在获取连接超时和空闲连接清理超时。
 
-- 读写超时。readTimeout/writeTimeout，有些框架叫做 so_timeout 或者 socketTimeout，均指的是数据读写超时。注意这边的超时大部分是指逻辑上的超时。soa 的超时指的也是读超时。读写超时一般都只针对客户端设置。
-- 连接超时。connectionTimeout，客户端通常指与服务端建立连接的最大时间。服务端这边 connectionTimeout 就有些五花八门了，jetty 中表示空闲连接清理时间，tomcat 则表示连接维持的最大时间。
-- 其他。包括连接获取超时 connectionAcquireTimeout 和空闲连接清理超时 idleConnectionTimeout。多用于使用连接池或队列的客户端或服务端框架。
+- 读写超时。`readTimeout/writeTimeout`，有些框架叫做 `so_timeout` 或者 `socketTimeout`，均指的是数据读写超时。注意这边的超时大部分是指逻辑上的超时。soa 的超时指的也是读超时。读写超时一般都只针对客户端设置。
+- 连接超时。`connectionTimeout`，客户端通常指与服务端建立连接的最大时间。服务端这边 `connectionTimeout` 就有些五花八门了，jetty 中表示空闲连接清理时间，tomcat 则表示连接维持的最大时间。
+- 其他。包括连接获取超时 `connectionAcquireTimeout` 和空闲连接清理超时 `idleConnectionTimeout`。多用于使用连接池或队列的客户端或服务端框架。
 
 我们在设置各种超时时间中，需要确认的是尽量保持客户端的超时小于服务端的超时，以保证连接正常结束。
 
@@ -446,10 +446,10 @@ jstat 是一个非常强大的 JVM 监控工具，一般用法是： `jstat [-op
 
 它支持的查看项有：
 
-- -class 查看类加载信息
-- -compile 编译统计信息
-- -gc 垃圾回收信息
-- -gcXXX 各区域 GC 的详细信息 如 -gcold
+- `-class` 查看类加载信息
+- `-compile` 编译统计信息
+- `-gc` 垃圾回收信息
+- `-gcXXX` 各区域 GC 的详细信息 如 -gcold
 
 使用它，对定位 JVM 的内存问题很有帮助。
 

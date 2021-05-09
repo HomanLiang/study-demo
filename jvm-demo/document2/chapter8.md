@@ -97,7 +97,7 @@ MAT 可以独立安装（[官方下载地址](http://www.eclipse.org/mat/downloa
 MAT 解压后，安装目录下有个 `MemoryAnalyzer.ini` 文件。
 
 ```
-MemoryAnalyzer.ini` 中有个重要的参数 `Xmx` 表示最大内存，默认为：`-vmargs -Xmx1024m
+MemoryAnalyzer.ini 中有个重要的参数 Xmx 表示最大内存，默认为：-vmargs -Xmx1024m
 ```
 
 如果试图用 MAT 导入的 dump 文件超过 1024 M，会报错：
