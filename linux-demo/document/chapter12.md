@@ -25,7 +25,7 @@
 
 ## 2.查看Linux内存情况
 
-### 2.1.查看*/proc/meminfo*
+### 2.1.查看`/proc/meminfo`
 
 ```
 [root@test ~]# cat /proc/meminfo
