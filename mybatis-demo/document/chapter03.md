@@ -22,13 +22,13 @@ SQL 映射文件只有很少的几个顶级元素（按照应被定义的顺序�
 
 
 
-## select
+## 1.select
 
 查询语句是 MyBatis 中最常用的元素之一——光能把数据存到数据库中价值并不大，还要能重新取出来才有用，多数应用也都是查询比修改要频繁。 MyBatis 的基本原则之一是：在每个插入、更新或删除操作之间，通常会执行多个查询操作。因此，MyBatis 在查询和结果映射做了相当多的改进。一个简单查询的 select 元素是非常简单的。比如：
 
 ```
 <select id="selectPerson" parameterType="int" resultType="hashmap">
-  SELECT * FROM PERSON WHERE ID = #{id}
+    SELECT * FROM PERSON WHERE ID = #{id}
 </select>
 ```
 
@@ -40,7 +40,7 @@ SQL 映射文件只有很少的几个顶级元素（按照应被定义的顺序�
 #{id}
 ```
 
-这就告诉 MyBatis 创建一个预处理语句（PreparedStatement）参数，在 JDBC 中，这样的一个参数在 SQL 中会由一个“?”来标识，并被传递到一个新的预处理语句中，就像这样：
+这就告诉 MyBatis 创建一个预处理语句（PreparedStatement）参数，在 JDBC 中，这样的一个参数在 SQL 中会由一个 `?` 来标识，并被传递到一个新的预处理语句中，就像这样：
 
 ```
 // 近似的 JDBC 代码，非 MyBatis 代码...
@@ -87,7 +87,7 @@ select 元素允许你配置很多属性来配置每条语句的行为细节。
 
 
 
-## insert, update 和 delete
+## 2.insert, update 和 delete
 
 数据变更语句 insert，update 和 delete 的实现非常接近：
 
@@ -154,7 +154,7 @@ select 元素允许你配置很多属性来配置每条语句的行为细节。
 
 如前所述，插入语句的配置规则更加丰富，在插入语句里面有一些额外的属性和子元素用来处理主键的生成，并且提供了多种生成方式。
 
-首先，如果你的数据库支持自动生成主键的字段（比如 MySQL 和 SQL Server），那么你可以设置 useGeneratedKeys=”true”，然后再把 keyProperty 设置为目标属性就 OK 了。例如，如果上面的 Author 表已经在 id 列上使用了自动生成，那么语句可以修改为：
+首先，如果你的数据库支持自动生成主键的字段（比如 MySQL 和 SQL Server），那么你可以设置 `useGeneratedKeys=”true”`，然后再把 keyProperty 设置为目标属性就 OK 了。例如，如果上面的 Author 表已经在 id 列上使用了自动生成，那么语句可以修改为：
 
 ```
 <insert id="insertAuthor" useGeneratedKeys="true"
@@ -212,7 +212,7 @@ selectKey 元素描述如下：
 | `order`         | 可以设置为 `BEFORE` 或 `AFTER`。如果设置为 `BEFORE`，那么它首先会生成主键，设置 `keyProperty` 再执行插入语句。如果设置为 `AFTER`，那么先执行插入语句，然后是 `selectKey` 中的语句 - 这和 Oracle 数据库的行为相似，在插入语句内部可能有嵌入索引调用。 |
 | `statementType` | 和前面一样，MyBatis 支持 `STATEMENT`，`PREPARED` 和 `CALLABLE` 类型的映射语句，分别代表 `Statement`, `PreparedStatement` 和 `CallableStatement` 类型。 |
 
-## sql
+## 3.sql
 
 这个元素可以用来定义可重用的 SQL 代码片段，以便在其它语句中使用。 参数可以静态地（在加载的时候）确定下来，并且可以在不同的 include 元素中定义不同的参数值。比如：
 
@@ -256,7 +256,7 @@ selectKey 元素描述如下：
 
 
 
-## 参数
+## 4.参数
 
 之前见到的所有语句都使用了简单的参数形式。但实际上，参数是 MyBatis 非常强大的元素。对于大多数简单的使用场景，你都不需要使用复杂的参数，比如：
 
@@ -325,7 +325,7 @@ MyBatis 也支持很多高级的数据类型，比如结构体（structs），�
 #{lastName}
 ```
 
-### 字符串替换
+### 4.1.字符串替换
 
 默认情况下，使用 `#{}` 参数语法时，MyBatis 会创建 `PreparedStatement` 参数占位符，并通过占位符安全地设置参数（就像使用 ? 一样）。 这样做更安全，更迅速，通常也是首选做法，不过有时你就是想直接在 SQL 语句中直接插入一个不转义的字符串。 比如 ORDER BY 子句，这时候你可以：
 
@@ -371,7 +371,7 @@ User userOfEmail = userMapper.findByColumn("email", "noone@nowhere.com");
 
 
 
-## 结果映射
+## 5.结果映射
 
 `resultMap` 元素是 MyBatis 中最重要最强大的元素。它可以让你从 90% 的 JDBC `ResultSets` 数据提取代码中解放出来，并在一些情形下允许你进行一些 JDBC 不支持的操作。实际上，在为一些比如连接的复杂语句编写映射代码的时候，一份 `resultMap` 能够代替实现同等功能的数千行代码。ResultMap 的设计思想是，对简单的语句做到零配置，对于复杂一点的语句，只需要描述语句之间的关系就行了。
 
@@ -476,7 +476,7 @@ public class User {
 
 如果这个世界总是这么简单就好了。
 
-### 高级结果映射
+### 5.1.高级结果映射
 
 MyBatis 创建时的一个思想是：数据库不可能永远是你所想或所需的那个样子。 我们希望每个数据库都具备良好的第三范式或 BCNF 范式，可惜它们并不都是那样。 如果能有一种数据库映射模式，完美适配所有的应用程序，那就太好了，但可惜也没有。 而 ResultMap 就是 MyBatis 对这个问题的答案。
 
@@ -555,7 +555,7 @@ MyBatis 创建时的一个思想是：数据库不可能永远是你所想或所
 
 `resultMap` 元素有很多子元素和一个值得深入探讨的结构。 下面是`resultMap` 元素的概念视图。
 
-### 结果映射（resultMap）
+### 5.2.结果映射（resultMap）
 
 - `constructor` - 用于在实例化类时，注入结果到构造方法中
 
@@ -590,7 +590,7 @@ MyBatis 创建时的一个思想是：数据库不可能永远是你所想或所
 
 下一部分将详细说明每个元素。
 
-### id & result
+### 5.3.id & result
 
 ```
 <id property="id" column="post_id"/>
@@ -611,7 +611,7 @@ MyBatis 创建时的一个思想是：数据库不可能永远是你所想或所
 | `jdbcType`    | JDBC 类型，所支持的 JDBC 类型参见这个表格之后的“支持的 JDBC 类型”。 只需要在可能执行插入、更新和删除的且允许空值的列上指定 JDBC 类型。这是 JDBC 的要求而非 MyBatis 的要求。如果你直接面向 JDBC 编程，你需要对可以为空值的列指定这个类型。 |
 | `typeHandler` | 我们在前面讨论过默认的类型处理器。使用这个属性，你可以覆盖默认的类型处理器。 这个属性值是一个类型处理器实现类的全限定名，或者是类型别名。 |
 
-### 支持的 JDBC 类型
+### 5.4.支持的 JDBC 类型
 
 为了以后可能的使用场景，MyBatis 通过内置的 jdbcType 枚举类型支持下面的 JDBC 类型。
 
@@ -622,7 +622,7 @@ MyBatis 创建时的一个思想是：数据库不可能永远是你所想或所
 | `INTEGER`  | `NUMERIC` | `DATE`        | `LONGVARBINARY` | `BOOLEAN` | `NCLOB`     |
 | `BIGINT`   | `DECIMAL` | `TIME`        | `NULL`          | `CURSOR`  | `ARRAY`     |
 
-### 构造方法
+### 5.5.构造方法
 
 通过修改对象属性的方式，可以满足大多数的数据传输对象（Data Transfer Object, DTO）以及绝大部分领域模型的要求。但有些情况下你想使用不可变类。 一般来说，很少改变或基本不变的包含引用或数据的表，很适合使用不可变类。 构造方法注入允许你在初始化时为类设置属性的值，而不用暴露出公有方法。MyBatis 也支持私有属性和私有 JavaBean 属性来完成注入，但有一些人更青睐于通过构造方法进行注入。 *constructor* 元素就是为此而生的。
 
@@ -672,7 +672,7 @@ public class User {
 | `resultMap`   | 结果映射的 ID，可以将嵌套的结果集映射到一个合适的对象树中。 它可以作为使用额外 select 语句的替代方案。它可以将多表连接操作的结果映射成一个单一的 `ResultSet`。这样的 `ResultSet` 将会将包含重复或部分数据重复的结果集。为了将结果集正确地映射到嵌套的对象树中，MyBatis 允许你 “串联”结果映射，以便解决嵌套结果集的问题。想了解更多内容，请参考下面的关联元素。 |
 | `name`        | 构造方法形参的名字。从 3.4.3 版本开始，通过指定具体的参数名，你可以以任意顺序写入 arg 元素。参看上面的解释。 |
 
-### 关联
+### 5.6.关联
 
 ```
 <association property="author" column="blog_author_id" javaType="Author">
@@ -697,7 +697,7 @@ public class User {
 | `jdbcType`    | JDBC 类型，所支持的 JDBC 类型参见这个表格之前的“支持的 JDBC 类型”。 只需要在可能执行插入、更新和删除的且允许空值的列上指定 JDBC 类型。这是 JDBC 的要求而非 MyBatis 的要求。如果你直接面向 JDBC 编程，你需要对可能存在空值的列指定这个类型。 |
 | `typeHandler` | 我们在前面讨论过默认的类型处理器。使用这个属性，你可以覆盖默认的类型处理器。 这个属性值是一个类型处理器实现类的完全限定名，或者是类型别名。 |
 
-### 关联的嵌套 Select 查询
+### 5.7.关联的嵌套 Select 查询
 
 | 属性        | 描述                                                         |
 | :---------- | :----------------------------------------------------------- |
@@ -736,14 +736,14 @@ public class User {
 
 所以还有另外一种方法。
 
-### 关联的嵌套结果映射
+### 5.8.关联的嵌套结果映射
 
 | 属性            | 描述                                                         |
 | :-------------- | :----------------------------------------------------------- |
 | `resultMap`     | 结果映射的 ID，可以将此关联的嵌套结果集映射到一个合适的对象树中。 它可以作为使用额外 select 语句的替代方案。它可以将多表连接操作的结果映射成一个单一的`ResultSet`。这样的 `ResultSet` 有部分数据是重复的。 为了将结果集正确地映射到嵌套的对象树中, MyBatis 允许你“串联”结果映射，以便解决嵌套结果集的问题。使用嵌套结果映射的一个例子在表格以后。 |
-| `columnPrefix`  | 当连接多个表时，你可能会不得不使用列别名来避免在 `ResultSet` 中产生重复的列名。指定 columnPrefix 列名前缀允许你将带有这些前缀的列映射到一个外部的结果映射中。 详细说明请参考后面的例子。 |
+| `columnPrefix`  | 当连接多个表时，你可能会不得不使用列别名来避免在 `ResultSet` 中产生重复的列名。指定 `columnPrefix` 列名前缀允许你将带有这些前缀的列映射到一个外部的结果映射中。 详细说明请参考后面的例子。 |
 | `notNullColumn` | 默认情况下，在至少一个被映射到属性的列不为空时，子对象才会被创建。 你可以在这个属性上指定非空的列来改变默认行为，指定后，Mybatis 将只在这些列非空时才创建一个子对象。可以使用逗号分隔来指定多个列。默认值：未设置（unset）。 |
-| `autoMapping`   | 如果设置这个属性，MyBatis 将会为本结果映射开启或者关闭自动映射。 这个属性会覆盖全局的属性 autoMappingBehavior。注意，本属性对外部的结果映射无效，所以不能搭配`select` 或 `resultMap` 元素使用。默认值：未设置（unset）。 |
+| `autoMapping`   | 如果设置这个属性，MyBatis 将会为本结果映射开启或者关闭自动映射。 这个属性会覆盖全局的属性 `autoMappingBehavior`。注意，本属性对外部的结果映射无效，所以不能搭配`select` 或 `resultMap` 元素使用。默认值：未设置（unset）。 |
 
 之前，你已经看到了一个非常复杂的嵌套关联的例子。 下面的例子则是一个非常简单的例子，用于演示嵌套结果映射如何工作。 现在我们将博客表和作者表连接在一起，而不是执行一个独立的查询语句，就像这样：
 
@@ -851,7 +851,7 @@ public class User {
 </resultMap>
 ```
 
-### 关联的多结果集（ResultSet）
+### 5.9.关联的多结果集（ResultSet）
 
 | 属性            | 描述                                                         |
 | :-------------- | :----------------------------------------------------------- |
@@ -897,7 +897,7 @@ SELECT * FROM AUTHOR WHERE ID = #{id}
 
 你已经在上面看到了如何处理“有一个”类型的关联。但是该怎么处理“有很多个”类型的关联呢？这就是我们接下来要介绍的。
 
-### 集合
+### 5.10.集合
 
 ```
 <collection property="posts" ofType="domain.blog.Post">
@@ -917,7 +917,7 @@ private List<Post> posts;
 
 要像上面这样，映射嵌套结果集合到一个 List 中，可以使用集合元素。 和关联元素一样，我们可以使用嵌套 Select 查询，或基于连接的嵌套结果映射集合。
 
-### 集合的嵌套 Select 查询
+### 5.11.集合的嵌套 Select 查询
 
 首先，让我们看看如何使用嵌套 Select 查询来为博客加载文章。
 
@@ -949,7 +949,7 @@ private List<Post> posts;
 <collection property="posts" column="id" ofType="Post" select="selectPostsForBlog"/>
 ```
 
-### 集合的嵌套结果映射
+### 5.12.集合的嵌套结果映射
 
 现在你可能已经猜到了集合的嵌套结果映射是怎样工作的——除了新增的 “ofType” 属性，它和关联的完全相同。
 
@@ -1002,7 +1002,7 @@ private List<Post> posts;
 </resultMap>
 ```
 
-### 集合的多结果集（ResultSet）
+### 5.13.集合的多结果集（ResultSet）
 
 像关联元素那样，我们可以通过执行存储过程实现，它会执行两个查询并返回两个结果集，一个是博客的结果集，另一个是文章的结果集：
 
@@ -1038,7 +1038,7 @@ SELECT * FROM POST WHERE BLOG_ID = #{id}
 
 高级关联和集合映射是一个深度话题。文档的介绍只能到此为止。配合少许的实践，你会很快了解全部的用法。
 
-### 鉴别器
+### 5.14.鉴别器
 
 ```
 <discriminator javaType="int" column="draft">
@@ -1117,7 +1117,7 @@ SELECT * FROM POST WHERE BLOG_ID = #{id}
 
 
 
-## 自动映射
+## 6.自动映射
 
 正如你在前面一节看到的，在简单的场景下，MyBatis 可以为你自动映射查询结果。但如果遇到复杂的场景，你需要构建一个结果映射。 但是在本节中，你将看到，你可以混合使用这两种策略。让我们深入了解一下自动映射是怎样工作的。
 
@@ -1179,14 +1179,14 @@ SELECT * FROM POST WHERE BLOG_ID = #{id}
 
 
 
-## 常用技巧
+## X.常用技巧
 
-### 批量插入
+### X.1.批量插入
 
 **xxxMapper.xml:**
 
 ```
-<!-- 批量插入生成的兑换码 -->
+	<!-- 批量插入生成的兑换码 -->
      <insert id ="insertCodeBatch" parameterType="java.util.List" >
             <selectKey resultType ="java.lang.Integer" keyProperty= "id"
                  order= "AFTER">
@@ -1230,10 +1230,10 @@ int insertCodeBatch(List<ReddemCode > reddemCodeList);
  (?,?,?,?,?,? ),(?,?,?,?,?,? ),(?,?,?,?,?,? ),(?,?,?,?,?,? )
 ```
 
-### 批量更新
+### X.2.批量更新
 
 ```
-<!-- 批量更新赛程 -->
+	<!-- 批量更新赛程 -->
     <update id="updateMatchs" parameterType="java.util.List">
         <foreach collection="matchs" item="item" index="index" open="" close="" separator=";">
             update t_match
@@ -1257,15 +1257,15 @@ int insertCodeBatch(List<ReddemCode > reddemCodeList);
                     IS_HOT_MATCH = #{item.isHotMatch,jdbcType=VARCHAR}
                 </if>
             </set>
-        where HOME_TEAM_ID = #{item.homeTeamId,jdbcType=VARCHAR} and
-        VISIT_TEAM_ID = #{item.visitTeamId,jdbcType=VARCHAR} and
-        MATCH_TIME = #{item.matchTime,jdbcType=BIGINT}
+        	where HOME_TEAM_ID = #{item.homeTeamId,jdbcType=VARCHAR} and
+        		VISIT_TEAM_ID = #{item.visitTeamId,jdbcType=VARCHAR} and
+        		MATCH_TIME = #{item.matchTime,jdbcType=BIGINT}
         </foreach>
     </update>
 ```
 
 ```
-/**
+	/**
      * 批量修改赛程
      * 
      * @param matchs
@@ -1277,7 +1277,7 @@ int insertCodeBatch(List<ReddemCode > reddemCodeList);
 这种批量跟心数据库的方式可以在一次数据库连接中更新所有数据，避免了频繁数据库建立和断开连接的开销，可以很大程度的提高数据更新效率。但是这样的问题是如果这个过程中更新出错，将很难知道具体是哪个数据出错，如果使用数据自身的事务保证，那么一旦出错，所有的更新将自动回滚。而且通常这种方式也更容易出错。因此通常的使用的方案是进行折中，也就是一次批量更新一部分（分页进行更新，比如说一共有1000条数据，一次更新100条）。这样可以分担出错的概率，也更容易定位到出错的位置。
  当然如果数据量确实很大的时候，这种批量更新也一样会导致更新效率低下（比如说一次更新100条，那如果10亿条数据呢，一样要批量更新1000万次，建立和断开1000万次数据库，这个效率是无法承受的）。这时候也许只能考虑其他方案了，比如引入缓存机制等。
 
-###  特殊符号替换
+###  X.3.特殊符号替换
 
 | 特殊字符 |                     替代符号                      |
 | :------: | :-----------------------------------------------: |
@@ -1290,17 +1290,27 @@ int insertCodeBatch(List<ReddemCode > reddemCodeList);
 | 大于等于 |      a>=b    a &gt;= b    a <![CDATA[>= ]]>b      |
 |  不等于  | a!=b    a <![CDATA[ <> ]]>b    a <![CDATA[!= ]]>b |
 
-### SpringBoot中Mybatis打印sql
+### X.4.SpringBoot中Mybatis打印sql
 
 如果使用的是application.properties文件，加入如下配置：
-        logging.level.com.example.demo.dao=debug
-        logging.level.com，后面的路径指的是mybatis对应的方法接口所在的包。并不是mapper.xml所在的包。
-        如果使用的是application.yml文件，加入如下配置：
+
+```
+logging.level.com.example.demo.dao=debug
+```
+
+`logging.level.com`，后面的路径指的是mybatis对应的方法接口所在的包。并不是 `mapper.xml` 所在的包。
+
+ 如果使用的是 `application.yml` 文件，加入如下配置：
+
+```
         logging:
           level:
              com.example.demo.dao : debug
+```
 
-### 返回自增Id
+
+
+### X.5.返回自增Id
 
 Mapper 接口：
 
@@ -1315,7 +1325,7 @@ Mapper xml：
 </insert>
 ```
 
-### 非自增主键返回
+### X.6.非自增主键返回
 
 ```
 <mapper namespace="com.itpsc.mapper.UserMapper" >
@@ -1328,4 +1338,3 @@ Mapper xml：
 </mapper>
 ```
 
-## 
