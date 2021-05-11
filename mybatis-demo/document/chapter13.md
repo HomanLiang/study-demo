@@ -17,8 +17,6 @@
 5. 数据库连接的获取与管理
 6. 查询结果的处理，以及延迟加载等
 
-如果大家能掌握上面的技术点，那么对 MyBatis 的原理将会有很深入的理解。若将以上技术点一一展开分析，会导致文章篇幅很大，因此我打算将以上知识点分成数篇文章进行分析。本篇文章将分析以上列表中的第1个、第2个以及第6个技术点，其他技术点将会在随后的文章中进行分析。好了，其他的就不多说了，下面开始我们的源码分析之旅。
-
 ### 1.2.SQL 执行过程分析
 
 #### 1.2.1 SQL 执行入口分析
@@ -65,7 +63,7 @@ public <T> T getMapper(Class<T> type, SqlSession sqlSession) {
 }
 ```
 
-如上，经过连续的调用，Mapper 接口代理对象的创建逻辑初现端倪。如果没看过我前面的分析文章，大家可能不知道 knownMappers 集合中的元素是何时存入的。这里再说一遍吧，MyBatis 在解析配置文件的 <mappers> 节点的过程中，会调用 MapperRegistry 的 addMapper 方法将 Class 到 MapperProxyFactory 对象的映射关系存入到 knownMappers。具体的代码就不分析了，大家可以阅读我之前写的文章，或者自行分析相关的代码。
+如上，经过连续的调用，Mapper 接口代理对象的创建逻辑初现端倪。如果没看过我前面的分析文章，大家可能不知道 knownMappers 集合中的元素是何时存入的。这里再说一遍吧，MyBatis 在解析配置文件的 `<mappers>` 节点的过程中，会调用 MapperRegistry 的 addMapper 方法将 Class 到 MapperProxyFactory 对象的映射关系存入到 knownMappers。具体的代码就不分析了，大家可以阅读我之前写的文章，或者自行分析相关的代码。
 
 在获取到 MapperProxyFactory 对象后，即可调用工厂方法为 Mapper 接口生成代理对象了。相关逻辑如下：
 
@@ -459,15 +457,15 @@ public Object getNamedParams(Object[] args) {
 }
 ```
 
-如上，convertArgsToSqlCommandParam 是一个空壳方法，该方法最终调用了 ParamNameResolver 的 getNamedParams 方法。getNamedParams 方法的主要逻辑是根据条件返回不同的结果，该方法的代码不是很难理解，我也进行了比较详细的注释，就不多说了。
+如上，`convertArgsToSqlCommandParam` 是一个空壳方法，该方法最终调用了 `ParamNameResolver` 的 `getNamedParams` 方法。getNamedParams 方法的主要逻辑是根据条件返回不同的结果，该方法的代码不是很难理解，我也进行了比较详细的注释，就不多说了。
 
-分析完 convertArgsToSqlCommandParam 的逻辑，接下来说说 MyBatis 对哪些 SQL 指令提供了支持，如下：
+分析完 `convertArgsToSqlCommandParam` 的逻辑，接下来说说 MyBatis 对哪些 SQL 指令提供了支持，如下：
 
-- 查询语句：SELECT
-- 更新语句：INSERT/UPDATE/DELETE
-- 存储过程：CALL
+- 查询语句：`SELECT`
+- 更新语句：`INSERT/UPDATE/DELETE`
+- 存储过程：`CALL`
 
-在上面的列表中，我刻意对 SELECT/INSERT/UPDATE/DELETE 等指令进行了分类，分类依据指令的功能以及 MyBatis 执行这些指令的过程。这里把 SELECT 称为查询语句，INSERT/UPDATE/DELETE 等称为更新语句。接下来，先来分析查询语句的执行过程。
+在上面的列表中，我刻意对 `SELECT/INSERT/UPDATE/DELETE` 等指令进行了分类，分类依据指令的功能以及 MyBatis 执行这些指令的过程。这里把 `SELECT` 称为查询语句，`INSERT/UPDATE/DELETE` 等称为更新语句。接下来，先来分析查询语句的执行过程。
 
 #### 1.2.2 查询语句的执行过程分析
 
@@ -478,7 +476,7 @@ public Object getNamedParams(Object[] args) {
 - executeForMap
 - executeForCursor
 
-这些方法在内部调用了 SqlSession 中的一些 select* 方法，比如 selectList、selectMap、selectCursor 等。这些方法的返回值类型是不同的，因此对于每种返回类型，需要有专门的处理方法。以 selectList 方法为例，该方法的返回值类型为 List。但如果我们的 Mapper 或 Dao 的接口方法返回值类型为数组，或者 Set，直接将 List 类型的结果返回给 Mapper/Dao 就不合适了。execute* 等方法只是对 select* 等方法做了一层简单的封装，因此接下来我们应该把目光放在这些 select* 方法上。下面我们来分析一下 selectOne 方法的源码，如下：
+这些方法在内部调用了 SqlSession 中的一些 `select*` 方法，比如 `selectList`、`selectMap`、`selectCursor` 等。这些方法的返回值类型是不同的，因此对于每种返回类型，需要有专门的处理方法。以 selectList 方法为例，该方法的返回值类型为 List。但如果我们的 Mapper 或 Dao 的接口方法返回值类型为数组，或者 Set，直接将 List 类型的结果返回给 `Mapper/Dao` 就不合适了。`execute*` 等方法只是对 `select*` 等方法做了一层简单的封装，因此接下来我们应该把目光放在这些 `select*` 方法上。下面我们来分析一下 selectOne 方法的源码，如下：
 
 ##### 1.2.2.1 selectOne 方法分析
 
@@ -680,7 +678,7 @@ public <E> List<E> query(Statement statement, ResultHandler resultHandler) throw
 
 ##### 1.2.2.2 获取 BoundSql
 
-我们在执行 SQL 时，一个重要的任务是将 SQL 语句解析出来。我们都知道 SQL 是配置在映射文件中的，但由于映射文件中的 SQL 可能会包含占位符 #{}，以及动态 SQL 标签，比如 `<if>`、`<where>` 等。因此，我们并不能直接使用映射文件中配置的 SQL。MyBatis 会将映射文件中的 SQL 解析成一组 SQL 片段。如果某个片段中也包含动态 SQL 相关的标签，那么，MyBatis 会对该片段再次进行分片。最终，一个 SQL 配置将会被解析成一个 SQL 片段树。形如下面的图片：
+我们在执行 SQL 时，一个重要的任务是将 SQL 语句解析出来。我们都知道 SQL 是配置在映射文件中的，但由于映射文件中的 SQL 可能会包含占位符 `#{}`，以及动态 SQL 标签，比如 `<if>`、`<where>` 等。因此，我们并不能直接使用映射文件中配置的 SQL。MyBatis 会将映射文件中的 SQL 解析成一组 SQL 片段。如果某个片段中也包含动态 SQL 相关的标签，那么，MyBatis 会对该片段再次进行分片。最终，一个 SQL 配置将会被解析成一个 SQL 片段树。形如下面的图片：
 
 ![2dbilxkhxu](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mybatis-demo/20210407231926.jpeg)
 
@@ -738,7 +736,9 @@ public BoundSql getBoundSql(Object parameterObject) {
 - ProviderSqlSource
 - VelocitySqlSource
 
-在如上几个实现类中，我们应该选择分析哪个实现类的逻辑呢？如果大家分析过 MyBatis 映射文件的解析过程，或者阅读过我上一篇的关于[MyBatis 映射文件分析](http://www.coolblog.xyz/2018/07/30/MyBatis-源码分析-映射文件解析过程/)的文章，那么这个问题不难回答。好了，不卖关子了，我来回答一下这个问题吧。首先我们把最后两个排除掉，不常用。剩下的三个实现类中，仅前两个实现类会在映射文件解析的过程中被使用。当 SQL 配置中包含 `${}`（不是 #{}）占位符，或者包含 `<if>`、`<where>` 等标签时，会被认为是动态 SQL，此时使用 DynamicSqlSource 存储 SQL 片段。否则，使用 RawSqlSource 存储 SQL 配置信息。相比之下 DynamicSqlSource 存储的 SQL 片段类型较多，解析起来也更为复杂一些。因此下面我将分析 DynamicSqlSource 的 getBoundSql 方法。弄懂这个，RawSqlSource 也不在话下。好了，下面开始分析。
+在如上几个实现类中，我们应该选择分析哪个实现类的逻辑呢？
+
+首先我们把最后两个排除掉，不常用。剩下的三个实现类中，仅前两个实现类会在映射文件解析的过程中被使用。当 SQL 配置中包含 `${}`（不是 `#{}`）占位符，或者包含 `<if>`、`<where>` 等标签时，会被认为是动态 SQL，此时使用 DynamicSqlSource 存储 SQL 片段。否则，使用 RawSqlSource 存储 SQL 配置信息。相比之下 DynamicSqlSource 存储的 SQL 片段类型较多，解析起来也更为复杂一些。因此下面我将分析 DynamicSqlSource 的 getBoundSql 方法。弄懂这个，RawSqlSource 也不在话下。好了，下面开始分析。
 
 ```javascript
 // -☆- DynamicSqlSource
@@ -855,11 +855,11 @@ public String getSql() {
 
 ###### 1.2.2.2.2 解析 SQL 片段
 
-对于一个包含了 ${} 占位符，或 <if>、<where> 等标签的 SQL，在解析的过程中，会被分解成多个片段。每个片段都有对应的类型，每种类型的片段都有不同的解析逻辑。在源码中，片段这个概念等价于 sql 节点，即 SqlNode。SqlNode 是一个接口，它有众多的实现类。其继承体系如下：
+对于一个包含了 `${}` 占位符，或 `<if>`、`<where>` 等标签的 SQL，在解析的过程中，会被分解成多个片段。每个片段都有对应的类型，每种类型的片段都有不同的解析逻辑。在源码中，片段这个概念等价于 sql 节点，即 SqlNode。SqlNode 是一个接口，它有众多的实现类。其继承体系如下：
 
 ![cnpapii4zu](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mybatis-demo/20210407232034.jpeg)
 
-上图只画出了部分的实现类，还有一小部分没画出来，不过这并不影响接下来的分析。在众多实现类中，StaticTextSqlNode 用于存储静态文本，TextSqlNode 用于存储带有 ${} 占位符的文本，IfSqlNode 则用于存储 <if> 节点的内容。MixedSqlNode 内部维护了一个 SqlNode 集合，用于存储各种各样的 SqlNode。接下来，我将会对 MixedSqlNode 、StaticTextSqlNode、TextSqlNode、IfSqlNode、WhereSqlNode 以及 TrimSqlNode 等进行分析，其他的实现类请大家自行分析。Talk is cheap，show you the code.
+上图只画出了部分的实现类，还有一小部分没画出来，不过这并不影响接下来的分析。在众多实现类中，StaticTextSqlNode 用于存储静态文本，TextSqlNode 用于存储带有 `${}` 占位符的文本，IfSqlNode 则用于存储 `<if>` 节点的内容。MixedSqlNode 内部维护了一个 SqlNode 集合，用于存储各种各样的 SqlNode。接下来，我将会对 MixedSqlNode 、StaticTextSqlNode、TextSqlNode、IfSqlNode、WhereSqlNode 以及 TrimSqlNode 等进行分析，其他的实现类请大家自行分析。Talk is cheap，show you the code.
 
 ```javascript
 public class MixedSqlNode implements SqlNode {
@@ -951,7 +951,7 @@ public class TextSqlNode implements SqlNode {
 }
 ```
 
-如上，GenericTokenParser 是一个通用的标记解析器，用于解析形如 ${xxx}，#{xxx} 等标记。GenericTokenParser 负责将标记中的内容抽取出来，并将标记内容交给相应的 TokenHandler 去处理。BindingTokenParser 负责解析标记内容，并将解析结果返回给 GenericTokenParser，用于替换 ${xxx} 标记。举个例子说明一下吧，如下。
+如上，GenericTokenParser 是一个通用的标记解析器，用于解析形如 `${xxx}`，`#{xxx}` 等标记。GenericTokenParser 负责将标记中的内容抽取出来，并将标记内容交给相应的 TokenHandler 去处理。BindingTokenParser 负责解析标记内容，并将解析结果返回给 GenericTokenParser，用于替换 `${xxx}` 标记。举个例子说明一下吧，如下。
 
 我们有这样一个 SQL 语句，用于从 article 表中查询某个作者所写的文章。如下：
 
@@ -1001,7 +1001,7 @@ public class IfSqlNode implements SqlNode {
 }
 ```
 
-IfSqlNode 对应的是 <if test='xxx'> 节点，<if> 节点是日常开发中使用频次比较高的一个节点。它的具体用法我想大家都很熟悉了，这里就不多啰嗦。IfSqlNode 的 apply 方法逻辑并不复杂，首先是通过 ONGL 检测 test 表达式是否为 true，如果为 true，则调用其他节点的 apply 方法继续进行解析。需要注意的是 <if> 节点中也可嵌套其他的动态节点，并非只有纯文本。因此 contents 变量遍历指向的是 MixedSqlNode，而非 StaticTextSqlNode。
+IfSqlNode 对应的是 `<if test='xxx'>` 节点，`<if>` 节点是日常开发中使用频次比较高的一个节点。它的具体用法我想大家都很熟悉了，这里就不多啰嗦。IfSqlNode 的 apply 方法逻辑并不复杂，首先是通过 ONGL 检测 test 表达式是否为 true，如果为 true，则调用其他节点的 apply 方法继续进行解析。需要注意的是 `<if>` 节点中也可嵌套其他的动态节点，并非只有纯文本。因此 contents 变量遍历指向的是 MixedSqlNode，而非 StaticTextSqlNode。
 
 关于 IfSqlNode 就说到这，接下来分析 WhereSqlNode 的实现。
 
@@ -1018,7 +1018,7 @@ public class WhereSqlNode extends TrimSqlNode {
 }
 ```
 
-在 MyBatis 中，WhereSqlNode 和 SetSqlNode 都是基于 TrimSqlNode 实现的，所以上面的代码看起来很简单。WhereSqlNode 对应于 <where> 节点，关于该节点的用法以及它的应用场景，大家请自行查阅资料。我在分析源码的过程中，默认大家已经知道了该节点的用途和应用场景。
+在 MyBatis 中，WhereSqlNode 和 SetSqlNode 都是基于 TrimSqlNode 实现的，所以上面的代码看起来很简单。WhereSqlNode 对应于 `<where>` 节点，关于该节点的用法以及它的应用场景，大家请自行查阅资料。我在分析源码的过程中，默认大家已经知道了该节点的用途和应用场景。
 
 接下来，我们把目光聚焦在 TrimSqlNode 的实现上。
 
@@ -1126,7 +1126,7 @@ public class SqlNodeTest {
 
 ###### 1.2.2.2.3 解析 #{} 占位符
 
-经过前面的解析，我们已经能从 DynamicContext 获取到完整的 SQL 语句了。但这并不意味着解析过程就结束了，因为当前的 SQL 语句中还有一种占位符没有处理，即 #{}。与 ${} 占位符的处理方式不同，MyBatis 并不会直接将 #{} 占位符替换为相应的参数值。#{} 占位符的解析逻辑这里先不多说，等相应的源码分析完了，答案就明了了。
+经过前面的解析，我们已经能从 DynamicContext 获取到完整的 SQL 语句了。但这并不意味着解析过程就结束了，因为当前的 SQL 语句中还有一种占位符没有处理，即 `#{}`。与 `${}` 占位符的处理方式不同，MyBatis 并不会直接将 `#{}` 占位符替换为相应的参数值。`#{} `占位符的解析逻辑这里先不多说，等相应的源码分析完了，答案就明了了。
 
 \#{} 占位符的解析逻辑是包含在 SqlSourceBuilder 的 parse 方法中，该方法最终会将解析后的 SQL 以及其他的一些数据封装到 StaticSqlSource 中。下面，一起来看一下 SqlSourceBuilder 的 parse 方法。
 
@@ -1293,7 +1293,7 @@ public class Author {
 
 ![20hbcxr125](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mybatis-demo/20210407232446.jpeg)
 
-正如测试结果所示，SQL 中的 #{age, ...} 占位符被替换成了问号 ?。#{age, ...} 也被解析成了一个 ParameterMapping 对象。
+正如测试结果所示，SQL 中的 `#{age, ...}` 占位符被替换成了问号 ?。`#{age, ...}` 也被解析成了一个 ParameterMapping 对象。
 
 本节的最后，我们再来看一下 StaticSqlSource 的创建过程。如下：
 
@@ -1521,7 +1521,7 @@ public class DefaultParameterHandler implements ParameterHandler {
 }
 ```
 
-如上代码，分割线以上的大段代码用于获取 #{xxx} 占位符属性所对应的运行时参数。分割线以下的代码则是获取 #{xxx} 占位符属性对应的 TypeHandler，并在最后通过 TypeHandler 将运行时参数值设置到 PreparedStatement 中。关于 TypeHandler 的用途，我在本系列文章的[导读](http://www.coolblog.xyz/2018/07/16/MyBatis-源码分析系列文章导读/)一文介绍过，这里就不赘述了。大家若不熟悉，可以去看看。
+如上代码，分割线以上的大段代码用于获取 `#{xxx}` 占位符属性所对应的运行时参数。分割线以下的代码则是获取 `#{xxx}` 占位符属性对应的 TypeHandler，并在最后通过 TypeHandler 将运行时参数值设置到 PreparedStatement 中。
 
 ##### 1.2.2.5 #{} 占位符的解析与参数的设置过程梳理
 
@@ -1581,7 +1581,7 @@ findByNameAndAge("tianxiaobo", 20)    // 20岁，好年轻啊，但是回不去�
 }
 ```
 
-下一步，我们要将运行时参数设置到 SQL 中。由于原 SQL 经过解析后，占位符信息已经被擦除掉了，我们无法直接将运行时参数 SQL 中。不过好在，这些占位符信息被记录在了 ParameterMapping 中了，MyBatis 会将 ParameterMapping 会按照 #{} 的解析顺序存入到 List 中。这样我们通过 ParameterMapping 在列表中的位置确定它与 SQL 中的哪个 `?` 占位符相关联。同时通过 ParameterMapping 中的 property 字段，我们到“参数名与参数值”映射表中查找具体的参数值。这样，我们就可以将参数值准确的设置到 SQL 中了，此时 SQL 如下：
+下一步，我们要将运行时参数设置到 SQL 中。由于原 SQL 经过解析后，占位符信息已经被擦除掉了，我们无法直接将运行时参数 SQL 中。不过好在，这些占位符信息被记录在了 ParameterMapping 中了，MyBatis 会将 ParameterMapping 会按照 `#{}` 的解析顺序存入到 List 中。这样我们通过 ParameterMapping 在列表中的位置确定它与 SQL 中的哪个 `?` 占位符相关联。同时通过 ParameterMapping 中的 property 字段，我们到“参数名与参数值”映射表中查找具体的参数值。这样，我们就可以将参数值准确的设置到 SQL 中了，此时 SQL 如下：
 
 ```javascript
 SELECT * FROM Author WHERE name = "tianxiaobo" AND age = 20
@@ -1702,7 +1702,7 @@ public void handleRowValues(ResultSetWrapper rsw, ResultMap resultMap, ResultHan
 }
 ```
 
-如上，handleRowValues 方法中针对两种映射方式进行了处理。一种是嵌套映射，另一种是简单映射。本文所说的嵌套查询是指 <ResultMap> 中嵌套了一个 <ResultMap> ，关于此种映射的处理方式本文就不进行分析了。下面我将详细分析简单映射的处理逻辑，如下：
+如上，handleRowValues 方法中针对两种映射方式进行了处理。一种是嵌套映射，另一种是简单映射。本文所说的嵌套查询是指 `<ResultMap>` 中嵌套了一个 `<ResultMap>` ，关于此种映射的处理方式本文就不进行分析了。下面我将详细分析简单映射的处理逻辑，如下：
 
 ```javascript
 private void handleRowValuesForSimpleResultMap(ResultSetWrapper rsw, ResultMap resultMap,
@@ -1782,7 +1782,7 @@ private Object getRowValue(ResultSetWrapper rsw, ResultMap resultMap) throws SQL
 
 1. 创建实体类对象
 2. 检测结果集是否需要自动映射，若需要则进行自动映射
-3. 按 <resultMap> 中配置的映射关系进行映射
+3. 按 `<resultMap>` 中配置的映射关系进行映射
 
 这三处代码的逻辑比较复杂，接下来按顺序进行分节说明。首先分析实体类的创建过程。
 
@@ -1822,7 +1822,7 @@ private Object createResultObject(ResultSetWrapper rsw, ResultMap resultMap, Res
 }
 ```
 
-如上，创建实体类对象的过程被封装在了 createResultObject 的重载方法中了，关于该方法，待会再分析。创建完实体类对后，还需要对 <resultMap> 中配置的映射信息进行检测。若发现有关联查询，且关联查询结果的加载方式为延迟加载，此时需为实体类生成代理类。举个例子说明一下，假设有如下两个实体类：
+如上，创建实体类对象的过程被封装在了 createResultObject 的重载方法中了，关于该方法，待会再分析。创建完实体类对后，还需要对 `<resultMap>` 中配置的映射信息进行检测。若发现有关联查询，且关联查询结果的加载方式为延迟加载，此时需为实体类生成代理类。举个例子说明一下，假设有如下两个实体类：
 
 ```javascript
 /** 作者类 */
@@ -1847,7 +1847,7 @@ public class Article {
 }
 ```
 
-如上，Article 对象中的数据由一条 SQL 从 article 表中查询。Article 类有一个 author 字段，该字段的数据由另一条 SQL 从 author 表中查出。我们在将 article 表的查询结果填充到 Article 类对象中时，并不希望 MyBaits 立即执行另一条 SQL 查询 author 字段对应的数据。而是期望在我们调用 article.getAuthor() 方法时，MyBaits 再执行另一条 SQL 从 author 表中查询出所需的数据。若如此，我们需要改造 getAuthor 方法，以保证调用该方法时可让 MyBaits 执行相关的 SQL。关于延迟加载后面将会进行详细的分析，这里先说这么多。下面分析 createResultObject 重载方法的逻辑，如下:
+如上，Article 对象中的数据由一条 SQL 从 article 表中查询。Article 类有一个 author 字段，该字段的数据由另一条 SQL 从 author 表中查出。我们在将 article 表的查询结果填充到 Article 类对象中时，并不希望 MyBaits 立即执行另一条 SQL 查询 author 字段对应的数据。而是期望在我们调用 `article.getAuthor()` 方法时，MyBaits 再执行另一条 SQL 从 author 表中查询出所需的数据。若如此，我们需要改造 getAuthor 方法，以保证调用该方法时可让 MyBaits 执行相关的 SQL。关于延迟加载后面将会进行详细的分析，这里先说这么多。下面分析 createResultObject 重载方法的逻辑，如下:
 
 ```javascript
 private Object createResultObject(ResultSetWrapper rsw, ResultMap resultMap, List<Class<?>> constructorArgTypes, List<Object> constructorArgs, String columnPrefix) throws SQLException {
@@ -1891,7 +1891,7 @@ private Object createResultObject(ResultSetWrapper rsw, ResultMap resultMap, Lis
 - `PARTIAL` - 将自动映射结果除了那些有内部定义内嵌结果映射的(joins)
 - `FULL` - 自动映射所有
 
-除了以上三种等级，我们还可以显示配置 <resultMap> 节点的 autoMapping 属性，以启用或者禁用指定 ResultMap 的自定映射设定。下面，来看一下自动映射相关的逻辑。
+除了以上三种等级，我们还可以显示配置 `<resultMap>` 节点的 autoMapping 属性，以启用或者禁用指定 ResultMap 的自定映射设定。下面，来看一下自动映射相关的逻辑。
 
 ```javascript
 private boolean shouldApplyAutomaticMappings(ResultMap resultMap, boolean isNested) {
@@ -1911,7 +1911,7 @@ private boolean shouldApplyAutomaticMappings(ResultMap resultMap, boolean isNest
 }
 ```
 
-如上，shouldApplyAutomaticMappings 方法用于检测是否应为当前结果集应用自动映射。检测结果取决于 <resultMap> 节点的 autoMapping 属性，以及全局自动映射行为。上面代码的逻辑不难理解，就不多说了。接下来分析 MyBatis 如何进行自动映射。
+如上，shouldApplyAutomaticMappings 方法用于检测是否应为当前结果集应用自动映射。检测结果取决于 `<resultMap>` 节点的 autoMapping 属性，以及全局自动映射行为。上面代码的逻辑不难理解，就不多说了。接下来分析 MyBatis 如何进行自动映射。
 
 ```javascript
 private boolean applyAutomaticMappings(ResultSetWrapper rsw, ResultMap resultMap, MetaObject metaObject, String columnPrefix) throws SQLException {
@@ -1938,7 +1938,7 @@ private boolean applyAutomaticMappings(ResultSetWrapper rsw, ResultMap resultMap
 
 applyAutomaticMappings 方法的代码不多，逻辑也不是很复杂。首先是获取 UnMappedColumnAutoMapping 集合，然后遍历该集合，并通过 TypeHandler 从结果集中获取数据，最后再将获取到的数据设置到实体类对象中。虽然逻辑上看起来没什么复杂的东西，但如果不清楚 UnMappedColumnAutoMapping 的用途，是无法理解上面代码的逻辑的。所以下面简单介绍一下 UnMappedColumnAutoMapping 的用途。
 
-UnMappedColumnAutoMapping 用于记录未配置在 <resultMap> 节点中的映射关系。该类定义在 DefaultResultSetHandler 内部，它的代码如下：
+UnMappedColumnAutoMapping 用于记录未配置在 `<resultMap>` 节点中的映射关系。该类定义在 DefaultResultSetHandler 内部，它的代码如下：
 
 ```javascript
 private static class UnMappedColumnAutoMapping {
@@ -2021,7 +2021,7 @@ private List<UnMappedColumnAutoMapping> createAutomaticMappings(ResultSetWrapper
 
 上面的代码有点多，不过不用太担心，耐心看一下，还是可以看懂的。下面我来总结一下这个方法的逻辑。
 
-1. 从 ResultSetWrapper 中获取未配置在 <resultMap> 中的列名
+1. 从 ResultSetWrapper 中获取未配置在 `<resultMap>` 中的列名
 2. 遍历上一步获取到的列名列表
 3. 若列名包含列名前缀，则移除列名前缀，得到属性名
 4. 将下划线形式的列名转成驼峰式
@@ -2070,11 +2070,11 @@ private void loadMappedAndUnmappedColumnNames(ResultMap resultMap, String column
 }
 ```
 
-如上，已映射列名与未映射列名的分拣逻辑并不复杂。我简述一下这个逻辑，首先是从当前数据集中获取列名集合，然后获取 <resultMap> 中配置的列名集合。之后遍历数据集中的列名集合，并判断列名是否被配置在了 <resultMap> 节点中。若配置了，则表明该列名已有映射关系，此时该列名存入 mappedColumnNames 中。若未配置，则表明列名未与实体类的某个字段形成映射关系，此时该列名存入 unmappedColumnNames 中。这样，列名的分拣工作就完成了。分拣过程示意图如下：
+如上，已映射列名与未映射列名的分拣逻辑并不复杂。我简述一下这个逻辑，首先是从当前数据集中获取列名集合，然后获取 `<resultMap>` 中配置的列名集合。之后遍历数据集中的列名集合，并判断列名是否被配置在了 `<resultMap>` 节点中。若配置了，则表明该列名已有映射关系，此时该列名存入 mappedColumnNames 中。若未配置，则表明列名未与实体类的某个字段形成映射关系，此时该列名存入 unmappedColumnNames 中。这样，列名的分拣工作就完成了。分拣过程示意图如下：
 
 ![mcd9k2oucs](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mybatis-demo/20210407232735.jpeg)
 
-如上图所示，实体类 Author 的 id 和 name 字段与列名 id 和 name 被配置在了 <resultMap> 中，它们之间形成了映射关系。列名 age、sex 和 email 未配置在 <resultMap> 中，因此未与 Author 中的字段形成映射，所以他们最终都被放入了 unMappedColumnNames 集合中。弄懂了未映射列名获取的过程，自动映射的代码逻辑就不难懂了。好了，关于自动映射的分析就先到这，接下来分析一下 MyBatis 是如何将结果集中的数据填充到已映射的实体类字段中的。
+如上图所示，实体类 Author 的 id 和 name 字段与列名 id 和 name 被配置在了 `<resultMap>` 中，它们之间形成了映射关系。列名 age、sex 和 email 未配置在 `<resultMap>` 中，因此未与 Author 中的字段形成映射，所以他们最终都被放入了 unMappedColumnNames 集合中。弄懂了未映射列名获取的过程，自动映射的代码逻辑就不难懂了。好了，关于自动映射的分析就先到这，接下来分析一下 MyBatis 是如何将结果集中的数据填充到已映射的实体类字段中的。
 
 ```javascript
 // -☆- DefaultResultSetHandler
@@ -2152,7 +2152,7 @@ private Object getPropertyMappingValue(ResultSet rs, MetaObject metaResultObject
 
 ###### 1.2.2.6.3 关联查询与延迟加载
 
-我们在学习 MyBatis 框架时，会经常碰到一对一，一对多的使用场景。对于这样的场景，通常我们可以用一条 SQL 进行多表查询完成任务。当然我们也可以使用关联查询，将一条 SQL 拆成两条去完成查询任务。MyBatis 提供了两个标签用于支持一对一和一对多的使用场景，分别是 <association> 和 <collection>。下面我来演示一下如何使用 <association> 完成一对一的关联查询。先来看看实体类的定义：
+我们在学习 MyBatis 框架时，会经常碰到一对一，一对多的使用场景。对于这样的场景，通常我们可以用一条 SQL 进行多表查询完成任务。当然我们也可以使用关联查询，将一条 SQL 拆成两条去完成查询任务。MyBatis 提供了两个标签用于支持一对一和一对多的使用场景，分别是 `<association>` 和 `<collection>`。下面我来演示一下如何使用 `<association>` 完成一对一的关联查询。先来看看实体类的定义：
 
 ```javascript
 /** 作者类 */
@@ -2984,8 +2984,6 @@ private Object rowCountResult(int rowCount) {
 
 在 MyBatis 中，SQL 执行过程的实现代码是有层次的，每层都有相应的功能。比如，SqlSession 是对外接口的接口，因此它提供了各种语义清晰的方法，供使用者调用。Executor 层做的事情较多，比如一二级缓存功能就是嵌入在该层内的。StatementHandler 层主要是与 JDBC 层面的接口打交道。至于 ParameterHandler 和 ResultSetHandler，一个负责向 SQL 中设置运行时参数，另一个负责处理 SQL 执行结果，它们俩可以看做是 StatementHandler 辅助类。最后看一下右边横跨数层的类，Configuration 是一个全局配置类，很多地方都依赖它。MappedStatement 对应 SQL 配置，包含了 SQL 配置的相关信息。BoundSql 中包含了已完成解析的 SQL 语句，以及运行时参数等。
 
-到此，关于 SQL 的执行过程就分析完了。内容比较多，希望大家耐心阅读。
-
 ### 1.3. 总结
 
-到这里，本文就接近尾声了。本篇文章从本月的1号开始写，一直到16号才写完初稿。内容之多，完全超出我事先的预计。尽管本文篇幅很大，但仍有部分逻辑和细节没有分析到，比如 SelectKeyGenerator。对于这些内容，如果大家能耐心看完本文，并且仔细分析了 MyBatis 执行 SQL 的相关源码，那么对 MyBatis 的原理会有很深的理解。深入理解 MyBatis，对日常工作也会产生积极的影响。比如我现在就以随心所欲的写 SQL 映射文件，把不合理的配置统统删掉。如果遇到 MyBatis 层面的异常，也不用担心无法解决了。
+尽管本文篇幅很大，但仍有部分逻辑和细节没有分析到，比如 SelectKeyGenerator。对于这些内容，如果大家能耐心看完本文，并且仔细分析了 MyBatis 执行 SQL 的相关源码，那么对 MyBatis 的原理会有很深的理解。深入理解 MyBatis，对日常工作也会产生积极的影响。比如我现在就以随心所欲的写 SQL 映射文件，把不合理的配置统统删掉。如果遇到 MyBatis 层面的异常，也不用担心无法解决了。

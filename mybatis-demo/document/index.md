@@ -13,7 +13,7 @@
 11. [MyBatis 应用](https://github.com/HomanLiang/study-demo/blob/main/mybatis-demo/document/chapter11.md)
 12. [MyBatis 增强](https://github.com/HomanLiang/study-demo/blob/main/mybatis-demo/document/chapter12.md)
 13. [MyBatis 源码](https://github.com/HomanLiang/study-demo/blob/main/mybatis-demo/document/chapter13.md)
-14. [MyBatis 面试题](https://github.com/HomanLiang/study-demo/blob/main/mybatis-demo/document/chapter14.md)
+14. [MyBatis 面试题](https://github.com/HomanLiang/study-demo/blob/main/mybatis-demo/document/chapterXX.md)
 
 
 

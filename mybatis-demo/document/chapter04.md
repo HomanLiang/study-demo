@@ -15,7 +15,7 @@
 - trim (where, set)
 - foreach
 
-## if
+## 1.if
 
 使用动态 SQL 最常见情景是根据条件包含 where 子句的一部分。比如：
 
@@ -49,11 +49,11 @@
 
 
 
-## choose、when、otherwise
+## 2.choose、when、otherwise
 
 有时候，我们不想使用所有的条件，而只是想从多个条件中选择一个使用。针对这种情况，MyBatis 提供了 choose 元素，它有点像 Java 中的 switch 语句。
 
-还是上面的例子，但是策略变为：传入了 “title” 就按 “title” 查找，传入了 “author” 就按 “author” 查找的情形。若两者都没有传入，就返回标记为 featured 的 BLOG（这可能是管理员认为，与其返回大量的无意义随机 Blog，还不如返回一些由管理员精选的 Blog）。
+还是上面的例子，但是策略变为：传入了 `title` 就按 `title` 查找，传入了 `author` 就按 `author` 查找的情形。若两者都没有传入，就返回标记为 featured 的 BLOG（这可能是管理员认为，与其返回大量的无意义随机 Blog，还不如返回一些由管理员精选的 Blog）。
 
 ```
 <select id="findActiveBlogLike"
@@ -75,9 +75,9 @@
 
 
 
-## trim、where、set
+## 3.trim、where、set
 
-前面几个例子已经方便地解决了一个臭名昭著的动态 SQL 问题。现在回到之前的 “if” 示例，这次我们将 “state = ‘ACTIVE’” 设置成动态条件，看看会发生什么。
+前面几个例子已经方便地解决了一个臭名昭著的动态 SQL 问题。现在回到之前的 `if` 示例，这次我们将 `state = ‘ACTIVE’` 设置成动态条件，看看会发生什么。
 
 ```
 <select id="findActiveBlogLike"
@@ -133,7 +133,7 @@ MyBatis 有一个简单且适合大多数场景的解决办法。而在其他场
 </select>
 ```
 
-*where* 元素只会在子元素返回任何内容的情况下才插入 “WHERE” 子句。而且，若子句的开头为 “AND” 或 “OR”，*where* 元素也会将它们去除。
+*where* 元素只会在子元素返回任何内容的情况下才插入 `WHERE` 子句。而且，若子句的开头为 `AND` 或 `OR`，*where* 元素也会将它们去除。
 
 如果 *where* 元素与你期望的不太一样，你也可以通过自定义 trim 元素来定制 *where* 元素的功能。比如，和 *where* 元素等价的自定义 trim 元素为：
 
@@ -172,7 +172,7 @@ MyBatis 有一个简单且适合大多数场景的解决办法。而在其他场
 
 注意，我们覆盖了后缀值设置，并且自定义了前缀值。
 
-## foreach
+## 4.foreach
 
 动态 SQL 的另一个常见使用场景是对集合进行遍历（尤其是在构建 IN 条件语句的时候）。比如：
 
@@ -194,7 +194,7 @@ MyBatis 有一个简单且适合大多数场景的解决办法。而在其他场
 
 至此，我们已经完成了与 XML 配置及映射文件相关的讨论。下一章将详细探讨 Java API，以便你能充分利用已经创建的映射配置。
 
-## script
+## 5.script
 
 要在带注解的映射器接口类中使用动态 SQL，可以使用 *script* 元素。比如:
 
@@ -212,7 +212,7 @@ MyBatis 有一个简单且适合大多数场景的解决办法。而在其他场
     void updateAuthorValues(Author author);
 ```
 
-## bind
+## 6.bind
 
 `bind` 元素允许你在 OGNL 表达式以外创建一个变量，并将其绑定到当前的上下文。比如：
 
@@ -226,9 +226,9 @@ MyBatis 有一个简单且适合大多数场景的解决办法。而在其他场
 
    
 
-## 多数据库支持
+## 7.多数据库支持
 
-如果配置了 databaseIdProvider，你就可以在动态代码中使用名为 “_databaseId” 的变量来为不同的数据库构建特定的语句。比如下面的例子：
+如果配置了 databaseIdProvider，你就可以在动态代码中使用名为 `_databaseId` 的变量来为不同的数据库构建特定的语句。比如下面的例子：
 
 ```
 <insert id="insert">
@@ -244,7 +244,9 @@ MyBatis 有一个简单且适合大多数场景的解决办法。而在其他场
 </insert>
 ```
 
-## 动态 SQL 中的插入脚本语言
+
+
+## 8.动态 SQL 中的插入脚本语言
 
 MyBatis 从 3.2 版本开始支持插入脚本语言，这允许你插入一种语言驱动，并基于这种语言来编写动态 SQL 查询语句。
 

@@ -8,21 +8,21 @@
 
 **前因**
 
-项目一直使用的是PageHelper实现分页功能，项目前期数据量较少一直没有什么问题。随着业务扩增，数据库扩增PageHelper出现了明显的性能问题。
+项目一直使用的是PageHelper实现分页功能，项目前期数据量较少一直没有什么问题。随着业务扩增，数据库扩增 `PageHelper` 出现了明显的性能问题。
 
-几十万甚至上百万的单表数据查询性能缓慢，需要几秒乃至十几秒的查询时间。故此特地研究了一下PageHelper源码，查找PageHelper分页的实现方式。
+几十万甚至上百万的单表数据查询性能缓慢，需要几秒乃至十几秒的查询时间。故此特地研究了一下 `PageHelper` 源码，查找`PageHelper` 分页的实现方式。
 
 一段较为简单的查询，跟随debug开始源码探寻之旅。
 
 ```
 public ResultContent select(Integer id) {
-        Page<Test> blogPage = PageHelper.startPage(1,3).doSelectPage( () -> testDao.select(id));
-        List<Test> test = (List<Test>)blogPage.getResult();
-        return new ResultContent(0, "success", test);
-    }
+	Page<Test> blogPage = PageHelper.startPage(1,3).doSelectPage( () -> testDao.select(id));
+    List<Test> test = (List<Test>)blogPage.getResult();
+    return new ResultContent(0, "success", test);
+}
 ```
 
-主要保存由前端传入的pageNum(页数)、pageSize(每页显示数量)和count(是否进行count(0)查询)信息。
+主要保存由前端传入的 `pageNum(页数)`、`pageSize(每页显示数量)` 和 `count(是否进行count(0)查询)` 信息。
 
 这里是简单的创建page并保存当前线程的变量副本心里，不做深究。
 
@@ -64,7 +64,7 @@ public <E> Page<E> doSelectPage(ISelect select) {
     }
 ```
 
-进入MapperProxy类执行invoke方法获取到方法名称及参数值
+进入MapperProxy类执行 `invoke` 方法获取到方法名称及参数值
 
 ```
 public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
@@ -319,8 +319,8 @@ spring.datasource.secondary.driver-class-name=com.mysql.cj.jdbc.Driver
 ```
 说明与注意：
 
-1. 多数据源配置的时候，与单数据源不同点在于spring.datasource之后多设置一个数据源名称primary和secondary来区分不同的数据源配置，这个前缀将在后续初始化数据源的时候用到。
-1. 数据源连接配置2.x和1.x的配置项是有区别的：2.x使用spring.datasource.secondary.jdbc-url，而1.x版本使用spring.datasource.secondary.url。如果你在配置的时候发生了这个报错java.lang.IllegalArgumentException: jdbcUrl is required with driverClassName.，那么就是这个配置项的问题。
+1. 多数据源配置的时候，与单数据源不同点在于 `spring.datasource` 之后多设置一个数据源名称 `primary` 和 `secondary` 来区分不同的数据源配置，这个前缀将在后续初始化数据源的时候用到。
+1. 数据源连接配置 `2.x` 和 `1.x` 的配置项是有区别的：`2.x` 使用 `spring.datasource.secondary.jdbc-url`，而 `1.x` 版本使用`spring.datasource.secondary.url`。如果你在配置的时候发生了这个报错 `java.lang.IllegalArgumentException: jdbcUrl is required with driverClassName.`，那么就是这个配置项的问题。
 1. 可以看到，不论使用哪一种数据访问框架，对于数据源的配置都是一样的。
 
 ### 2.2.初始化数据源与MyBatis配置
@@ -328,7 +328,8 @@ spring.datasource.secondary.driver-class-name=com.mysql.cj.jdbc.Driver
 
 这里我们继续将数据源与框架配置做拆分处理：
 
-1. 单独建一个多数据源的配置类，比如下面这样：
+2.2.1.单独建一个多数据源的配置类，比如下面这样：
+
 ```
 @Configuration
 public class DataSourceConfiguration {
@@ -348,10 +349,12 @@ public class DataSourceConfiguration {
 
 }
 ```
-可以看到内容跟JdbcTemplate、Spring Data JPA的时候是一模一样的。通过@ConfigurationProperties可以知道这两个数据源分别加载了spring.datasource.primary.*和spring.datasource.secondary.*的配置。@Primary注解指定了主数据源，就是当我们不特别指定哪个数据源的时候，就会使用这个Bean真正差异部分在下面的JPA配置上。
+可以看到内容跟 `JdbcTemplate`、`Spring Data JPA` 的时候是一模一样的。通过 `@ConfigurationProperties` 可以知道这两个数据源分别加载了 `spring.datasource.primary.*` 和 `spring.datasource.secondary.*` 的配置。`@Primary` 注解指定了主数据源，就是当我们不特别指定哪个数据源的时候，就会使用这个Bean真正差异部分在下面的JPA配置上。
 
-2. 分别创建两个数据源的MyBatis配置。
+2.2.2.分别创建两个数据源的MyBatis配置。
+
 Primary数据源的JPA配置：
+
 ```
 @Configuration
 @MapperScan(
@@ -411,13 +414,13 @@ public class SecondaryConfig {
 ```
 说明与注意：
 
-1. 配置类上使用@MapperScan注解来指定当前数据源下定义的Entity和Mapper的包路径；另外需要指定sqlSessionFactory和sqlSessionTemplate，这两个具体实现在该配置类中类中初始化。
-1. 配置类的构造函数中，通过@Qualifier注解来指定具体要用哪个数据源，其名字对应在DataSourceConfiguration配置类中的数据源定义的函数名。
-1. 配置类中定义SqlSessionFactory和SqlSessionTemplate的实现，注意具体使用的数据源正确（如果使用这里的演示代码，只要第二步没问题就不需要修改）。
+1. 配置类上使用 `@MapperScan` 注解来指定当前数据源下定义的Entity和Mapper的包路径；另外需要指定sqlSessionFactory和sqlSessionTemplate，这两个具体实现在该配置类中类中初始化。
+1. 配置类的构造函数中，通过 `@Qualifier` 注解来指定具体要用哪个数据源，其名字对应在 `DataSourceConfiguration` 配置类中的数据源定义的函数名。
+1. 配置类中定义 `SqlSessionFactory` 和 `SqlSessionTemplate` 的实现，注意具体使用的数据源正确（如果使用这里的演示代码，只要第二步没问题就不需要修改）。
 
 上一篇介绍JPA的时候，因为之前介绍JPA的使用时候，说过实体和Repository定义的方法，所以省略了 User 和 Repository的定义代码，但是还是有读者问怎么没有这个，其实都有说明，仓库代码里也都是有的。未避免再问这样的问题，所以这里就贴一下吧。
 
-根据上面Primary数据源的定义，在com.didispace.chapter39.p包下，定义Primary数据源要用的实体和数据访问对象，比如下面这样：
+根据上面Primary数据源的定义，在 `com.didispace.chapter39.p` 包下，定义Primary数据源要用的实体和数据访问对象，比如下面这样：
 ```
 @Data
 @NoArgsConstructor
@@ -447,7 +450,7 @@ public interface UserMapperPrimary {
 
 }
 ```
-根据上面Secondary数据源的定义，在com.didispace.chapter39.s包下，定义Secondary数据源要用的实体和数据访问对象，比如下面这样：
+根据上面Secondary数据源的定义，在 `com.didispace.chapter39.s` 包下，定义Secondary数据源要用的实体和数据访问对象，比如下面这样：
 ```
 @Data
 @NoArgsConstructor
@@ -540,7 +543,7 @@ public class Chapter39ApplicationTests {
 
 ### 3.1.远程排查
 
-通过 Grafana 发现程序运行时集群的资源使用率非常低。判断应用发来的压力较小，将并发数从 40 提高到 100，资源使用率和 QPS 指标几乎没有变化。通过 connection count 监控看到，随着并发数的增加，连接数也同样增加了，确认并发数的修改是生效的。但奇怪的是执行 show processlist 发现大部分连接是空闲状态。简单走查了程序代码，是 Spring batch + MyBatis 架构。因为 Spring batch 设置并发的方式很简单，所以考虑线程数的调整应该是生效且可以正常工作的。
+通过 Grafana 发现程序运行时集群的资源使用率非常低。判断应用发来的压力较小，将并发数从 40 提高到 100，资源使用率和 QPS 指标几乎没有变化。通过 `connection count` 监控看到，随着并发数的增加，连接数也同样增加了，确认并发数的修改是生效的。但奇怪的是执行 show processlist 发现大部分连接是空闲状态。简单走查了程序代码，是 `Spring batch + MyBatis` 架构。因为 `Spring batch` 设置并发的方式很简单，所以考虑线程数的调整应该是生效且可以正常工作的。
 
 虽然还没有搞清资源使用率低的问题，但还是有其他收获。应用服务器和 TiDB 集群的网络延迟达到了 2~3 ms。为了排除高网络延迟的干扰，将应用部署到 TiDB 集群内部运行，批处理耗时从 35 分钟下降到 27 分钟，但依然和 Oracle 有较大差距。因为数据库本身没有压力，所以当时的情况调整数据库参数也没什么意义。
 
@@ -603,9 +606,9 @@ public Reflector findForClass(Class<?> type) {
 }
 ```
 
-这里大致是这样，MyBatis 在进行参数处理、结果映射等操作时，会涉及大量的反射操作。Java 中的反射虽然功能强大，但是代码编写起来比较复杂且容易出错，为了简化反射操作的相关代码， MyBatis 提供了专门的反射模块，它对常见的反射操作做了进一步封装，提供了更加简洁方便的反射 API 。DefaultReflectorFactory 提供的 findForClass() 会为指定的 Class 创建 Reflector 对象，并将 Reflector 对象缓存到 reflectorMap 中，造成线程阻塞的就在对 reflectorMap 的操作上。
+这里大致是这样，MyBatis 在进行参数处理、结果映射等操作时，会涉及大量的反射操作。Java 中的反射虽然功能强大，但是代码编写起来比较复杂且容易出错，为了简化反射操作的相关代码， MyBatis 提供了专门的反射模块，它对常见的反射操作做了进一步封装，提供了更加简洁方便的反射 API 。DefaultReflectorFactory 提供的 `findForClass()` 会为指定的 Class 创建 Reflector 对象，并将 Reflector 对象缓存到 reflectorMap 中，造成线程阻塞的就在对 reflectorMap 的操作上。
 
-因为 MyBatis 支持对 ReflectorFactory 自定义实现，所以当时的思路是绕过缓存的步骤，也就是将 classCacheEnabled 设为 false，走 return new Reflector(type) 的逻辑。但依然会在其他调用 ConcurrentHashmap.computeIfAbsent 的地方被阻塞。
+因为 MyBatis 支持对 ReflectorFactory 自定义实现，所以当时的思路是绕过缓存的步骤，也就是将 `classCacheEnabled` 设为 false，走 `return new Reflector(type)` 的逻辑。但依然会在其他调用 `ConcurrentHashmap.computeIfAbsent` 的地方被阻塞。
 
 到这看起来是一个通用问题，于是将注意力放到 concurrentHashmap 的 computerIfAbsent 上。computerIfAbsent 是 JDK8 中 为 map 提供的新方法
 
@@ -613,7 +616,7 @@ public Reflector findForClass(Class<?> type) {
 public V computeIfAbsent(K key, Function<? super K,? extends V> mappingFunction)
 ```
 
-它首先判断缓存 map 中是否存在指定 key 的值，如果不存在，会自动调用 mappingFunction (key) 计算 key 的 value，然后将 key = value 放入到缓存 Map。ConcurrentHashMap 中重写了 computeIfAbsent 方法确保 mappingFunction 中的操作是线程安全的。
+它首先判断缓存 map 中是否存在指定 key 的值，如果不存在，会自动调用 `mappingFunction (key)` 计算 key 的 value，然后将 `key = value` 放入到缓存 Map。ConcurrentHashMap 中重写了 computeIfAbsent 方法确保 mappingFunction 中的操作是线程安全的。
 
 官方说明中一段：
 
@@ -633,9 +636,9 @@ public V computeIfAbsent(K key, Function<? super K,? extends V> mappingFunction)
 
 ### 3.4.当时的结论
 
-MyBatis 3.5.X 在缓存反射对象用到的 computerIfAbsent 方法在 JDK8 中性能不理想。需要升级 jdk9 及以上版本解决这个问题。对于 MyBatis 本身，没有针对 JDK8 中的 computerIfAbsent 性能问题进行特殊处理，所以升级 MyBatis 版本也不能解决问题。
+`MyBatis 3.5.X` 在缓存反射对象用到的 computerIfAbsent 方法在 JDK8 中性能不理想。需要升级 jdk9 及以上版本解决这个问题。对于 MyBatis 本身，没有针对 JDK8 中的 computerIfAbsent 性能问题进行特殊处理，所以升级 MyBatis 版本也不能解决问题。
 
-但可以降级（在 MyBatis 3.4.X 中，还没有引入这个函数，所以理论上可以规避这个问题。
+但可以降级（在 `MyBatis 3.4.X` 中，还没有引入这个函数，所以理论上可以规避这个问题。
 
 ```
 	@Override  

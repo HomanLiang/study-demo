@@ -58,7 +58,7 @@ public class Customer {
 }
 ```
 
-**注** getter与setter省略，可以使用lombok插件进行省略操作，可以的话，加上@Id与@Table两个注解
+**注** `getter` 与 `setter` 省略，可以使用 `lombok` 插件进行省略操作，可以的话，加上 `@Id` 与 `@Table` 两个注解
 
 ### 1.3.集成Mapper
 
@@ -118,15 +118,15 @@ mybatis.mapperLocations=classpath*:cn/base/mapper/*.xml
 
   实体类字段：驼峰式命名
 
-  数据库表字段：使用“_”区分各个单词
+  数据库表字段：使用 `_` 区分各个单词
 
-  用法：在@Column 注解的name 属性中指定目标字段的字段名
+  用法：在 `@Column` 注解的name 属性中指定目标字段的字段名
 
 - **@Id 注解**
 
-  通用Mapper 在执行xxxByPrimaryKey(key)方法时，有两种情况。
+  通用Mapper 在执行 `xxxByPrimaryKey(key)` 方法时，有两种情况。
 
-  情况1：没有使用@Id 注解明确指定主键字段
+  情况1：没有使用 `@Id` 注解明确指定主键字段
 
     ```
     SELECT emp_id,emp_name,emp_salary_apple,emp_age FROM tabple_emp WHERE emp_id = ?
@@ -357,7 +357,7 @@ public class MpConfig {
 
 ps：这里图丢了一个我重新补的一个数据，说明下意思，忽略ID与上面的不一致。
 
-而第二个再执行update的时候，where条件version=1，已经找不到了，因为version已经被上面的更新成了2，所以更新失败。
+而第二个再执行update的时候，where条件 `version=1`，已经找不到了，因为version已经被上面的更新成了2，所以更新失败。
 
 
 

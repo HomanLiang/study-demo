@@ -12,9 +12,9 @@
 
 - SqlSession：代表和数据库的一次会话，向用户提供了操作数据库的方法
 
-- MapperedStatement：代表要往数据库发送的要执行的指令，可以理解为sql的抽象表示
+- MapperedStatement：代表要往数据库发送的要执行的指令，可以理解为 sql 的抽象表示
 
-- Executor：用来和数据库交互的执行器，接收MapperedStatement作为参数
+- Executor：用来和数据库交互的执行器，接收 `MapperedStatement` 作为参数
 
 **1.2.一级缓存的介绍**
 
@@ -399,14 +399,14 @@ public boolean equals(Object object) {
 
 **1.5.一级缓存的生命周期是多长？**
 
-**开始：**mybatis建立一次数据库会话时，就会生成一系列对象：SqlSession--->Executor--->PerpetualCache,也就开启了对一级缓存的维护。
+**开始：**mybatis建立一次数据库会话时，就会生成一系列对象：`SqlSession--->Executor--->PerpetualCache`,也就开启了对一级缓存的维护。
 
 **结束：** 
 
 - 会话结束，会释放掉以上生成的一系列对象，缓存也就不可用了。
-- 调用sqlSession.close方法，会释放掉PerpetualCache对象，一级缓存不可用
-- 调用sqlSession.clearCache方法，会清空PerpetualCache对象中的缓存数据，该对象可用，一级缓存不可用
-- 调用sqlSession的update,insert，delete方法，会清空PerpetualCache对象中的缓存数据，该对象可用，一级缓存不可用
+- 调用 `sqlSession.close` 方法，会释放掉 `PerpetualCache` 对象，一级缓存不可用
+- 调用 `sqlSession.clearCache` 方法，会清空 `PerpetualCache` 对象中的缓存数据，该对象可用，一级缓存不可用
+- 调用 `sqlSession` 的 `update`, `insert`，`delete`方法，会清空 `PerpetualCache` 对象中的缓存数据，该对象可用，一级缓存不可用
 
 
 
@@ -418,7 +418,7 @@ MyBatis 一级缓存最大的共享范围就是一个SqlSession内部，那么�
 
 ![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mybatis-demo/20210407002039.png)
 
-当二级缓存开启后，同一个命名空间(namespace) 所有的操作语句，都影响着一个**共同的 cache**，也就是二级缓存被多个 SqlSession 共享，是一个**全局的变量**。当开启缓存后，数据的查询执行的流程就是 二级缓存 -> 一级缓存 -> 数据库。
+当二级缓存开启后，同一个命名空间(namespace) 所有的操作语句，都影响着一个**共同的 cache**，也就是二级缓存被多个 SqlSession 共享，是一个**全局的变量**。当开启缓存后，数据的查询执行的流程就是 `二级缓存 -> 一级缓存 -> 数据库`。
 
 #### 2.1.1.二级缓存开启条件
 
@@ -484,7 +484,7 @@ public class Dept implements Serializable {
 }
 ```
 
-myBatis-config.xml
+`myBatis-config.xml`
 
 在myBatis-config 中添加开启二级缓存的条件
 
@@ -495,9 +495,9 @@ myBatis-config.xml
 </settings>
 ```
 
-DeptDao.xml
+`DeptDao.xml`
 
-还需要在 Mapper 对应的xml中添加 cache 标签，表示对哪个mapper 开启缓存
+还需要在 Mapper 对应的 `xml` 中添加 cache 标签，表示对哪个mapper 开启缓存
 
 ```xml
 <!-- 表示DEPT表查询结果保存到二级缓存(共享缓存) -->
@@ -861,7 +861,7 @@ cacheElement(context.evalNode("cache"));
 
 **根据上面我们的 — 多表操作对二级缓存的影响 一节中提到的解决办法，采用 cache-ref 来进行命名空间的依赖能够避免二级缓存**，但是总不能每次写一个 XML 配置都会采用这种方式吧，最有效的方式还是避免多表操作使用二级缓存
 
-然后我们再来看一下cacheElement(context.evalNode("cache")) 这个方法
+然后我们再来看一下 `cacheElement(context.evalNode("cache"))` 这个方法
 
 ```java
 private void cacheElement(XNode context) throws Exception {

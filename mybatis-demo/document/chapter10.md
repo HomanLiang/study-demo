@@ -18,170 +18,170 @@ Mybatis里面的核心对象还是比较多，如下：
 | ParameterHandler | 负责对用户传递的参数转换成JDBC Statement 所需要的参数        |
 | ResultSetHandler | 负责将JDBC返回的ResultSet结果集对象转换成List类型的集合；    |
 | TypeHandler      | 负责java数据类型和jdbc数据类型之间的映射和转换               |
-| MappedStatement  | MappedStatement维护了一条mapper.xml文件里面 select 、update、delete、insert节点的封装 |
+| MappedStatement  | MappedStatement维护了一条 `mapper.xml` 文件里面 `select `、`update`、`delete`、`insert`节点的封装 |
 | SqlSource        | 负责根据用户传递的parameterObject，动态地生成SQL语句，将信息封装到BoundSql对象中，并返回 |
 | BoundSql         | 表示动态生成的SQL语句以及相应的参数信息                      |
 | Configuration    | MyBatis所有的配置信息都维持在Configuration对象之中           |
 
 Mybatis拦截器并不是每个对象里面的方法都可以被拦截的。Mybatis拦截器只能拦截Executor、ParameterHandler、StatementHandler、ResultSetHandler四个对象里面的方法。
 
-- **Executor**
+### 1.1.Executor
 
-	Mybatis中所有的Mapper语句的执行都是通过Executor进行的。Executor是Mybatis的核心接口。从其定义的接口方法我们可以看出，对应的增删改语句是通过Executor接口的update方法进行的，查询是通过query方法进行的。Executor里面常用拦截方法如下所示。
+Mybatis中所有的Mapper语句的执行都是通过Executor进行的。Executor是Mybatis的核心接口。从其定义的接口方法我们可以看出，对应的增删改语句是通过Executor接口的update方法进行的，查询是通过query方法进行的。Executor里面常用拦截方法如下所示。
 
-    ```dart
-    public interface Executor {
-
-       ...
-
-        /**
-         * 执行update/insert/delete
-         */
-        int update(MappedStatement ms, Object parameter) throws SQLException;
-
-        /**
-         * 执行查询,先在缓存里面查找
-         */
-        <E> List<E> query(MappedStatement ms, Object parameter, RowBounds rowBounds, ResultHandler resultHandler, CacheKey cacheKey, BoundSql boundSql) throws SQLException;
-
-        /**
-         * 执行查询
-         */
-        <E> List<E> query(MappedStatement ms, Object parameter, RowBounds rowBounds, ResultHandler resultHandler) throws SQLException;
-
-        /**
-         * 执行查询，查询结果放在Cursor里面
-         */
-        <E> Cursor<E> queryCursor(MappedStatement ms, Object parameter, RowBounds rowBounds) throws SQLException;
-
-        ...
-
-    }
-    ```
-
-- **ParameterHandler**
-
-	ParameterHandler用来设置参数规则，当StatementHandler使用prepare()方法后，接下来就是使用它来设置参数。所以如果有对参数做自定义逻辑处理的时候，可以通过拦截ParameterHandler来实现。ParameterHandler里面可以拦截的方法解释如下：
-
-    ```csharp
-    public interface ParameterHandler {
+  ```dart
+  public interface Executor {
 
      ...
 
-     /**
-      * 设置参数规则的时候调用 -- PreparedStatement
-      */
-     void setParameters(PreparedStatement ps) throws SQLException;
+      /**
+       * 执行update/insert/delete
+       */
+      int update(MappedStatement ms, Object parameter) throws SQLException;
 
-     ...
+      /**
+       * 执行查询,先在缓存里面查找
+       */
+      <E> List<E> query(MappedStatement ms, Object parameter, RowBounds rowBounds, ResultHandler resultHandler, CacheKey cacheKey, BoundSql boundSql) throws SQLException;
 
-    }
-    ```
+      /**
+       * 执行查询
+       */
+      <E> List<E> query(MappedStatement ms, Object parameter, RowBounds rowBounds, ResultHandler resultHandler) throws SQLException;
 
-- **StatementHandler**
+      /**
+       * 执行查询，查询结果放在Cursor里面
+       */
+      <E> Cursor<E> queryCursor(MappedStatement ms, Object parameter, RowBounds rowBounds) throws SQLException;
 
-  StatementHandler负责处理Mybatis与JDBC之间Statement的交互。
+      ...
 
-    ```java
-    public interface StatementHandler {
+  }
+  ```
 
-        ...
+### 1.2.ParameterHandler
 
-        /**
-         * 从连接中获取一个Statement
-         */
-        Statement prepare(Connection connection, Integer transactionTimeout)
-                throws SQLException;
+ParameterHandler用来设置参数规则，当StatementHandler使用 `prepare()` 方法后，接下来就是使用它来设置参数。所以如果有对参数做自定义逻辑处理的时候，可以通过拦截ParameterHandler来实现。ParameterHandler里面可以拦截的方法解释如下：
 
-        /**
-         * 设置statement执行里所需的参数
-         */
-        void parameterize(Statement statement)
-                throws SQLException;
+  ```csharp
+  public interface ParameterHandler {
 
-        /**
-         * 批量
-         */
-        void batch(Statement statement)
-                throws SQLException;
+   ...
 
-        /**
-         * 更新：update/insert/delete语句
-         */
-        int update(Statement statement)
-                throws SQLException;
+   /**
+    * 设置参数规则的时候调用 -- PreparedStatement
+    */
+   void setParameters(PreparedStatement ps) throws SQLException;
 
-        /**
-         * 执行查询
-         */
-        <E> List<E> query(Statement statement, ResultHandler resultHandler)
-                throws SQLException;
+   ...
 
-        <E> Cursor<E> queryCursor(Statement statement)
-                throws SQLException;
+  }
+  ```
 
-        ...
+### 1.3.StatementHandler
 
-    }
-    ```
+StatementHandler负责处理Mybatis与JDBC之间Statement的交互。
 
-	> 一般只拦截StatementHandler里面的prepare方法。
+  ```java
+  public interface StatementHandler {
 
-	在Mybatis里面RoutingStatementHandler是SimpleStatementHandler(对应Statement)、PreparedStatementHandler(对应PreparedStatement)、CallableStatementHandler(对应CallableStatement)的路由类，所有需要拦截StatementHandler里面的方法的时候，对RoutingStatementHandler做拦截处理就可以了，如下的写法可以过滤掉一些不必要的拦截类。
+      ...
 
-    ```java
-    @Intercepts({
-            @Signature(
-                    type = StatementHandler.class,
-                    method = "prepare",
-                    args = {Connection.class, Integer.class}
-            )
-    })
-    public class TableShardInterceptor implements Interceptor {
-    
-        @Override
-        public Object intercept(Invocation invocation) throws Throwable {
-            if (invocation.getTarget() instanceof RoutingStatementHandler) {
-                // TODO: 做自己的逻辑
-            }
-            return invocation.proceed();
-        }
-    
-        @Override
-        public Object plugin(Object target) {
-            // 当目标类是StatementHandler类型时，才包装目标类，否者直接返回目标本身,减少目标被代理的次数
-            return (target instanceof RoutingStatementHandler) ? Plugin.wrap(target, this) : target;
-        }
-    
-        @Override
-        public void setProperties(Properties properties) {
-    
-        }
-    }
-    ```
+      /**
+       * 从连接中获取一个Statement
+       */
+      Statement prepare(Connection connection, Integer transactionTimeout)
+              throws SQLException;
 
-	> 关于Statement、PreparedStatement和CallableStatement的一些区别。以及Statement和PreparedStatement相比PreparedStatement的优势在哪里。强烈建议大家去百度下。
+      /**
+       * 设置statement执行里所需的参数
+       */
+      void parameterize(Statement statement)
+              throws SQLException;
 
-- **ResultSetHandler**
+      /**
+       * 批量
+       */
+      void batch(Statement statement)
+              throws SQLException;
 
-	ResultSetHandler用于对查询到的结果做处理。所以如果你有需求需要对返回结果做特殊处理的情况下可以去拦截ResultSetHandler的处理。ResultSetHandler里面常用拦截方法如下：
+      /**
+       * 更新：update/insert/delete语句
+       */
+      int update(Statement statement)
+              throws SQLException;
 
-    ```java
-    public interface ResultSetHandler {
+      /**
+       * 执行查询
+       */
+      <E> List<E> query(Statement statement, ResultHandler resultHandler)
+              throws SQLException;
 
-        /**
-         * 将Statement执行后产生的结果集（可能有多个结果集）映射为结果列表
-         */
-        <E> List<E> handleResultSets(Statement stmt) throws SQLException;
-        <E> Cursor<E> handleCursorResultSets(Statement stmt) throws SQLException;
+      <E> Cursor<E> queryCursor(Statement statement)
+              throws SQLException;
 
-        /**
-         * 处理存储过程执行后的输出参数
-         */
-        void handleOutputParameters(CallableStatement cs) throws SQLException;
+      ...
 
-    }
-    ```
+  }
+  ```
+
+> 一般只拦截StatementHandler里面的prepare方法。
+
+在Mybatis里面 `RoutingStatementHandler` 是 `SimpleStatementHandler(对应Statement)`、`PreparedStatementHandler(对应PreparedStatement)`、`CallableStatementHandler(对应CallableStatement)` 的路由类，所有需要拦截StatementHandler里面的方法的时候，对RoutingStatementHandler做拦截处理就可以了，如下的写法可以过滤掉一些不必要的拦截类。
+
+  ```java
+  @Intercepts({
+          @Signature(
+                  type = StatementHandler.class,
+                  method = "prepare",
+                  args = {Connection.class, Integer.class}
+          )
+  })
+  public class TableShardInterceptor implements Interceptor {
+  
+      @Override
+      public Object intercept(Invocation invocation) throws Throwable {
+          if (invocation.getTarget() instanceof RoutingStatementHandler) {
+              // TODO: 做自己的逻辑
+          }
+          return invocation.proceed();
+      }
+  
+      @Override
+      public Object plugin(Object target) {
+          // 当目标类是StatementHandler类型时，才包装目标类，否者直接返回目标本身,减少目标被代理的次数
+          return (target instanceof RoutingStatementHandler) ? Plugin.wrap(target, this) : target;
+      }
+  
+      @Override
+      public void setProperties(Properties properties) {
+  
+      }
+  }
+  ```
+
+> 关于Statement、PreparedStatement和CallableStatement的一些区别。以及Statement和PreparedStatement相比PreparedStatement的优势在哪里。强烈建议大家去百度下。
+
+### 1.4.ResultSetHandler
+
+ResultSetHandler用于对查询到的结果做处理。所以如果你有需求需要对返回结果做特殊处理的情况下可以去拦截ResultSetHandler的处理。ResultSetHandler里面常用拦截方法如下：
+
+  ```java
+  public interface ResultSetHandler {
+
+      /**
+       * 将Statement执行后产生的结果集（可能有多个结果集）映射为结果列表
+       */
+      <E> List<E> handleResultSets(Statement stmt) throws SQLException;
+      <E> Cursor<E> handleCursorResultSets(Statement stmt) throws SQLException;
+
+      /**
+       * 处理存储过程执行后的输出参数
+       */
+      void handleOutputParameters(CallableStatement cs) throws SQLException;
+
+  }
+  ```
 
 ## 2.Mybatis拦截器的使用
 
@@ -189,7 +189,7 @@ Mybatis拦截器的使用，分两步：自定义拦截器类、注册拦截器�
 
 ### 2.1 自定义拦截器类
 
-自定义的拦截器需要实现Interceptor接口，并且需要在自定义拦截器类上添加@Intercepts注解。
+自定义的拦截器需要实现 `Interceptor` 接口，并且需要在自定义拦截器类上添加 `@Intercepts` 注解。
 
 #### 2.1.1 Interceptor接口
 
@@ -221,7 +221,7 @@ public interface Interceptor {
 
 #### 2.1.2 @Intercepts注解
 
-Intercepts注解需要一个Signature(拦截点)参数数组。通过Signature来指定拦截哪个对象里面的哪个方法。@Intercepts注解定义如下:
+Intercepts注解需要一个 `Signature(拦截点)` 参数数组。通过Signature来指定拦截哪个对象里面的哪个方法。`@Intercepts` 注解定义如下:
 
 ```kotlin
 @Documented
