@@ -6,11 +6,11 @@
 
 
 
-## Error Log
+## 1.Error Log
 
 记录Mysql运行过程中的Error、Warning、Note等信息，系统出错或者某条记录出问题可以查看Error日志。
 
-- Mysql的错误日志默认以hostname.err存放在Mysql的日志目录，可以通过以下语句查看：
+- Mysql的错误日志默认以 `hostname.err` 存放在Mysql的日志目录，可以通过以下语句查看：
 
   ```ruby
 mysql> show variables like "log_error";
@@ -21,13 +21,13 @@ mysql> show variables like "log_error";
   +---------------+---------------
   ```
   
-- 修改错误日志的地址可以在/etc/my.cnf中添加--log-error = [filename]来开启mysql错误日志。我的是：
+- 修改错误日志的地址可以在 `/etc/my.cnf` 中添加 `--log-error = [filename]` 来开启mysql错误日志。我的是：
 
   ```cpp
  log_error = /tmp/mysql.log
   ```
   
-- 先来查看一下：tail -f /tmp/mysql.log
+- 先来查看一下：`tail -f /tmp/mysql.log`
 
   ```dart
 bash-3.2# tail -f /tmp/mysql.log 
@@ -43,15 +43,15 @@ bash-3.2# tail -f /tmp/mysql.log
   2015-12-23T07:28:03.923562Z 0 [Note] InnoDB: page_cleaner: 1000ms intended loop took 61473ms. The settings might not be optimal. (flushed=0 and evicted=0, during the time.)
   ```
 
-信息量比较大，暂不分析了。。。。当然 如果mysql配置或连接出错时， 仍然可以通过tail -f 来跟踪日志的
+信息量比较大，暂不分析了。。。。当然 如果mysql配置或连接出错时， 仍然可以通过 `tail -f` 来跟踪日志的
 
 
 
-## General Query Log
+## 2.General Query Log
 
 记录mysql的日常日志，包括查询、修改、更新等的每条sql。
 
-- 先查看mysql是否启用了查询日志: **show global variables like "%genera%"**
+- 先查看mysql是否启用了查询日志: `show global variables like "%genera%"`
 
   ```ruby
 mysql> show global variables like "%genera%";
@@ -66,11 +66,11 @@ mysql> show global variables like "%genera%";
   4 rows in set (0.00 sec)
   ```
   
-  我这里是配置了日志输出文件：/tmp/mysql_query.log，并且日志功能关闭
+  我这里是配置了日志输出文件：`/tmp/mysql_query.log`，并且日志功能关闭
 
-- 查询日志的输出文件可以在**/etc/my.cnf** 中添加**general-log-file = [filename]**
+- 查询日志的输出文件可以在 `/etc/my.cnf` 中添加 `general-log-file = [filename]`
 
-- Mysql打开general log日志后，所有的查询语句都可以在general log文件中输出，如果打开，文件会非常大，建议调试的时候打开，平时关闭
+- Mysql打开 `general log` 日志后，所有的查询语句都可以在 `general log` 文件中输出，如果打开，文件会非常大，建议调试的时候打开，平时关闭
 
   ```csharp
 mysql> set global general_log = on;
@@ -82,7 +82,7 @@ mysql> set global general_log = on;
   
 - **注意：**
 
-  如果打开了日志功能，但是没有写入日志，那就有可能是mysql对日志文件的权限不够，所以需要指定权限，我的日志文件是 /tmp/mysql_query.log , 则：
+  如果打开了日志功能，但是没有写入日志，那就有可能是mysql对日志文件的权限不够，所以需要指定权限，我的日志文件是 `/tmp/mysql_query.log`, 则：
 
   ```cpp
 chown mysql:mysql /tmp/mysql_query.log
@@ -90,10 +90,10 @@ chown mysql:mysql /tmp/mysql_query.log
 
 
 
-## 慢查询日志
-### 概念
-MySQL的慢查询日志是MySQL提供的一种日志记录，它用来记录在MySQL中响应时间超过阀值的语句，具体指运行时间超过`long_query_time`值的SQL，则会被记录到慢查询日志中。`long_query_time`的默认值为10，意思是运行10S以上的语句。默认情况下，Mysql数据库并不启动慢查询日志，需要我们手动来设置这个参数，当然，如果不是调优需要的话，一般不建议启动该参数，因为开启慢查询日志会或多或少带来一定的性能影响。慢查询日志支持将日志记录写入文件，也支持将日志记录写入数据库表。
-### 相关参数
+## 3.慢查询日志
+### 3.1.概念
+MySQL的慢查询日志是MySQL提供的一种日志记录，它用来记录在MySQL中响应时间超过阀值的语句，具体指运行时间超过`long_query_time` 值的SQL，则会被记录到慢查询日志中。`long_query_time` 的默认值为10，意思是运行10S以上的语句。默认情况下，Mysql数据库并不启动慢查询日志，需要我们手动来设置这个参数，当然，如果不是调优需要的话，一般不建议启动该参数，因为开启慢查询日志会或多或少带来一定的性能影响。慢查询日志支持将日志记录写入文件，也支持将日志记录写入数据库表。
+### 3.2.相关参数
 MySQL 慢查询的相关参数解释：
 
 - `slow_query_log`：是否开启慢查询日志，1表示开启，0表示关闭。
@@ -101,8 +101,8 @@ MySQL 慢查询的相关参数解释：
 - `slow-query-log-file`：新版（5.6及以上版本）MySQL数据库慢查询日志存储路径。可以不设置该参数，系统则会默认给一个缺省的文件`host_name-slow.log`
 - `long_query_time`：慢查询阈值，当查询时间多于设定的阈值时，记录日志。
 - `log_queries_not_using_indexes`：未使用索引的查询也被记录到慢查询日志中（可选项）。
-- `log_output`：日志存储方式。log_output='FILE'表示将日志存入文件，默认值是`'FILE'`。`log_output='TABLE'`表示将日志存入数据库，这样日志信息就会被写入到`mysql.slow_log`表中。MySQL数据库支持同时两种日志存储方式，配置的时候以逗号隔开即可，如：`log_output='FILE,TABLE'`。日志记录到系统的专用日志表中，要比记录到文件耗费更多的系统资源，因此对于需要启用慢查询日志，又需要能够获得更高的系统性能，那么建议优先记录到文件。
-### 慢查询日志配置
+- `log_output`：日志存储方式。`log_output='FILE'` 表示将日志存入文件，默认值是`'FILE'`。`log_output='TABLE'`表示将日志存入数据库，这样日志信息就会被写入到`mysql.slow_log`表中。MySQL数据库支持同时两种日志存储方式，配置的时候以逗号隔开即可，如：`log_output='FILE,TABLE'`。日志记录到系统的专用日志表中，要比记录到文件耗费更多的系统资源，因此对于需要启用慢查询日志，又需要能够获得更高的系统性能，那么建议优先记录到文件。
+### 3.3.慢查询日志配置
 默认情况下`slow_query_log`的值为`OFF`，表示慢查询日志是禁用的，可以通过设置`slow_query_log`的值来开启，如下所示：
 ```
 mysql> show variables  like '%slow_query_log%';
@@ -148,7 +148,7 @@ slow_query_log =1
 slow_query_log_file=/tmp/mysql_slow.log
 ```
 ![Image](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mysql-demo/20210307104601.png)
-关于慢查询的参数slow_query_log_file ，它指定慢查询日志文件的存放路径，系统默认会给一个缺省的文件`host_name-slow.log`（如果没有指定参数`slow_query_log_file`的话）
+关于慢查询的参数 `slow_query_log_file`，它指定慢查询日志文件的存放路径，系统默认会给一个缺省的文件`host_name-slow.log`（如果没有指定参数`slow_query_log_file`的话）
 
 ```
 mysql> show variables like 'slow_query_log_file';
@@ -296,10 +296,10 @@ mysql> show global status like '%Slow_queries%';
  
 mysql> 
 ```
-### 日志分析工具mysqldumpslow
-在生产环境中，如果要手工分析日志，查找、分析SQL，显然是个体力活，MySQL提供了日志分析工具mysqldumpslow
+### 3.4.日志分析工具mysqldumpslow
+在生产环境中，如果要手工分析日志，查找、分析SQL，显然是个体力活，MySQL提供了日志分析工具 `mysqldumpslow`
 
-查看mysqldumpslow的帮助信息：
+查看 `mysqldumpslow` 的帮助信息：
 ```
 [root@DB-Server ~]# mysqldumpslow --help
 Usage: mysqldumpslow [ OPTS... ] [ LOGS... ]
@@ -360,34 +360,46 @@ mysqldumpslow -s r -t 20 /mysqldata/mysql/mysql06-slow.log | more
 
 
 
-### 问题
+### 3.X.问题
 
-#### 1. 为什么在慢查询日志里面出现Query_time小于long_query_time阀值的SQL语句呢？
+#### 3.X.1. 为什么在慢查询日志里面出现Query_time小于long_query_time阀值的SQL语句呢？
 例如，如下截图，`long_query_time=5`， 但是`Query_time`小于1秒的SQL都记录到慢查询日志当中了。
+
 ![Image [4]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mysql-demo/20210307104901.png)
+
 相信有些人遇到这个问题的时候觉得很奇怪，其实这个不是bug，而是你设置了系统变量`log_queries_not_using_indexes` ,这个系统变量开启后，会将那些未使用索引的SQL也被记录到慢查询日志中，另外，`full index scan`的SQL也会被记录到慢查询日志。所以，当满足这些条件的SQL，即使`Query_time`时间小于`long_query_time`的值，也会被记录到慢查询日志。
 
-#### 2. 使用日志分析工具mysqldumpslow分析有些日志非常慢，如何加快？
+#### 3.X.2. 使用日志分析工具mysqldumpslow分析有些日志非常慢，如何加快？
 ```
 mysqldumpslow -s t -t 10 /var/lib/mysql/MyDB-slow.log
 ```
 
 1. 出现这种情况是因为慢查询日志变得很大（个人遇到的案例，慢查询日志就有2G多了），所以，需要每天或每周切分慢查询日志。设置一个Crontab作业即可。
-/var/lib/mysql/DB-Server-slow.log.20181112
-/var/lib/mysql/DB-Server-slow.log.20181113
-/var/lib/mysql/DB-Server-slow.log.20181114
-/var/lib/mysql/DB-Server-slow.log.20181115
+
+  ```
+  /var/lib/mysql/DB-Server-slow.log.20181112
+  /var/lib/mysql/DB-Server-slow.log.20181113
+  /var/lib/mysql/DB-Server-slow.log.20181114
+  /var/lib/mysql/DB-Server-slow.log.20181115
+  ```
 
 2. 开启了系统变量`log_queries_not_using_indexes`后，如果系统设计糟糕，未使用索引的SQL很多，那么这一类的日志可能会有很多，所以还有个特别的开关`log_throttle_queries_not_using_indexes`用于限制每分钟输出未使用索引的日志数量。
 
-#### 3. mysqldumpslow的生成报告中的Count、 Time、 Lock、Rows代表具体意思。
+#### 3.X.3. mysqldumpslow的生成报告中的Count、 Time、 Lock、Rows代表具体意思。
 `mysqldumpslow -s c -t 10 /var/lib/mysql/MyDB-slow.log` 使用mysqldumpslow分析慢查询日志分析获取访问次数最多的10个SQL。
-Count:表示这个SQL总共执行了195674次（慢查询日志中出现的次数）
-Time:表示执行时间，后面括号里面的38s 表示这个SQL语句累计的执行耗费时间为38秒。其实就是单次执行的时间和总共执行消耗的时间的区别。
-Lock:表示锁定时间，后面括号里面表示这些SQL累计的锁定时间为48s
-Rows:表示返回的记录数，括号里面表示所有SQL语句累计返回记录数
+
+**Count**:表示这个SQL总共执行了195674次（慢查询日志中出现的次数）
+
+**Time**:表示执行时间，后面括号里面的38s 表示这个SQL语句累计的执行耗费时间为38秒。其实就是单次执行的时间和总共执行消耗的时间的区别。
+
+**Lock**:表示锁定时间，后面括号里面表示这些SQL累计的锁定时间为48s
+
+**Rows**:表示返回的记录数，括号里面表示所有SQL语句累计返回记录数
+
 ![Image [3] - 副本](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mysql-demo/20210307105002.png)
+
 然后我们看看慢查询日志的相关信息：
+
 ![Image [5]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mysql-demo/20210307105103.png)
 
 ```
@@ -424,10 +436,10 @@ Thu Nov 15 09:43:51 CST 2018
 [root@DB-Server ~]# date -d @1542246231
 Wed Nov 14 20:43:51 EST 2018
 ```
-#### 4. 如何分析慢查询日志一段时间内的数据呢？
-mysqldumpslow这款工具没有提供相关参数分析某个日期范围内的慢查询日志，也就是说没法提供精细的搜索、分析。如果要分析某段时间内的慢查询日志可以使用工具pt-query-digest 
+#### 3.X.4. 如何分析慢查询日志一段时间内的数据呢？
+`mysqldumpslow` 这款工具没有提供相关参数分析某个日期范围内的慢查询日志，也就是说没法提供精细的搜索、分析。如果要分析某段时间内的慢查询日志可以使用工具 `pt-query-digest`
 
-如果实在需要使用mysqldumpslow分析某段时间内的慢查询SQL，可以借助awk命令的帮助。如下样例所示
+如果实在需要使用 `mysqldumpslow` 分析某段时间内的慢查询SQL，可以借助 `awk` 命令的帮助。如下样例所示
 ```
 #取出一天时间的慢查询日志
 
@@ -437,9 +449,9 @@ mysqldumpslow这款工具没有提供相关参数分析某个日期范围内的�
 
 #awk '/# Time: 2018-11-14T04/,/# Time: 2018-11-14T06/' DB-Server-slow.log > slow_04_06.log
 ```
-#### 5. 关于慢查询日志中query_time和lock_time的关系。
-只有当一个SQL的执行时间（不包括锁等待的时间 lock_time）>long_query_time的时候，才会判定为慢查询SQL；但是判定为慢查询SQL之后，输出的Query_time包括了（执行时间+锁等待时间），并且也会输出Lock_time时间。当一个SQL的执行时间（排除lock_time）小于long_query_time的时候（即使他锁等待超过了很久），也不会记录到慢查询日志当中的。
-#### 6. mysqldumpslow相关参数的详细信息
+#### 3.X.5. 关于慢查询日志中query_time和lock_time的关系。
+只有当一个SQL的 `执行时间（不包括锁等待的时间 lock_time）>long_query_time` 的时候，才会判定为慢查询SQL；但是判定为慢查询SQL之后，输出的Query_time包括了（执行时间+锁等待时间），并且也会输出Lock_time时间。当一个SQL的执行时间（排除lock_time）小于long_query_time的时候（即使他锁等待超过了很久），也不会记录到慢查询日志当中的。
+#### 3.X.6. mysqldumpslow相关参数的详细信息
 ```
 #  mysqldumpslow --help
 Usage: mysqldumpslow [ OPTS... ] [ LOGS... ]
@@ -481,7 +493,7 @@ Parse and summarize the MySQL slow query log. Options are
   -l           don't subtract lock time from total time  
                #不要从总时间减去锁定时间
 ```
-#### 7. 系统变量Slow_queries会统计慢查询出现的次数。
+#### 3.X.7. 系统变量Slow_queries会统计慢查询出现的次数。
 ```
 mysql>  show global status like '%slow%'; 
 +---------------------+--------+
@@ -491,12 +503,12 @@ mysql>  show global status like '%slow%';
 | Slow_queries        | 120    |
 +---------------------+--------+
 ```
-#### 8. 系统变量slow_launch_time 是什么？ 跟慢查询日志有关系吗？
+#### 3.X.8. 系统变量slow_launch_time 是什么？ 跟慢查询日志有关系吗？
 如果创建线程需要的时间比slow_launch_time多，服务器会增加Slow_launch_threads的状态变量的数量。其实这个状态变量跟慢查询没有什么关系。之所以放到这里，是有人问过这个问题！
 
 
 
-## binlog
+## 4.binlog
 
 `binlog` 用于记录数据库执行的写入性操作(不包括查询)信息，以二进制的形式保存在磁盘中。`binlog` 是 `mysql`的逻辑日志，并且由 `Server` 层进行记录，使用任何存储引擎的 `mysql` 数据库都会记录 `binlog` 日志。
 
@@ -514,7 +526,7 @@ mysql>  show global status like '%slow%';
 
 
 
-### 启用binlog功能和查看binlog
+### 4.1.启用binlog功能和查看binlog
 
 Binlog 日志功能默认是开启的，线上情况下 Binlog 日志的增长速度是很快的，在 MySQL 的配置文件 `my.cnf` 中提供一些参数来对 Binlog 进行设置。
 
@@ -541,7 +553,8 @@ sync_binlog=0
 
 需要注意的是：
 
-**max_binlog_size** ：Binlog 最大和默认值是 1G，该设置并不能严格控制 Binlog 的大小，尤其是 Binlog 比较靠近最大值而又遇到一个比较大事务时，为了保证事务的完整性不可能做切换日志的动作，只能将该事务的所有 SQL 都记录进当前日志直到事务结束。所以真实文件有时候会大于 max_binlog_size 设定值。
+**max_binlog_size** ：Binlog 最大和默认值是 1G，该设置并不能严格控制 Binlog 的大小，尤其是 Binlog 比较靠近最大值而又遇到一个比较大事务时，为了保证事务的完整性不可能做切换日志的动作，只能将该事务的所有 SQL 都记录进当前日志直到事务结束。所以真实文件有时候会大于 `max_binlog_size` 设定值。
+
 **expire_logs_days** ：Binlog 过期删除不是服务定时执行，是需要借助事件触发才执行，事件包括：
 
 - 服务器重启
@@ -553,9 +566,9 @@ sync_binlog=0
 
 **sync_binlog**：这个参数决定了 Binlog 日志的更新频率。默认 0 ，表示该操作由操作系统根据自身负载自行决定多久写一次磁盘。
 
-sync_binlog = 1 表示每一条事务提交都会立刻写盘。sync_binlog=n 表示 n 个事务提交才会写盘。
+`sync_binlog = 1` 表示每一条事务提交都会立刻写盘。`sync_binlog=n` 表示 n 个事务提交才会写盘。
 
-根据 MySQL 文档，写 Binlog 的时机是：SQL transaction 执行完，但任何相关的 Locks 还未释放或事务还未最终 commit 前。这样保证了 Binlog 记录的操作时序与数据库实际的数据变更顺序一致。
+根据 MySQL 文档，写 Binlog 的时机是：`SQL transaction` 执行完，但任何相关的 Locks 还未释放或事务还未最终 commit 前。这样保证了 Binlog 记录的操作时序与数据库实际的数据变更顺序一致。
 
 检查 Binlog 文件是否已开启：
 
@@ -602,12 +615,12 @@ Copymysql> show binlog events in 'mysql-bin.000001';
 
 Binlog 的版本是V4，可以看到日志的结束时间为 Stop。出现 Stop event 有两种情况：
 
-1. 是 master shut down 的时候会在 Binlog 文件结尾出现
-2. 是备机在关闭的时候会写入 relay log 结尾，或者执行 RESET SLAVE 命令执行
+1. 是 `master shut down` 的时候会在 Binlog 文件结尾出现
+2. 是备机在关闭的时候会写入 `relay log` 结尾，或者执行 `RESET SLAVE` 命令执行
 
 本文出现的原因是我有手动停止过 MySQL 服务。
 
-一般来说一份正常的 Binlog 日志文件会以 **Rotate event** 结束。当 Binlog 文件超过指定大小，Rotate event 会写在文件最后，指向下一个 Binlog 文件。
+一般来说一份正常的 Binlog 日志文件会以 `Rotate event` 结束。当 Binlog 文件超过指定大小，`Rotate event` 会写在文件最后，指向下一个 Binlog 文件。
 
 我们来看看有过数据操作的 Binlog 日志文件是什么样子的。
 
@@ -644,13 +657,13 @@ Copymysql> show binlog events in 'mysql-bin.000002';
 
 我们对 event 查询的数据行关键字段来解释一下：
 
-- **Pos**：当前事件的开始位置，每个事件都占用固定的字节大小，结束位置(End_log_position)减去Pos，就是这个事件占用的字节数。
+- **Pos**：当前事件的开始位置，每个事件都占用固定的字节大小，结束位置(`End_log_position`)减去Pos，就是这个事件占用的字节数。
 
   上面的日志中我们能看到，第一个事件位置并不是从 0 开始，而是从 4。MySQL 通过文件中的前 4 个字节，来判断这是不是一个 Binlog 文件。这种方式很常见，很多格式的文件，如 pdf、doc、jpg等，都会通常前几个特定字符判断是否是合法文件。
 
 - **Event_type**：表示事件的类型
 
-- **Server_id**：表示产生这个事件的 MySQL server_id，通过设置 my.cnf 中的 **server-id** 选项进行配置
+- **Server_id**：表示产生这个事件的 MySQL server_id，通过设置 `my.cnf` 中的 `server-id` 选项进行配置
 
 - **End_log_position**：下一个事件的开始位置
 
@@ -658,14 +671,14 @@ Copymysql> show binlog events in 'mysql-bin.000002';
 
 
 
-### binlog使用场景
+### 4.2.binlog使用场景
 
 在实际应用中， `binlog` 的主要使用场景有两个，分别是 **主从复制** 和 **数据恢复** 。
 
 1. **主从复制** ：在 `Master` 端开启 `binlog` ，然后将 `binlog`发送到各个 `Slave` 端， `Slave` 端重放 `binlog` 从而达到主从数据一致。
 2. **数据恢复** ：通过使用 `mysqlbinlog` 工具来恢复数据。
 
-### binlog刷盘时机
+### 4.3.binlog刷盘时机
 
 对于 `InnoDB` 存储引擎而言，只有在事务提交时才会记录`biglog` ，此时记录还在内存中，那么 `biglog`是什么时候刷到磁盘中的呢？
 
@@ -677,7 +690,7 @@ Copymysql> show binlog events in 'mysql-bin.000002';
 
 从上面可以看出， `sync_binlog` 最安全的是设置是 `1` ，这也是`MySQL 5.7.7`之后版本的默认值。但是设置一个大一些的值可以提升数据库性能，因此实际情况下也可以将值适当调大，牺牲一定的一致性来获取更好的性能。
 
-### binlog日志格式
+### 4.4.binlog日志格式
 
 `binlog` 日志有三种格式，分别为 `STATMENT` 、 `ROW` 和 `MIXED`。
 
@@ -686,18 +699,18 @@ Copymysql> show binlog events in 'mysql-bin.000002';
 - `STATMENT`：基于`SQL` 语句的复制( `statement-based replication, SBR` )，每一条会修改数据的sql语句会记录到`binlog` 中  。
 
 	- 优点：不需要记录每一行的变化，减少了 binlog 日志量，节约了 IO  , 从而提高了性能；
-	- 缺点：在某些情况下会导致主从数据不一致，比如执行sysdate() 、  slepp()  等 。
+	- 缺点：在某些情况下会导致主从数据不一致，比如执行 `sysdate()` 、 ` slepp()`  等 。
 
 - `ROW`：基于行的复制(`row-based replication, RBR` )，不记录每条sql语句的上下文信息，仅需记录哪条数据被修改了 。
 
-	- 优点：不会出现某些特定情况下的存储过程、或function、或trigger的调用和触发无法被正确复制的问题 ；
+	- 优点：不会出现某些特定情况下的存储过程、或 `function`、或 `trigger` 的调用和触发无法被正确复制的问题 ；
 	- 缺点：会产生大量的日志，尤其是` alter table ` 的时候会让日志暴涨
 
 - `MIXED`：基于`STATMENT` 和 `ROW` 两种模式的混合复制(`mixed-based replication, MBR` )，一般的复制使用`STATEMENT` 模式保存 `binlog` ，对于 `STATEMENT` 模式无法复制的操作使用 `ROW` 模式保存 `binlog`
 
   ![image-20210308221010353](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mysql-demo/image-20210308221010353.png)
 
-### 如何通过 `mysqlbinlog` 命令手动恢复数据
+### 4.5.如何通过 `mysqlbinlog` 命令手动恢复数据
 
 上面说过每一条 event 都有位点信息，如果我们当前的 MySQL 库被无操作或者误删除了，那么该如何通过 Binlog 来恢复到删除之前的数据状态呢？
 
@@ -725,13 +738,13 @@ Copymysqlbinlog --start-position=0  --stop-position=500  bin-log.000003 > /root/
 
 上面命令的作用就是将 0 -500 位点的数据恢复到自定义的 SQL 文件中。同理 706 - 800 的数据也是一样操作。之后我们执行这两个 SQL 文件就行了。
 
-### Binlog 事件类型
+### 4.6.Binlog 事件类型
 
 上面我们说到了 Binlog 日志中的事件，不同的操作会对应着不同的事件类型，且不同的 Binlog 日志模式同一个操作的事件类型也不同，下面我们一起看看常见的事件类型。
 
 首先我们看看源码中的事件类型定义：
 
-源码位置：/libbinlogevents/include/binlog_event.h
+源码位置：`/libbinlogevents/include/binlog_event.h`
 
 ```c++
 Copyenum Log_event_type
@@ -830,7 +843,7 @@ Copyenum Log_event_type
 
 **FORMAT_DESCRIPTION_EVENT**
 
-FORMAT_DESCRIPTION_EVENT 是 Binlog V4 中为了取代之前版本中的 START_EVENT_V3 事件而引入的。它是 Binlog 文件中的第一个事件，而且，该事件只会在 Binlog 中出现一次。MySQL 根据 FORMAT_DESCRIPTION_EVENT 的定义来解析其它事件。
+`FORMAT_DESCRIPTION_EVENT` 是 `Binlog V4` 中为了取代之前版本中的 `START_EVENT_V3` 事件而引入的。它是 Binlog 文件中的第一个事件，而且，该事件只会在 Binlog 中出现一次。MySQL 根据 `FORMAT_DESCRIPTION_EVENT` 的定义来解析其它事件。
 
 它通常指定了 MySQL 的版本，Binlog 的版本，该 Binlog 文件的创建时间。
 
@@ -870,15 +883,15 @@ Copymysql> show binlog events in 'mysql-bin.000002';
 
 ROWS_EVENT分为三种：
 
-- WRITE_ROWS_EVENT
-- UPDATE_ROWS_EVENT
-- DELETE_ROWS_EVENT
+- `WRITE_ROWS_EVENT`
+- `UPDATE_ROWS_EVENT`
+- `DELETE_ROWS_EVENT`
 
 分别对应 insert，update 和 delete 操作。
 
-对于 insert 操作，WRITE_ROWS_EVENT 包含了要插入的数据。
+对于 insert 操作，`WRITE_ROWS_EVENT` 包含了要插入的数据。
 
-对于 update 操作，UPDATE_ROWS_EVENT 不仅包含了修改后的数据，还包含了修改前的值。
+对于 update 操作，`UPDATE_ROWS_EVENT` 不仅包含了修改后的数据，还包含了修改前的值。
 
 对于 delete 操作，仅仅需要指定删除的主键（在没有主键的情况下，会给定所有列）。
 
@@ -915,9 +928,9 @@ Copymysql> show binlog events in 'binlog.000008';
 
 
 
-## redo log
+## 5.redo log
 
-### 为什么需要redo log
+### 5.1.为什么需要redo log
 
 我们都知道，事务的四大特性里面有一个是 **持久性** ，具体来说就是**只要事务提交成功，那么对数据库做的修改就被永久保存下来了，不可能因为任何原因再回到原来的状态** 。
 
@@ -930,17 +943,15 @@ Copymysql> show binlog events in 'binlog.000008';
 
 因此 `mysql` 设计了 `redo log` ， **具体来说就是只记录事务对数据页做了哪些修改**，这样就能完美地解决性能问题了(相对而言文件更小并且是顺序IO)。
 
-### redo log基本概念
+### 5.2.redo log基本概念
 
 `redo log` 包括两部分：一个是内存中的日志缓冲( `redo log buffer` )，另一个是磁盘上的日志文件( `redo logfile`)。
 
-`mysql` 每执行一条 `DML` 语句，先将记录写入 `redo log buffer`，后续某个时间点再一次性将多个操作记录写到 `redo log file`。这种 **先写日志，再写磁盘** 的技术就是 `MySQL`
-里经常说到的 `WAL(Write-Ahead Logging)` 技术。
+`mysql` 每执行一条 `DML` 语句，先将记录写入 `redo log buffer`，后续某个时间点再一次性将多个操作记录写到 `redo log file`。这种 **先写日志，再写磁盘** 的技术就是 `MySQL`里经常说到的 `WAL(Write-Ahead Logging)` 技术。
 
 在计算机操作系统中，用户空间( `user space` )下的缓冲区数据一般情况下是无法直接写入磁盘的，中间必须经过操作系统内核空间( `kernel space` )缓冲区( `OS Buffer` )。
 
-因此， `redo log buffer` 写入 `redo logfile` 实际上是先写入 `OS Buffer` ，然后再通过系统调用 `fsync()` 将其刷到 `redo log file`
-中，过程如下：
+因此， `redo log buffer` 写入 `redo logfile` 实际上是先写入 `OS Buffer` ，然后再通过系统调用 `fsync()` 将其刷到 `redo log file`中，过程如下：
 
 ![image-20210308220105394](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mysql-demo/image-20210308220105394.png)
 
@@ -952,7 +963,7 @@ Copymysql> show binlog events in 'binlog.000008';
 
 
 
-### redo log记录形式
+### 5.3.redo log记录形式
 
 前面说过， `redo log` 实际上记录数据页的变更，而这种变更记录是没必要全部保存，因此 `redo log`实现上采用了大小固定，循环写入的方式，当写到结尾时，会回到开头循环写日志。如下图：
 
@@ -970,7 +981,7 @@ Copymysql> show binlog events in 'binlog.000008';
 
 还有一种情况，在宕机前正处于`checkpoint` 的刷盘过程，且数据页的刷盘进度超过了日志页的刷盘进度，此时会出现数据页中记录的 `LSN` 大于日志中的 `LSN`，这时超出日志进度的部分将不会重做，因为这本身就表示已经做过的事情，无需再重做。
 
-### redo log与binlog区别
+### 5.4.redo log与binlog区别
 
 ![image-20210308220401703](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mysql-demo/image-20210308220401703.png)
 
@@ -980,13 +991,13 @@ Copymysql> show binlog events in 'binlog.000008';
 
 
 
-## undo log
+## 6.undo log
 
-### 1、undo是啥
+### 6.1.undo是啥
 
-undo日志用于存放数据修改被修改前的值，假设修改 tba 表中 id=2的行数据，把Name='B' 修改为Name = 'B2' ，那么undo日志就会用来存放Name='B'的记录，如果这个修改出现异常，可以使用undo日志来实现回滚操作，保证事务的一致性。
+undo日志用于存放数据修改被修改前的值，假设修改 tba 表中 `id=2` 的行数据，把 `Name='B'` 修改为 `Name = 'B2'`，那么undo日志就会用来存放 `Name='B'` 的记录，如果这个修改出现异常，可以使用undo日志来实现回滚操作，保证事务的一致性。
 
-对数据的变更操作，主要来自 INSERT UPDATE DELETE，而UNDO LOG中分为两种类型，一种是 INSERT_UNDO（INSERT操作），记录插入的唯一键值；一种是 UPDATE_UNDO（包含UPDATE及DELETE操作），记录修改的唯一键值以及old column记录。
+对数据的变更操作，主要来自 `INSERT UPDATE DELETE`，而UNDO LOG中分为两种类型，一种是 `INSERT_UNDO（INSERT操作）`，记录插入的唯一键值；一种是 `UPDATE_UNDO（包含UPDATE及DELETE操作）`，记录修改的唯一键值以及old column记录。
 
 | Id   | Name |
 | ---- | ---- |
@@ -995,7 +1006,7 @@ undo日志用于存放数据修改被修改前的值，假设修改 tba 表中 i
 | 3    | C    |
 | 4    | D    |
 
-### 2、 undo参数
+### 6.2.undo参数
 
 MySQL跟undo有关的参数设置有这些：
 
@@ -1022,11 +1033,11 @@ MySQL跟undo有关的参数设置有这些：
 
 - **innodb_max_undo_log_size**
 
-  控制最大undo tablespace文件的大小，当启动了innodb_undo_log_truncate 时，undo tablespace 超过innodb_max_undo_log_size 阀值时才会去尝试truncate。该值默认大小为1G，truncate后的大小默认为10M。
+  控制最大 `undo tablespace` 文件的大小，当启动了 `innodb_undo_log_truncate` 时，`undo tablespace` 超过`innodb_max_undo_log_size` 阀值时才会去尝试 `truncate`。该值默认大小为 `1G`，`truncate` 后的大小默认为 `10M`。
 
 - **innodb_undo_tablespaces** 
 
-  设置undo独立表空间个数，范围为0-128， 默认为0，0表示表示不开启独立undo表空间 且 undo日志存储在ibdata文件中。该参数只能在最开始初始化MySQL实例的时候指定，如果实例已创建，这个参数是不能变动的，如果在数据库配置文 件 .cnf 中指定innodb_undo_tablespaces 的个数大于实例创建时的指定个数，则会启动失败，提示该参数设置有误。
+  设置undo独立表空间个数，范围为0-128， 默认为0，0表示表示不开启独立undo表空间 且 undo日志存储在 `ibdata` 文件中。该参数只能在最开始初始化MySQL实例的时候指定，如果实例已创建，这个参数是不能变动的，如果在数据库配置文 件 `.cnf` 中指定`innodb_undo_tablespaces`  的个数大于实例创建时的指定个数，则会启动失败，提示该参数设置有误。
 
   ![image-20210308224116476](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mysql-demo/image-20210308224116476.png)
 
@@ -1036,33 +1047,33 @@ MySQL跟undo有关的参数设置有这些：
   
   **什么时候需要来设置这个参数呢？**
   
-  当DB写压力较大时，可以设置独立UNDO表空间，把UNDO LOG从ibdata文件中分离开来，指定 innodb_undo_directory目录存放，可以制定到高速磁盘上，加快UNDO LOG 的读写性能。
+  当DB写压力较大时，可以设置独立 `UNDO` 表空间，把 `UNDO LOG` 从 `ibdata` 文件中分离开来，指定 `innodb_undo_directory` 目录存放，可以制定到高速磁盘上，加快 `UNDO LOG` 的读写性能。
   
 - **innodb_undo_log_truncate**
 
-  InnoDB的purge线程，根据innodb_undo_log_truncate设置开启或关闭、innodb_max_undo_log_size的参数值，以及truncate的频率来进行空间回收和 undo file 的重新初始化。
+  InnoDB的 `purge` 线程，根据 `innodb_undo_log_truncate` 设置开启或关闭、`innodb_max_undo_log_size` 的参数值，以及`truncate` 的频率来进行空间回收和 `undo file` 的重新初始化。
 
   **该参数生效的前提是，已设置独立表空间且独立表空间个数大于等于2个。**
 
-  purge线程在truncate undo log file的过程中，需要检查该文件上是否还有活动事务，如果没有，需要把该undo log file标记为不可分配，这个时候，undo log 都会记录到其他文件上，所以至少需要2个独立表空间文件，才能进行truncate 操作，标注不可分配后，会创建一个独立的文件undo_<space_id>_trunc.log，记录现在正在truncate 某个undo log文件，然后开始初始化undo log file到10M，操作结束后，删除表示truncate动作的 undo_<space_id>_trunc.log 文件，这个文件保证了即使在truncate过程中发生了故障重启数据库服务，重启后，服务发现这个文件，也会继续完成truncate操作，删除文件结束后，标识该undo log file可分配。
+  `purge` 线程在 `truncate undo log file` 的过程中，需要检查该文件上是否还有活动事务，如果没有，需要把该 `undo log file` 标记为不可分配，这个时候，`undo log` 都会记录到其他文件上，所以至少需要2个独立表空间文件，才能进行 `truncate` 操作，标注不可分配后，会创建一个独立的文件 `undo_<space_id>_trunc.log`，记录现在正在 `truncate` 某个 `undo log` 文件，然后开始初始化`undo log file` 到 `10M`，操作结束后，删除表示 `truncate` 动作的 `undo_<space_id>_trunc.log` 文件，这个文件保证了即使在`truncate` 过程中发生了故障重启数据库服务，重启后，服务发现这个文件，也会继续完成 `truncate` 操作，删除文件结束后，标识该`undo log file` 可分配。
 
 - **innodb_purge_rseg_truncate_frequency**
 
   用于控制purge回滚段的频度，默认为128。假设设置为n，则说明，当Innodb Purge操作的协调线程 purge事务128次时，就会触发一次History purge，检查当前的undo log 表空间状态是否会触发truncate。
 
-### 3、 undo空间管理
+### 6.3.undo空间管理
 
 如果需要设置独立表空间，需要在初始化数据库实例的时候，指定独立表空间的数量。
 
-UNDO内部由多个回滚段组成，即 Rollback segment，一共有128个，保存在ibdata系统表空间中，分别从resg slot0 - resg slot127，每一个resg slot，也就是每一个回滚段，内部由1024个undo segment 组成。
+UNDO内部由多个回滚段组成，即 `Rollback segment`，一共有128个，保存在ibdata系统表空间中，分别从 `resg slot0 - resg slot127`，每一个 `resg slot`，也就是每一个回滚段，内部由1024个 `undo segment` 组成。
 
-回滚段（rollback segment）分配如下：
+回滚段（`rollback segment`）分配如下：
 
 - slot 0 ，预留给系统表空间；
 - slot 1- 32，预留给临时表空间，每次数据库重启的时候，都会重建临时表空间；
 - slot33-127，如果有独立表空间，则预留给UNDO独立表空间；如果没有，则预留给系统表空间；
 
-回滚段中除去32个提供给临时表事务使用，剩下的 128-32=96个回滚段，可执行 96*1024 个并发事务操作，每个事务占用一个 undo segment slot，注意，如果事务中有临时表事务，还会在临时表空间中的 undo segment slot 再占用一个 undo segment slot，即占用2个undo segment slot。如果错误日志中有：`Cannot find a free slot for an undo log。`则说明并发的事务太多了，需要考虑下是否要分流业务。
+回滚段中除去32个提供给临时表事务使用，剩下的 `128-32=96` 个回滚段，可执行 `96*1024` 个并发事务操作，每个事务占用一个 `undo segment slot`，注意，如果事务中有临时表事务，还会在临时表空间中的 `undo segment slot` 再占用一个 `undo segment slot`，即占用2个 `undo segment slot`。如果错误日志中有：`Cannot find a free slot for an undo log。`则说明并发的事务太多了，需要考虑下是否要分流业务。
 
 回滚段（rollback segment ）采用 轮询调度的方式来分配使用，如果设置了独立表空间，那么就不会使用系统表空间回滚段中undo segment，而是使用独立表空间的，同时，如果回顾段正在 Truncate操作，则不分配。
 

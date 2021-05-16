@@ -2,22 +2,22 @@
 
 # MySQL 事务
 
-## 数据库事务介绍
+## 1.数据库事务介绍
 
-### 事务的四大特性（ACID）
+### 1.1.事务的四大特性（ACID）
 
 1. **原子性(atomicity)：** 事务的最小工作单元，要么全成功，要么全失败。
 2. **一致性(consistency)：** 事务开始和结束后，数据库的完整性不会被破坏。
 3. **隔离性(isolation)：** 不同事务之间互不影响，四种隔离级别为RU（读未提交）、RC（读已提交）、RR（可重复读）、SERIALIZABLE （串行化）。
 4. **持久性(durability)：** 事务提交后，对数据的修改是永久性的，即使系统故障也不会丢失。
 
-### 事务的隔离级别
+### 1.2.事务的隔离级别
 
-#### 读未提交（Read UnCommitted/RU）
+#### 1.2.1.读未提交（Read UnCommitted/RU）
 
 又称为**脏读**，一个事务可以读取到另一个事务未提交的数据。这种隔离级别岁最不安全的一种，因为未提交的事务是存在回滚的情况。
 
-#### 读已提交（Read Committed/RC）
+#### 1.2.2.读已提交（Read Committed/RC）
 
 又称为**不可重复读**，一个事务因为读取到另一个事务已提交的修改数据，导致在当前事务的不同时间读取同一条数据获取的结果不一致。
 
@@ -32,7 +32,7 @@
 | 5            |                                      | update user set name='王二' where id=1;(默认隐式提交事务) |
 | 6            | select * from user where id=1;(王二) |                                                           |
 
-#### 可重复读（Repeatable Read/RR）
+#### 1.2.3.可重复读（Repeatable Read/RR）
 
 又称为**幻读**，一个事物读可以读取到其他事务提交的数据，但是在RR隔离级别下，当前读取此条数据只可读取一次，在当前事务中，不论读取多少次，数据任然是第一次读取的值，不会因为在第一次读取之后，其他事务再修改提交此数据而产生改变。因此也成为幻读，因为读出来的数据并不一定就是最新的数据。
 
@@ -47,7 +47,7 @@
 | 5            |                                      | update user set name='王二' where id=1;(默认隐式提交事务)   |
 | 6            | select * from user where id=1;(张三) |                                                             |
 
-#### 串行化（Serializable）
+#### 1.2.4.串行化（Serializable）
 
 所有的数据库的读或者写操作都为串行执行，当前隔离级别下只支持单个请求同时执行，所有的操作都需要队列执行。所以种隔离级别下所有的数据是最稳定的，但是性能也是最差的。数据库的锁实现就是这种隔离级别的更小粒度版本。
 
@@ -62,9 +62,9 @@
 
 
 
-## 事务和MVCC原理
+## 2.事务和MVCC原理
 
-### 不同事务同时操作同一条数据产生的问题
+### 2.1.不同事务同时操作同一条数据产生的问题
 
 示例：
 
@@ -94,7 +94,7 @@
 
 
 
-### LBCC 解决数据丢失
+### 2.2.LBCC 解决数据丢失
 
 **LBCC，基于锁的并发控制，Lock Based Concurrency Control。**
 
@@ -102,7 +102,7 @@
 
 
 
-### MVCC 解决数据丢失
+### 2.3.MVCC 解决数据丢失
 
 **MVCC，多版本的并发控制，Multi-Version Concurrency Control。**
 
@@ -112,46 +112,46 @@
 
 
 
-### InnoDB的MVCC实现逻辑
+### 2.4.InnoDB的MVCC实现逻辑
 
-#### 1、InnoDB存储引擎保存的MVCC的数据
+#### 2.4.1.InnoDB存储引擎保存的MVCC的数据
 
-InnoDB的MVCC是通过在每行记录后面保存两个隐藏的列来实现的。**一个保存了行的事务ID（DB_TRX_ID），一个保存了行的回滚指针（DB_ROLL_PT）**。每开始一个新的事务，都会自动递增产 生一个新的事务id。事务开始时刻的会把事务id放到当前事务影响的行事务id中，当查询时需要用当前事务id和每行记录的事务id进行比较。
+InnoDB的MVCC是通过在每行记录后面保存两个隐藏的列来实现的。一个保存了行的事务ID（`DB_TRX_ID`），一个保存了行的回滚指针（`DB_ROLL_PT`）。每开始一个新的事务，都会自动递增产 生一个新的事务id。事务开始时刻的会把事务id放到当前事务影响的行事务id中，当查询时需要用当前事务id和每行记录的事务id进行比较。
 
 下面看一下在REPEATABLE READ隔离级别下，MVCC具体是如何操作的。
 
-**SELECT**
+**2.4.1.1.SELECT**
 
 InnoDB 会根据以下两个条件检查每行记录：
 
 1. InnoDB只查找版本早于当前事务版本的数据行（也就是，行的事务编号小于或等于当前事务的事务编号），这样可以确保事务读取的行，要么是在事务开始前已经存在的，要么是事务自身插入或者修改过的。
 2. 删除的行要事务ID判断，读取到事务开始之前状态的版本，只有符合上述两个条件的记录，才能返回作为查询结果。
 
-**INSERT**
+**2.4.1.2.INSERT**
 
 InnoDB为新插入的每一行保存当前事务编号作为行版本号。
 
-**DELETE**
+**2.4.1.3.DELETE**
 
 InnoDB为删除的每一行保存当前事务编号作为行删除标识。
 
-**UPDATE**
+**2.4.1.4.UPDATE**
 
 InnoDB为插入一行新记录，保存当前事务编号作为行版本号，同时保存当前事务编号到原来的行作为行删除标识。
 
 保存这两个额外事务编号，使大多数读操作都可以不用加锁。这样设计使得读数据操作很简单，性能很好，并且也能保证只会读取到符合标准的行。不足之处是每行记录都需要额外的存储空间，需要做更多的行检查工作，以及一些额外的维护工作。
 
-> MVCC只在REPEATABLE READ和READ COMMITIED两个隔离级别下工作。其他两个隔离级别都和 MVCC不兼容 ，因为READ UNCOMMITIED总是读取最新的数据行，而不是符合当前事务版本的数据行。而SERIALIZABLE则会对所有读取的行都加锁。
+> MVCC只在 `REPEATABLE READ` 和 `READ COMMITIED` 两个隔离级别下工作。其他两个隔离级别都和 MVCC不兼容 ，因为READ UNCOMMITIED总是读取最新的数据行，而不是符合当前事务版本的数据行。而SERIALIZABLE则会对所有读取的行都加锁。
 
 **MVCC 在mysql 中的实现依赖的是 undo log 与 read view 。**
 
-#### 2、undo log
+#### 2.4.2.undo log
 
 根据行为的不同，undo log分为两种：**insert undo log** 和 **update undo log**
 
 - **insert undo log：**
 
-  insert 操作中产生的undo log，因为insert操作记录只对当前事务本身课件，对于其他事务此记录不可见，所以 insert undo log 可以在事务提交后直接删除而不需要进行purge操作。
+  insert 操作中产生的 `undo log`，因为insert操作记录只对当前事务本身课件，对于其他事务此记录不可见，所以 `insert undo log` 可以在事务提交后直接删除而不需要进行purge操作。
 
 	> purge的主要任务是将数据库中已经 mark del 的数据删除，另外也会批量回收undo pages
 	
@@ -161,7 +161,7 @@ InnoDB为插入一行新记录，保存当前事务编号作为行版本号，�
 	
 - **update undo log：**
 
-  update 或 delete 操作中产生的 undo log。因为会对已经存在的记录产生影响，为了提供 MVCC机制，因此update undo log 不能在事务提交时就进行删除，而是将事务提交时放到入 history list 上，等待 purge 线程进行最后的删除操作。
+  `update` 或 `delete` 操作中产生的 `undo log`。因为会对已经存在的记录产生影响，为了提供 MVCC机制，因此 `update undo log` 不能在事务提交时就进行删除，而是将事务提交时放到入 `history list` 上，等待 purge 线程进行最后的删除操作。
 
   **数据第一次被修改时：**
 
@@ -171,25 +171,25 @@ InnoDB为插入一行新记录，保存当前事务编号作为行版本号，�
 
   ![image-20210307222806163](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mysql-demo/image-20210307222806163.png)
 
-  为了保证事务并发操作时，在写各自的undo log时不产生冲突，InnoDB采用回滚段的方式来维护undo log的并发写入和持久化。回滚段实际上是一种 Undo 文件组织方式。
+  为了保证事务并发操作时，在写各自的 `undo log` 时不产生冲突，InnoDB采用回滚段的方式来维护 `undo log` 的并发写入和持久化。回滚段实际上是一种 Undo 文件组织方式。
 
-#### 3、ReadView
+#### 2.4.3.ReadView
 
 对于 **RU(READ UNCOMMITTED)** 隔离级别下，所有事务直接读取数据库的最新值即可，和 **SERIALIZABLE** 隔离级别，所有请求都会加锁，同步执行。所以这对这两种情况下是不需要使用到 **Read View** 的版本控制。
 
-对于 **RC(READ COMMITTED)** 和 **RR(REPEATABLE READ)** 隔离级别的实现就是通过上面的版本控制来完成。两种隔离界别下的核心处理逻辑就是判断所有版本中哪个版本是当前事务可见的处理。针对这个问题InnoDB在设计上增加了**ReadView**的设计，**ReadView**中主要包含当前系统中还有哪些活跃的读写事务，把它们的事务id放到一个列表中，我们把这个列表命名为为**m_ids**。
+对于 **RC(READ COMMITTED)** 和 **RR(REPEATABLE READ)** 隔离级别的实现就是通过上面的版本控制来完成。两种隔离界别下的核心处理逻辑就是判断所有版本中哪个版本是当前事务可见的处理。针对这个问题InnoDB在设计上增加了**ReadView**的设计，**ReadView**中主要包含当前系统中还有哪些活跃的读写事务，把它们的事务id放到一个列表中，我们把这个列表命名为为 `m_ids`。
 
 对于查询时的版本链数据是否看见的判断逻辑：
 
-- 如果被访问版本的 trx_id 属性值小于 m_ids 列表中最小的事务id，表明生成该版本的事务在生成 ReadView 前已经提交，所以该版本可以被当前事务访问。
-- 如果被访问版本的 trx_id 属性值大于 m_ids 列表中最大的事务id，表明生成该版本的事务在生成 ReadView 后才生成，所以该版本不可以被当前事务访问。
-- 如果被访问版本的 trx_id 属性值在 m_ids 列表中最大的事务id和最小事务id之间，那就需要判断一下 trx_id 属性值是不是在 m_ids 列表中，如果在，说明创建 ReadView 时生成该版本的事务还是活跃的，该版本不可以被访问；如果不在，说明创建 ReadView 时生成该版本的事务已经被提交，该版本可以被访问。
+- 如果被访问版本的 `trx_id` 属性值小于 `m_ids` 列表中最小的事务id，表明生成该版本的事务在生成 ReadView 前已经提交，所以该版本可以被当前事务访问。
+- 如果被访问版本的 `trx_id` 属性值大于 `m_ids` 列表中最大的事务id，表明生成该版本的事务在生成 ReadView 后才生成，所以该版本不可以被当前事务访问。
+- 如果被访问版本的 `trx_id` 属性值在 `m_ids` 列表中最大的事务id和最小事务id之间，那就需要判断一下 `trx_id` 属性值是不是在 `m_ids` 列表中，如果在，说明创建 ReadView 时生成该版本的事务还是活跃的，该版本不可以被访问；如果不在，说明创建 ReadView 时生成该版本的事务已经被提交，该版本可以被访问。
 
 **举个例子：**
 
-##### 3.1、READ COMMITTED 隔离级别下的ReadView
+##### 2.4.3.1.READ COMMITTED 隔离级别下的ReadView
 
-**每次读取数据前都生成一个ReadView (m_ids列表)**
+**每次读取数据前都生成一个ReadView (`m_ids` 列表)**
 
 | **时间** | **Transaction 777**                          | **Transaction 888**                            | **Trasaction 999**               |
 | :------- | :------------------------------------------- | :--------------------------------------------- | :------------------------------- |
@@ -233,7 +233,7 @@ InnoDB为插入一行新记录，保存当前事务编号作为行版本号，�
 
 **总结：** **使用READ COMMITTED隔离级别的事务在每次查询开始时都会生成一个独立的 ReadView。**
 
-##### 3.2、REPEATABLE READ 隔离级别下的ReadView
+##### 2.4.3.2.REPEATABLE READ 隔离级别下的ReadView
 
 **在事务开始后第一次读取数据时生成一个ReadView（m_ids列表）**
 
@@ -277,15 +277,15 @@ InnoDB为插入一行新记录，保存当前事务编号作为行版本号，�
 
 
 
-### MVCC总结：
+### 2.5.MVCC总结
 
-所谓的MVCC（Multi-Version Concurrency Control ，多版本并发控制）指的就是在使用 **READ COMMITTD** 、**REPEATABLE READ** 这两种隔离级别的事务在执行普通的 SELECT 操作时访问记录的版本链的过程，这样子可以使不同事务的 `读-写` 、 `写-读` 操作并发执行，从而提升系统性能。
+所谓的MVCC（`Multi-Version Concurrency Control` ，多版本并发控制）指的就是在使用 **READ COMMITTD** 、**REPEATABLE READ** 这两种隔离级别的事务在执行普通的 SELECT 操作时访问记录的版本链的过程，这样子可以使不同事务的 `读-写` 、 `写-读` 操作并发执行，从而提升系统性能。
 
-在 MySQL 中， READ COMMITTED 和 REPEATABLE READ 隔离级别的的一个非常大的区别就是它们生成 ReadView 的时机不同。在 READ COMMITTED 中每次查询都会生成一个实时的 ReadView，做到保证每次提交后的数据是处于当前的可见状态。而 REPEATABLE READ 中，在当前事务第一次查询时生成当前的 ReadView，并且当前的 ReadView 会一直沿用到当前事务提交，以此来保证可重复读（REPEATABLE READ）。
+在 MySQL 中， `READ COMMITTED` 和 `REPEATABLE READ` 隔离级别的的一个非常大的区别就是它们生成 `ReadView` 的时机不同。在 `READ COMMITTED` 中每次查询都会生成一个实时的 ReadView，做到保证每次提交后的数据是处于当前的可见状态。而 `REPEATABLE READ` 中，在当前事务第一次查询时生成当前的 ReadView，并且当前的 ReadView 会一直沿用到当前事务提交，以此来保证可重复读（`REPEATABLE READ`）。
 
 
 
-### MVCC总结2：
+### 2.6.MVCC总结2
 
 1. 一般我们认为MVCC有下面几个特点：
    - 每行数据都存在一个版本，每次数据更新时都更新该版本

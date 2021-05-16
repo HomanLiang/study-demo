@@ -67,7 +67,7 @@ CREATE TABLE tb_name
 ) CHARACTER SET latin1 COLLATE latin1_bin;
 ```
 
-> ***提示: ***查看数据库当前编码方式，使用命令：
+> **提示: **查看数据库当前编码方式，使用命令：
 >  show variables like 'char%';
 >  你会看到类似的输出：
 
@@ -132,20 +132,28 @@ COMMENT = 'XXXX表';
 
   ![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mysql-demo/20210505094814.png)
 
-- 
 
 ## 2. 常用数据类型
 
 **int**：整型 
-**double**：浮点型，例如double(5,2)表示最多5位，其中必须有2位小数，即最大值为999.99； 
-**char**：固定长度字符串类型； char(10) ‘abc ’ 
-**varchar**：可变长度字符串类型；varchar(10) ‘abc’ 
+
+**double**：浮点型，例如 `double(5,2)` 表示最多5位，其中必须有2位小数，即最大值为999.99； 
+
+**char**：固定长度字符串类型； `char(10) `
+
+**varchar**：可变长度字符串类型；`varchar(10) `
+
 **text**：字符串类型; 
+
 **blob**：字节类型； 
-**date**：日期类型，格式为：yyyy-MM-dd； 
-**time**：时间类型，格式为：hh:mm:ss 
-**timestamp**：时间戳类型 yyyy-MM-dd hh:mm:ss 会自动赋值 
-**datetime**:日期时间类型 yyyy-MM-dd hh:mm:ss
+
+**date**：日期类型，格式为：`yyyy-MM-dd` 
+
+**time**：时间类型，格式为：`hh:mm:ss`
+
+**timestamp**：时间戳类型 `yyyy-MM-dd hh:mm:ss` 会自动赋值 
+
+**datetime**:日期时间类型 `yyyy-MM-dd hh:mm:ss`
 
 
 
@@ -257,7 +265,7 @@ SELECT name, AVG(tb_field) FROM tb_name GROUP BY name;
 
   一般意义上我们在取前N条记录时候，都是根据某个业务字段进行降序排序，然后取前N条就能实现。
 
-  形如“select * from info order by views asc limit 0,3 ”，这条SQL就是取info表中的前3条记录。
+  形如 `select * from info order by views asc limit 0,3`，这条SQL就是取info表中的前3条记录。
 
   但是当你仔细阅读我们的题目要求，你会发现：**“它是让你每个类型下都要取浏览量的前3条记录”**。
 
