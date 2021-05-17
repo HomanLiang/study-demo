@@ -56,7 +56,7 @@ Tips： 最好不要在主库上数据库备份，大型活动前取消这样的
 
 - 进行分级缓存（避免前端大量缓存失效）
 
-- 避免使用 select* 进行查询
+- 避免使用 `select *` 进行查询
 
 - 分离业务网络和服务器网络
 
@@ -145,8 +145,11 @@ Tips： 最好不要在主库上数据库备份，大型活动前取消这样的
 
 ```
 sort_buffer_size #定义了每个线程排序缓存区的大小，MySQL在有查询、需要做排序操作时才会为每个缓冲区分配内存（直接分配该参数的全部内存）；
+
 join_buffer_size #定义了每个线程所使用的连接缓冲区的大小，如果一个查询关联了多张表，MySQL会为每张表分配一个连接缓冲，导致一个查询产生了多个连接缓冲；
+
 read_buffer_size #定义了当对一张MyISAM进行全表扫描时所分配读缓冲池大小，MySQL有查询需要时会为其分配内存，其必须是4k的倍数；
+
 read_rnd_buffer_size #索引缓冲区大小，MySQL有查询需要时会为其分配内存，只会分配需要的大小。
 ```
 注意： 以上四个参数是为一个线程分配的，如果有100个连接，那么需要×100。
@@ -178,6 +181,7 @@ MySQL数据库实例：
 
 ### 3.5.性能优化顺序
 从上到下：
+
 ![Image [4]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mysql-demo/20210307113404.png)
 
 
@@ -202,10 +206,10 @@ show global status like 'Com_______';
 
 下面这些对于所有存储引擎的表操作都会进行累计
 
-- Com_select：执行 select 操作的次数，一次查询只累加 1。
-- Com_insert：执行 INSERT 操作的次数，对于批量插入的 INSERT 操作，只累加一次。
-- Com_update：执行 UPDATE 操作的次数。
-- Com_delete：执行 DELETE 操作的次数。
+- `Com_select`：执行 select 操作的次数，一次查询只累加 1。
+- `Com_insert`：执行 INSERT 操作的次数，对于批量插入的 INSERT 操作，只累加一次。
+- `Com_update`：执行 UPDATE 操作的次数。
+- `Com_delete`：执行 DELETE 操作的次数。
 
 有专门针对Innodb统计的，其中 `rows_read`代表的是读取的行数。
 
@@ -215,7 +219,7 @@ show status like 'Innodb_rows_%';
 
 ![image-20210311222000785](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mysql-demo/20210311222000.png)
 
-对于事务型的应用，通过 Com_commit 和 Com_rollback 可以了解事务提交和回滚的情况， 对于回滚操作非常频繁的数据库，可能意味着应用编写存在问题。
+对于事务型的应用，通过 `Com_commit` 和 `Com_rollback` 可以了解事务提交和回滚的情况， 对于回滚操作非常频繁的数据库，可能意味着应用编写存在问题。
 
 ------
 
@@ -253,11 +257,12 @@ show status like 'Innodb_rows_%';
 - **id**：id相同表示加载表的执行顺序从上到下，id越大加载的优先级越高
 
 - **select_type**：表示 SELECT 的类型，常见的取值有
-- SIMPLE（简单表，即不使用表连接 或者子查询）
-	- PRIMARY（主查询，即外层的查询）
-	- UNION（UNION 中的第二个或 者后面的查询语句）
-	- SUBQUERY（子查询中的第一个 SELECT）
-	
+
+  - SIMPLE（简单表，即不使用表连接 或者子查询）
+
+  - PRIMARY（主查询，即外层的查询）
+  - UNION（UNION 中的第二个或 者后面的查询语句）
+  - SUBQUERY（子查询中的第一个 SELECT）
 - **table**：输出结果集的表
 
 - **type**：表示表的连接类型，性能好到坏的结果
@@ -498,20 +503,25 @@ EXPLAIN select * from Teacher t GROUP BY teacherName;
 
 ![image-20210311230509139](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mysql-demo/20210311230509.png)
 
-报错：Expression #1 of SELECT list is not in GROUP BY clause and contains nonaggregated column 'demo_01.Teacher.teacherName' which is not functionally dependent on columns in GROUP BY clause; this is incompatible with sql_mode=only_full_group_by
+报错：
+
+```
+Expression #1 of SELECT list is not in GROUP BY clause and contains nonaggregated column 'demo_01.Teacher.teacherName' which is not functionally dependent on columns in GROUP BY clause; this is incompatible with sql_mode=only_full_group_by
+```
 
 解决办法：
-1、找到mysql的配置文件 my.ini (一般在mysql根目录)
 
-2、在my.cn中将以下内容添加到 [mysqld]下
+- 找到mysql的配置文件 `my.ini` (一般在mysql根目录)
 
-我的是：etc/my.cnf
+- 在 `my.cn` 中将以下内容添加到 `[mysqld]` 下
 
-sql_mode=NO_ENGINE_SUBSTITUTION,STRICT_TRANS_TABLES
+我的是：`etc/my.cnf`
+
+`sql_mode=NO_ENGINE_SUBSTITUTION,STRICT_TRANS_TABLES`
 
 ### 4.4.show profile分析SQL
 
-show profile可以分析sql运行的时间，通过 `have_profiling`可以查看MySQL是否支持profile
+`show profile` 可以分析sql运行的时间，通过 `have_profiling`可以查看MySQL是否支持profile
 
 ![image-20210311230547435](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mysql-demo/20210311230547.png)
 
@@ -778,7 +788,7 @@ select * from information_schema.optimizer_trace\G;
 
 除非单表数据未来会一直不断上涨，否则不要一开始就考虑拆分，拆分会带来逻辑、部署、运维的各种复杂度，一般以整型值为主的表在千万级以下，字符串为主的表在五百万以下是没有太大问题的。而事实上很多时候MySQL单表的性能依然有不少优化空间，甚至能正常支撑千万级以上的数据量：
 
-#### 引擎
+#### 5.1.1.引擎
 
 目前广泛使用的是MyISAM和InnoDB两种引擎：
 
@@ -809,7 +819,7 @@ ps: 据说innodb已经在mysql 5.6.4支持全文索引了
 
 总体来讲，MyISAM适合SELECT密集型的表，而InnoDB适合INSERT和UPDATE密集型的表
 
-#### Schema与数据类型优化
+#### 5.1.2.Schema与数据类型优化
 
 1. 整数通常是标识列最好的选择，因为它们很快并且可以使用 `AUTO_INCREMENT`
 1. 完全“随机”的字符串（如：`MD5()`、`SHA1()` 或者 `UUID()` 等产生的字符串）会任意分布在很大的空间内，会导致INSERT以及一些SELECT语句变的很慢
@@ -819,7 +829,7 @@ ps: 据说innodb已经在mysql 5.6.4支持全文索引了
 1. 不用外键，由程序保证约束
 1. 尽量不用UNIQUE，由程序保证约束
 
-#### 字段
+#### 5.1.3.字段
 
 - 尽量使用TINYINT、SMALLINT、MEDIUM_INT作为整数类型而非INT，如果非负则加上UNSIGNED
 - VARCHAR的长度只分配真正需要的空间
@@ -829,7 +839,7 @@ ps: 据说innodb已经在mysql 5.6.4支持全文索引了
 - 避免使用NULL字段，很难查询优化且占用额外索引空间
 - 用整型来存IP
 
-#### 索引
+#### 5.1.4.索引
 
 - 索引并不是越多越好，要根据查询有针对性的创建，考虑在 `WHERE` 和 `ORDER BY` 命令上涉及的列建立索引，可根据EXPLAIN来查看是否用了索引还是全表扫描
 - 值分布很稀少的字段不适合建索引，例如"性别"这种只有两三个值的字段--数据越不集中，并且回表数据多，速度就慢
@@ -885,7 +895,7 @@ ps: 据说innodb已经在mysql 5.6.4支持全文索引了
     
     ![image-20210311230954888](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mysql-demo/20210311230954.png)
     
-- 以like '%XX'开头不走索引
+- 以 `like '%XX'` 开头不走索引
 
     正常走索引
 
@@ -903,7 +913,7 @@ ps: 据说innodb已经在mysql 5.6.4支持全文索引了
     
     ![image-20210311231022629](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mysql-demo/20210311231022.png)
     
-    不走索引解决办法：使用覆盖索引，将*号改成有索引的列，再通过索引查询
+    不走索引解决办法：使用覆盖索引，将 `*` 号改成有索引的列，再通过索引查询
 
     ```mysql
     explain select StudentID from Student where StudentName LIKE '%货物9000号%' 
@@ -924,14 +934,14 @@ ps: 据说innodb已经在mysql 5.6.4支持全文索引了
 
 	![image-20210311231053721](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mysql-demo/20210311231053.png)
 
-- in走索引、not in 不走索引，但也不是绝对的
+- `in` 走索引、`not in` 不走索引，但也不是绝对的
 
 - 对于联合索引来说，要遵守最左前缀法则
-    
-举列来说索引含有字段id、name、school，可以直接用id字段，也可以id、name这样的顺序，但是name;school都无法使用这个索引。所以在创建联合索引的时候一定要注意索引字段顺序，常用的查询字段放在最前面。
-    
-如果不是按照索引的最左列开始查找，则无法使用索引
-    
+  
+  举列来说索引含有字段id、name、school，可以直接用id字段，也可以id、name这样的顺序，但是name;school都无法使用这个索引。所以在创建联合索引的时候一定要注意索引字段顺序，常用的查询字段放在最前面。
+  
+  如果不是按照索引的最左列开始查找，则无法使用索引
+  
 - 所有的非聚簇索引都需要先通过索引定位到对应的主键，然后在到聚簇索引查找数据，所以在定义主键索引的时候一定要谨慎
 
 - 只有当索引的列顺序和ORDER BY子句的顺序完全一致，并且所有列的排序方向（倒序或者正序）都一样时，MySQL才能够使用索引来对结果做排序。有一种情况下ORDER BY子句可以不满足索引的最左前缀的要求，就是前导列为常量的时候。
@@ -954,7 +964,7 @@ ps: 据说innodb已经在mysql 5.6.4支持全文索引了
 
 - 编写查询语句时应该避免单行查找、尽可能的使用数据原生顺序从而避免额外的排序操作，并尽可能使用索引覆盖查询
 
-- 不做列运算：SELECT id WHERE age + 1 = 10，任何对列的操作都将导致表扫描，它包括数据库教程函数、计算表达式等等，查询时要尽可能将操作移至等号右边
+- 不做列运算：`SELECT id WHERE age + 1 = 10`，任何对列的操作都将导致表扫描，它包括数据库教程函数、计算表达式等等，查询时要尽可能将操作移至等号右边
 
 - 关联查询的时候要确保关联的字段上有索引
 
@@ -962,51 +972,51 @@ ps: 据说innodb已经在mysql 5.6.4支持全文索引了
 
 - SQL提示
 
-    （1）USE index，在有多个索引的情况下，希望Mysql使用该索引，但不是一定会用。
+    - USE index，在有多个索引的情况下，希望Mysql使用该索引，但不是一定会用。
 
-    ```mysql
-    explain select * from sales2 use index (ind_sales2_id) where id = 3
-    ```
+      ```
+      explain select * from sales2 use index (ind_sales2_id) where id = 3
+      ```
 
-    （2）ignore index可以忽略使用该索引，使用其他索引
+    - `ignore index` 可以忽略使用该索引，使用其他索引
 
-    （3）在数据量很多的情况下，查询数据占很大比重，即使使用了索引，数据库也不会用，这时候使用force index强制指定索引。
+    - 在数据量很多的情况下，查询数据占很大比重，即使使用了索引，数据库也不会用，这时候使用 `force index` 强制指定索引。
 
 
 
-#### SQL优化
+#### 5.1.5.SQL优化
 
 - 可通过开启慢查询日志来找出较慢的SQL
 
 - sql语句尽可能简单：一条sql只能在一个cpu运算；大语句拆小语句，减少锁时间；一条大sql可以堵死整个库
 
-- 不用SELECT *
+- 不用 `SELECT *`
 
-- OR改写成IN：OR的效率是n级别，IN的效率是log(n)级别，in的个数建议控制在200以内
+- OR改写成IN：OR的效率是n级别，IN的效率是 `log(n)` 级别，in的个数建议控制在200以内
 
 - 不用函数和触发器，在应用程序实现
 
-- 少用JOIN
+- 少用 `JOIN`
 
-- 对于连续数值，使用BETWEEN不用IN：SELECT id FROM t WHERE num BETWEEN 1 AND 5
+- 对于连续数值，使用BETWEEN不用IN：`SELECT id FROM t WHERE num BETWEEN 1 AND 5`
 
 - 列表数据不要拿全表，要使用LIMIT来分页，每页数量也不要太大
 
 - SQL语句中IN包含的值不应过多
   
-  MySQL对于IN做了相应的优化，即将IN中的常量全部存储在一个数组里面，而且这个数组是排好序的。但是如果数值较多，产生的消耗也是比较大的。再例如：select id from t where num in(1,2,3) 对于连续的数值，能用between就不要用in了；再或者使用连接来替换。
+  MySQL对于IN做了相应的优化，即将IN中的常量全部存储在一个数组里面，而且这个数组是排好序的。但是如果数值较多，产生的消耗也是比较大的。再例如：`select id from t where num in(1,2,3)` 对于连续的数值，能用between就不要用in了；再或者使用连接来替换。
   
-- 当只需要一条数据的时候，使用limit 1
+- 当只需要一条数据的时候，使用 `limit 1`
   
   这是为了使EXPLAIN中type列达到const类型五、如果排序字段没有用到索引
   
 - 如果排序字段没有用到索引，就尽量少排序
 
-- 尽量用union all代替union
+- 尽量用 `union all` 代替 `union`
   
-  union和union all的差异主要是前者需要将结果集合并后再进行唯一性过滤操作，这就会涉及到排序，增加大量的CPU运算，加大资源消耗及延迟。当然，union all的前提条件是两个结果集没有重复数据。
+  `union` 和 `union all` 的差异主要是前者需要将结果集合并后再进行唯一性过滤操作，这就会涉及到排序，增加大量的CPU运算，加大资源消耗及延迟。当然，`union all` 的前提条件是两个结果集没有重复数据。
   
-- 不使用ORDER BY RAND()
+- 不使用 `ORDER BY RAND()`
 
     ```
     select id from `dynamic` order by rand() limit 1000;
@@ -1024,8 +1034,9 @@ ps: 据说innodb已经在mysql 5.6.4支持全文索引了
     select id,name from product limit 866613, 20
     ```
 
-	使用上述SQL语句做分页的时候，可能有人会发现，随着表数据量的增加，直接使用limit分页查询会越来越慢。
-优化的方法如下：可以取前一页的最大行数的id，然后根据这个最大的id来限制下一页的起点。比如此列中，上一页最大的id是866612。SQL可以采用如下的写法：
+    使用上述SQL语句做分页的时候，可能有人会发现，随着表数据量的增加，直接使用limit分页查询会越来越慢。
+
+    优化的方法如下：可以取前一页的最大行数的id，然后根据这个最大的id来限制下一页的起点。比如此列中，上一页最大的id是866612。SQL可以采用如下的写法：
 
     ```
     select id,name from product where id> 866612 limit 20
@@ -1059,19 +1070,19 @@ ps: 据说innodb已经在mysql 5.6.4支持全文索引了
 
   （3）尽量按主键顺序插入
 
-- 优化Order by语句
+- 优化 `Order by` 语句
 
   （1）如果按照多字段排序，要么统一升序要么统一降序
 
   （2）order 不用后面的字段需要和索引的顺序保持一致
 
-  （3）如果Extra列还出现Using filesort，表示进行了额外的一次排序，考虑使用联合索引
+  （3）如果Extra列还出现 `Using filesort`，表示进行了额外的一次排序，考虑使用联合索引
 
-- 优化Group by语句
+- 优化 `Group by` 语句
 
-  （1）使用Group by如果Extra列出现Using filesort，表示Group by语句默认进行了排序，可以使用Order by null取消排序
+  （1）使用 `Group by` 如果Extra列出现 `Using filesort`，表示 `Group by` 语句默认进行了排序，可以使用 `Order by null` 取消排序
 
-  （2）使用Group by如果Extra列出现Using Temporary，可以给字段建立索引提高效率
+  （2）使用 `Group by` 如果Extra列出现 `Using Temporary`，可以给字段建立索引提高效率
 
 - 优化嵌套查询
 
@@ -1079,15 +1090,15 @@ ps: 据说innodb已经在mysql 5.6.4支持全文索引了
 
 - 优化OR查询
 
-  （1）如果需要用到索引，则每个列需要单独创建索引，不能用复合索引
+  - 如果需要用到索引，则每个列需要单独创建索引，不能用复合索引
 
-  （2）使用Union替换Or
+  - 使用Union替换Or
 
 - 优化分页查询
 
-  （1）根据主键进行排序分页操作，得到主键再回原表进行查询
+  - 根据主键进行排序分页操作，得到主键再回原表进行查询
 
-  （2）主键自增时，可以直接根据ID查询，数据没删除的情况下
+  - 主键自增时，可以直接根据ID查询，数据没删除的情况下
 
 - 尽量使用数字型字段，若只含数值信息的字段尽量不要设计为字符型，这会降低查询和连接的性能，并会增加存储开销。这是因为引擎在处理查询和连接时会逐个比较字符串中每一个字符，而对于数字型而言只需要比较一次就够了。
 
@@ -1108,7 +1119,7 @@ ps: 据说innodb已经在mysql 5.6.4支持全文索引了
 
 - 无论如何排序都是一个成本很高的操作，所以从性能角度考虑，应尽可能避免排序或者尽可能避免对大量数据进行排序
 
-- COUNT()函数有两种不同的作用：它可以统计某个列值的数量，也可以统计行数。最简单的就是通过`COUNT(*)`来统计行数
+- `COUNT()` 函数有两种不同的作用：它可以统计某个列值的数量，也可以统计行数。最简单的就是通过`COUNT(*)`来统计行数
 
 - 在数据量很大并且历史数据需要定期删除的情况下，可以考虑使用分区表
 
@@ -1118,35 +1129,35 @@ ps: 据说innodb已经在mysql 5.6.4支持全文索引了
 
 
 
-#### 系统调优参数
+#### 5.1.6.系统调优参数
 
 可以使用下面几个工具来做基准测试：
 
 - sysbench：一个模块化，跨平台以及多线程的性能测试工具
-- iibench-mysql：基于 Java 的 MySQL/Percona/MariaDB 索引进行插入性能测试工具
+- iibench-mysql：基于 Java 的 `MySQL/Percona/MariaDB` 索引进行插入性能测试工具
 - tpcc-mysql：Percona开发的TPC-C测试工具
 
 具体的调优参数内容较多，具体可参考官方文档，这里介绍一些比较重要的参数：
 
-- back_log：back_log值指出在MySQL暂时停止回答新请求之前的短时间内多少个请求可以被存在堆栈中。也就是说，如果MySql的连接数据达到max_connections时，新来的请求将会被存在堆栈中，以等待某一连接释放资源，该堆栈的数量即back_log，如果等待连接的数量超过back_log，将不被授予连接资源。可以从默认的50升至500
-- wait_timeout：数据库连接闲置时间，闲置连接会占用内存资源。可以从默认的8小时减到半小时
-- max_user_connection: 最大连接数，默认为0无上限，最好设一个合理上限
-- thread_concurrency：并发线程数，设为CPU核数的两倍
-- skip_name_resolve：禁止对外部连接进行DNS解析，消除DNS解析时间，但需要所有远程主机用IP访问
-- key_buffer_size：索引块的缓存大小，增加会提升索引处理速度，对MyISAM表性能影响最大。对于内存4G左右，可设为256M或384M，通过查询show status like 'key_read%'，保证key_reads / key_read_requests在0.1%以下最好
-- innodb_buffer_pool_size：缓存数据块和索引块，对InnoDB表性能影响最大。通过查询show status like 'Innodb_buffer_pool_read%'，保证 (Innodb_buffer_pool_read_requests – Innodb_buffer_pool_reads) / Innodb_buffer_pool_read_requests越高越好
-- innodb_additional_mem_pool_size：InnoDB存储引擎用来存放数据字典信息以及一些内部数据结构的内存空间大小，当数据库对象非常多的时候，适当调整该参数的大小以确保所有数据都能存放在内存中提高访问效率，当过小的时候，MySQL会记录Warning信息到数据库的错误日志中，这时就需要该调整这个参数大小
-- innodb_log_buffer_size：InnoDB存储引擎的事务日志所使用的缓冲区，一般来说不建议超过32MB
-- query_cache_size：缓存MySQL中的ResultSet，也就是一条SQL语句执行的结果集，所以仅仅只能针对select语句。当某个表的数据有任何任何变化，都会导致所有引用了该表的select语句在Query Cache中的缓存数据失效。所以，当我们的数据变化非常频繁的情况下，使用Query Cache可能会得不偿失。根据命中率(Qcache_hits/(Qcache_hits+Qcache_inserts)*100))进行调整，一般不建议太大，256MB可能已经差不多了，大型的配置型静态数据可适当调大.
-- 可以通过命令show status like 'Qcache_%'查看目前系统Query catch使用大小
-- read_buffer_size：MySql读入缓冲区大小。对表进行顺序扫描的请求将分配一个读入缓冲区，MySql会为它分配一段内存缓冲区。如果对表的顺序扫描请求非常频繁，可以通过增加该变量值以及内存缓冲区大小提高其性能
-- sort_buffer_size：MySql执行排序使用的缓冲大小。如果想要增加ORDER BY的速度，首先看是否可以让MySQL使用索引而不是额外的排序阶段。如果不能，可以尝试增加sort_buffer_size变量的大小
-- read_rnd_buffer_size：MySql的随机读缓冲区大小。当按任意顺序读取行时(例如，按照排序顺序)，将分配一个随机读缓存区。进行排序查询时，MySql会首先扫描一遍该缓冲，以避免磁盘搜索，提高查询速度，如果需要排序大量数据，可适当调高该值。但MySql会为每个客户连接发放该缓冲空间，所以应尽量适当设置该值，以避免内存开销过大。
-- record_buffer：每个进行一个顺序扫描的线程为其扫描的每张表分配这个大小的一个缓冲区。如果你做很多顺序扫描，可能想要增加该值
-- thread_cache_size：保存当前没有与连接关联但是准备为后面新的连接服务的线程，可以快速响应连接的线程请求而无需创建新的
-- table_cache：类似于thread_cache_size，但用来缓存表文件，对InnoDB效果不大，主要用于MyISAM
+- `back_log`：back_log值指出在MySQL暂时停止回答新请求之前的短时间内多少个请求可以被存在堆栈中。也就是说，如果MySql的连接数据达到max_connections时，新来的请求将会被存在堆栈中，以等待某一连接释放资源，该堆栈的数量即back_log，如果等待连接的数量超过back_log，将不被授予连接资源。可以从默认的50升至500
+- `wait_timeout`：数据库连接闲置时间，闲置连接会占用内存资源。可以从默认的8小时减到半小时
+- `max_user_connection`: 最大连接数，默认为0无上限，最好设一个合理上限
+- `thread_concurrency`：并发线程数，设为CPU核数的两倍
+- `skip_name_resolve`：禁止对外部连接进行DNS解析，消除DNS解析时间，但需要所有远程主机用IP访问
+- `key_buffer_size`：索引块的缓存大小，增加会提升索引处理速度，对MyISAM表性能影响最大。对于内存4G左右，可设为256M或384M，通过查询show status like 'key_read%'，保证key_reads / key_read_requests在0.1%以下最好
+- `innodb_buffer_pool_size`：缓存数据块和索引块，对InnoDB表性能影响最大。通过查询 `show status like 'Innodb_buffer_pool_read%'`，保证 `(Innodb_buffer_pool_read_requests – Innodb_buffer_pool_reads) / Innodb_buffer_pool_read_requests` 越高越好
+- `innodb_additional_mem_pool_size`：InnoDB存储引擎用来存放数据字典信息以及一些内部数据结构的内存空间大小，当数据库对象非常多的时候，适当调整该参数的大小以确保所有数据都能存放在内存中提高访问效率，当过小的时候，MySQL会记录Warning信息到数据库的错误日志中，这时就需要该调整这个参数大小
+- `innodb_log_buffer_size`：InnoDB存储引擎的事务日志所使用的缓冲区，一般来说不建议超过32MB
+- `query_cache_size`：缓存MySQL中的ResultSet，也就是一条SQL语句执行的结果集，所以仅仅只能针对select语句。当某个表的数据有任何任何变化，都会导致所有引用了该表的select语句在Query Cache中的缓存数据失效。所以，当我们的数据变化非常频繁的情况下，使用Query Cache可能会得不偿失。根据命中率 `(Qcache_hits/(Qcache_hits+Qcache_inserts)*100))` 进行调整，一般不建议太大，256MB可能已经差不多了，大型的配置型静态数据可适当调大.
+- 可以通过命令 `show status like 'Qcache_%'` 查看目前系统Query catch使用大小
+- `read_buffer_size`：MySql读入缓冲区大小。对表进行顺序扫描的请求将分配一个读入缓冲区，MySql会为它分配一段内存缓冲区。如果对表的顺序扫描请求非常频繁，可以通过增加该变量值以及内存缓冲区大小提高其性能
+- `sort_buffer_size`：MySql执行排序使用的缓冲大小。如果想要增加ORDER BY的速度，首先看是否可以让MySQL使用索引而不是额外的排序阶段。如果不能，可以尝试增加sort_buffer_size变量的大小
+- `read_rnd_buffer_size`：MySql的随机读缓冲区大小。当按任意顺序读取行时(例如，按照排序顺序)，将分配一个随机读缓存区。进行排序查询时，MySql会首先扫描一遍该缓冲，以避免磁盘搜索，提高查询速度，如果需要排序大量数据，可适当调高该值。但MySql会为每个客户连接发放该缓冲空间，所以应尽量适当设置该值，以避免内存开销过大。
+- `record_buffer`：每个进行一个顺序扫描的线程为其扫描的每张表分配这个大小的一个缓冲区。如果你做很多顺序扫描，可能想要增加该值
+- `thread_cache_size`：保存当前没有与连接关联但是准备为后面新的连接服务的线程，可以快速响应连接的线程请求而无需创建新的
+- `table_cache`：类似于 `thread_cache_size`，但用来缓存表文件，对InnoDB效果不大，主要用于MyISAM
 
-#### 升级硬件
+#### 5.1.7.升级硬件
 
 Scale up，这个不多说了，根据MySQL是CPU密集型还是I/O密集型，通过提升CPU和内存、使用SSD，都能显著提升MySQL性能
 
@@ -1160,13 +1171,13 @@ Scale up，这个不多说了，根据MySQL是CPU密集型还是I/O密集型，�
 
 下面就从text类型的存储结构，引发的问题解释下为什么不建议使用text类型，以及Text改造的建议方法。
 
-#### 背景
+#### 6.1.1.背景
 
 写log表导致DML慢
 
 - **问题描述**
 
-  某歪有一个业务系统，使用RDS for MySQL 5.7的高可用版本，配置long_query_time=1s，添加慢查询告警，我第一反应就是某歪又乱点了。
+  某歪有一个业务系统，使用RDS for MySQL 5.7的高可用版本，配置 `long_query_time=1s`，添加慢查询告警，我第一反应就是某歪又乱点了。
 
   我通过监控看CPU， QPS，TPS等指标不是很高，最近刚好双十一全站都在做营销活动，用户量稍微有所增加。某歪反馈有些原本不慢的接口变的很慢，影响了正常的业务，需要做一下troubleshooting。
 
@@ -1174,11 +1185,11 @@ Scale up，这个不多说了，根据MySQL是CPU密集型还是I/O密集型，�
 
   我从慢查询告警，可以看到有一些insert和update语句比较慢，同时告警时段的监控，发现IOPS很高，达到了70MB/s左右，由于RDS的CloundDBA功能不可用，又没有audit log功能，troubleshooting比较困难，硬着头皮只能分析binlog了。
 
-  配置了max_binlog_size =512MB，在IOPS高的时段里，看下binlog的生成情况。
+  配置了 `max_binlog_size =512MB`，在IOPS高的时段里，看下binlog的生成情况。
 
   ![image-20210311234505214](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mysql-demo/20210311234505.png)
 
-  需要分析为什么binlog写这么快，最有可能原因就是insert into request_log表上有text类型，request_log表结构如下（demo）
+  需要分析为什么binlog写这么快，最有可能原因就是 `insert into request_log` 表上有text类型，`request_log`表结构如下（demo）
 
     ```
     CREATE TABLE request_log (`
@@ -1204,17 +1215,17 @@ Scale up，这个不多说了，根据MySQL是CPU密集型还是I/O密集型，�
   
   满屏幕都是看不清的内容，翻了半天没翻完。
   
-  基本上已经确定是写入request_log的log字段引起的，导致binlog_cache频繁的flush，以及binlog过度切换，导致IOPS过高，影响了其他正常的DML操作。
+  基本上已经确定是写入 `request_log` 的log字段引起的，导致 `binlog_cache` 频繁的flush，以及binlog过度切换，导致IOPS过高，影响了其他正常的DML操作。
 
 - **问题解决**
 
   跟开发同学沟通后，计划在下一个版本修复这个问题，不再将request信息写入表中，写入到本地日志文件，通过filebeat抽取到es进行查询，如果只是为了查看日志也可以接入grayLog等日志工具，没必要写入数据库。
 
-#### MySQL中的Text
+#### 6.1.2.MySQL中的Text
 
-1、**Text类型**
+**6.1.2.1.Text类型**
 
-text是一个能够存储大量的数据的大对象，有四种类型：TINYTEXT, TEXT, MEDIUMTEXT,LONGTEXT，不同类型存储的值范围不同，如下所示
+text是一个能够存储大量的数据的大对象，有四种类型：`TINYTEXT, TEXT`, `MEDIUMTEXT`,`LONGTEXT`，不同类型存储的值范围不同，如下所示
 
 | Data Type  | Storage Required             |
 | :--------- | :--------------------------- |
@@ -1223,9 +1234,9 @@ text是一个能够存储大量的数据的大对象，有四种类型：TINYTEX
 | MEDIUMTEXT | L + 3 bytes, where L < 2**24 |
 | LONGTEXT   | L + 4 bytes, where L < 2**32 |
 
-其中L表是text类型中存储的实际长度的字节数。可以计算出TEXT类型最大存储长度2**16-1 = 65535 Bytes。
+其中L表是text类型中存储的实际长度的字节数。可以计算出TEXT类型最大存储长度 `2**16-1 = 65535 Bytes`。
 
-2、**InnoDB数据页**
+**6.1.2.2.InnoDB数据页**
 
 Innodb数据页由以下7个部分组成：
 
@@ -1243,7 +1254,7 @@ Innodb数据页由以下7个部分组成：
 
 从MySQL 5.6开始默认的表存储引擎是InnoDB，它是面向ROW存储的，每个page(default page size = 16KB)，存储的行记录也是有规定的，最多允许存储16K/2 - 200 = 7992行。
 
-3、**InnoDB的行格式**
+**6.1.2.3.InnoDB的行格式**
 
 Innodb支持四种行格式：
 
@@ -1256,7 +1267,7 @@ Innodb支持四种行格式：
 
 由于Dynamic是Compact变异而来，结构大同而已，现在默认都是Dynamic格式；COMPRESSED主要是对表和索引数据进行压缩，一般适用于使用率低的归档，备份类的需求，主要介绍下REDUNDANT和COMPACT行格式。
 
-3.1、**Redundant行格式**
+**6.1.2.3.1.Redundant行格式**
 
 这种格式为了兼容旧版本MySQL。
 
@@ -1281,7 +1292,7 @@ Innodb支持四种行格式：
 
 其中变长类型是通过长度 + 数据的方式存储，不同类型长度是从1到4个字节（L+1 到 L + 4），对于TEXT类型的值需要L Bytes存储value，同时需要2个字节存储value的长度。同时Innodb最大行长度规定为65535 Bytes，对于Text类型，只保存9到12字节的指针，数据单独存在overflow page中。
 
-3.2、**Compact行格式**
+**6.1.2.3.2.Compact行格式**
 
 这种行格式比redundant格式减少了存储空间作为代价，但是会增加某些操作的CPU开销。如果系统workload是受缓存命中率和磁盘速度限制，compact行格式可能更快。如果你的工作负载受CPU速度限制，compact行格式可能更慢，Compact 行格式被所有file format所支持。
 
@@ -1308,11 +1319,11 @@ Compact首部是一个非NULL变长字段长度的列表，并且是按列的顺
 - 固定长度的字符字段比如CHAR(10)通过固定长度的格式存储，尾部填充空格。
 - 对于变长的字符集，比如uft8mb3和utf8mb4， InnoDB试图用N字节来存储 CHAR(N)。如果CHAR(N)列的值的长度超过N字节，列后面的空格减少到最小值。CHAR(N)列值的最大长度是最大字符编码数 x N。比如utf8mb4字符集的最长编码为4，则列的最长字节数是 4*N。
 
-#### Text类型引发的问题
+#### 6.1.3.Text类型引发的问题
 
-1、**插入text字段导致报错**
+**6.1.3.1.插入text字段导致报错**
 
-1.1、**创建测试表**
+**6.1.3.1.1.创建测试表**
 
 ```
 [root@barret] [test]>create table user(id bigint not null primary key auto_increment, 
@@ -1326,7 +1337,7 @@ Compact首部是一个非NULL变长字段长度的列表，并且是按列的顺
 Query OK, 0 rows affected (0.04 sec)
 ```
 
-1.2、**插入测试数据**
+**6.1.3.1.2.插入测试数据**
 
 ```
 root@barret] [test]>insert into user(name,age,gender,info) values('moon', 34, 'M', repeat('a',1024*1024*3));
@@ -1335,7 +1346,7 @@ ERROR 1406 (22001): Data too long for column 'info' at row 1
 ERROR 1301 (HY000): Result of repeat() was larger than max_allowed_packet (4194304) - truncated
 ```
 
-1.3、**错误分析**
+**6.1.3.1.3.错误分析**
 
 ```
 [root@barret] [test]>select @@max_allowed_packet;
@@ -1359,13 +1370,13 @@ max_allowed_packet:  This value by default is small, to catch large (possibly in
 
 增加该参数的大小可以缓解报错，但是不能彻底的解决问题。
 
-2、**RDS实例被锁定**
+**6.1.3.2.RDS实例被锁定**
 
-2.1、**背景描述**
+**6.1.3.2.1.背景描述**
 
 公司每个月都会做一些营销活动，有个服务apush活动推送，单独部署在高可用版的RDS for MySQL 5.7，配置是4C8G 150G磁盘，数据库里也就4张表，晚上22：00下班走的时候，rds实例数据使用了50G空间，第二天早晨9：30在地铁上收到钉钉告警短信，提示push服务rds实例由于disk is full被locked with —read-only，开发也反馈，应用日志报了一堆MySQL error。
 
-2.2、**问题分析**
+**6.1.3.2.2.问题分析**
 
 通过DMS登录到数据库，看一下那个表最大，发现有张表push_log占用了100G+，看了下表结构，里面有两个text字段。
 
@@ -1377,7 +1388,7 @@ mysql>show  table status like 'push_log'；
 
 发现Avg_row_length基本都在150KB左右，Rows = 78w，表的大小约为780000*150KB/1024/1024 = 111.5G。
 
-3、**通过主键update也很慢**
+**6.1.3.3.通过主键update也很慢**
 
 ```
 insert into user(name,age,gender,info) values('thooo', 35, 'M', repeat('c',65535);
@@ -1433,7 +1444,7 @@ mysql> show profile cpu,block io for query 1;
 
 可以看到主要耗时在updating这一步，IO输出次数16392次，在并发的表上通过id做update，也会变得很慢。
 
-4、**group_concat也会导致查询报错**
+**6.1.3.4.group_concat也会导致查询报错**
 
 在业务开发当中，经常有类似这样的需求，需要根据每个省份可以定点医保单位名称，通常实现如下：
 
@@ -1445,7 +1456,7 @@ select group_concat(dru_name) from t_drugstore group by province;
 
 当group_concat返回的结果集的大小超过max_allowed_packet限制的时候，程序会报错，这一点要额外注意。
 
-5、**MySQL内置的log表**
+**6.1.3.5.MySQL内置的log表**
 
 MySQL中的日志表mysql.general_log和mysql.slow_log，如果开启审计audit功能，同时log_output=TABLE，就会有mysql.audit_log表，结构跟mysql.general_log大同小异。
 
@@ -1482,17 +1493,17 @@ mysql.slow_log记录的是执行超过long_query_time的所有SQL，如果遵循
 
 建议将log_output=FILE，开启slow_log， audit_log，这样就会将slow_log，audit_log写入文件，通过Go API处理这些文件将数据写入分布式列式数据库clickhouse中做统计分析。
 
-#### Text改造建议
+#### 6.1.4.Text改造建议
 
-1、**使用es存储**
+**6.1.4.1.使用es存储**
 
 在MySQL中，一般log表会存储text类型保存request或response类的数据，用于接口调用失败时去手动排查问题，使用频繁的很低。可以考虑写入本地log file，通过filebeat抽取到es中，按天索引，根据数据保留策略进行清理。
 
-2、**使用对象存储**
+**6.1.4.2.使用对象存储**
 
 有些业务场景表用到TEXT，BLOB类型，存储的一些图片信息，比如商品的图片，更新频率比较低，可以考虑使用对象存储，例如阿里云的OSS，AWS的S3都可以，能够方便且高效的实现这类需求。
 
-#### 总结
+#### 6.1.5.总结
 
 由于MySQL是单进程多线程模型，一个SQL语句无法利用多个cpu core去执行，这也就决定了MySQL比较适合OLTP（特点：大量用户访问、逻辑读，索引扫描，返回少量数据，SQL简单）业务系统，同时要针对MySQL去制定一些建模规范和开发规范，尽量避免使用Text类型，它不但消耗大量的网络和IO带宽，同时在该表上的DML操作都会变得很慢。
 
@@ -1504,18 +1515,19 @@ mysql.slow_log记录的是执行超过long_query_time的所有SQL，如果遵循
 
 当需要从数据库查询的表有上万条记录的时候，一次性查询所有结果会变得很慢，特别是随着数据量的增加特别明显，这时需要使用分页查询。对于数据库分页查询，也有很多种方法和优化的点。下面简单说一下我知道的一些方法。
 
-#### 准备工作
+#### 6.2.1.准备工作
 
 为了对下面列举的一些优化进行测试，下面针对已有的一张表进行说明。
 
-- 表名：order_history
+- 表名：`order_history`
 - 描述：某个业务的订单历史表
-- 主要字段：unsigned int id，tinyint(4) int type
-- 字段情况：该表一共37个字段，不包含text等大型数据，最大为varchar(500)，id字段为索引，且为递增。
+- 主要字段：`unsigned int id`，`tinyint(4) int type`
+- 字段情况：该表一共37个字段，不包含text等大型数据，最大为 `varchar(500)`，id字段为索引，且为递增。
 - 数据量：5709294
 - MySQL版本：5.7.16
-  线下找一张百万级的测试表可不容易，如果需要自己测试的话，可以写shell脚本什么的插入数据进行测试。
-  以下的 sql 所有语句执行的环境没有发生改变，下面是基本测试结果：
+
+线下找一张百万级的测试表可不容易，如果需要自己测试的话，可以写shell脚本什么的插入数据进行测试。
+以下的 sql 所有语句执行的环境没有发生改变，下面是基本测试结果：
 
 ```sql
 select count(*) from orders_history;
@@ -1529,7 +1541,7 @@ select count(*) from orders_history;
 - 8323 ms
 - 8401 ms
 
-#### 一般分页查询
+#### 6.2.2.一般分页查询
 
 一般的分页查询使用简单的 limit 子句就可以实现。limit 子句声明如下：
 
@@ -1607,7 +1619,7 @@ select * from orders_history where type=8 limit 1000000,100;
 
 **这种分页查询方式会从数据库第一条记录开始扫描，所以越往后，查询速度越慢，而且查询的数据越多，也会拖慢总查询速度。**
 
-#### 使用子查询优化
+#### 6.2.3.使用子查询优化
 
 这种方式先定位偏移位置的 id，然后往后查询，这种方式适用于 id 递增的情况。
 
@@ -1638,7 +1650,7 @@ select * from orders_history where type=8 limit 100000,100;
 
 这种方式相较于原始一般的查询方法，将会增快数倍。
 
-#### 使用 id 限定优化
+#### 6.2.4.使用 id 限定优化
 
 这种方式假设数据表的id是**连续递增**的，则我们根据查询的页数和查询的记录数可以算出查询的id的范围，可以使用 id between and 来查询：
 
@@ -1667,13 +1679,13 @@ limit 100;
 
 这种 in 查询的方式要注意：某些 mysql 版本不支持在 in 子句中使用 limit。
 
-#### 使用临时表优化
+#### 6.2.5.使用临时表优化
 
 这种方式已经不属于查询优化，这儿附带提一下。
 
 对于使用 id 限定优化中的问题，需要 id 是连续递增的，但是在一些场景下，比如使用历史表的时候，或者出现过数据缺失问题时，可以考虑使用临时存储的表来记录分页的id，使用分页的id来进行 in 查询。这样能够极大的提高传统的分页查询速度，尤其是数据量上千万的时候。
 
-#### 关于数据表的id说明
+#### 6.2.6.关于数据表的id说明
 
 一般情况下，在数据库中建立表的时候，强制为每一张表添加 id 递增字段，这样方便查询。
 
