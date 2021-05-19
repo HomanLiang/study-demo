@@ -4,7 +4,7 @@
 
 # Netty 介绍和应用场景
 
-## Netty 的介绍
+## 1.Netty 的介绍
 
 1. Netty 是由 JBOSS 提供的一个 Java 开源框架，现在 Github 上的独立项目
 
@@ -20,7 +20,7 @@
 
 
 
-## Netty的特点
+## 2.Netty的特点
 1. 高并发
 Netty是一款基于NIO（Nonblocking I/O，非阻塞IO）开发的网络通信框架，对比于BIO（Blocking I/O，阻塞IO），他的并发性能得到了很大提高 。
 
@@ -32,7 +32,7 @@ Netty的传输快其实也是依赖了NIO的一个特性——零拷贝。
 
   
 
-## Netty 的应用场景
+## 3.Netty 的应用场景
 
 1. 互联网行业
    - 互联网行业：在分布式系统中，各个节点之间需要远程服务调用，高性能的 RPC 框架必不可少， Netty 作为异步高性能的通信框架，往往作为基础组件被这些 RCP 框架使用。
@@ -49,7 +49,7 @@ Netty的传输快其实也是依赖了NIO的一个特性——零拷贝。
 
 
 
-## Netty 的学习参考资料
+## 4.Netty 的学习参考资料
 
 1. Nettty IN Action
 2. Netty 权威指南

@@ -6,10 +6,10 @@
 
 # Java NIO 编程
 
-## Java NIO 基本介绍
+## 1.Java NIO 基本介绍
 
 1. Java NIO 全称 java non-blocking IO，是指 JDK 提供的新 API。从 JDK 1.4 开始，Java 提供了一系列改进的输入/输出的新特性，被统称为 NIO(即 New IO)，是同步非阻塞的
-2. NIO 相关类都被放在 java.nio 包及子包下，并且对原 java.io 包中的很多类进行改写。
+2. NIO 相关类都被放在 `java.nio` 包及子包下，并且对原 `java.io` 包中的很多类进行改写。
 3. NIO 有三大核心部分：**Channel(通道)**，**Buffer(缓冲区)**，**Selector(选择器)**
 4. NIO 是面向缓冲区，或者面向块编程的。数据读取到一个它稍后处理的缓冲区，需要时可在缓冲区中前后移动，这就增加了处理过程中的灵活性，使用它可以提供非阻塞式的高伸缩性网络
 5. Java NIO 的非阻塞模式，使一个线程从某通道发送请求或者读取数据，但是它能得到目前可用的数据，如果目前没有数据可用时，就什么都不会获取，而不是保持线程阻塞，所以直至数据变得可以读取之前，该线程可以继续做其他得事情。非阻塞写也是如此，一个线程请求写入一些数据到某通道，但不需要等待它完全写入，这个线程同时可以去做别的事情。
@@ -18,7 +18,7 @@
 
 
 
-## NIO 和 BIO 的比较
+## 2.NIO 和 BIO 的比较
 
 1. BIO 以流的方式处理数据，而 NIO 以块的方式处理数据，块 I/O 的效率比流 I/O 高很多。
 2. BIO 是阻塞的，NIO 则是非阻塞的
@@ -26,7 +26,7 @@
 
 
 
-## NIO 三大核心原理示意图
+## 3.NIO 三大核心原理示意图
 
 Selector、Channel 和 Buffer 的关系图（简单版）：
 
@@ -44,15 +44,15 @@ Selector、Channel 和 Buffer 的关系图（简单版）：
 
 
 
-## 缓冲区（Buffer）
+## 4.缓冲区（Buffer）
 
-### 基本介绍
+### 4.1.基本介绍
 
 缓冲区（Buffer）：缓冲区本质上是一个可以读写数据的内存块，可以理解成是一个容器对象（含数组），该对象提供了一组方法，可以更轻松地使用内存块，缓冲区对象内置了一些机制，能够跟踪和记录缓冲区的状态变化情况。Channel 提供从文件、网络读取数据的渠道，但是读取或者写入的数据都必须经由 Buffer，如图：
 
 ![]( https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/netty-demo/5.png )
 
-### Buffer 类及其子类
+### 4.2.Buffer 类及其子类
 
 1. 在 NIO 中，Buffer 是一个顶层父类，它是一个抽象类，类的层级关系图：
 
@@ -60,13 +60,13 @@ Selector、Channel 和 Buffer 的关系图（简单版）：
 
    常用 Buffer 子类一览：
 
-   - ByteBuffer：存储字节数据到缓冲区
-   - ShortBuffer：存储短型数据到缓冲区
-   - CharBuffer：存储字符数据到缓冲区
-   - IntBuffer：存储整型数据到缓冲区
-   - LongBuffer：存储长整型数据到缓冲区
-   - DoubleBuffer：存储小数到缓冲区
-   - FloatBuffer：存储小数到缓冲区
+   - `ByteBuffer`：存储字节数据到缓冲区
+   - `ShortBuffer`：存储短型数据到缓冲区
+   - `CharBuffer`：存储字符数据到缓冲区
+   - `IntBuffer`：存储整型数据到缓冲区
+   - `LongBuffer`：存储长整型数据到缓冲区
+   - `DoubleBuffer`：存储小数到缓冲区
+   - `FloatBuffer`：存储小数到缓冲区
 
 2. Buffer 类定义了所有的缓冲区都具有的四个属性来提供关于其所有包含的数据元素的信息：
 
@@ -122,7 +122,7 @@ Selector、Channel 和 Buffer 的关系图（简单版）：
 
    
 
-### ByteBuffer
+### 4.3.ByteBuffer
 
 从前面可以看出对于 Java 中的基本数据类型（Boolean 除外），都有一个 Buffer 类型与之相对应，最常用的自然是 ByteBuffer 类（二进制数据），该类的主要方法
 
@@ -130,9 +130,9 @@ Selector、Channel 和 Buffer 的关系图（简单版）：
 
 
 
-## 通道（Channel）
+## 5.通道（Channel）
 
-### 基本介绍
+### 5.1.基本介绍
 
 1. NIO 的通道类似于流，但有些区别如下：
    - 通道可以同时进行读写，而流只能读或者只能写
@@ -142,10 +142,10 @@ Selector、Channel 和 Buffer 的关系图（简单版）：
 
 3. 常用的 Channel 类有：
 
-   - FileChannel -- 用于文件的数据读写
-   - DatagramChannel -- 用于 UDP 的数据读写
-   - ServerSocketChannel -- 类似 ServerSocket -- 用于 TCP 的数据读写
-   - SocketChannel -- 类似 Socket -- 用于 TCP 的数据读写
+   - `FileChannel` -- 用于文件的数据读写
+   - `DatagramChannel` -- 用于 UDP 的数据读写
+   - `ServerSocketChannel` -- 类似 ServerSocket -- 用于 TCP 的数据读写
+   - `SocketChannel` -- 类似 Socket -- 用于 TCP 的数据读写
 
 4. 示意图：
 
@@ -153,9 +153,9 @@ Selector、Channel 和 Buffer 的关系图（简单版）：
 
 
 
-### FileChannel 类
+### 5.2.FileChannel 类
 
-FileChannel 主要用来对本地文件进行 IO 操作，常见方法有：
+`FileChannel` 主要用来对本地文件进行 IO 操作，常见方法有：
 
 - `public int read(ByteBuffer dst)`，从通道读取数据并放到缓冲区中
 - `public int write(ByteBuffer src)`，把缓冲区的数据写到通道中
@@ -164,7 +164,7 @@ FileChannel 主要用来对本地文件进行 IO 操作，常见方法有：
 
 
 
-### 应用实例1 -- 本地文件写入数据
+### 5.3.应用实例1 -- 本地文件写入数据
 
 实例要求：
 
@@ -208,7 +208,7 @@ public class FileChannel01 {
 
 
 
-### 应用实例2 -- 本地文件读数据
+### 5.4.应用实例2 -- 本地文件读数据
 
 实例要求：
 
@@ -250,7 +250,7 @@ public class FileChannel02 {
 
 
 
-### 应用实例3 -- 使用一个 Buffer 完成文件读取、写入
+### 5.5.应用实例3 -- 使用一个 Buffer 完成文件读取、写入
 
 实例要求：
 
@@ -315,7 +315,7 @@ public class FileChannel03 {
 
 
 
-### 应用实例4 -- 拷贝文件 transferFrom 方法
+### 5.6.应用实例4 -- 拷贝文件 transferFrom 方法
 
 实例要求：
 
@@ -357,7 +357,7 @@ public class FileChannel04 {
 
 
 
-### 关于 Buffer 和 Channel 的注意事项和细节
+### 5.7.关于 Buffer 和 Channel 的注意事项和细节
 
 1. ByteBuffer 支持类型化的 put 和 get，put 放入的是什么类型，get 就应该使用相应的数据类型来取出，否则可能有 BufferUnderflowExceptin 异常。
 
@@ -536,9 +536,9 @@ public class FileChannel04 {
 
 
 
-## Selector(选择器)
+## 6.Selector(选择器)
 
-### 基本介绍
+### 6.1.基本介绍
 
 1. Java 的 NIO，用非阻塞的 IO 方式。可以用一个线程，处理多个的客户端连接，就会使用到 Selector（选择器）
 2. Selector 能够检测多个注册的通道上是否有事件发生（注意：多个 Channel 以事件的方式可以注册到同一个 Selector），如果有事件发生，便获取事件然后针对每个事件进行相应的处理。这样就可以只用一个单线程去管理多个通道，也就是管理多个连接和请求。
@@ -547,7 +547,7 @@ public class FileChannel04 {
 
 
 
-### Selector 示意图和特点说明
+### 6.2.Selector 示意图和特点说明
 
 ![]( https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/netty-demo/12.png )
 
@@ -561,7 +561,7 @@ public class FileChannel04 {
 
 
 
-### Selector 类相关方法
+### 6.3.Selector 类相关方法
 
 Selector 类是一个抽象类，常用方法和说明如下：
 
@@ -569,7 +569,7 @@ Selector 类是一个抽象类，常用方法和说明如下：
 
 
 
-### 注意事项
+### 6.4.注意事项
 
 1. NIO 中的 ServerSocketChannel 功能类似 ServerSocket，SocketChannel 功能类似 Socket
 2. Selector 相关方法说明：
@@ -580,24 +580,24 @@ Selector 类是一个抽象类，常用方法和说明如下：
 
 
 
-## NIO 原理分析图
+## 7.NIO 原理分析图
 
-Selector、SelectionKey、ServerSocketChannel 和 SocketChannel 关系梳理图
+`Selector`、`SelectionKey`、`ServerSocketChannel` 和 `SocketChannel` 关系梳理图
 
 ![]( https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/netty-demo/14.png )
 
 对上图的说明：
 
-1. 当客户端连接时，会通过 ServerSocketChannel 得到 SocketChannel
-2. Selector 进行监听 select 方法，返回有事件发生的通道的个数。
-3. 将 SocketChannel 注册到 Selector 上，register(Selector sel, int ops)，一个 Selector 上可以注册多个 SocketChannel
-4. 注册后返回一个 SelectionKey，会和该 Selector 关联（集合）
-5. 进一步得到各个 SelectionKey（有事件发生）
-6. 在通过 SelectionKey 反向获取 SocketChannel，方法 channel() ，得到Channel，完成业务处理
+1. 当客户端连接时，会通过 `ServerSocketChannel` 得到 `SocketChannel`
+2. `Selector` 进行监听 `select` 方法，返回有事件发生的通道的个数。
+3. 将 `SocketChannel` 注册到 `Selector` 上，`register(Selector sel, int ops)`，一个 `Selector` 上可以注册多个 `SocketChannel`
+4. 注册后返回一个 `SelectionKey`，会和该 `Selector` 关联（集合）
+5. 进一步得到各个 `SelectionKey`（有事件发生）
+6. 在通过 `SelectionKey` 反向获取 `SocketChannel`，方法 `channel() `，得到 `Channel`，完成业务处理
 
 
 
-## NIO 快速入门
+## 8.NIO 快速入门
 
 案例要求：
 
@@ -734,14 +734,14 @@ public class NIOClient {
 
 
 
-## SelectionKey
+## 9.SelectionKey
 
-1. SelectionKey，表示 Selector 和网络通道的注册关系，共四种：
+1. `SelectionKey`，表示 `Selector` 和网络通道的注册关系，共四种：
 
-   - OP_ACCEPT: 有新的网络连接可以 accept，值为 16
-   - OP_CONNECT: 代表连接已经建立，值为 8
-   - OP_READ：代表读操作，值为 1
-   - OP_WRITE:  代表写操作，值为 4
+   - `OP_ACCEPT`: 有新的网络连接可以 accept，值为 16
+   - `OP_CONNECT`: 代表连接已经建立，值为 8
+   - `OP_READ`：代表读操作，值为 1
+   - `OP_WRITE`:  代表写操作，值为 4
 
 2. Selection 相关方法
 
@@ -749,9 +749,9 @@ public class NIOClient {
 
 
 
-## ServerSocketChannel
+## 10.ServerSocketChannel
 
-1. ServerSocketChannel 在服务器端监听新的客户端 Socket 连接
+1. `ServerSocketChannel` 在服务器端监听新的客户端 Socket 连接
 
 2. 相关方法如下：
 
@@ -759,9 +759,9 @@ public class NIOClient {
 
 
 
-## SocketChannel
+## 11.SocketChannel
 
-1. SocketChannel，网络 IO 通道，具体负责进行读写操作。NIO 把缓冲区的数据写入通道，或者把通道里的数据读到缓冲区。
+1. `SocketChannel`，网络 IO 通道，具体负责进行读写操作。NIO 把缓冲区的数据写入通道，或者把通道里的数据读到缓冲区。
 
 2. 相关方法如下：
 
@@ -769,7 +769,7 @@ public class NIOClient {
 
 
 
-## NIO 实例 -- 群聊系统
+## 12.NIO 实例 -- 群聊系统
 
 实例要求：
 
@@ -1076,7 +1076,7 @@ public class GroupChatClient {
 
 ![]( https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/netty-demo/20.png )
 
-## Java AIO 基本介绍
+## 13.Java AIO 基本介绍
 
 - JDK 7 引入了 Asynchronous I/O，即 AIO。在进行 I/O 编程中，常用到两种模式：Reactor和 Proactor。Java 的 NIO 就是 Reactor，当有事件触发时，服务器端得到通知，进行相应的处理
 
@@ -1086,7 +1086,7 @@ public class GroupChatClient {
 
 
 
-## BIO、NIO、AIO对比表
+## 14.BIO、NIO、AIO对比表
 
 ![]( https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/netty-demo/32.png )
 
