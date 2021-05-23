@@ -10,16 +10,16 @@
 
 现在我们有了Nginx的环境，接下来我们的目标是通过Nginx将用户的请求反向代理到Tomcat上，那么我们首先启动一台Tomcat服务器，默认配置即可。
 
-然后我们打开nginx.conf文件，王子给大家简单介绍一下里面的一些配置的含义。
+然后我们打开 `nginx.conf` 文件，王子给大家简单介绍一下里面的一些配置的含义。
 
 ```
 listen       81;
 server_name  localhost;
 ```
 
-- listen：刚才我们已经改过了，它就是代表Nginx的监听端口，这个没什么可说的
+- `listen`：刚才我们已经改过了，它就是代表Nginx的监听端口，这个没什么可说的
 
-- server_name：表示监听到之后请求转到哪里，默认直接转到本地。
+- `server_name`：表示监听到之后请求转到哪里，默认直接转到本地。
 
 ```
 location / {
@@ -28,15 +28,15 @@ location / {
 }
 ```
 
-- location:表示匹配的路径，这时配置了/表示所有请求都被匹配到这里
+- `location`：表示匹配的路径，这时配置了 `/` 表示所有请求都被匹配到这里
 
-- root：里面配置了root这时表示当匹配这个请求的路径时，将会在html这个文件夹内寻找相应的文件。
+- `root`：里面配置了root这时表示当匹配这个请求的路径时，将会在 `html` 这个文件夹内寻找相应的文件。
 
-- index：当没有指定主页时，默认会选择这个指定的文件，它可以有多个，并按顺序来加载，如果第一个不存在，则找第二个，依此类推。
+- `index`：当没有指定主页时，默认会选择这个指定的文件，它可以有多个，并按顺序来加载，如果第一个不存在，则找第二个，依此类推。
 
 **除了这些配置，我们再补充一个配置**
 
-proxy_pass，它表示代理路径，相当于转发，而不像之前说的root必须指定一个文件夹。
+`proxy_pass`，它表示代理路径，相当于转发，而不像之前说的root必须指定一个文件夹。
 
 那么现在我们修改一下配置文件，如下：
 
@@ -46,13 +46,13 @@ location / {
 }  
 ```
 
-然后我们让Nginx重新加载配置文件，回到Nginx根目录执行nginx -s reload命令就可以了。
+然后我们让Nginx重新加载配置文件，回到Nginx根目录执行 `nginx -s reload` 命令就可以了。
 
 然后我们再重新打开Nginx的页面，小伙伴们，是不是发现它已经打开了Tomcat页面呢。
 
 ### 1.2.实现负载均衡的配置
 
-刚刚我们已经实现了请求的反向代理，从Nginx转发到了Tomcat上，那么如何配置可以实现一个Tomcat的负载均衡集群呢，其实也是很容易的。
+刚刚我们已经实现了请求的反向代理，从 `Nginx` 转发到了 `Tomcat` 上，那么如何配置可以实现一个 `Tomcat` 的负载均衡集群呢，其实也是很容易的。
 
 配置如下：
 
@@ -69,11 +69,11 @@ server{
 }  
 ```
 
-小伙伴们，划重点了，这里一定要注意。upstream后的名字一定不要带下划线，Nginx是不认下划线的，会导致转发异常。
+小伙伴们，划重点了，这里一定要注意。`upstream` 后的名字一定不要带下划线，`Nginx` 是不认下划线的，会导致转发异常。
 
-那么如何添加新的tomcat实现负载均衡呢？
+那么如何添加新的 `tomcat` 实现负载均衡呢？
 
-我们修改端口，新打开一个tomcat服务器，端口为8081，然后增加配置如下：
+我们修改端口，新打开一个 `tomcat` 服务器，端口为 `8081`，然后增加配置如下：
 
 ```
 upstream localtomcat {  
@@ -82,9 +82,9 @@ upstream localtomcat {
 }  
 ```
 
-再重新加载Nginx的配置文件，你会发现，负载均衡已经实现了，现在会向两台tomcat转发请求了。
+再重新加载 `Nginx` 的配置文件，你会发现，负载均衡已经实现了，现在会向两台 `tomcat` 转发请求了。
 
-而且我们可以设置weight=数字来指定每个tomcat的权重，数字越大，表明请求到的机会越大。
+而且我们可以设置 `weight=数字` 来指定每个 `tomcat` 的权重，数字越大，表明请求到的机会越大。
 
 配置如下：
 
@@ -95,15 +95,17 @@ upstream localtomcat {
 }  
 ```
 
+
+
 ## 2.Nginx的高可用负载均衡
 
 ### 2.1.Keepalived 简要介绍
 
-Keepalived 是一种高性能的服务器高可用或热备解决方案， Keepalived 可以用来防止服务器单点故障的发生，通过配合 Nginx 可以实现 web 前端服务的高可用。
+`Keepalived` 是一种高性能的服务器高可用或热备解决方案，`Keepalived` 可以用来防止服务器单点故障的发生，通过配合 `Nginx` 可以实现 web 前端服务的高可用。
 
-Keepalived 以 VRRP 协议为实现基础，用 VRRP 协议来实现高可用性(HA)。 VRRP(Virtual RouterRedundancy Protocol)协议是用于实现路由器冗余的协议， VRRP 协议将两台或多台路由器设备虚拟成一个设备，对外提供虚拟路由器 IP(一个或多个)，而在路由器组内部，如果实际拥有这个对外 IP 的路由器如果工作正常的话就是 MASTER，或者是通过算法选举产生， MASTER 实现针对虚拟路由器 IP 的各种网络功能，如 ARP 请求， ICMP，以及数据的转发等；其他设备不拥有该虚拟 IP，状态是 BACKUP，除了接收 MASTER 的VRRP 状态通告信息外，不执行对外的网络功能。
+`Keepalived` 以 `VRRP` 协议为实现基础，用 `VRRP` 协议来实现高可用性(`HA`)。 `VRRP`(`Virtual RouterRedundancy Protocol`)协议是用于实现路由器冗余的协议， `VRRP` 协议将两台或多台路由器设备虚拟成一个设备，对外提供虚拟路由器 IP(一个或多个)，而在路由器组内部，如果实际拥有这个对外 IP 的路由器如果工作正常的话就是 `MASTER`，或者是通过算法选举产生， `MASTER` 实现针对虚拟路由器 `IP` 的各种网络功能，如 `ARP` 请求， `ICMP`，以及数据的转发等；其他设备不拥有该虚拟 `IP`，状态是 `BACKUP`，除了接收 `MASTER` 的`VRRP` 状态通告信息外，不执行对外的网络功能。
 
-当主机失效时， BACKUP 将接管原先 MASTER 的网络功能。VRRP 协议使用多播数据来传输 VRRP 数据， VRRP 数据使用特殊的虚拟源 MAC 地址发送数据而不是自身网卡的 MAC 地址， VRRP 运行时只有 MASTER 路由器定时发送 VRRP 通告信息，表示 MASTER 工作正常以及虚拟路由器 IP(组)， BACKUP 只接收 VRRP 数据，不发送数据，如果一定时间内没有接收到 MASTER 的通告信息，各 BACKUP 将宣告自己成为 MASTER，发送通告信息，重新进行 MASTER 选举状态。
+当主机失效时， `BACKUP` 将接管原先 `MASTER` 的网络功能。`VRRP` 协议使用多播数据来传输 `VRRP` 数据， `VRRP` 数据使用特殊的虚拟源 `MAC` 地址发送数据而不是自身网卡的 `MAC` 地址， `VRRP` 运行时只有 `MASTER` 路由器定时发送 `VRRP` 通告信息，表示 `MASTER` 工作正常以及虚拟路由器 `IP`(组)，`BACKUP` 只接收 `VRRP` 数据，不发送数据，如果一定时间内没有接收到 `MASTER` 的通告信息，各 `BACKUP` 将宣告自己成为 `MASTER`，发送通告信息，重新进行 `MASTER` 选举状态。
 
 ### 2.2.方案规划
 
@@ -111,9 +113,9 @@ Keepalived 以 VRRP 协议为实现基础，用 VRRP 协议来实现高可用性
 
 **操作系统与安装软件如下：**
 
-- CentOS 6.8 x64
-- keepalived-1.2.18.tar.gz
-- nginx-1.19.1.tar.gz
+- `CentOS 6.8 x64`
+- `keepalived-1.2.18.tar.gz`
+- `nginx-1.19.1.tar.gz`
 
 **2.2.1.安装依赖环境**
 
@@ -175,11 +177,11 @@ make
 make install
 ```
 
-**这里需要注意的是：安装Nginx时，指定的是openssl、pcre和zlib的源码解压目录，安装完成后Nginx配置文件的完整路径为：/usr/local/nginx-1.19.1/conf/nginx.conf。**
+**这里需要注意的是：安装Nginx时，指定的是openssl、pcre和zlib的源码解压目录，安装完成后Nginx配置文件的完整路径为：`/usr/local/nginx-1.19.1/conf/nginx.conf`。**
 
 ### 2.3.配置Nginx
 
-在命令行输入如下命令编辑Nginx的nginx.conf文件，如下所示。
+在命令行输入如下命令编辑 `Nginx` 的 `nginx.conf` 文件，如下所示。
 
 ```bash
 # vim /usr/local/nginx-1.19.1/conf/nginx.conf
@@ -320,7 +322,7 @@ nginx: configuration file /usr/local/nginx-1.19.1/conf/nginx.conf test is succes
 
 #### 2.6.1.上传或下载 keepalived
 
-上传或下载 keepalived（keepalived-1.2.18.tar.gz） 到 /usr/local/src 目录
+上传或下载 `keepalived`（`keepalived-1.2.18.tar.gz`） 到 `/usr/local/src` 目录
 
 #### 2.6.2.解压安装
 
@@ -334,7 +336,7 @@ nginx: configuration file /usr/local/nginx-1.19.1/conf/nginx.conf test is succes
 
 #### 2.6.3.将 keepalived 安装成 Linux 系统服务
 
-因为没有使用 keepalived 的默认路径安装（默认是/usr/local） ,安装完成之后，需要做一些工作复制默认配置文件到默认路径
+因为没有使用 `keepalived` 的默认路径安装（默认是 `/usr/local`） ,安装完成之后，需要做一些工作复制默认配置文件到默认路径
 
 ```bash
 # mkdir /etc/keepalived
@@ -358,7 +360,7 @@ nginx: configuration file /usr/local/nginx-1.19.1/conf/nginx.conf test is succes
 
 #### 2.6.4.修改 Keepalived 配置文件
 
-**MASTER 节点配置文件（192.168.50.133）**
+**MASTER 节点配置文件（`192.168.50.133`）**
 
 ```bash
 # vim /etc/keepalived/keepalived.conf
@@ -399,7 +401,7 @@ vrrp_instance VI_1 {
 }
 ```
 
-**BACKUP 节点配置文件（192.168.50.134）**
+**BACKUP 节点配置文件（`192.168.50.134`）**
 
 ```bash
 # vim /etc/keepalived/keepalived.conf
@@ -435,7 +437,7 @@ vrrp_instance VI_1 {
 
 #### 2.6.5.编写 Nginx 状态检测脚本
 
-编写 Nginx 状态检测脚本 /etc/keepalived/nginx_check.sh (已在 keepalived.conf 中配置)脚本要求：如果 nginx 停止运行，尝试启动，如果无法启动则杀死本机的 keepalived 进程， keepalied将虚拟 ip 绑定到 BACKUP 机器上。 内容如下。
+编写 Nginx 状态检测脚本 `/etc/keepalived/nginx_check.sh` (已在 `keepalived.conf` 中配置)脚本要求：如果 `nginx` 停止运行，尝试启动，如果无法启动则杀死本机的 `keepalived` 进程，`keepalied` 将虚拟 `ip` 绑定到 `BACKUP` 机器上。 内容如下。
 
 ```bash
 # vim /etc/keepalived/nginx_check.sh
@@ -466,22 +468,22 @@ Starting keepalived: [ OK ]
 
 ### 2.7.Keepalived+Nginx 的高可用测试
 
-同时启动192.168.50.133和192.168.50.134上的Nginx和Keepalived，我们通过VIP(192.168.50.130)来访问Nginx，如下所示。
+同时启动 `192.168.50.133` 和 `192.168.50.134` 上的 `Nginx` 和 `Keepalived` ，我们通过`VIP` (`192.168.50.130`)来访问 `Nginx`，如下所示。
 
 ![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/nginx-demo/20210414221919.png)
 
-我们关闭192.168.50.133上的Keepalived和Nginx，在192.168.50.133执行如下命令。
+我们关闭 `192.168.50.133` 上的 `Keepalived` 和 `Nginx`，在 `192.168.50.133` 执行如下命令。
 
 ```bash
 service keepalived stop
 /usr/local/nginx-1.19.1/sbin/nginx -s stop
 ```
 
-此时，再通过VIP(192.168.50.130)来访问Nginx，如下所示。
+此时，再通过`VIP` (`192.168.50.130`)来访问 `Nginx`，如下所示。
 
 ![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/nginx-demo/20210414221926.png)
 
-我们再开启192.168.50.133上的Keepalived和Nginx，在192.168.50.133执行如下命令：
+我们再开启 `192.168.50.133` 上的 `Keepalived` 和 `Nginx`，在 `192.168.50.133` 执行如下命令：
 
 ```bash
 /usr/local/nginx-1.19.1/sbin/nginx
@@ -494,9 +496,9 @@ service keepalived start
 service keepalived start
 ```
 
-因为我们写了脚本nginx_check.sh，这个脚本会为我们自动自动Nginx。
+因为我们写了脚本 `nginx_check.sh`，这个脚本会为我们自动自动 `Nginx`。
 
-此时，我们再通过VIP(192.168.50.130)来访问Nginx，如下所示。
+此时，我们再通过`VIP`(`192.168.50.130`)来访问 `Nginx`，如下所示。
 
 ![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/nginx-demo/20210414221944.png)
 
@@ -506,18 +508,18 @@ service keepalived start
 
 **注意：使用Nginx实现MySQL数据库的负载均衡，前提是要搭建MySQL的主主复制环境，关于MySQL主主复制环境的搭建，后续会在MySQL专题为大家详细阐述。这里，我们假设已经搭建好MySQL的主主复制环境，MySQL服务器的IP和端口分别如下所示。**
 
-- 192.168.1.101 3306
-- 192.168.1.102 3306
+- `192.168.1.101 3306`
+- `192.168.1.102 3306`
 
 通过Nginx访问MySQL的IP和端口如下所示。
 
-- 192.168.1.100 3306
+- `192.168.1.100 3306`
 
 ### 3.2.Nginx实现MySQL负载均衡
 
 nginx在版本1.9.0以后支持tcp的负载均衡，具体可以参照官网关于模块[ngx_stream_core_module](http://nginx.org/en/docs/stream/ngx_stream_core_module.html#tcp_nodelay)的叙述，链接地址为：http://nginx.org/en/docs/stream/ngx_stream_core_module.html#tcp_nodelay。
 
-nginx从1.9.0后引入模块ngx_stream_core_module，模块是没有编译的，需要用到编译，编译时需添加--with-stream配置参数，stream负载均衡官方配置样例如下所示。
+`nginx` 从 `1.9.0` 后引入模块 `ngx_stream_core_module`，模块是没有编译的，需要用到编译，编译时需添加 `--with-stream` 配置参数，`stream` 负载均衡官方配置样例如下所示。
 
 ```bash
 worker_processes auto;
@@ -607,13 +609,13 @@ stream{
 jdbc:mysql://192.168.1.100:3306/数据库名称
 ```
 
-此时，Nginx会将访问MySQL的请求路由到IP地址为192.168.1.101和192.168.1.102的MySQL上。
+此时，`Nginx` 会将访问 `MySQL` 的请求路由到IP地址为 `192.168.1.101` 和 `192.168.1.102` 的 `MySQL`上。
 
 ## 4.禁用IP和IP段
 
 ### 4.1.禁用IP和IP段
 
-Nginx的ngx_http_access_module 模块可以封配置内的ip或者ip段，语法如下：
+`Nginx` 的 `ngx_http_access_module` 模块可以封配置内的ip或者ip段，语法如下：
 
 ```bash
 deny IP;
@@ -630,9 +632,9 @@ allow    all;
 
 ### 4.2.配置禁用ip和ip段
 
-下面说明假定nginx的目录在/usr/local/nginx/。
+下面说明假定 `nginx` 的目录在 `/usr/local/nginx/`。
 
-首先要建一个封ip的配置文件blockips.conf，然后vi blockips.conf编辑此文件，在文件中输入要封的ip。
+首先要建一个封 `ip` 的配置文件 `blockips.conf`，然后 `vi blockips.conf` 编辑此文件，在文件中输入要封的ip。
 
 ```bash
 deny 1.2.3.4;
@@ -640,13 +642,13 @@ deny 91.212.45.0/24;
 deny 91.212.65.0/24;
 ```
 
-然后保存此文件，并且打开nginx.conf文件，在http配置节内添加下面一行配置：
+然后保存此文件，并且打开 `nginx.conf` 文件，在http配置节内添加下面一行配置：
 
 ```bash
 include blockips.conf;
 ```
 
-保存nginx.conf文件，然后测试现在的nginx配置文件是否是合法的：
+保存 `nginx.conf` 文件，然后测试现在的 `nginx` 配置文件是否是合法的：
 
 ```bash
 /usr/local/nginx/sbin/nginx -t
@@ -728,7 +730,7 @@ Your IP Address is <!--#echo var="REMOTE_ADDR" --> blocked.
 
 ### 5.1.为何会跨域？
 
-出于浏览器的同源策略限制。同源策略（Sameoriginpolicy）是一种约定，它是浏览器最核心也最基本的安全功能，如果缺少了同源策略，则浏览器的正常功能可能都会受到影响。可以说Web是构建在同源策略基础之上的，浏览器只是针对同源策略的一种实现。同源策略会阻止一个域的javascript脚本和另外一个域的内容进行交互。所谓同源（即指在同一个域）就是两个页面具有相同的协议（protocol），主机（host）和端口号（port）。
+出于浏览器的同源策略限制。同源策略（Sameoriginpolicy）是一种约定，它是浏览器最核心也最基本的安全功能，如果缺少了同源策略，则浏览器的正常功能可能都会受到影响。可以说Web是构建在同源策略基础之上的，浏览器只是针对同源策略的一种实现。同源策略会阻止一个域的javascript脚本和另外一个域的内容进行交互。所谓同源（即指在同一个域）就是两个页面具有相同的协议（`protocol`），主机（`host`）和端口号（`port`）。
 
 ### 5.2.Nginx如何解决跨域？
 
@@ -738,7 +740,7 @@ Nginx作为反向代理服务器，就是把http请求转发到另一个或者�
 
 ### 5.3.Nginx解决跨域案例
 
-使用Nginx解决跨域问题时，我们可以编译Nginx的nginx.conf配置文件，例如，将nginx.conf文件的server节点的内容编辑成如下所示。
+使用Nginx解决跨域问题时，我们可以编译 `Nginx` 的 `nginx.conf` 配置文件，例如，将 `nginx.conf` 文件的 `server` 节点的内容编辑成如下所示。
 
 ```bash
 server {
@@ -758,7 +760,7 @@ server {
 }
 ```
 
-然后我把项目部署在nginx的html根目录下，在ajax调用时设置url从http://www.binghe.com/apistest/test 变为 http://www.binghe.com/apis/apistest/test然后成功解决。
+然后我把项目部署在 `nginx` 的 `html` 根目录下，在 `ajax` 调用时设置url从 `http://www.binghe.com/apistest/test` 变为 `http://www.binghe.com/apis/apistest/test` 然后成功解决。
 
 假设，之前我在页面上发起的Ajax请求如下所示。
 
@@ -822,8 +824,8 @@ Nginx作为一款高性能的Web代理和负载均衡服务器，往往会部署
 
 Nginx官方版本限制IP的连接和并发分别有两个模块：
 
-- limit_req_zone 用来限制单位时间内的请求数，即速率限制,采用的漏桶算法 "leaky bucket"。
-- limit_req_conn 用来限制同一时间连接数，即并发限制。
+- `limit_req_zone` 用来限制单位时间内的请求数，即速率限制,采用的漏桶算法 "leaky bucket"。
+- `limit_req_conn` 用来限制同一时间连接数，即并发限制。
 
 ### 6.3.limit_req_zone 参数配置
 
@@ -836,17 +838,17 @@ Context:    http, server, location
 limit_req_zone $binary_remote_addr zone=one:10m rate=1r/s;
 ```
 
-- 第一个参数：$binary_remote_addr 表示通过remote_addr这个标识来做限制，“binary_”的目的是缩写内存占用量，是限制同一客户端ip地址。
-- 第二个参数：zone=one:10m表示生成一个大小为10M，名字为one的内存区域，用来存储访问的频次信息。
-- 第三个参数：rate=1r/s表示允许相同标识的客户端的访问频次，这里限制的是每秒1次，还可以有比如30r/m的。
+- 第一个参数：`$binary_remote_addr` 表示通过 `remote_addr` 这个标识来做限制，`binary_` 的目的是缩写内存占用量，是限制同一客户端ip地址。
+- 第二个参数：`zone=one:10m` 表示生成一个大小为 `10M`，名字为 `one` 的内存区域，用来存储访问的频次信息。
+- 第三个参数：`rate=1r/s` 表示允许相同标识的客户端的访问频次，这里限制的是每秒1次，还可以有比如 `30r/m` 的。
 
 ```bash
 limit_req zone=one burst=5 nodelay;
 ```
 
-- 第一个参数：zone=one 设置使用哪个配置区域来做限制，与上面limit_req_zone 里的name对应。
-- 第二个参数：burst=5，重点说明一下这个配置，burst爆发的意思，这个配置的意思是设置一个大小为5的缓冲区当有大量请求（爆发）过来时，超过了访问频次限制的请求可以先放到这个缓冲区内。
-- 第三个参数：nodelay，如果设置，超过访问频次而且缓冲区也满了的时候就会直接返回503，如果没有设置，则所有请求会等待排队。
+- 第一个参数：`zone=one` 设置使用哪个配置区域来做限制，与上面 `limit_req_zone`  里的 `name` 对应。
+- 第二个参数：`burst=5`，重点说明一下这个配置，`burst` 爆发的意思，这个配置的意思是设置一个大小为5的缓冲区当有大量请求（爆发）过来时，超过了访问频次限制的请求可以先放到这个缓冲区内。
+- 第三个参数：`nodelay`，如果设置，超过访问频次而且缓冲区也满了的时候就会直接返回503，如果没有设置，则所有请求会等待排队。
 
 #### 6.3.2.limit_req_zone示例
 
@@ -921,7 +923,7 @@ server {
 }
 ```
 
-可以配置多个limit_conn指令。例如，以上配置将限制每个客户端IP连接到服务器的数量，同时限制连接到虚拟服务器的总数。
+可以配置多个 `limit_conn` 指令。例如，以上配置将限制每个客户端IP连接到服务器的数量，同时限制连接到虚拟服务器的总数。
 
 ```bash
 Syntax: limit_conn_zone key zone=name:size;
@@ -930,7 +932,7 @@ Context:    http
 limit_conn_zone $binary_remote_addr zone=addr:10m;
 ```
 
-在这里，客户端IP地址作为关键。请注意，不是$ remote_addr，而是使用$ binary_remote_addr变量。 $ remote_addr变量的大小可以从7到15个字节不等。存储的状态在32位平台上占用32或64字节的内存，在64位平台上总是占用64字节。对于IPv4地址，$ binary_remote_addr变量的大小始终为4个字节，对于IPv6地址则为16个字节。存储状态在32位平台上始终占用32或64个字节，在64位平台上占用64个字节。一个兆字节的区域可以保持大约32000个32字节的状态或大约16000个64字节的状态。如果区域存储耗尽，服务器会将错误返回给所有其他请求。
+在这里，客户端IP地址作为关键。请注意，不是 `$ remote_addr`，而是使用 `$ binary_remote_addr` 变量。` $ remote_addr` 变量的大小可以从7到15个字节不等。存储的状态在32位平台上占用32或64字节的内存，在64位平台上总是占用64字节。对于 `IPv4` 地址，`$ binary_remote_addr` 变量的大小始终为4个字节，对于 `IPv6` 地址则为16个字节。存储状态在32位平台上始终占用32或64个字节，在64位平台上占用64个字节。一个兆字节的区域可以保持大约32000个32字节的状态或大约16000个64字节的状态。如果区域存储耗尽，服务器会将错误返回给所有其他请求。
 
 ```bash
 Syntax: limit_conn_log_level info | notice | warn | error;
@@ -984,7 +986,7 @@ server {
 }
 ```
 
-我们加入了burst=4，意思是每个key(此处是每个IP)最多允许4个突发请求的到来。如果单个IP在10ms内发送6个请求，结果会怎样呢？
+我们加入了 `burst=4`，意思是每个key(此处是每个IP)最多允许4个突发请求的到来。如果单个IP在10ms内发送6个请求，结果会怎样呢？
 
 ![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/nginx-demo/20210414230350.png)
 

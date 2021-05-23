@@ -58,7 +58,7 @@ Nginx服务器访问量非常高，在Nginx的错误日志中不停的输出如�
 ulimit -n 655350
 ```
 
-同时修改nginx.conf ， 添加如下配置项。
+同时修改 `nginx.conf `， 添加如下配置项。
 
 ```bash
 worker_rlimit_nofile 655350; 
@@ -68,15 +68,15 @@ worker_rlimit_nofile 655350;
 
 这样就可以解决Nginx连接过多的问题，Nginx就可以支持高并发（这里需要配置Nginx）。
 
-另外， `ulimit -n`还会影响到MySQL的并发连接数。把它提高，也可以提高MySQL的并发。
+另外， `ulimit -n` 还会影响到MySQL的并发连接数。把它提高，也可以提高MySQL的并发。
 
 **注意： 用 `ulimit -n 655350` 修改只对当前的shell有效，退出后失效。**
 
 ### 1.4.永久解决问题
 
-若要令修改ulimits的数值永久生效，则必须修改配置文件，可以给ulimit修改命令放入/etc/profile里面，这个方法实在是不方便。
+若要令修改ulimits的数值永久生效，则必须修改配置文件，可以给 `ulimit` 修改命令放入 `/etc/profile` 里面，这个方法实在是不方便。
 
-还有一个方法是修改/etc/security/limits.conf配置文件，如下所示。
+还有一个方法是修改 `/etc/security/limits.conf` 配置文件，如下所示。
 
 ```ba
 vim /etc/security/limits.conf
@@ -93,7 +93,7 @@ vim /etc/security/limits.conf
 
 其中：星号代表全局， soft为软件，hard为硬件，nofile为这里指可打开的文件句柄数。
 
-最后，需要注意的是：要使 limits.conf 文件配置生效，必须要确保 pam_limits.so 文件被加入到启动文件中。查看 /etc/pam.d/login 文件中是否存在如下配置。
+最后，需要注意的是：要使 `limits.conf` 文件配置生效，必须要确保 `pam_limits.so` 文件被加入到启动文件中。查看 `/etc/pam.d/login` 文件中是否存在如下配置。
 
 ```bash
 session required /lib64/security/pam_limits.so
@@ -152,7 +152,7 @@ make     #编译Nginx,切记不要输入make install
 
 上述命令中，切记不要输入`make install` 进行安装。
 
-执行完 `make` 命令后，会在当前目录的objs目录下生成nginx命令，此时我们需要先停止Nginx服务，备份/usr/local/nginx/sbin/目录下的nginx命令，然后将objs目录下的nginx命令复制到/usr/local/nginx/sbin/目录下，然后启动Nginx服务。
+执行完 `make` 命令后，会在当前目录的objs目录下生成nginx命令，此时我们需要先停止Nginx服务，备份 `/usr/local/nginx/sbin/` 目录下的nginx命令，然后将objs目录下的nginx命令复制到 `/usr/local/nginx/sbin/` 目录下，然后启动Nginx服务。
 
 ```bash
 nginx_service.sh stop   #通过脚本停止Nginx服务
@@ -171,11 +171,11 @@ nginx_service.sh start #通过脚本启动Nginx服务
 error_log  logs/error.log debug;
 ```
 
-此时，开启了Nginx的debug日志功能，并将debug信息输出到error.log文件中。
+此时，开启了Nginx的debug日志功能，并将debug信息输出到 `error.log` 文件中。
 
 #### 2.2.3.分析问题
 
-接下来，在服务器命令行输入如下命令监听error.log文件的输出日志。
+接下来，在服务器命令行输入如下命令监听 `error.log` 文件的输出日志。
 
 ```bash
 tail -F /usr/local/nginx/logs/error.log
@@ -205,13 +205,13 @@ tail -F /usr/local/nginx/logs/error.log
 2021/02/26 21:34:26 [debug] 31486#0: *56 using configuration "/base"
 ```
 
-从上面的输出日志中，我们可以看到：访问的接口地址为“/third/system/base/thirdapp/get_detail”，如下所示。
+从上面的输出日志中，我们可以看到：访问的接口地址为 `/third/system/base/thirdapp/get_detail` ，如下所示。
 
 ```bash
 2021/02/26 21:34:26 [debug] 31486#0: *56 http uri: "/third/system/base/thirdapp/get_detail"
 ```
 
-Nginx在进行转发时，分别匹配了“/”，“file/”，“~/base”，最终将请求转发到了“/base”，如下所示。
+Nginx在进行转发时，分别匹配了 `/`，`file/`，`~/base`，最终将请求转发到了 `/base`，如下所示。
 
 ```bash
 2021/02/26 21:34:26 [debug] 31486#0: *56 test location: "/"
@@ -220,7 +220,7 @@ Nginx在进行转发时，分别匹配了“/”，“file/”，“~/base”，
 2021/02/26 21:34:26 [debug] 31486#0: *56 using configuration "/base"
 ```
 
-我们再来看看Nginx的配置，打开nginx.conf文件，找到下面的配置。
+我们再来看看Nginx的配置，打开 `nginx.conf` 文件，找到下面的配置。
 
 ```bash
 location ~/base {
@@ -233,13 +233,13 @@ location ~/third {
 }
 ```
 
-**那么问题来了，访问的接口明明是“/third/system/base/thirdapp/get_detail”，为啥会走到“/base”下面呢？**
+**那么问题来了，访问的接口明明是 `/third/system/base/thirdapp/get_detail`，为啥会走到 `/base`下面呢？**
 
 说到这里，相信细心的小伙伴已经发现问题了，**没错，又是运维的锅！！**
 
 ### 2.3.解决问题
 
-看了Nginx的配置后，相信很多小伙伴应该都知道如何解决问题了，没错那就是把nginx.conf中的如下配置。
+看了Nginx的配置后，相信很多小伙伴应该都知道如何解决问题了，没错那就是把 `nginx.conf` 中的如下配置。
 
 ```bash
 location ~/base {
@@ -265,17 +265,17 @@ location /third {
 }
 ```
 
-去掉“~”符号即可。
+去掉 `~` 符号即可。
 
-接下来，再次模拟访问http接口，能够正常访问接口。
+接下来，再次模拟访问 `http` 接口，能够正常访问接口。
 
-接下来，将Nginx的debug功能关闭，也就是将nginx.conf文件中的 `error_log logs/error.log debug;` 配置注释掉，如下所示。
+接下来，将Nginx的debug功能关闭，也就是将 `nginx.conf` 文件中的 `error_log logs/error.log debug;` 配置注释掉，如下所示。
 
 ```bash
 # error_log  logs/error.log debug;
 ```
 
-重新加载nginx.conf文件。
+重新加载 `nginx.conf` 文件。
 
 ```bash
 nginx_service.sh reload
@@ -291,12 +291,12 @@ nginx_service.sh reload
 location [=|~|~*|^~] /uri/ { … }
 ```
 
-- = 严格匹配。如果请求匹配这个location，那么将停止搜索并立即处理此请求
-- ~ 区分大小写匹配(可用正则表达式)
-- ~* 不区分大小写匹配(可用正则表达式)
-- !~ 区分大小写不匹配
-- !~* 不区分大小写不匹配
-- ^~ 如果把这个前缀用于一个常规字符串,那么告诉nginx 如果路径匹配那么不测试正则表达式
+- `=` 严格匹配。如果请求匹配这个location，那么将停止搜索并立即处理此请求
+- `~` 区分大小写匹配(可用正则表达式)
+- `~*` 不区分大小写匹配(可用正则表达式)
+- `!~` 区分大小写不匹配
+- `!~*` 不区分大小写不匹配
+- `^~` 如果把这个前缀用于一个常规字符串,那么告诉nginx 如果路径匹配那么不测试正则表达式
 
 **示例1：**
 
@@ -363,8 +363,8 @@ location ^~ /binghe/ {
 
 #### 2.4.4.permanent 和 redirect关键字的区别
 
-- rewrite … permanent 永久性重定向，请求日志中的状态码为301
-- rewrite … redirect 临时重定向，请求日志中的状态码为302
+- `rewrite … permanent` 永久性重定向，请求日志中的状态码为301
+- `rewrite … redirect` 临时重定向，请求日志中的状态码为302
 
 #### 2.4.5.综合实例
 
@@ -385,7 +385,7 @@ location ^~ /binghe/ {
     }
     ```
 
-	这里将所有符合条件的URL（PS：不区分大小写）都重定向到/testpage.txt请求，也就是 `/usr/local/nginx/html/testpage.txt` 文件
+	这里将所有符合条件的URL（PS：不区分大小写）都重定向到 `/testpage.txt` 请求，也就是 `/usr/local/nginx/html/testpage.txt` 文件
 
 2. 使用alias关键字
 

@@ -7,5 +7,5 @@
 5. [Nginx 负载均衡](https://github.com/HomanLiang/study-demo/blob/main/nginx-demo/document/chapter04.md)
 6. [Nginx 应用](https://github.com/HomanLiang/study-demo/blob/main/nginx-demo/document/chapter05.md)
 7. [Nginx 常见问题](https://github.com/HomanLiang/study-demo/blob/main/nginx-demo/document/chapter06.md)
-8. [Nginx 面试题](https://github.com/HomanLiang/study-demo/blob/main/nginx-demo/document/chapter07.md)
+8. [Nginx 面试题](https://github.com/HomanLiang/study-demo/blob/main/nginx-demo/document/chapterXX.md)
 
