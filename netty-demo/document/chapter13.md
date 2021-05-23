@@ -1,14 +1,18 @@
+[toc]
+
+
+
 # Pipeline Handler HandlerContext 创建源码剖析
 
-## 源码剖析目的
+## 1.源码剖析目的
 
-Netty 中的 ChannelPipeline 、 ChannelHandler 和 ChannelHandlerContext 是非常核心的组件, 我们从源码来分析 Netty 是如何设计这三个核心组件的，并分析是如何创建和协调工作的
+Netty 中的 `ChannelPipeline` 、 `ChannelHandler` 和 `ChannelHandlerContext` 是非常核心的组件, 我们从源码来分析 Netty 是如何设计这三个核心组件的，并分析是如何创建和协调工作的
 
 
 
-## 源码剖析
+## 2.源码剖析
 
-###  ChannelPipeline 、 ChannelHandler 和 ChannelHandlerContext 介绍
+###  2.1.ChannelPipeline 、 ChannelHandler 和 ChannelHandlerContext 介绍
 
 1. 三者关系
 
@@ -38,7 +42,7 @@ Netty 中的 ChannelPipeline 、 ChannelHandler 和 ChannelHandlerContext 是非
 
      说明：
 
-     - 可以看出该接口继承了 inBound，outBound， Iterable 接口，表示他可以调用数据出站的方法和入站的方法，同时也能遍历内部的链表，看看他的几个代表性的方法，基本上都是针对 handler 链表的插入、追加、删除、替换操作，类似是一个 LinkedList。同时也能返回 channel（也就是 socket）
+     - 可以看出该接口继承了 `inBound`，`outBound`， `Iterable` 接口，表示他可以调用数据出站的方法和入站的方法，同时也能遍历内部的链表，看看他的几个代表性的方法，基本上都是针对 handler 链表的插入、追加、删除、替换操作，类似是一个 LinkedList。同时也能返回 channel（也就是 socket）
 
    - 在 pipeline 的接口文档上，提供了一幅画
 
@@ -48,9 +52,9 @@ Netty 中的 ChannelPipeline 、 ChannelHandler 和 ChannelHandlerContext 是非
 
      - 这是一个 handler 的 list，handler 用于处理或拦截入站事件和出站事件，pipeline 实现了过滤器的高级形式，以便用户控制事件如何处理以及 handler 在 pipeline 中如何交互。
 
-     - 上图描述了一个典型的 handler 在 Pipeline 中处理 I/O 事件的方式，I/O事件由 inBoundHandler 或者 outBoundHandler 处理，并通过调用 ChannelHandlerContext.fireChannelRead 方法转发给其最近的处理程序
+     - 上图描述了一个典型的 handler 在 Pipeline 中处理 I/O 事件的方式，I/O事件由 inBoundHandler 或者 outBoundHandler 处理，并通过调用 `ChannelHandlerContext.fireChannelRead` 方法转发给其最近的处理程序
 
-     - 入站事件由入站处理程序以自下而上的方向处理，如图所示。入站处理程序通常处理由图底部的I/O线程生成入站数据。入站数据通常从如 SocketChannel.read(ByteBuffer) 获取。
+     - 入站事件由入站处理程序以自下而上的方向处理，如图所示。入站处理程序通常处理由图底部的I/O线程生成入站数据。入站数据通常从如 `SocketChannel.read(ByteBuffer)` 获取。
 
      - 通常一个 pipeline 有多个 handler，例如，一个典型的服务器在每个通道的管道中都会有以下处理程序：
 
@@ -152,7 +156,7 @@ Netty 中的 ChannelPipeline 、 ChannelHandler 和 ChannelHandlerContext 是非
 
 
 
-### ChannelPipeline 、 ChannelHandler 和 ChannelHandlerContext 创建过程
+### 2.2.ChannelPipeline 、 ChannelHandler 和 ChannelHandlerContext 创建过程
 
 分为 3 个步骤来看创建的过程：
 
@@ -275,7 +279,7 @@ Netty 中的 ChannelPipeline 、 ChannelHandler 和 ChannelHandlerContext 是非
 
 
 
-## Pipeline Handler HandlerContext创建过程梳理
+## 3.Pipeline Handler HandlerContext创建过程梳理
 
 1. 每当创建 ChannelSocket 的时候都会创建一个绑定的 pipeline，一对一的关系，创建 pipeline 的时候也会创建 tail 节点和 head 节点，形成最初的链表。
 2. 在调用 pipeline 的 addLast 方法的时候，会根据给定的 handler 创建一个 Context，然后，将这个 Context 插入到链表的尾端（tail 前面）。

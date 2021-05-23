@@ -1,26 +1,30 @@
+[toc]
+
+
+
 # Netty 心跳(heartbeat)服务源码剖析
 
-## 源码剖析目的
+## 1.源码剖析目的
 
 Netty 作为一个网络框架，提供了诸多功能，比如编码解码等，Netty 还提供了非常重要的一个服务-----心跳机制heartbeat。通过心跳检查对方是否有效，这是 RPC 框架中是必不可少的功能。下面我们分析一下Netty内部心跳服务源码实现。
 
 
 
-## 源码剖析
+## 2.源码剖析
 
-### 说明
+### 2.1.说明
 
-1. Netty 提供了 IdleStateHandler ，ReadTimeoutHandler，WriteTimeoutHandler 三个Handler 检测连接的有效性，重点分析 IdleStateHandler 。如图所示：
+1. Netty 提供了 `IdleStateHandler` ，`ReadTimeoutHandler`，`WriteTimeoutHandler` 三个Handler 检测连接的有效性，重点分析 `IdleStateHandler` 。如图所示：
 
    ![image-20201220203042293](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/netty-demo/image-20201220203042293.png)
 
-2. ReadTimeout 事件和 WriteTimeout 事件都会自动关闭连接，而且属于异常处理，所以这里只介绍一下，我们重点看 IdleStateHandler 
+2. `ReadTimeout` 事件和 `WriteTimeout` 事件都会自动关闭连接，而且属于异常处理，所以这里只介绍一下，我们重点看 `IdleStateHandler`
 
 
 
-### 源码剖析
+### 2.2.源码剖析
 
-### IdleStateHandler 分析
+#### 2.2.1.IdleStateHandler 分析
 
 1. 4 个属性
 
@@ -106,7 +110,7 @@ Netty 作为一个网络框架，提供了诸多功能，比如编码解码等�
 
 
 
-### 读事件的 run 方法（即 ReaderIdleTimeoutTask）分析
+#### 2.2.2.读事件的 run 方法（即 ReaderIdleTimeoutTask）分析
 
 1. 代码及其说明
 
@@ -148,7 +152,7 @@ Netty 作为一个网络框架，提供了诸多功能，比如编码解码等�
 
 
 
-### 写事件的 run 方法（即 WriterIdleTimeoutTask）分析
+#### 2.2.3.写事件的 run 方法（即 WriterIdleTimeoutTask）分析
 
 1. 代码及其说明
 
@@ -187,7 +191,7 @@ Netty 作为一个网络框架，提供了诸多功能，比如编码解码等�
 
 
 
-### 所有事件的 run 方法（即 AllIdleTimeoutTask）分析
+#### 2.2.4.所有事件的 run 方法（即 AllIdleTimeoutTask）分析
 
 1. 代码及其说明
 
@@ -245,7 +249,7 @@ Netty 作为一个网络框架，提供了诸多功能，比如编码解码等�
 
 
 
-## Netty 的心跳机制小结
+## 3.Netty 的心跳机制小结
 
 1. IdleStateHandler 可以实现心跳功能，当服务器和客户端没有任何读写交互时，并超过了给定的时间，则会触发用户 handler 的 userEventTriggered 方法。用户可以在这个方法中尝试向对方发送消息，如果发送失败，则关闭连接。
 2. IdleStateHandler 的实现基于 EventLoop 的定时任务，每次读写都会记录一个值，在定时任务运行的时候，通过计算当时时间和设置时间和上次事件发生时间的结果来判断是否空闲

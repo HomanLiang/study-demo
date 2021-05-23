@@ -2,7 +2,7 @@
 
 # Netty 高性能架构设计
 
-## 线程模型基本介绍
+## 1.线程模型基本介绍
 
 1. 不同的线程模式，对程序的性能有很大影响，为了搞清Netty 线程模式，我们来系统的讲解下各个线程模式， 最后看看Netty 线程模型有什么优越性.
 2. 目前存在的线程模型有：
@@ -16,9 +16,9 @@
 
 
 
-## 传统阻塞 I/O 服务模型
+## 2.传统阻塞 I/O 服务模型
 
-### 工作原理图
+### 2.1.工作原理图
 
 ![]( https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/netty-demo/34.png )
 
@@ -26,21 +26,21 @@
 2. 蓝色的框表示线程
 3. 白色的框表示方法(API)
 
-### 模型特点
+### 2.2.模型特点
 
 1. 采用阻塞IO模式获取输入的数据
 2. 每个连接都需要独立的线程完成数据的输入，业务处理，数据返回
 
-### 问题分析
+### 2.3.问题分析
 
 1. 当并发数很大，就会创建大量的线程，占用很大系统资源
 2. 连接创建后，如果当前线程暂时没有数据可读，该线程会阻塞在read 操作，造成线程资源浪费
 
 
 
-## Reactor 模式
+## 3.Reactor 模式
 
-### 针对传统阻塞 I/O 服务模型的 2 个缺点，解决方案： 
+### 3.1.针对传统阻塞 I/O 服务模型的 2 个缺点，解决方案： 
 
 1. 基于 I/O 复用模型：多个连接共用一个阻塞对象，应用程序只需要在一个阻塞对象等待，无需阻塞等待所有连接。当某个连接有新的数据可以处理时，操作系统通知应用程序，线程从阻塞状态返回，开始进行业务处理 Reactor 对应的叫法：
    - 反应器模式 
@@ -52,7 +52,7 @@
 
 
 
-### I/O 复用结合线程池，就是 Reactor 模式基本设计思想，如图：
+### 3.2.I/O 复用结合线程池，就是 Reactor 模式基本设计思想，如图：
 
 ![]( https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/netty-demo/36.png )
 
@@ -64,14 +64,14 @@
 
 
 
-### Reactor 模式中 核心组成：
+### 3.3.Reactor 模式中 核心组成：
 
 1. Reactor： Reactor 在一个单独的线程中运行，负责监听和分发事件，分发给适当的处理程序来对 IO 事件做出反应。 它就像公司的电话接线员，它接听来自客户的电话并将线路转移到适当的联系人；
 2. Handlers：处理程序执行 I/O 事件要完成的实际事件，类似于客户想要与之交谈的公司中的实际官员。Reactor 通过调度适当的处理程序来响应 I/O 事件，处理程序执行非阻塞操作。
 
 
 
-### Reactor 模式分类：
+### 3.4.Reactor 模式分类：
 
 根据 Reactor 的数量和处理资源池线程的数量不同，有 3 种典型的实现
 
@@ -81,7 +81,7 @@
 
 
 
-## 单 Reactor 单线程
+## 4.单 Reactor 单线程
 
 工作原理示意图（演示下NIO 群聊说明）：
 ![]( https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/netty-demo/37.png )
@@ -114,7 +114,7 @@
 
 
 
-## 单Reactor多线程
+## 5.单Reactor多线程
 
 **工作原理示意图**：
 
@@ -139,7 +139,7 @@
 
 
 
-## 主从 Reactor 多线程
+## 6.主从 Reactor 多线程
 
 **工作原理示意图**：
 
@@ -181,7 +181,7 @@
 
 
 
-## Reactor 模式小结
+## 7.Reactor 模式小结
 
 **3 种模式用生活案例来理解**:
 
@@ -198,9 +198,9 @@
 
 
 
-## Netty模型
+## 8.Netty模型
 
-### 工作原理示意图1-简单版
+### 8.1.工作原理示意图1-简单版
 
 Netty 主要基于主从 Reactors 多线程模型（如图）做了一定的改进，其中主从 Reactor 多线程模型有多个 Reactor
 
@@ -208,13 +208,13 @@ Netty 主要基于主从 Reactors 多线程模型（如图）做了一定的改�
 
 **对上图说明**
 
-1. BossGroup 线程维护Selector , 只关注Accecpt
-2. 当接收到Accept事件，获取到对应的SocketChannel, 封装成 NIOScoketChannel并注册到Worker 线程(事件循环), 并进行维护
+1. `BossGroup` 线程维护 `Selector`, 只关注 `Accecpt`
+2. 当接收到 `Accept` 事件，获取到对应的 `SocketChannel`, 封装成 `NIOScoketChannel` 并注册到Worker 线程(事件循环), 并进行维护
 3. 当Worker线程监听到selector 中通道发生自己感兴趣的事件后，就进行处理(就由handler)， 注意handler 已经加入到通道
 
 
 
-### 工作原理示意图2-进阶版
+### 8.2.工作原理示意图2-进阶版
 
 Netty 主要基于主从 Reactors 多线程模型（如图）做了一定的改进，其中主从 Reactor 多线程模型有多个 Reactor
 
@@ -222,7 +222,7 @@ Netty 主要基于主从 Reactors 多线程模型（如图）做了一定的改�
 
 
 
-### 工作原理示意图-详细版
+### 8.3.工作原理示意图-详细版
 
 ![]( https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/netty-demo/43.png )
 
@@ -245,7 +245,7 @@ Netty 主要基于主从 Reactors 多线程模型（如图）做了一定的改�
 
 
 
-### Netty快速入门实例-TCP服务
+### 8.4.Netty快速入门实例-TCP服务
 
 **实例要求：**
 
@@ -517,7 +517,7 @@ public class NettyClientHandler extends ChannelInboundHandlerAdapter {
 
 
 
-### 任务队列中的 Task 有 3 种典型使用场景
+### 8.5.任务队列中的 Task 有 3 种典型使用场景
 
 1. 用户程序自定义的普通任务 [举例说明]
 
@@ -670,9 +670,9 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter {
 
 
 
-## 异步模型
+## 9.异步模型
 
-### 基本介绍
+### 9.1.基本介绍
 
 1. 异步的概念和同步相对。当一个异步过程调用发出后，调用者不能立刻得到结果。实际处理这个调用的组件在完成后，通过状态、通知和回调来通知调用者。
 2. Netty 中的 I/O 操作是异步的，包括 Bind、Write、Connect 等操作会简单的返回一个 ChannelFuture。
@@ -681,14 +681,14 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter {
 
 
 
-### Future 说明
+### 9.2.Future 说明
 
 1. 表示异步的执行结果, 可以通过它提供的方法来检测执行是否完成，比如检索计算等等.
 2. ChannelFuture 是一个接口 ： public interface ChannelFuture extends Future<Void>我们可以添加监听器，当监听的事件发生时，就会通知到监听器. （案例说明）
 
 
 
-### 工作原理示意图
+### 9.3.工作原理示意图
 
 ![]( https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/netty-demo/46.png )
 
@@ -701,7 +701,7 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter {
 
 
 
-### Future-Listener 机制
+### 9.4.Future-Listener 机制
 
 1. 当 Future 对象刚刚创建时，处于非完成状态，调用者可以通过返回的 ChannelFuture 来获取操作执行的状态，注册监听函数来执行完成后的操作。
 2. 常见有如下操作
@@ -735,7 +735,7 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter {
 
 
 
-## 快速入门实例-HTTP服务
+## 10.快速入门实例-HTTP服务
 
 **实例要求**：
 

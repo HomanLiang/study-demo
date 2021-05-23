@@ -1,15 +1,19 @@
+[toc]
+
+
+
 # ChannelPipeline 调度 handler 的源码剖析
 
-## 源码剖析目的
+## 1.源码剖析目的
 
 1. 当一个请求进来的时候，ChannelPipeline 是如何调用内部的这些 handler 的呢？我们一起来分析下。
 2. 首先，当一个请求进来的时候，会第一个调用 pipeline 的 相关方法，如果是入站事件，这些方法由 fire 开头，表示开始管道的流动。让后面的 handler 继续处理
 
 
 
-## 源码剖析
+## 2.源码剖析
 
-### 说明
+### 2.1.说明
 
 1. 当浏览器输入 http://localhost:8007。可以看到会执行handler
 2. 在Debug时，可以将断点下在 DefaultChannelPipeline 类的
@@ -23,7 +27,7 @@ public final ChannelPipeline fireChannelActive() {
 
 
 
-### 源码分析
+### 2.2.源码分析
 
 1. DefaultChannelPipeline 是如何实现这些 fire 方法的
 
@@ -156,7 +160,7 @@ public final ChannelPipeline fireChannelActive() {
 
 
 
-## ChannelPipeline 调度 handler 梳理
+## 3.ChannelPipeline 调度 handler 梳理
 
 1. Context 包装 handler，多个 Context 在 pipeline 中形成了双向链表，入站方向叫 inbound，由 head 节点开始，出站方法叫 outbound ，由 tail 节点开始。
 

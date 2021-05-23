@@ -1,14 +1,18 @@
+[toc]
+
+
+
 # Netty 核心组件 EventLoop 源码剖析
 
-## 源码剖析目的
+## 1.源码剖析目的
 
 Echo第一行代码就是 ：`EventLoopGroup bossGroup = new NioEventLoopGroup(1);` 下面分析其最核心的组件 EventLoop
 
 
 
-## 源码剖析
+## 2.源码剖析
 
-### EventLoop 介绍
+### 2.1.EventLoop 介绍
 
 1. 首先看看 NioEventLoop 的继承图
 
@@ -16,14 +20,14 @@ Echo第一行代码就是 ：`EventLoopGroup bossGroup = new NioEventLoopGroup(1
 
    说明：
 
-   - ScheduledExecutorService 接口表示是一个定时任务接口，EventLoop 接收定时任务
+   - `ScheduledExecutorService` 接口表示是一个定时任务接口，EventLoop 接收定时任务
    - EventLoop 接口：Netty 接口文档说明该接口作用：一旦 Channel 注册了，就处理该 Channel 对应得所有 I/O 操作
    - SingleThreadEventExecutor 表示这是一个单个线程的线程池
    - EventLoop 是一个单例的线程池，里面含有一个死循环的线程不断的做着 3 件事：监听端口、处理端口事件、处理队列事件。每个 EventLoop都可以绑定多个 Channel，而每个 Channel 始终只能由一个 EventLoop 来处理 
 
 
 
-### NioEventLoop 的使用 -- execute 方法
+### 2.2.NioEventLoop 的使用 -- execute 方法
 
 1. execute 源码剖析
 
@@ -83,11 +87,10 @@ Echo第一行代码就是 ：`EventLoopGroup bossGroup = new NioEventLoopGroup(1
        }
    ```
 
-   
 
 
 
-### NioEventLoop 的父类 SingleThreadEventExecutor 的 startThread 方法
+### 2.3.NioEventLoop 的父类 SingleThreadEventExecutor 的 startThread 方法
 
 1. 当执行 execute 方法的时候，如果当前线程不是 EventLoop 所属线程，则尝试启动线程，也就是 startThread 方法，代码如下：
 
@@ -184,7 +187,7 @@ Echo第一行代码就是 ：`EventLoopGroup bossGroup = new NioEventLoopGroup(1
 
 
 
-### EventLoop 中的 Loop 是靠 run 实现的，我们分析下 run 方法（该方法在 NioEventLoop）
+### 2.4.EventLoop 中的 Loop 是靠 run 实现的，我们分析下 run 方法（该方法在 NioEventLoop）
 
 ```
     @Override
@@ -380,7 +383,7 @@ Echo第一行代码就是 ：`EventLoopGroup bossGroup = new NioEventLoopGroup(1
 
 
 
-## EventLoop 作为 Netty 的核心的运行机制小结
+## 3.EventLoop 作为 Netty 的核心的运行机制小结
 
 每次执行 execute 方法都是向队列添加任务。当第一次添加时就启动线程，执行 run 方法，而 run 方法是整个 EventLoop 的核心，就像 EventLoop 的名字一样， 不停 Loop。Loop 做了下面 3 件事：
 

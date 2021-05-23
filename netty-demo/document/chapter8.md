@@ -1,6 +1,10 @@
+[TOC]
+
+
+
 # Google Protobuf
 
-## 编码和解码的基本介绍
+## 1.编码和解码的基本介绍
 
 1. 编写网络应用程序时，因为数据在网络中传输的都是二进制字节码数据，在发送数据时就需要编码，接收数据时就需要解码 
 2. codec (编解码器) 的组成部分有两个：decoder (解码器)和 encoder (编码器)。encoder 负责把业务数据转换成字节码数据，decoder 负责把字节码数据转换成业务数据
@@ -9,7 +13,7 @@
 
 
 
-## Netty 本身的编码解码的机制和问题分析
+## 2.Netty 本身的编码解码的机制和问题分析
 
 1. Netty 自身提供了一些 codec(编解码器)
 
@@ -32,9 +36,9 @@
 
 
 
-## Protobuf基本介绍和使用示意图
+## 3.Protobuf基本介绍和使用示意图
 
-### 基本介绍
+### 3.1.基本介绍
 
 1. Protobuf 是 Google 发布的开源项目，全称 Google Protocol Buffers，是一种轻便高效的结构化数据存储格式，可以用于结构化数据串行化，或者说序列化。它很适合做数据存储或 RPC[远程过程调用  remote procedure call ] 数据交换格式 。目前很多公司 `http+json`=>`tcp+protobuf`
 2. [参考文档](https://developers.google.com/protocol-buffers/docs/proto)
@@ -43,67 +47,64 @@
 5. 高性能，高可靠性
 6. 使用 Protobuf 编译器能自动生成代码，Protobuf 是将类的定义使用`.proto` 文件进行描述。说明，在idea 中编写` .proto` 文件时，会自动提示是否下载` .ptoto` 编写插件. 可以让语法高亮。然后通过`protoc.exe` 编译器根据`.proto` 自动生成`.java` 文件
 
-### Protobuf 使用示意图
+### 3.2.Protobuf 使用示意图
 
 ![]( https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/netty-demo/8_2.png )
 
 
 
-### 使用Maven插件生成Java代码
+### 3.3.使用Maven插件生成Java代码
 
-使用protobuf-maven-plugin，可以非常方便的生成Java代码。
+使用 `protobuf-maven-plugin`，可以非常方便的生成Java代码。
 
-1. 插件的配置如下(pom.xml)：
+1. 插件的配置如下(`pom.xml`)：
 
-```
-
-    <build>
-        <defaultGoal>package</defaultGoal>
-        <extensions>
-            <extension>
-                <groupId>kr.motd.maven</groupId>
-                <artifactId>os-maven-plugin</artifactId>
-                <version>1.5.0.Final</version>
-            </extension>
-        </extensions>
-
-        <plugins>
-            <!-- protobuf 编译组件 -->
-            <plugin>
-                <groupId>org.xolstice.maven.plugins</groupId>
-                <artifactId>protobuf-maven-plugin</artifactId>
-                <version>0.5.1</version>
-                <extensions>true</extensions>
-                <configuration>
-                    <!-- Protobuf 协议文件的路径 -->
-           		<protoSourceRoot>${project.basedir}/src/main/proto/config</protoSourceRoot>
-                    <!-- Java 文件的目标路径 -->
-                    <outputDirectory>${project.basedir}/src/main/proto/generateFiles</outputDirectory>
-                    <!-- Protobuf 代码生成工具的路径 -->
-                    <protocArtifact>com.google.protobuf:protoc:3.6.1:exe:${os.detected.classifier}</protocArtifact>
-                </configuration>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>compile</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-
-            <!-- 编译jar包的jdk版本 -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.1</version>
-                <configuration>
-                    <source>${java.version}</source>
-                    <target>${java.version}</target>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
-```
+       <build>
+           <defaultGoal>package</defaultGoal>
+           <extensions>
+               <extension>
+                   <groupId>kr.motd.maven</groupId>
+                   <artifactId>os-maven-plugin</artifactId>
+                   <version>1.5.0.Final</version>
+               </extension>
+           </extensions>
+       
+           <plugins>
+               <!-- protobuf 编译组件 -->
+               <plugin>
+                   <groupId>org.xolstice.maven.plugins</groupId>
+                   <artifactId>protobuf-maven-plugin</artifactId>
+                   <version>0.5.1</version>
+                   <extensions>true</extensions>
+                   <configuration>
+                       <!-- Protobuf 协议文件的路径 -->
+              			<protoSourceRoot>${project.basedir}/src/main/proto/config</protoSourceRoot>
+                       <!-- Java 文件的目标路径 -->
+                       <outputDirectory>${project.basedir}/src/main/proto/generateFiles</outputDirectory>
+                       <!-- Protobuf 代码生成工具的路径 -->
+                       <protocArtifact>com.google.protobuf:protoc:3.6.1:exe:${os.detected.classifier}</protocArtifact>
+                   </configuration>
+                   <executions>
+                       <execution>
+                           <goals>
+                               <goal>compile</goal>
+                           </goals>
+                       </execution>
+                   </executions>
+               </plugin>
+       
+               <!-- 编译jar包的jdk版本 -->
+               <plugin>
+                   <groupId>org.apache.maven.plugins</groupId>
+                   <artifactId>maven-compiler-plugin</artifactId>
+                   <version>3.1</version>
+                   <configuration>
+                       <source>${java.version}</source>
+                       <target>${java.version}</target>
+                   </configuration>
+               </plugin>
+           </plugins>
+       </build>
 
 2. 通过步骤1设置配置文件目录和生成的Java文件目录
 
@@ -133,7 +134,7 @@
 
 
 
-### Protobuf快速入门实例
+### 3.4.Protobuf快速入门实例
 
 编写程序，使用`Protobuf`完成如下功能
 
@@ -1081,7 +1082,7 @@ public class NettyClientHandler extends ChannelInboundHandlerAdapter {
 
 
 
-### Protobuf快速入门实例2
+### 3.5.Protobuf快速入门实例2
 
 编写程序，使用Protobuf完成如下功能：
 

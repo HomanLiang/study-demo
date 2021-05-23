@@ -4,17 +4,17 @@
 
 # Netty 核心源码剖析（二）
 
-## Netty 接收请求过程源码剖析 
+## 1.Netty 接收请求过程源码剖析 
 
-### 源码剖析目的
+### 1.1.源码剖析目的
 
 服务器启动后肯定是要接受客户端请求并返回客户端想要的信息的，下面源码分析 Netty 在启动之后是如何接受客户端请求的
 
 
 
-### 源码剖析
+### 1.2.源码剖析
 
-#### 说明
+#### 1.2.1.说明
 
 1. 从之前服务器启动的源码中，我们得知，服务器最终注册了一个 Accept 事件等待客户端的连接。我们也知道，NioServerSocketChannel 将自己注册到了 boss 单例线程池（reactor 线程）上，也就是 EventLoop 。
 
@@ -28,7 +28,7 @@
 
 
 
-#### 源码分析过程
+#### 1.2.2.源码分析过程
 
 1. 断点位置 NioEventLoop 的如下方法 processSelectedKey
 
@@ -46,7 +46,7 @@
 
 3. 从断点我们可以看到，readyOps 是16，也就是 Accept 事件。说明浏览器的请求已经进来了。
 
-4. 这个 unsafe 是 boss 线程中 NioServerSocketChannel 的 AbstractNioMessageChannel$NioMessageUnsafe 对象。我们进入到 AbstractNioMessageChannel$NioMessageUnsafe 的 read 方法中
+4. 这个 unsafe 是 boss 线程中 `NioServerSocketChannel` 的 `AbstractNioMessageChannel$NioMessageUnsafe` 对象。我们进入到 `AbstractNioMessageChannel$NioMessageUnsafe` 的 read 方法中
 
 5. read 方法代码
 
@@ -156,7 +156,7 @@
 
 
 
-7. 回到 read 方法，继续分析。循环执行 pipeline.fireChannelRead 方法
+7. 回到 read 方法，继续分析。循环执行 `pipeline.fireChannelRead` 方法
 
    - 前面分析 doReadMessages 方法的作用是通过 ServerSocket 的 accept 方法获取到 TCP 连接，然后封装成 Netty 的 NioSocketChannel 对象，最后添加到容器中
 
@@ -286,7 +286,7 @@
 
 
 
-#### Netty接受请求过程梳理
+#### 1.2.3.Netty接受请求过程梳理
 
 总体流程：接收连接 => 创建一个新的 NioSocketChannel => 注册到一个 worker EventLoop 上 =>  注册 selector Read 事件
 

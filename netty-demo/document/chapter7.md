@@ -4,7 +4,7 @@
 
 # Netty核心模块组件
 
-## Bootstrap、ServerBootstrap
+## 1.Bootstrap、ServerBootstrap
 
 1. Bootstrap 意思是引导，一个 Netty 应用通常由一个 Bootstrap 开始，主要作用是配置整个 Netty 程序，串联各个组件，Netty 中 Bootstrap 类是客户端程序的启动引导类，ServerBootstrap 是服务端启动引导类
 2. 常见的方法有
@@ -19,17 +19,17 @@
 
 
 
-## Future、ChannelFuture
+## 2.Future、ChannelFuture
 
 1. Netty 中所有的 IO 操作都是异步的，不能立刻得知消息是否被正确处理。但是可以过一会等它执行完成或者直接注册一个监听，具体的实现就是通过 Future 和 ChannelFutures，他们可以注册一个监听，当操作执行成功或失败时监听会自动触发注册的监听事件
 
 2. 常见的方法有
-   - Channel channel()，返回当前正在进行 IO 操作的通道
-   - ChannelFuture sync()，等待异步操作执行完毕
+   - `Channel channel()`，返回当前正在进行 IO 操作的通道
+   - `ChannelFuture sync()`，等待异步操作执行完毕
 
 
 
-## Channel
+## 3.Channel
 
 1. Netty 网络通信的组件，能够用于执行网络 I/O 操作。
 2. 通过Channel 可获得当前网络连接的通道的状态
@@ -46,7 +46,7 @@
 
 
 
-## Selector
+## 4.Selector
 
 1. Netty 基于 Selector 对象实现 I/O 多路复用，通过 Selector 一个线程可以监听多个连接的 Channel 事件。
    当向一个 Selector 中注册 Channel 后，Selector 内部的机制就可以自动不断地查询(Select) 这些注册的 Channel
@@ -54,7 +54,7 @@
 
 
 
-## ChannelHandler 及其实现类
+## 5.ChannelHandler 及其实现类
 
 1. ChannelHandler 是一个接口，处理 I/O 事件或拦截 I/O 操作，并将其转发到其 ChannelPipeline(业务处理链)中的下一个处理程序。
 2. ChannelHandler 本身并没有提供很多方法，因为这个接口有许多的方法需要实现，方便使用期间，可以继承它的子类
@@ -140,7 +140,7 @@ public class ChannelInboundHandlerAdapter extends ChannelHandlerAdapter implemen
 
 
 
-## Pipeline 和 ChannelPipeline
+## 6.Pipeline 和 ChannelPipeline
 
 ChannelPipeline 是一个重点：
 
@@ -158,7 +158,7 @@ ChannelPipeline 是一个重点：
 
 
 
-## ChannelHandlerContext
+## 7.ChannelHandlerContext
 
 1. 保存 Channel 相关的所有上下文信息，同时关联一个 ChannelHandler 对象
 2. 即ChannelHandlerContext 中 包 含 一 个 具 体 的 事 件 处 理 器 ChannelHandler ， 同 时ChannelHandlerContext 中也绑定了对应的 pipeline 和 Channel 的信息，方便对 ChannelHandler进行调用.
@@ -170,7 +170,7 @@ ChannelPipeline 是一个重点：
 
 
 
-## ChannelOption
+## 8.ChannelOption
 
 1. Netty 在创建 Channel 实例后,一般都需要设置 ChannelOption 参数。
 2. ChannelOption 参数如下:
@@ -184,7 +184,7 @@ ChannelPipeline 是一个重点：
 
 
 
-## EventLoopGroup 和其实现类 NioEventLoopGroup
+## 9.EventLoopGroup 和其实现类 NioEventLoopGroup
 
 1. EventLoopGroup 是一组 EventLoop 的抽象，Netty 为了更好的利用多核 CPU 资源，一般会有多个 EventLoop 同时工作，每个 EventLoop 维护着一个 Selector 实例。
 2. EventLoopGroup 提供 next 接口，可以从组里面按照一定规则获取其中一个 EventLoop来处理任务。在 Netty 服务器端编程中，我们一般都需要提供两个 EventLoopGroup，例如：BossEventLoopGroup 和 WorkerEventLoopGroup。
@@ -201,15 +201,16 @@ ChannelPipeline 是一个重点：
 
 
 
-## Unpooled 类
+## 10.Unpooled 类
 
 1. Netty 提供一个专门用来操作缓冲区(即Netty的数据容器)的工具类
+
 2. 常用方法如下所示
 
-```java
-//通过给定的数据和字符编码返回一个 ByteBuf 对象（类似于 NIO 中的 ByteBuffer 但有区别）
-public static ByteBuf copiedBuffer(CharSequence string, Charset charset)
-```
+   ```
+   //通过给定的数据和字符编码返回一个 ByteBuf 对象（类似于 NIO 中的 ByteBuffer 但有区别）
+   public static ByteBuf copiedBuffer(CharSequence string, Charset charset)
+   ```
 
 3. 举例说明Unpooled 获取 Netty的数据容器ByteBuf 的基本使用 【案例演示】
 
@@ -320,7 +321,7 @@ public class NettyByteBuf02 {
 
 
 
-## Netty应用实例-群聊系统
+## 11.Netty应用实例-群聊系统
 
 **实例要求:**  
 
@@ -624,7 +625,7 @@ public class GroupChatClientHandler extends SimpleChannelInboundHandler<String> 
 
 
 
-## Netty心跳检测机制案例
+## 12.Netty心跳检测机制案例
 
 **实例要求:**  
 
@@ -755,7 +756,7 @@ public class HeartBeatServerHandler extends ChannelInboundHandlerAdapter {
 
 
 
-## Netty 通过WebSocket编程实现服务器和客户端长连接
+## 13.Netty 通过WebSocket编程实现服务器和客户端长连接
 
 **实例要求:**  
 
