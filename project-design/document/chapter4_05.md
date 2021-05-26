@@ -95,9 +95,9 @@ TCC在业务层面追求最终一致性，不会长久占用资源；
 
 假设订单总额为：200，状态：支付中，则此时资源预留情况如下：
 
-- tc_account账户表：tc_total=1000，tc_ice=200，总金额1000，冻结200；
-- tc_inventory库存表：tc_total=100，tc_ice=20，总库存100件，冻结20件；
-- tc_waybill运单表：tc_state=1，运单状态，出库中；
+- `tc_account` 账户表：`tc_total=1000`，`tc_ice=200`，总金额1000，冻结200；
+- `tc_inventory` 库存表：`tc_total=100`，`tc_ice=20`，总库存100件，冻结20件；
+- `tc_waybill` 运单表：`tc_state=1`，运单状态，出库中；
 
 这样下单链路上的相关资源已检查并且预留成功；
 
@@ -107,9 +107,9 @@ TCC在业务层面追求最终一致性，不会长久占用资源；
 
 ![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/project-design/20210418210905.png)
 
-- tc_account账户表：tc_total=800，tc_ice=0，即订单扣款成功；
-- tc_inventory库存表：tc_total=80，tc_ice=0，库存消减成功；
-- tc_waybill运单表：tc_state=2，运单状态，已出库；
+- `tc_account` 账户表：`tc_total=800`，`tc_ice=0`，即订单扣款成功；
+- `tc_inventory` 库存表：`tc_total=80`，`tc_ice=0`，库存消减成功；
+- `tc_waybill` 运单表：`tc_state=2`，运单状态，已出库；
 
 这样下单链路上的相关资源已全部提交处理成功，这是最理想的状态；
 
@@ -119,9 +119,9 @@ TCC在业务层面追求最终一致性，不会长久占用资源；
 
 ![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/project-design/20210418210900.png)
 
-- tc_account账户表：tc_total=1000，tc_ice=0，取消账户冻结的200；
-- tc_inventory库存表：tc_total=100，tc_ice=0，取消库存冻结的20件；
-- tc_waybill运单表：tc_state=3，运单状态，已撤回；
+- `tc_account` 账户表：`tc_total=1000`，`tc_ice=0`，取消账户冻结的200；
+- `tc_inventory` 库存表：`tc_total=100`，`tc_ice=0`，取消库存冻结的20件；
+- `tc_waybill` 运单表：`tc_state=3`，运单状态，已撤回；
 
 这样下单链路上的相关数据都基于该笔订单做回退操作，恢复；
 
@@ -220,31 +220,31 @@ public class OrderService {
 }
 ```
 
-如果你之前看过 Spring Cloud 架构原理那篇文章，同时对 Spring Cloud 有一定的了解的话，应该是可以理解上面那段代码的。
+如果你之前看过 `Spring Cloud` 架构原理那篇文章，同时对 `Spring Cloud` 有一定的了解的话，应该是可以理解上面那段代码的。
 
-其实就是订单服务完成本地数据库操作之后，通过 Spring Cloud 的 Feign 来调用其他的各个服务罢了。
+其实就是订单服务完成本地数据库操作之后，通过 `Spring Cloud` 的 `Feign` 来调用其他的各个服务罢了。
 
-但是光是凭借这段代码，是不足以实现 TCC 分布式事务的啊？！兄弟们，别着急，我们对这个订单服务修改点儿代码好不好。
+但是光是凭借这段代码，是不足以实现 `TCC` 分布式事务的啊？！兄弟们，别着急，我们对这个订单服务修改点儿代码好不好。
 
-首先，上面那个订单服务先把自己的状态修改为：OrderStatus.UPDATING。
+首先，上面那个订单服务先把自己的状态修改为：`OrderStatus.UPDATING`。
 
-这是啥意思呢？也就是说，在 pay() 那个方法里，你别直接把订单状态修改为已支付啊！你先把订单状态修改为 UPDATING，也就是修改中的意思。
+这是啥意思呢？也就是说，在 `pay()` 那个方法里，你别直接把订单状态修改为已支付啊！你先把订单状态修改为 `UPDATING`，也就是修改中的意思。
 
 这个状态是个没有任何含义的这么一个状态，代表有人正在修改这个状态罢了。
 
-然后呢，库存服务直接提供的那个 reduceStock() 接口里，也别直接扣减库存啊，你可以是冻结掉库存。
+然后呢，库存服务直接提供的那个 `reduceStock()` 接口里，也别直接扣减库存啊，你可以是冻结掉库存。
 
-举个例子，本来你的库存数量是 100，你别直接 100 - 2 = 98，扣减这个库存！
+举个例子，本来你的库存数量是 `100`，你别直接 `100 - 2 = 98`，扣减这个库存！
 
-你可以把可销售的库存：100 - 2 = 98，设置为 98 没问题，然后在一个单独的冻结库存的字段里，设置一个 2。也就是说，有 2 个库存是给冻结了。
+你可以把可销售的库存：`100 - 2 = 98`，设置为 98 没问题，然后在一个单独的冻结库存的字段里，设置一个 2。也就是说，有 2 个库存是给冻结了。
 
-积分服务的 addCredit() 接口也是同理，别直接给用户增加会员积分。你可以先在积分表里的一个预增加积分字段加入积分。
+积分服务的 `addCredit()` 接口也是同理，别直接给用户增加会员积分。你可以先在积分表里的一个预增加积分字段加入积分。
 
-比如：用户积分原本是 1190，现在要增加 10 个积分，别直接 1190 + 10 = 1200 个积分啊！
+比如：用户积分原本是 1190，现在要增加 10 个积分，别直接 `1190 + 10 = 1200` 个积分啊！
 
 你可以保持积分为 1190 不变，在一个预增加字段里，比如说 prepare_add_credit 字段，设置一个 10，表示有 10 个积分准备增加。
 
-仓储服务的 saleDelivery() 接口也是同理啊，你可以先创建一个销售出库单，但是这个销售出库单的状态是“UNKNOWN”。
+仓储服务的 `saleDelivery()` 接口也是同理啊，你可以先创建一个销售出库单，但是这个销售出库单的状态是 `UNKNOWN`。
 
 也就是说，刚刚创建这个销售出库单，此时还不确定它的状态是什么呢！
 
@@ -262,7 +262,7 @@ public class OrderService {
 
 然后就分成两种情况了，第一种情况是比较理想的，那就是各个服务执行自己的那个 Try 操作，都执行成功了，Bingo！
 
-这个时候，就需要依靠 TCC 分布式事务框架来推动后续的执行了。这里简单提一句，如果你要玩儿 TCC 分布式事务，必须引入一款 TCC 分布式事务框架，比如国内开源的 ByteTCC、Himly、TCC-transaction。
+这个时候，就需要依靠 TCC 分布式事务框架来推动后续的执行了。这里简单提一句，如果你要玩儿 TCC 分布式事务，必须引入一款 TCC 分布式事务框架，比如国内开源的 `ByteTCC`、`Himly`、`TCC-transaction`。
 
 否则的话，感知各个阶段的执行情况以及推进执行下一个阶段的这些事情，不太可能自己手写实现，太复杂了。
 
@@ -281,17 +281,17 @@ public class OrderServiceConfirm {
 }
 ```
 
-库存服务也是类似的，你可以有一个 InventoryServiceConfirm 类，里面提供一个 reduceStock() 接口的 Confirm 逻辑，这里就是将之前冻结库存字段的 2 个库存扣掉变为 0。
+库存服务也是类似的，你可以有一个 `InventoryServiceConfirm` 类，里面提供一个 `reduceStock()` 接口的 `Confirm` 逻辑，这里就是将之前冻结库存字段的 2 个库存扣掉变为 0。
 
 这样的话，可销售库存之前就已经变为 98 了，现在冻结的 2 个库存也没了，那就正式完成了库存的扣减。
 
-积分服务也是类似的，可以在积分服务里提供一个 CreditServiceConfirm 类，里面有一个 addCredit() 接口的 Confirm 逻辑，就是将预增加字段的 10 个积分扣掉，然后加入实际的会员积分字段中，从 1190 变为 1120。
+积分服务也是类似的，可以在积分服务里提供一个 `CreditServiceConfirm` 类，里面有一个 `addCredit()` 接口的 `Confirm` 逻辑，就是将预增加字段的 10 个积分扣掉，然后加入实际的会员积分字段中，从 1190 变为 1120。
 
-仓储服务也是类似，可以在仓储服务中提供一个 WmsServiceConfirm 类，提供一个 saleDelivery() 接口的 Confirm 逻辑，将销售出库单的状态正式修改为“已创建”，可以供仓储管理人员查看和使用，而不是停留在之前的中间状态“UNKNOWN”了。
+仓储服务也是类似，可以在仓储服务中提供一个 `WmsServiceConfirm` 类，提供一个 `saleDelivery()` 接口的 `Confirm` 逻辑，将销售出库单的状态正式修改为“已创建”，可以供仓储管理人员查看和使用，而不是停留在之前的中间状态“UNKNOWN”了。
 
-好了，上面各种服务的 Confirm 的逻辑都实现好了，一旦订单服务里面的 TCC 分布式事务框架感知到各个服务的 Try 阶段都成功了以后，就会执行各个服务的 Confirm 逻辑。
+好了，上面各种服务的 `Confirm` 的逻辑都实现好了，一旦订单服务里面的 `TCC` 分布式事务框架感知到各个服务的 `Try` 阶段都成功了以后，就会执行各个服务的 `Confirm` 逻辑。
 
-订单服务内的 TCC 事务框架会负责跟其他各个服务内的 TCC 事务框架进行通信，依次调用各个服务的 Confirm 逻辑。然后，正式完成各个服务的所有业务逻辑的执行。
+订单服务内的 `TCC` 事务框架会负责跟其他各个服务内的 `TCC` 事务框架进行通信，依次调用各个服务的 `Confirm` 逻辑。然后，正式完成各个服务的所有业务逻辑的执行。
 
 同样，给大家来一张图，顺着图一起来看看整个过程：
 
@@ -301,21 +301,21 @@ public class OrderServiceConfirm {
 
 好，这是比较正常的一种情况，那如果是异常的一种情况呢？
 
-举个例子：在 Try 阶段，比如积分服务吧，它执行出错了，此时会怎么样？
+举个例子：在 `Try` 阶段，比如积分服务吧，它执行出错了，此时会怎么样？
 
-那订单服务内的 TCC 事务框架是可以感知到的，然后它会决定对整个 TCC 分布式事务进行回滚。
+那订单服务内的 TCC 事务框架是可以感知到的，然后它会决定对整个 `TCC` 分布式事务进行回滚。
 
-也就是说，会执行各个服务的第二个 C 阶段，Cancel 阶段。同样，为了实现这个 Cancel 阶段，各个服务还得加一些代码。
+也就是说，会执行各个服务的第二个 C 阶段，`Cancel` 阶段。同样，为了实现这个 `Cancel` 阶段，各个服务还得加一些代码。
 
-首先订单服务，它得提供一个 OrderServiceCancel 的类，在里面有一个 pay() 接口的 Cancel 逻辑，就是可以将订单的状态设置为“CANCELED”，也就是这个订单的状态是已取消。
+首先订单服务，它得提供一个 `OrderServiceCancel` 的类，在里面有一个 `pay()` 接口的 `Cancel` 逻辑，就是可以将订单的状态设置为 `CANCELED`，也就是这个订单的状态是已取消。
 
-库存服务也是同理，可以提供 reduceStock() 的 Cancel 逻辑，就是将冻结库存扣减掉 2，加回到可销售库存里去，98 + 2 = 100。
+库存服务也是同理，可以提供 `reduceStock()` 的 `Cancel` 逻辑，就是将冻结库存扣减掉 2，加回到可销售库存里去，`98 + 2 = 100`。
 
-积分服务也需要提供 addCredit() 接口的 Cancel 逻辑，将预增加积分字段的 10 个积分扣减掉。
+积分服务也需要提供 `addCredit()` 接口的 `Cancel` 逻辑，将预增加积分字段的 10 个积分扣减掉。
 
-仓储服务也需要提供一个 saleDelivery() 接口的 Cancel 逻辑，将销售出库单的状态修改为“CANCELED”设置为已取消。
+仓储服务也需要提供一个 `saleDelivery()` 接口的 `Cancel` 逻辑，将销售出库单的状态修改为 `CANCELED` 设置为已取消。
 
-然后这个时候，订单服务的 TCC 分布式事务框架只要感知到了任何一个服务的 Try 逻辑失败了，就会跟各个服务内的 TCC 分布式事务框架进行通信，然后调用各个服务的 Cancel 逻辑。
+然后这个时候，订单服务的 `TCC` 分布式事务框架只要感知到了任何一个服务的 `Try` 逻辑失败了，就会跟各个服务内的 `TCC` 分布式事务框架进行通信，然后调用各个服务的 `Cancel` 逻辑。
 
 大家看看下面的图，直观的感受一下：
 
@@ -323,56 +323,52 @@ public class OrderServiceConfirm {
 
 #### 2.3.4.总结与思考
 
-好了，兄弟们，聊到这儿，基本上大家应该都知道 TCC 分布式事务具体是怎么回事了！
+好了，兄弟们，聊到这儿，基本上大家应该都知道 `TCC` 分布式事务具体是怎么回事了！
 
-总结一下，你要玩儿 TCC 分布式事务的话：首先需要选择某种 TCC 分布式事务框架，各个服务里就会有这个 TCC 分布式事务框架在运行。
+总结一下，你要玩儿 `TCC` 分布式事务的话：首先需要选择某种 `TCC` 分布式事务框架，各个服务里就会有这个 `TCC` 分布式事务框架在运行。
 
-然后你原本的一个接口，要改造为 3 个逻辑，Try-Confirm-Cancel：
+然后你原本的一个接口，要改造为 3 个逻辑，`Try-Confirm-Cancel`：
 
-- 先是服务调用链路依次执行 Try 逻辑。
-- 如果都正常的话，TCC 分布式事务框架推进执行 Confirm 逻辑，完成整个事务。
-- 如果某个服务的 Try 逻辑有问题，TCC 分布式事务框架感知到之后就会推进执行各个服务的 Cancel 逻辑，撤销之前执行的各种操作。
+- 先是服务调用链路依次执行 `Try` 逻辑。
+- 如果都正常的话，`TCC` 分布式事务框架推进执行 `Confirm` 逻辑，完成整个事务。
+- 如果某个服务的 `Try` 逻辑有问题，`TCC` 分布式事务框架感知到之后就会推进执行各个服务的 `Cancel` 逻辑，撤销之前执行的各种操作。
 
-这就是所谓的 TCC 分布式事务。TCC 分布式事务的核心思想，说白了，就是当遇到下面这些情况时：
+这就是所谓的 `TCC` 分布式事务。`TCC` 分布式事务的核心思想，说白了，就是当遇到下面这些情况时：
 
 - 某个服务的数据库宕机了。
 - 某个服务自己挂了。
 - 那个服务的 Redis、Elasticsearch、MQ 等基础设施故障了。
 - 某些资源不足了，比如说库存不够这些。
 
-先来 Try 一下，不要把业务逻辑完成，先试试看，看各个服务能不能基本正常运转，能不能先冻结我需要的资源。
+先来 `Try` 一下，不要把业务逻辑完成，先试试看，看各个服务能不能基本正常运转，能不能先冻结我需要的资源。
 
-如果 Try 都 OK，也就是说，底层的数据库、Redis、Elasticsearch、MQ 都是可以写入数据的，并且你保留好了需要使用的一些资源（比如冻结了一部分库存）。
+如果 `Try` 都 `OK`，也就是说，底层的数据库、Redis、Elasticsearch、MQ 都是可以写入数据的，并且你保留好了需要使用的一些资源（比如冻结了一部分库存）。
 
-接着，再执行各个服务的 Confirm 逻辑，基本上 Confirm 就可以很大概率保证一个分布式事务的完成了。
+接着，再执行各个服务的 `Confirm` 逻辑，基本上 `Confirm` 就可以很大概率保证一个分布式事务的完成了。
 
-那如果 Try 阶段某个服务就失败了，比如说底层的数据库挂了，或者 Redis 挂了，等等。
+那如果 `Try` 阶段某个服务就失败了，比如说底层的数据库挂了，或者 Redis 挂了，等等。
 
-此时就自动执行各个服务的 Cancel 逻辑，把之前的 Try 逻辑都回滚，所有服务都不要执行任何设计的业务逻辑。保证大家要么一起成功，要么一起失败。
+此时就自动执行各个服务的 `Cancel` 逻辑，把之前的 `Try` 逻辑都回滚，所有服务都不要执行任何设计的业务逻辑。保证大家要么一起成功，要么一起失败。
 
-等一等，你有没有想到一个问题？如果有一些意外的情况发生了，比如说订单服务突然挂了，然后再次重启，TCC 分布式事务框架是如何保证之前没执行完的分布式事务继续执行的呢？
+等一等，你有没有想到一个问题？如果有一些意外的情况发生了，比如说订单服务突然挂了，然后再次重启，`TCC` 分布式事务框架是如何保证之前没执行完的分布式事务继续执行的呢？
 
 所以，TCC 事务框架都是要记录一些分布式事务的活动日志的，可以在磁盘上的日志文件里记录，也可以在数据库里记录。保存下来分布式事务运行的各个阶段和状态。
 
-问题还没完，万一某个服务的 Cancel 或者 Confirm 逻辑执行一直失败怎么办呢？
+问题还没完，万一某个服务的 `Cancel` 或者 `Confirm` 逻辑执行一直失败怎么办呢？
 
-那也很简单，TCC 事务框架会通过活动日志记录各个服务的状态。举个例子，比如发现某个服务的 Cancel 或者 Confirm 一直没成功，会不停的重试调用它的 Cancel 或者 Confirm 逻辑，务必要它成功！
+那也很简单，TCC 事务框架会通过活动日志记录各个服务的状态。举个例子，比如发现某个服务的 `Cancel` 或者 `Confirm` 一直没成功，会不停的重试调用它的 `Cancel` 或者 `Confirm` 逻辑，务必要它成功！
 
-当然了，如果你的代码没有写什么 Bug，有充足的测试，而且 Try 阶段都基本尝试了一下，那么其实一般 Confirm、Cancel 都是可以成功的！
+当然了，如果你的代码没有写什么 `Bug`，有充足的测试，而且 `Try` 阶段都基本尝试了一下，那么其实一般 `Confirm`、`Cancel` 都是可以成功的！
 
 最后，再给大家来一张图，来看看给我们的业务，加上分布式事务之后的整个执行流程：
 
 ![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/project-design/20210418211646.png)
 
-不少大公司里，其实都是自己研发 TCC 分布式事务框架的，专门在公司内部使用，比如我们就是这样。
+不少大公司里，其实都是自己研发 `TCC` 分布式事务框架的，专门在公司内部使用，比如我们就是这样。
 
-不过如果自己公司没有研发 TCC 分布式事务框架的话，那一般就会选用开源的框架。
+不过如果自己公司没有研发 `TCC` 分布式事务框架的话，那一般就会选用开源的框架。
 
-这里笔者给大家推荐几个比较不错的框架，都是咱们国内自己开源出去的：ByteTCC，TCC-transaction，Himly。
-
-大家有兴趣的可以去它们的 GitHub 地址，学习一下如何使用，以及如何跟 Spring Cloud、Dubbo 等服务框架整合使用。
-
-只要把那些框架整合到你的系统里，很容易就可以实现上面那种奇妙的 TCC 分布式事务的效果了。
+这里笔者给大家推荐几个比较不错的框架，都是咱们国内自己开源出去的：`ByteTCC`，`TCC-transaction`，`Himly`。
 
 ## 3.跑通分布式事务框架tcc-transaction的示例项目
 
@@ -382,30 +378,30 @@ public class OrderServiceConfirm {
 
 网上查了下，还没找到基于Go开源的比较成熟的分布式事务框架。
 
-于是，准备看看之前隔壁部门大佬写的tcc-transaction，这是一个基于tcc思想实现的分布式事务框架。
+于是，准备看看之前隔壁部门大佬写的 `tcc-transaction`，这是一个基于 `tcc` 思想实现的分布式事务框架。
 
-tcc分别代码Try，Confirm和Cancel。
+`tcc` 分别代码 `Try`，`Confirm` 和 `Cancel`。
 
-Try: 尝试执行业务
+`Try`: 尝试执行业务
 
 - 完成所有业务检查（一致性）
 - 预留必须业务资源（准隔离性）
 
-Confirm: 确认执行业务
+`Confirm`: 确认执行业务
 
 - 真正执行业务
 - 不作任何业务检查
-- 只使用Try阶段预留的业务资源
-- Confirm操作满足幂等性
+- 只使用 `Try` 阶段预留的业务资源
+- `Confirm` 操作满足幂等性
 
-Cancel: 取消执行业务
+`Cancel`: 取消执行业务
 
 - 释放Try阶段预留的业务资源
-- Cancel操作满足幂等性
+- `Cancel` 操作满足幂等性
 
-要了解其实现原理，第一步就是跑通项目自带的示例，即tcc-transaction-tutorial-sample部分的代码。
+要了解其实现原理，第一步就是跑通项目自带的示例，即 `tcc-transaction-tutorial-sample` 部分的代码。
 
-今天主要介绍在跑通tcc-transaction-tutorial-sample过程中遇到的各种坑。
+今天主要介绍在跑通 `tcc-transaction-tutorial-sample` 过程中遇到的各种坑。
 
 ### 3.2.依赖环境
 
@@ -425,7 +421,7 @@ Cancel: 取消执行业务
 
 **第一步：克隆代码**
 
-使用"git clone https://github.com/changmingxie/tcc-transaction"命令下载代码
+使用 `git clone https://github.com/changmingxie/tcc-transaction` 命令下载代码
 
 **第二步：导入代码并执行数据库脚本**
 
@@ -437,11 +433,11 @@ Cancel: 取消执行业务
 
 主要修改的是数据库配置参数。拿 `tcc-transaction-dubbo-sample` 举例，需要修改的文件有
 
-- tcc-transaction/tcc-transaction-tutorial-sample/tcc-transaction-dubbo-sample/tcc-transaction-dubbo-capital/src/main/resources/tccjdbc.properties
+- `tcc-transaction/tcc-transaction-tutorial-sample/tcc-transaction-dubbo-sample/tcc-transaction-dubbo-capital/src/main/resources/tccjdbc.properties`
 
-- tcc-transaction/tcc-transaction-tutorial-sample/tcc-transaction-dubbo-sample/tcc-transaction-dubbo-redpacket/src/main/resources/tccjdbc.properties
+- `tcc-transaction/tcc-transaction-tutorial-sample/tcc-transaction-dubbo-sample/tcc-transaction-dubbo-redpacket/src/main/resources/tccjdbc.properties`
 
-- tcc-transaction/tcc-transaction-tutorial-sample/tcc-transaction-dubbo-sample/tcc-transaction-dubbo-order/src/main/resources/tccjdbc.properties
+- `tcc-transaction/tcc-transaction-tutorial-sample/tcc-transaction-dubbo-sample/tcc-transaction-dubbo-order/src/main/resources/tccjdbc.properties`
 
 三个文件修改后对应配置如下
 
@@ -482,17 +478,17 @@ c3p0.checkoutTimeout=30000
 
 **第四步：启动项目**
 
-结合项目的README.md文件以及网上的文章了解到如果要跑通示例项目，需要分别启动三个项目。
+结合项目的 `README.md` 文件以及网上的文章了解到如果要跑通示例项目，需要分别启动三个项目。
 
-tcc-transaction提供了两个版本：
+`tcc-transaction` 提供了两个版本：
 
 - 基于dubbo通讯的示例版本
 - 基于http通讯的示例版本
 
 这两个版本对于的三个项目分别是
 
-- tcc-transaction-dubbo-capital（账户资产服务）、 tcc-transaction-dubbo-redpacket（红包服务）、 tcc-transaction-dubbo-order（交易订单服务）
-- tcc-transaction-http-capital（账户资产服务）、 tcc-transaction-http-redpacket（红包服务）、 tcc-transaction-http-order（交易订单服务）
+- `tcc-transaction-dubbo-capital`（账户资产服务）、` tcc-transaction-dubbo-redpacket`（红包服务）、 `tcc-transaction-dubbo-order`（交易订单服务）
+- `tcc-transaction-http-capital`（账户资产服务）、 `tcc-transaction-http-redpacket`（红包服务）、 `tcc-transaction-http-order`（交易订单服务）
 
 ![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/project-design/20210418214522.png)
 
@@ -640,7 +636,7 @@ org.mybatis.spring.MyBatisSystemException: nested exception is org.apache.ibatis
 
 以电商的购物场景为例：
 
-客户端 ---->购物车微服务 ---->订单微服务 ----> 支付微服务。
+`客户端 ---->购物车微服务 ---->订单微服务 ----> 支付微服务`。
 
 这种调用链非常普遍。
 
