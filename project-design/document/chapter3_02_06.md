@@ -86,7 +86,7 @@ SPU 是一个介于叶子类目和商品之间的概念, 是对类目的细化�
 
 CSPU是淘宝特色的一个商品模型，这里的C是Child的意思，也就是子标准化产品单元，即SPU的细分，更细粒度的标识产品。
 
-“类目+关键属性+销售属性”唯一确定一个的细粒度产品CSPU。
+`类目+关键属性+销售属性` 唯一确定一个的细粒度产品 `CSPU`。
 
 ![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/project-design/20210423235536.png)
 

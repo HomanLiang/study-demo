@@ -8,13 +8,13 @@
 
 ### 1.1.为何要放弃fastjson？
 
-究其原因，**是fastjson漏洞频发**，导致了公司内部需要频繁的督促各业务线升级fastjson版本，来防止安全问题。
+究其原因，**是fastjson漏洞频发**，导致了公司内部需要频繁的督促各业务线升级 `fastjson` 版本，来防止安全问题。
 
-fastjson在2020年频繁暴露安全漏洞，此漏洞可以绕过autoType开关来实现反序列化远程代码执行并获取服务器访问权限。
+`fastjson` 在2020年频繁暴露安全漏洞，此漏洞可以绕过 `autoType` 开关来实现反序列化远程代码执行并获取服务器访问权限。
 
-从2019年7月份发布的v1.2.59一直到2020年6月份发布的 v1.2.71 ，每个版本的升级中都有关于AutoType的升级，涉及13个正式版本。
+从2019年7月份发布的 `v1.2.59` 一直到2020年6月份发布的 `v1.2.71` ，每个版本的升级中都有关于 `AutoType` 的升级，涉及13个正式版本。
 
-fastjson中与AutoType相关的版本历史：
+`fastjson` 中与 `AutoType` 相关的版本历史：
 
 ```
 1.2.59发布，增强AutoType打开时的安全性 fastjson
@@ -35,7 +35,7 @@ fastjson中与AutoType相关的版本历史：
 
 **本文主要讨论Gson替换fastjson框架的实战问题，所以在这里不展开详细讨论各种json框架的优劣，只给出结论。**
 
-经过评估，主要有Jackson和Gson两种json框架放入考虑范围内，与fastjson进行对比。
+经过评估，主要有 `Jackson` 和 `Gson` 两种 `json` 框架放入考虑范围内，与 `fastjson` 进行对比。
 
 #### 1.2.1.三种json框架的特点
 
@@ -43,19 +43,19 @@ fastjson中与AutoType相关的版本历史：
 
 - 速度快
 
-	fastjson相对其他JSON库的特点是快，从2011年fastjson发布1.1.x版本之后，其性能从未被其他Java实现的JSON库超越。
+	`fastjson` 相对其他JSON库的特点是快，从2011年 `fastjson` 发布1.1.x版本之后，其性能从未被其他Java实现的JSON库超越。
 
 - 使用广泛
 
-	fastjson在阿里巴巴大规模使用，在数万台服务器上部署，fastjson在业界被广泛接受。在2012年被开源中国评选为最受欢迎的国产开源软件之一。
+	`fastjson` 在阿里巴巴大规模使用，在数万台服务器上部署，`fastjson` 在业界被广泛接受。在2012年被开源中国评选为最受欢迎的国产开源软件之一。
 
 - 测试完备
 
-	fastjson有非常多的testcase，在1.2.11版本中，testcase超过3321个。每次发布都会进行回归测试，保证质量稳定。
+	`fastjson` 有非常多的 `testcase` ，在1.2.11版本中，`testcase` 超过3321个。每次发布都会进行回归测试，保证质量稳定。
 
 - 使用简单
 
-	fastjson的API十分简洁。
+	`fastjson` 的API十分简洁。
 
 **Jackson**
 
@@ -89,22 +89,22 @@ https://github.com/zysrxx/json-comparison
 
 本文不详细讨论性能的差异，毕竟这其中涉及了很多各个框架的实现思路和优化，所以只给出结论：
 
-1. 序列化单对象性能Fastjson > Jackson > Gson，其中Fastjson和Jackson性能差距很小，Gson性能较差
+1. 序列化单对象性能 `Fastjson > Jackson > Gson`，其中Fastjson和Jackson性能差距很小，Gson性能较差
    
-2. 序列化大对象性能Jackson> Fastjson > Gson ，序列化大Json对象时Jackson> Gson > Fastjson，Jackson序列化大数据时性能优势明显
+2. 序列化大对象性能 `Jackson> Fastjson > Gson` ，序列化大Json对象时 `Jackson> Gson > Fastjson`，Jackson序列化大数据时性能优势明显
    
-3. 反序列化单对象性能 Fastjson > Jackson > Gson , 性能差距较小
+3. 反序列化单对象性能 `Fastjson > Jackson > Gson` , 性能差距较小
    
-4. 反序列化大对象性能 Fastjson > Jackson > Gson , 性能差距较很小
+4. 反序列化大对象性能 `Fastjson > Jackson > Gson` , 性能差距较很小
 
 #### 1.2.3.最终选择方案
 
-- Jackson适用于高性能场景，Gson适用于高安全性场景
+- `Jackson`适用于高性能场景，`Gson` 适用于高安全性场景
 
-- 对于新项目仓库，不再使用fastjson。对于存量系统，考虑到Json更换成本，由以下几种方案可选：
+- 对于新项目仓库，不再使用 `fastjson`。对于存量系统，考虑到 `Json` 更换成本，由以下几种方案可选：
 
-  - 项目未使用autoType功能，建议直接切换为非fastjson，如果切换成本较大，可以考虑继续使用fastjson，关闭safemode。
-  - 业务使用了autoType功能，建议推进废弃fastjson。
+  - 项目未使用 `autoType` 功能，建议直接切换为非 `fastjson`，如果切换成本较大，可以考虑继续使用 `fastjson`，关闭`safemode`。
+  - 业务使用了 `autoType` 功能，建议推进废弃 `fastjson`。
 
 ### 1.3.替换依赖注意事项
 
@@ -304,7 +304,7 @@ System.out.println(gsonUnderScore.toJson(user));
 
 ### 1.5.常见问题排雷
 
-**下面整理了我们在公司项目迁移Gson过程中，踩过的坑，这些坑现在写起来感觉没什么技术含量。但是这才是我写这篇文章的初衷，帮助大家把这些很难发现的坑避开。**
+下面整理了我们在公司项目迁移Gson过程中，踩过的坑，这些坑现在写起来感觉没什么技术含量。但是这才是我写这篇文章的初衷，帮助大家把这些很难发现的坑避开。
 
 这些问题有的是在测试进行回归测试的时候发现的，有的是在自测的时候发现的，有的是在上线后发现的，比如Swagger挂了这种不会去测到的问题。
 
@@ -376,7 +376,7 @@ org.springframework.http.converter.HttpMessageNotWritableException
 
 **解决方案：**
 
-application.properties里面添加：
+`application.properties` 里面添加：
 
 ```
 #Preferred JSON mapper to use for HTTP message conversion

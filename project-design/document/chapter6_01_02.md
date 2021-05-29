@@ -8,21 +8,21 @@
 
 ### 1.1.简介
 
-gradle的最新版本是6.7，从2009年的第一个版本，到2020年的6.7，已经发展了11年了。gradle是作为android的官方构建工具引入的，除了java，它还能够支持多种语言的构建，所以用途非常广泛。
+`gradle` 的最新版本是 `6.7`，从2009年的第一个版本，到2020年的 `6.7`，已经发展了11年了。`gradle` 是作为 `android` 的官方构建工具引入的，除了 `java` ，它还能够支持多种语言的构建，所以用途非常广泛。
 
-gradle是开源的构建工具，你可以使用groovy或者kotlin来编写gradle的脚本，所以说gradle是一个非常强大的，高度定制化的和非常快速的构建工具。
+`gradle` 是开源的构建工具，你可以使用 `groovy` 或者 `kotlin` 来编写 `gradle` 的脚本，所以说 `gradle` 是一个非常强大的，高度定制化的和非常快速的构建工具。
 
-根据我的了解，虽然gradle非常强大，但是对于java程序员来说，一般还是都使用的maven，或者同时提供maven和gradle两种构建方式。
+根据我的了解，虽然 `gradle` 非常强大，但是对于 `java` 程序员来说，一般还是都使用的 `maven`，或者同时提供 `maven` 和 `gradle` 两种构建方式。
 
 为什么会这样呢？个人觉得有两个原因：
 
-- 第一个原因是gradle安装文件和依赖包的网络环境，如果单单依靠国内的网络环境的话，非常难安装完成。
+- 第一个原因是 `gradle` 安装文件和依赖包的网络环境，如果单单依靠国内的网络环境的话，非常难安装完成。
 
-- 第二个原因就是gradle中需要自己编写构建脚本，相对于纯配置的脚本来说，比较复杂。
+- 第二个原因就是 `gradle` 中需要自己编写构建脚本，相对于纯配置的脚本来说，比较复杂。
 
 ### 1.2.安装gradle和解决gradle安装的问题
 
-gradle需要java8的支持，所以，你首先需要安装好JDK8或者以上的版本。
+`gradle` 需要 `java8` 的支持，所以，你首先需要安装好 `JDK8` 或者以上的版本。
 
 ```sh
 ❯ java -version
@@ -31,7 +31,7 @@ Java(TM) SE Runtime Environment (build 1.8.0_151-b12)
 Java HotSpot(TM) 64-Bit Server VM (build 25.151-b12, mixed mode)
 ```
 
-安装gradle有两种方式，一种就是最简单的从官网上面下载安装包。然后解压在某个目录，最后将PATH指向该目录下的bin即可：
+安装 `gradle` 有两种方式，一种就是最简单的从官网上面下载安装包。然后解压在某个目录，最后将PATH指向该目录下的bin即可：
 
 ```sh
 ❯ mkdir /opt/gradle
@@ -42,13 +42,13 @@ LICENSE  NOTICE  bin  README  init.d  lib  media
 export PATH=$PATH:/opt/gradle/gradle-6.7/bin
 ```
 
-如果你想使用包管理器，比如MAC上面的brew来进行管理的话，则可以这样安装：
+如果你想使用包管理器，比如 `MAC` 上面的 `brew` 来进行管理的话，则可以这样安装：
 
 ```sh
 brew install gradle
 ```
 
-但是这样安装很有可能在下载gradle安装包的时候卡住。
+但是这样安装很有可能在下载 `gradle` 安装包的时候卡住。
 
 ```sh
 ==> Downloading https://services.gradle.org/distributions/gradle-6.4.1-bin.zip
@@ -57,7 +57,7 @@ brew install gradle
 
 怎么办呢？
 
-这时候我们需要自行下载gradle-6.4.1-bin.zip安装包，然后将其放入http服务器中，让这个压缩包可以通过http协议来访问。
+这时候我们需要自行下载 `gradle-6.4.1-bin.zip` 安装包，然后将其放入http服务器中，让这个压缩包可以通过 `http` 协议来访问。
 
 简单点的做法就是将这个zip文件拷贝到IDEA中，利用IDEA本地服务器的预览功能，获得zip的http路径，比如：http://localhost:63345/gradle/gradle-6.7-all.zip.
 
@@ -67,7 +67,7 @@ brew install gradle
 brew edit gradle
 ```
 
-使用上面的命令可以修改gracle.rb文件，我们替换掉下面的一段：
+使用上面的命令可以修改 `gracle.rb` 文件，我们替换掉下面的一段：
 
 ```sh
   homepage "https://www.gradle.org/"
@@ -75,9 +75,9 @@ brew edit gradle
   sha256 "0080de8491f0918e4f529a6db6820fa0b9e818ee2386117f4394f95feb1d5583"
 ```
 
-url替换成为http://localhost:63345/gradle/gradle-6.7-all.zip，而sha256可以使用 sha256sum gradle-6.7-all.zip这个命令来获取。
+url替换成为 `http://localhost:63345/gradle/gradle-6.7-all.zip`，而 `sha256` 可以使用 `sha256sum gradle-6.7-all.zip`这个命令来获取。
 
-替换之后，重新执行brew install gradle即可安装完成。
+替换之后，重新执行 `brew install gradle` 即可安装完成。
 
 安装完毕之后，我们使用gradle -v命令可以验证是否安装成功：
 
@@ -89,21 +89,21 @@ Welcome to Gradle 6.7!
 
 ### 1.3.Gradle特性
 
-gradle作为一种新的构建工具，因为它是依赖于groovy和kotlin脚本的，基于脚本的灵活性，我们通过自定义脚本基本上可以做任何想要的构建工作。
+`gradle` 作为一种新的构建工具，因为它是依赖于 `groovy` 和 `kotlin` 脚本的，基于脚本的灵活性，我们通过自定义脚本基本上可以做任何想要的构建工作。
 
-虽然说gradle可以做任何构建工作，但是gradle现在还是有一定的限制，那就是项目的依赖项目前只支持于maven和Ivy兼容的存储库以及文件系统。
+虽然说 `gradle` 可以做任何构建工作，但是 `gradle` 现在还是有一定的限制，那就是项目的依赖项目前只支持于 `maven` 和 `Ivy` 兼容的存储库以及文件系统。
 
-gradle通过各种预定义的插件，可以轻松的构建通用类型的项目，并且支持自定义的插件类型。
+`gradle` 通过各种预定义的插件，可以轻松的构建通用类型的项目，并且支持自定义的插件类型。
 
-另外一个非常重要的特性是gradle是以任务为基础的，每一个build都包含了一系列的task，这些task又有各自的依赖关系，然后这些task一起构成了一个有向无环图Directed Acyclic Graphs (DAGs)。
+另外一个非常重要的特性是 `gradle` 是以任务为基础的，每一个 `build` 都包含了一系列的 `task`，这些 `task` 又有各自的依赖关系，然后这些 `task` 一起构成了一个有向无环图 `Directed Acyclic Graphs`(`DAGs`)。
 
-有了这个DAG，gradle就可以决定各个task的顺序，并执行他们。
+有了这个 `DAG`，`gradle`就可以决定各个 `task` 的顺序，并执行他们。
 
-我们看两个task DAG的例子，一个是通用的task，一个是专门的编译java的例子：
+我们看两个 `task DAG` 的例子，一个是通用的 `task`，一个是专门的编译 `java` 的例子：
 
 ![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/project-design/20210424150730.png)
 
-task可以依赖task，我们看个例子：
+`task` 可以依赖 `task`，我们看个例子：
 
 ```java
 task hello {
@@ -119,45 +119,45 @@ task intro {
 }
 ```
 
-一个task可以包含Actions，inputs和Outputs。根据需要这些类型可以自由组合。
+一个 `task` 可以包含 `Actions`，`inputs`和 `Outputs`。根据需要这些类型可以自由组合。
 
 #### 1.3.1.标准task
 
-Gradle包含了下面7种标准的task：
+`Gradle` 包含了下面7种标准的 `task`：
 
-- clean ：用来删除build目录和里面的一切。
-- check：这是一个生命周期任务，通常做一些验证工作，比如执行测试任务等。
-- assemble ：这是一个生命周期任务，用来生成可分发的文件，比如jar包。
-- build： 也是一个生命周期任务，用来执行测试任务和生成最后的production文件。通常我们不在build中直接做任何特定的任务操作，它一般是其他任务的组合。
-- buildConfiguration： 组装configuration中指定的archives。
-- uploadConfiguration： 除了执行buildConfiguration之外，还会执行上传工作。
-- cleanTask： 删除特定的某个task的执行结果。
+- `clean` ：用来删除 `build` 目录和里面的一切。
+- `check`：这是一个生命周期任务，通常做一些验证工作，比如执行测试任务等。
+- `assemble` ：这是一个生命周期任务，用来生成可分发的文件，比如 `jar` 包。
+- `build`：也是一个生命周期任务，用来执行测试任务和生成最后的 `production` 文件。通常我们不在 `build` 中直接做任何特定的任务操作，它一般是其他任务的组合。
+- `buildConfiguration`： 组装 `configuration` 中指定的 `archives`。
+- `uploadConfiguration`： 除了执行 `buildConfiguration` 之外，还会执行上传工作。
+- `cleanTask`：删除特定的某个 `task` 的执行结果。
 
 #### 1.3.2.Build phases
 
-一个gradle的build包含了三个phases：
+一个 `gradle` 的 `build` 包含了三个 `phases`：
 
-- Initialization： 初始化阶段。gradle支持一个或者多个project的build。在初始化阶段，gradle将会判断到底有哪些project将会执行，并且为他们分别创建一个project实例。
-- Configuration： 配置阶段。gradle将会执行build脚本，然后分析出要运行的tasks。
-- Execution： 执行阶段。gradle将会执行configuration阶段分析出来的tasks。
+- `Initialization`： 初始化阶段。`gradle` 支持一个或者多个 `project` 的 `build`。在初始化阶段，`gradle` 将会判断到底有哪些`project` 将会执行，并且为他们分别创建一个 `project` 实例。
+- `Configuration`： 配置阶段。`gradle` 将会执行 `build` 脚本，然后分析出要运行的 `tasks`。
+- `Execution`：执行阶段。`gradle` 将会执行 `configuration` 阶段分析出来的tasks。
 
 ### 1.4.Gradle Wrapper
 
-上面讲的是gradle的手动安装，如果是在多人工作的环境中使用了gradle，有没有什么办法可以不用手动安装gradle就可以自动运行gradle程序呢？
+上面讲的是 `gradle` 的手动安装，如果是在多人工作的环境中使用了 `gradle`，有没有什么办法可以不用手动安装 `gradle` 就可以自动运行 `gradle` 程序呢？
 
-方法当然有，那就是gradle wrapper:
+方法当然有，那就是 `gradle wrapper`:
 
 ![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/project-design/20210424150842.png)
 
-gradle wrapper是一个工具，通过它我们可以方便的对本地的gradle进行管理。
+`gradle wrapper` 是一个工具，通过它我们可以方便的对本地的 `gradle` 进行管理。
 
-上图列出了gradle wrapper的工作流程，第一步是去下载gradle的安装文件，第二步是将这个安装文件解压到gradle的用户空间，第三步就是使用这个解压出来的gradle了。
+上图列出了 `gradle wrapper` 的工作流程，第一步是去下载 `gradle` 的安装文件，第二步是将这个安装文件解压到 `gradle` 的用户空间，第三步就是使用这个解压出来的 `gradle` 了。
 
-我们先看下怎么创建gradle wrapper：
+我们先看下怎么创建 `gradle wrapper`：
 
-虽然Gradle wrapper的作用是帮我们下载和安装gradle，但是要生成gradle wrapper需要使用gradle命令才行。也就是说有了wrapper你可以按照成功gradle，有了gradle你才可以生成gradle wrapper。
+虽然 `Gradle wrapper` 的作用是帮我们下载和安装 `gradle`，但是要生成 `gradle wrapper` 需要使用 `gradle` 命令才行。也就是说有了`wrapper` 你可以按照成功 `gradle`，有了 `gradle` 你才可以生成 `gradle wrapper`。
 
-假如我们已经手动按照好了gradle，那么可以执行下面的命令来生成gradle wrapper：
+假如我们已经手动按照好了 `gradle`，那么可以执行下面的命令来生成 `gradle wrapper`：
 
 ```sh
 $ gradle wrapper
@@ -179,7 +179,7 @@ BUILD SUCCESSFUL in 0s
 └── gradlew.bat
 ```
 
-gradle/wrapper/gradle-wrapper.properties 是 wrapper的配置文件，我们看下里面的内容：
+`gradle/wrapper/gradle-wrapper.properties` 是  `wrapper` 的配置文件，我们看下里面的内容：
 
 ```sh
 distributionBase=GRADLE_USER_HOME
@@ -189,11 +189,11 @@ zipStoreBase=GRADLE_USER_HOME
 zipStorePath=wrapper/dists
 ```
 
-其中distributionUrl就是我们要下载的gradle的路径，其他的配置是gradle的安装目录。
+其中 `distributionUrl` 就是我们要下载的 `gradle` 的路径，其他的配置是 `gradle` 的安装目录。
 
-一般来说有两种安装文件类型：bin和all。bin和all的区别在于，bin只有安装文件，而all还包含了gradle的文档和样例代码。
+一般来说有两种安装文件类型：`bin` 和 `all`。`bin` 和 `all` 的区别在于，`bin` 只有安装文件，而 `all` 还包含了 `gradle` 的文档和样例代码。
 
-我们可以通过--distribution-type参数来修改安装文件的类型。此外还有 --gradle-version ，--gradle-distribution-url和--gradle-distribution-sha256-sum 这几个参数可以使用。
+我们可以通过 `--distribution-type` 参数来修改安装文件的类型。此外还有 `--gradle-version` ，`--gradle-distribution-url` 和 `--gradle-distribution-sha256-sum` 这几个参数可以使用。
 
 ```sh
 $ gradle wrapper --gradle-version 6.7 --distribution-type all
@@ -205,28 +205,28 @@ BUILD SUCCESSFUL in 0s
 
 除了配置文件之外，我们还有3个文件：
 
-- gradle-wrapper.jar： wrapper业务逻辑的实现文件。
-- gradlew, gradlew.bat ：使用wrapper执行build的执行文件。也就是说我们可以使用wrapper来执行gradle的build任务。
+- `gradle-wrapper.jar`： `wrapper` 业务逻辑的实现文件。
+- `gradlew`, `gradlew.bat` ：使用 `wrapper` 执行 `build` 的执行文件。也就是说我们可以使用 `wrapper` 来执行 `gradle` 的 `build` 任务。
 
 #### 1.4.1.wrapper的使用
 
-我们可以这样使用gradlew,来执行build：
+我们可以这样使用 `gradlew`,来执行 `build`：
 
 ```sh
 gradlew.bat build
 ```
 
-> 注意，如果你是第一次在项目中执行build命令的话，将会自动为你下载和安装gradle。
+> 注意，如果你是第一次在项目中执行 `build` 命令的话，将会自动为你下载和安装 `gradle`。
 
 #### 1.4.2.wrapper的升级
 
-如果我们想要升级gradle的版本，也很简单：
+如果我们想要升级 `gradle` 的版本，也很简单：
 
 ```sh
 ./gradlew wrapper --gradle-version 6.7
 ```
 
-或者直接修改 gradle-wrapper.properties 也可以。
+或者直接修改 `gradle-wrapper.properties` 也可以。
 
 ### 1.5.一个简单的build.gradle
 
@@ -252,36 +252,36 @@ application {
 }
 ```
 
-上面我们需要安装一个application plugin，使用的是jcenter的依赖仓库，还指定了几个具体的依赖项。最后，指明了我们应用程序的mainClass。
+上面我们需要安装一个 `application plugin`，使用的是 `jcenter` 的依赖仓库，还指定了几个具体的依赖项。最后，指明了我们应用程序的 `mainClass`。
 
 ### 1.6.gradle使用maven仓库
 
-build.gradle中的repositories指明的是使用的仓库选项。
+`build.gradle` 中的 `repositories` 指明的是使用的仓库选项。
 
-默认情况下gradle有自己的本地仓库,一般在~/.gradle目录下面，如果我们之前用的是maven仓库，那么在本地的maven仓库中已经存在了很多依赖包了，如何重用呢？
+默认情况下 `gradle` 有自己的本地仓库,一般在 `~/.gradle` 目录下面，如果我们之前用的是 `maven` 仓库，那么在本地的 `maven` 仓库中已经存在了很多依赖包了，如何重用呢？
 
-我们可以这样修改repositories：
+我们可以这样修改 `repositories`：
 
 ```java
-    mavenLocal()
-    mavenCentral()
+mavenLocal()
+mavenCentral()
 ```
 
-这样的话, 就会优先从maven的仓库中查找所需的jar包。
+这样的话, 就会优先从 `maven` 的仓库中查找所需的 `jar` 包。
 
 ## 2.深入了解gradle和maven的区别
 
 ### 2.1.gradle和maven的比较
 
-虽然gradle和maven都可以作为java程序的构建工具。但是两者还是有很大的不同之处的。我们可以从下面几个方面来进行分析。
+虽然 `gradle` 和 `maven` 都可以作为java程序的构建工具。但是两者还是有很大的不同之处的。我们可以从下面几个方面来进行分析。
 
 #### 2.1.1.可扩展性
 
-Google选择gradle作为android的构建工具不是没有理由的，其中一个非常重要的原因就是因为gradle够灵活。一方面是因为gradle使用的是groovy或者kotlin语言作为脚本的编写语言，这样极大的提高了脚本的灵活性，但是其本质上的原因是gradle的基础架构能够支持这种灵活性。
+`Google` 选择 `gradle` 作为 `android` 的构建工具不是没有理由的，其中一个非常重要的原因就是因为 `gradle` 够灵活。一方面是因为`gradle` 使用的是 `groovy` 或者 `kotlin` 语言作为脚本的编写语言，这样极大的提高了脚本的灵活性，但是其本质上的原因是 `gradle` 的基础架构能够支持这种灵活性。
 
-你可以使用gradle来构建native的C/C++程序，甚至扩展到任何语言的构建。
+你可以使用 `gradle` 来构建 `native` 的 `C/C++` 程序，甚至扩展到任何语言的构建。
 
-相对而言，maven的灵活性就差一些，并且自定义起来也比较麻烦，但是maven的项目比较容易看懂，并且上手简单。
+相对而言，`maven` 的灵活性就差一些，并且自定义起来也比较麻烦，但是 `maven` 的项目比较容易看懂，并且上手简单。
 
 所以如果你的项目没有太多自定义构建需求的话还是推荐使用maven，但是如果有自定义的构建需求，那么还是投入gradle的怀抱吧。
 
@@ -289,51 +289,51 @@ Google选择gradle作为android的构建工具不是没有理由的，其中一�
 
 虽然现在大家的机子性能都比较强劲，好像在做项目构建的时候性能的优势并不是那么的迫切，但是对于大型项目来说，一次构建可能会需要很长的时间，尤其对于自动化构建和CI的环境来说，当然希望这个构建是越快越好。
 
-Gradle和Maven都支持并行的项目构建和依赖解析。但是gradle的三个特点让gradle可以跑的比maven快上一点：
+`Gradle` 和 `Maven` 都支持并行的项目构建和依赖解析。但是 `gradle` 的三个特点让 `gradle` 可以跑的比 `maven` 快上一点：
 
 - 增量构建
 
-  gradle为了提升构建的效率，提出了增量构建的概念，为了实现增量构建，gradle将每一个task都分成了三部分，分别是input输入，任务本身和output输出。下图是一个典型的java编译的task。
+  `gradle` 为了提升构建的效率，提出了增量构建的概念，为了实现增量构建，`gradle` 将每一个 `task` 都分成了三部分，分别是 `input` 输入，任务本身和 `output` 输出。下图是一个典型的 `java` 编译的 `task`。
 
   ![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/project-design/20210424151623.png)
 
-  以上图为例，input就是目标jdk的版本，源代码等，output就是编译出来的class文件。
+  以上图为例，`input` 就是目标 `jdk` 的版本，源代码等，`output` 就是编译出来的 `class` 文件。
 
-  增量构建的原理就是监控input的变化，只有input发送变化了，才重新执行task任务，否则gradle认为可以重用之前的执行结果。
+  增量构建的原理就是监控 `input` 的变化，只有 `input` 发送变化了，才重新执行 `task` 任务，否则 `gradle` 认为可以重用之前的执行结果。
 
-  所以在编写gradle的task的时候，需要指定task的输入和输出。
+  所以在编写 `gradle` 的 `task` 的时候，需要指定 `task` 的输入和输出。
 
-  并且要注意只有会对输出结果产生变化的才能被称为输入，如果你定义了对初始结果完全无关的变量作为输入，则这些变量的变化会导致gradle重新执行task，导致了不必要的性能的损耗。
+  并且要注意只有会对输出结果产生变化的才能被称为输入，如果你定义了对初始结果完全无关的变量作为输入，则这些变量的变化会导致 `gradle` 重新执行 `task`，导致了不必要的性能的损耗。
 
   还要注意不确定执行结果的任务，比如说同样的输入可能会得到不同的输出结果，那么这样的任务将不能够被配置为增量构建任务。
 
 - 构建缓存
 
-  gradle可以重用同样input的输出作为缓存，大家可能会有疑问了，这个缓存和增量编译不是一个意思吗？
+  `gradle` 可以重用同样 `input` 的输出作为缓存，大家可能会有疑问了，这个缓存和增量编译不是一个意思吗？
 
-  在同一个机子上是的，但是缓存可以跨机器共享.如果你是在一个CI服务的话，build cache将会非常有用。因为developer的build可以直接从CI服务器上面拉取构建结果，非常的方便。
+  在同一个机子上是的，但是缓存可以跨机器共享.如果你是在一个CI服务的话，`build cache` 将会非常有用。因为 `developer` 的`build` 可以直接从 `CI` 服务器上面拉取构建结果，非常的方便。
 
-- Gradle守护进程
+- `Gradle` 守护进程
 
-  gradle会开启一个守护进程来和各个build任务进行交互，优点就是不需要每次构建都初始化需要的组件和服务。
+  `gradle` 会开启一个守护进程来和各个 `build` 任务进行交互，优点就是不需要每次构建都初始化需要的组件和服务。
 
-  同时因为守护进程是一个一直运行的进程，除了可以避免每次JVM启动的开销之外，还可以缓存项目结构，文件，task和其他的信息，从而提升运行速度。
+  同时因为守护进程是一个一直运行的进程，除了可以避免每次 `JVM` 启动的开销之外，还可以缓存项目结构，文件，`task` 和其他的信息，从而提升运行速度。
 
-  我们可以运行 gradle --status 来查看正在运行的daemons进程。
+  我们可以运行 `gradle --status` 来查看正在运行的 `daemons` 进程。
 
-  从Gradle 3.0之后，daemons是默认开启的，你可以使用 org.gradle.daemon=false 来禁止daemons。
+  从 `Gradle 3.0` 之后，`daemons` 是默认开启的，你可以使用 `org.gradle.daemon=false` 来禁止 `daemons`。
 
-我们可以通过下面的几个图来直观的感受一下gradle和maven的性能比较：
+我们可以通过下面的几个图来直观的感受一下 `gradle` 和 `maven` 的性能比较：
 
-- 使用gradle和maven构建 Apache Commons Lang 3的比较：
+- 使用 `gradle` 和 `maven` 构建 `Apache Commons Lang 3` 的比较：
 
   ![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/project-design/20210424151736.png)
 
-- 使用gradle和maven构建小项目（10个模块，每个模块50个源文件和50个测试文件）的比较：
+- 使用 `gradle` 和 `maven` 构建小项目（10个模块，每个模块50个源文件和50个测试文件）的比较：
 
   ![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/project-design/20210424151750.png)
 
-- 使用gradle和maven构建大项目（500个模块，每个模块100个源文件和100个测试文件）的比较：
+- 使用 `gradle` 和 `maven` 构建大项目（500个模块，每个模块100个源文件和100个测试文件）的比较：
 
   ![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/project-design/20210424151803.png)
 
@@ -341,23 +341,23 @@ Gradle和Maven都支持并行的项目构建和依赖解析。但是gradle的三
 
 #### 2.1.3.依赖的区别
 
-gralde和maven都可以本地缓存依赖文件，并且都支持依赖文件的并行下载。
+`gralde` 和 `maven` 都可以本地缓存依赖文件，并且都支持依赖文件的并行下载。
 
-在maven中只可以通过版本号来覆盖一个依赖项。而gradle更加灵活，你可以自定义依赖关系和替换规则，通过这些替换规则，gradle可以构建非常复杂的项目。
+在 `maven` 中只可以通过版本号来覆盖一个依赖项。而 `gradle` 更加灵活，你可以自定义依赖关系和替换规则，通过这些替换规则，`gradle` 可以构建非常复杂的项目。
 
 ### 2.2.从maven迁移到gradle
 
-因为maven出现的时间比较早，所以基本上所有的java项目都支持maven，但是并不是所有的项目都支持gradle。如果你有需要把maven项目迁移到gradle的想法，那么就一起来看看吧。
+因为 `maven` 出现的时间比较早，所以基本上所有的java项目都支持 `maven`，但是并不是所有的项目都支持 `gradle`。如果你有需要把`maven` 项目迁移到 `gradle` 的想法，那么就一起来看看吧。
 
-根据我们之前的介绍，大家可以发现gradle和maven从本质上来说就是不同的，gradle通过task的DAG图来组织任务，而maven则是通过attach到phases的goals来执行任务。
+根据我们之前的介绍，大家可以发现 `gradle` 和 `maven` 从本质上来说就是不同的，`gradle` 通过 `task` 的 `DAG` 图来组织任务，而`maven` 则是通过 `attach` 到 `phases` 的 `goals` 来执行任务。
 
-虽然两者的构建有很大的不同，但是得益于gradle和maven相识的各种约定规则，从maven移植到gradle并不是那么难。
+虽然两者的构建有很大的不同，但是得益于 `gradle `和 `maven` 相识的各种约定规则，从 `maven` 移植到 `gradle` 并不是那么难。
 
-要想从maven移植到gradle，首先要了解下maven的build生命周期，maven的生命周期包含了clean，compile，test，package，verify，install和deploy这几个phase。
+要想从 `maven` 移植到 `gradle`，首先要了解下 `maven` 的 `build` 生命周期，`maven` 的生命周期包含了 `clean`，`compile`，`test`，`package`，`verify`，`install` 和 `deploy` 这几个 `phase`。
 
-我们需要将maven的生命周期phase转换为gradle的生命周期task。这里需要使用到gradle的Base Plugin，Java Plugin和Maven Publish Plugin。
+我们需要将 `maven` 的生命周期 `phase` 转换为 `gradle` 的生命周期 `task`。这里需要使用到 `gradle` 的 `Base Plugin`，`Java Plugin` 和 `Maven Publish Plugin`。
 
-先看下怎么引入这三个plugin：
+先看下怎么引入这三个 `plugin`：
 
 ```java
 plugins {
@@ -367,17 +367,17 @@ plugins {
 }
 ```
 
-clean会被转换成为clean task，compile会被转换成为classes task，test会被转换成为test task，package会被转换成为assemble task，verify 会被转换成为check task，install会被转换成为 Maven Publish Plugin 中的publishToMavenLocal task，deploy 会被转换成为Maven Publish Plugin 中的publish task。
+`clean` 会被转换成为 `clean task`，`compile`会被转换成为 `classes task`，`test` 会被转换成为 `test task`，`package` 会被转换成为 `assemble task`，`verify` 会被转换成为 `check task`，`install` 会被转换成为 `Maven Publish Plugin` 中的`publishToMavenLocal task`，`deploy` 会被转换成为 `Maven Publish Plugin` 中的 `publish task`。
 
-有了这些task之间的对应关系，我们就可以尝试进行maven到gradle的转换了。
+有了这些 `task` 之间的对应关系，我们就可以尝试进行 `maven` 到 `gradle` 的转换了。
 
 #### 2.2.1.自动转换
 
-我们除了可以使用 gradle init 命令来创建一个gradle的架子之外，还可以使用这个命令来将maven项目转换成为gradle项目，gradle init命令会去读取pom文件，并将其转换成为gradle项目。
+我们除了可以使用 `gradle init` 命令来创建一个 `gradle` 的架子之外，还可以使用这个命令来将 `maven` 项目转换成为 `gradle` 项目，`gradle init` 命令会去读取 `pom` 文件，并将其转换成为 `gradle` 项目。
 
 #### 2.2.2.转换依赖
 
-gradle和maven的依赖都包含了group ID, artifact ID 和版本号。两者本质上是一样的，只是形式不同，我们看一个转换的例子：
+`gradle` 和 `maven` 的依赖都包含了 `group ID`, `artifact ID` 和版本号。两者本质上是一样的，只是形式不同，我们看一个转换的例子：
 
 ```xml
 <dependencies>
@@ -389,7 +389,7 @@ gradle和maven的依赖都包含了group ID, artifact ID 和版本号。两者�
 </dependencies>
 ```
 
-上是一个maven的例子，我们看下gradle的例子怎写：
+上是一个maven的例子，我们看下 `gradle` 的例子怎写：
 
 ```java
 dependencies {
@@ -397,37 +397,37 @@ dependencies {
 }
 ```
 
-可以看到gradle比maven写起来要简单很多。
+可以看到 `gradle` 比 `maven` 写起来要简单很多。
 
-注意这里的implementation实际上是由 Java Plugin 来实现的。
+注意这里的 `implementation` 实际上是由 ` Java Plugin` 来实现的。
 
-我们在maven的依赖中有时候还会用到scope选项，用来表示依赖的范围，我们看下这些范围该如何进行转换：
+我们在 `maven` 的依赖中有时候还会用到 `scope` 选项，用来表示依赖的范围，我们看下这些范围该如何进行转换：
 
-- compile：
+- `compile`：
 
-  在gradle可以有两种配置来替换compile，我们可以使用implementation或者api。
+  在 `gradle` 可以有两种配置来替换 `compile`，我们可以使用 `implementation` 或者 `api`。
 
-  前者在任何使用Java Plugin的gradle中都可以使用，而api只能在使用Java Library Plugin的项目中使用。
+  前者在任何使用 `Java Plugin` 的 `gradle` 中都可以使用，而 `api` 只能在使用 `Java Library Plugin` 的项目中使用。
 
-  当然两者是有区别的，如果你是构建应用程序或者webapp，那么推荐使用implementation，如果你是在构建Java libraries，那么推荐使用api。
+  当然两者是有区别的，如果你是构建应用程序或者 `webapp`，那么推荐使用 `implementation`，如果你是在构建 `Java libraries`，那么推荐使用 `api`。
 
-- runtime：
+- `runtime`：
 
-  可以替换成 runtimeOnly 。
+  可以替换成 `runtimeOnly` 。
 
-- test：
+- `test`：
 
-  gradle中的test分为两种，一种是编译test项目的时候需要，那么可以使用testImplementation，一种是运行test项目的时候需要，那么可以使用testRuntimeOnly。
+  `gradle` 中的 `test` 分为两种，一种是编译 `test` 项目的时候需要，那么可以使用 `testImplementation`，一种是运行 `test` 项目的时候需要，那么可以使用 `testRuntimeOnly`。
 
-- provided：
+- `provided`：
 
-  可以替换成为compileOnly。
+  可以替换成为 `compileOnly`。
 
-- import：
+- `import`：
 
-  在maven中，import经常用在dependencyManagement中，通常用来从一个pom文件中导入依赖项，从而保证项目中依赖项目版本的一致性。
+  在 `maven` 中，`import` 经常用在 `dependencyManagement` 中，通常用来从一个 `pom` 文件中导入依赖项，从而保证项目中依赖项目版本的一致性。
 
-在gradle中，可以使用 platform() 或者 enforcedPlatform() 来导入pom文件：
+在 `gradle` 中，可以使用 `platform()` 或者 `enforcedPlatform()` 来导入 `pom` 文件：
 
 ```java
 dependencies {
@@ -438,9 +438,9 @@ dependencies {
 }
 ```
 
-比如上面的例子中，我们导入了spring-boot-dependencies。因为这个pom中已经定义了依赖项的版本号，所以我们在后面引入gson的时候就不需要指定版本号了。
+比如上面的例子中，我们导入了 `spring-boot-dependencies`。因为这个 `pom` 中已经定义了依赖项的版本号，所以我们在后面引入`gson` 的时候就不需要指定版本号了。
 
-platform和enforcedPlatform的区别在于，enforcedPlatform会将导入的pom版本号覆盖其他导入的版本号：
+`platform` 和 `enforcedPlatform` 的区别在于，`enforcedPlatform` 会将导入的 `pom` 版本号覆盖其他导入的版本号：
 
 ```java
 dependencies {
@@ -458,9 +458,9 @@ dependencies {
 
 #### 2.2.3.转换repositories仓库
 
-gradle可以兼容使用maven或者lvy的repository。gradle没有默认的仓库地址，所以你必须手动指定一个。
+`gradle` 可以兼容使用 `maven` 或者 `lvy` 的 `repository`。`gradle`没有默认的仓库地址，所以你必须手动指定一个。
 
-你可以在gradle使用maven的仓库：
+你可以在 `gradle` 使用 `maven` 的仓库：
 
 ```java
 repositories {
@@ -468,7 +468,7 @@ repositories {
 }
 ```
 
-我们还可以直接指定maven仓库的地址：
+我们还可以直接指定 `maven` 仓库的地址：
 
 ```java
 repositories {
@@ -478,7 +478,7 @@ repositories {
 }
 ```
 
-如果你想使用maven本地的仓库，则可以这样使用：
+如果你想使用 `maven` 本地的仓库，则可以这样使用：
 
 ```java
 repositories {
@@ -486,21 +486,21 @@ repositories {
 }
 ```
 
-但是mavenLocal是不推荐使用的，为什么呢？
+但是 `mavenLocal` 是不推荐使用的，为什么呢？
 
-mavenLocal只是maven在本地的一个cache，它包含的内容并不完整。比如说一个本地的maven repository module可能只包含了jar包文件，并没有包含source或者javadoc文件。那么我们将不能够在gradle中查看这个module的源代码，因为gradle会首先在maven本地的路径中查找这个module。
+`mavenLocal` 只是maven在本地的一个cache，它包含的内容并不完整。比如说一个本地的 `maven repository module` 可能只包含了`jar` 包文件，并没有包含 `source` 或者 `javadoc` 文件。那么我们将不能够在 `gradle` 中查看这个 `module` 的源代码，因为 `gradle` 会首先在 `maven` 本地的路径中查找这个 `module`。
 
-并且本地的repository是不可信任的，因为里面的内容可以轻易被修改，并没有任何的验证机制。
+并且本地的 `repository` 是不可信任的，因为里面的内容可以轻易被修改，并没有任何的验证机制。
 
 #### 2.2.4.控制依赖的版本
 
-如果同一个项目中对同一个模块有不同版本的两个依赖的话，默认情况下Gradle会在解析完DAG之后，选择版本最高的那个依赖包。
+如果同一个项目中对同一个模块有不同版本的两个依赖的话，默认情况下 `Gradle` 会在解析完 `DAG` 之后，选择版本最高的那个依赖包。
 
 但是这样做并不一定就是正确的， 所以我们需要自定义依赖版本的功能。
 
-首先就是上面我们提到的使用platform()和enforcedPlatform() 来导入BOM（packaging类型是POM的）文件。
+首先就是上面我们提到的使用 `platform()` 和 `enforcedPlatform()` 来导入 `BOM`（`packaging` 类型是 `POM` 的）文件。
 
-如果我们项目中依赖了某个module，而这个module又依赖了另外的module，我们叫做传递依赖。在这种情况下，如果我们希望控制传递依赖的版本，比如说将传递依赖的版本升级为一个新的版本，那么可以使用dependency constraints：
+如果我们项目中依赖了某个 `module`，而这个 `module` 又依赖了另外的 `module`，我们叫做传递依赖。在这种情况下，如果我们希望控制传递依赖的版本，比如说将传递依赖的版本升级为一个新的版本，那么可以使用 `dependency constraints`：
 
 ```java
 dependencies {
@@ -516,11 +516,11 @@ dependencies {
 }
 ```
 
-> 注意，dependency constraints只对传递依赖有效，如果上面的例子中commons-codec并不是传递依赖，那么将不会有任何影响。
+> 注意，`dependency constraints` 只对传递依赖有效，如果上面的例子中 `commons-codec` 并不是传递依赖，那么将不会有任何影响。
 
-> 同时 Dependency constraints需要Gradle Module Metadata的支持，也就是说只有你的module是发布在gradle中才支持这个特性，如果是发布在maven或者ivy中是不支持的。
+> 同时 `Dependency constraints` 需要 `Gradle Module Metadata` 的支持，也就是说只有你的 `module` 是发布在 `gradle` 中才支持这个特性，如果是发布在 `maven` 或者 `ivy` 中是不支持的。
 
-上面讲的是传递依赖的版本升级。同样是传递依赖，如果本项目也需要使用到这个传递依赖的module，但是需要使用到更低的版本（因为默认gradle会使用最新的版本），就需要用到版本降级了。
+上面讲的是传递依赖的版本升级。同样是传递依赖，如果本项目也需要使用到这个传递依赖的 `module`，但是需要使用到更低的版本（因为默认 `gradle` 会使用最新的版本），就需要用到版本降级了。
 
 ```java
 dependencies {
@@ -533,13 +533,13 @@ dependencies {
 }
 ```
 
-我们可以在implementation中指定特定的version即可。
+我们可以在 `implementation` 中指定特定的 `version` 即可。
 
-strictly表示的是强制匹配特定的版本号，除了strictly之外，还有require，表示需要的版本号大于等于给定的版本号。prefer，如果没有指定其他的版本号，那么就使用prefer这个。reject，拒绝使用这个版本。
+`strictly` 表示的是强制匹配特定的版本号，除了 `strictly` 之外，还有 `require`，表示需要的版本号大于等于给定的版本号。prefer，如果没有指定其他的版本号，那么就使用 `prefer` 这个。`reject`，拒绝使用这个版本。
 
-除此之外，你还可以使用Java Platform Plugin来指定特定的platform，从而限制版本号。
+除此之外，你还可以使用 `Java Platform Plugin` 来指定特定的 `platform`，从而限制版本号。
 
-最后看一下如何exclude一个依赖：
+最后看一下如何 `exclude` 一个依赖：
 
 ```java
 dependencies {
@@ -560,7 +560,7 @@ maven中可以创建多模块项目：
 </modules>
 ```
 
-我们可以在gradle中做同样的事情settings.gradle：
+我们可以在gradle中做同样的事情 `settings.gradle`：
 
 ```java
 rootProject.name = 'simple-multi-module'  
@@ -570,9 +570,9 @@ include 'simple-weather', 'simple-webapp'
 
 #### 2.2.6.profile和属性
 
-maven中可以使用profile来区别不同的环境，在gradle中，我们可以定义好不同的profile文件，然后通过脚本来加载他们：
+`maven` 中可以使用 `profile` 来区别不同的环境，在 `gradle` 中，我们可以定义好不同的 `profile` 文件，然后通过脚本来加载他们：
 
-build.gradle：
+`build.gradle`：
 
 ```java
 if (!hasProperty('buildProfile')) ext.buildProfile = 'default'  
@@ -586,13 +586,13 @@ task greeting {
 }
 ```
 
-profile-default.gradle：
+`profile-default.gradle`：
 
 ```java
 ext.message = 'foobar'  
 ```
 
-profile-test.gradle：
+`profile-test.gradle`：
 
 ```java
 ext.message = 'testing 1 2 3'
@@ -610,11 +610,11 @@ testing 1 2 3
 
 #### 2.2.7.资源处理
 
-在maven中有一个process-resources阶段，可以执行resources:resources用来进行resource文件的拷贝操作。
+在 `maven` 中有一个 `process-resources` 阶段，可以执行 `resources:resources` 用来进行 `resource` 文件的拷贝操作。
 
-在Gradle中的Java plugin的processResources task也可以做相同的事情。
+在 `Gradle` 中的 `Java plugin` 的 `processResources task` 也可以做相同的事情。
 
-比如我可以执行copy任务：
+比如我可以执行 `copy` 任务：
 
 ```java
 task copyReport(type: Copy) {
@@ -637,26 +637,26 @@ task copyPdfReportsForArchiving(type: Copy) {
 
 ### 3.1.project和task
 
-gradle是一个构建工具，所谓构建工具就是通过既定的各种规则，将原代码或者原文件通过一定的task处理过后，打包生成目标文件的步骤。
+`gradle` 是一个构建工具，所谓构建工具就是通过既定的各种规则，将原代码或者原文件通过一定的 `task` 处理过后，打包生成目标文件的步骤。
 
-所以我们在gradle中有两个非常重要的概念，分别是项目和任务。
+所以我们在 `gradle` 中有两个非常重要的概念，分别是项目和任务。
 
-每一个gradle的构建任务可以包含一个或者多个项目，项目可以有多种类型，比如是一个web项目或者一个java lib项目等。为了实现project要完成的目标，需要定义一个个的task来辅助完成目标。
+每一个 `gradle` 的构建任务可以包含一个或者多个项目，项目可以有多种类型，比如是一个 `web` 项目或者一个 `java lib` 项目等。为了实现 `project` 要完成的目标，需要定义一个个的 `task` 来辅助完成目标。
 
-task主要用来执行特定的任务，比如编译class文件，打包成jar，生成javadoc等等。
+`task` 主要用来执行特定的任务，比如编译 `class` 文件，打包成 `jar`，生成 `javadoc` 等等。
 
 ### 3.2.一个例子
 
-接下来我们使用一个具体的例子来讲解一下，gradle到底是怎么用的。
+接下来我们使用一个具体的例子来讲解一下，`gradle` 到底是怎么用的。
 
-首先我们创建一个新的project目录：
+首先我们创建一个新的 `project` 目录：
 
 ```sh
 $ mkdir gradle-test
 $ cd gradle-test
 ```
 
-gradle提供了一个init方法，来方便的创建gradle项目的骨架，我们用下看：
+`gradle` 提供了一个 `init` 方法，来方便的创建 `gradle` 项目的骨架，我们用下看：
 
 ```sh
 gradle init
@@ -737,20 +737,20 @@ BUILD SUCCESSFUL in 45s
 14 directories, 8 files
 ```
 
-其中gradle-wrapper是帮你自动设置和安装gradle的工具，同时它还提供了gradlew和gradlew.bat这两个执行文件，用来执行gradle的任务。
+其中 `gradle-wrapper` 是帮你自动设置和安装 `gradle` 的工具，同时它还提供了 `gradlew` 和 `gradlew.bat` 这两个执行文件，用来执行`gradle` 的任务。
 
-我们主要看其中的两个配置文件，settings.gradle和build.gradle。
+我们主要看其中的两个配置文件，`settings.gradle` 和 `build.gradle`。
 
-settings.gradle中配置的是gradle中要build的项目信息：
+`settings.gradle` 中配置的是 `gradle` 中要 `build` 的项目信息：
 
 ```java
 rootProject.name = 'gradle-test'
 include('app')
 ```
 
-上面的例子中，rootProject.name指定了项目的名字，include('app')表示需要引入一个叫做app的子项目，这个子项目中包含着实际的要打包的内容。
+上面的例子中，`rootProject.name` 指定了项目的名字，`include('app')` 表示需要引入一个叫做 `app` 的子项目，这个子项目中包含着实际的要打包的内容。
 
-再看一下app中的build.gradle文件：
+再看一下 `app` 中的 `build.gradle` 文件：
 
 ```java
 plugins {
@@ -781,7 +781,7 @@ application {
 
 一切准备好之后，我们就可以进行构建和运行了。
 
-有两种方式来运行，一种方式就是使用系统自带的gradle命令，一种方式就是使用刚刚gradle为你生成的gradlew。
+有两种方式来运行，一种方式就是使用系统自带的 `gradle` 命令，一种方式就是使用刚刚gradle为你生成的 `gradlew`。
 
 ```java
 gradle run
@@ -800,7 +800,7 @@ BUILD SUCCESSFUL in 2s
 7 actionable tasks: 6 executed, 1 up-to-date
 ```
 
-你还可以带上 --scan 参数将build上传到gradle scan中，得到更加详细的构建分析：
+你还可以带上 `--scan` 参数将 `build`上传到 `gradle scan` 中，得到更加详细的构建分析：
 
 ```java
 ./gradlew build --scan
@@ -819,9 +819,9 @@ https://gradle.com/s/5u4w3gxeurtd2
 
 ### 3.3.task详细讲解
 
-上面的例子中，我们使用的都是gradle默认的tasks，并没有看到自定义task的使用，接下来我们将会探讨一下，如何在build.gradle编写自己的task。
+上面的例子中，我们使用的都是 `gradle` 默认的 `tasks`，并没有看到自定义 `task` 的使用，接下来我们将会探讨一下，如何在`build.gradle` 编写自己的 `task`。
 
-这里我们使用的groovy来编写build.gradle，所以我们可以像运行代码一样来运行它。
+这里我们使用的 `groovy` 来编写 `build.gradle`，所以我们可以像运行代码一样来运行它。
 
 #### 3.3.1.task脚本
 
@@ -835,7 +835,7 @@ task hello {
 }
 ```
 
-上面定义了一个名叫hello的task，并且会在执行最后输出 "Hello www.flydean.com!"。
+上面定义了一个名叫 `hello` 的 `task`，并且会在执行最后输出 "Hello www.flydean.com!"。
 
 我们这样运行：
 
@@ -844,11 +844,11 @@ gradle -q hello
 Hello www.flydean.com!
 ```
 
--q的意思是悄悄的执行，将会忽略gradle自身的log信息。我们把要执行的task名字写在gradle后面就可以了。
+`-q` 的意思是悄悄的执行，将会忽略 `gradle` 自身的 `log` 信息。我们把要执行的 `task` 名字写在 `gradle` 后面就可以了。
 
-如果你熟悉ant命令的话，可以看到gradle的task和ant很类似，不过更加的强大。
+如果你熟悉 `ant` 命令的话，可以看到 `gradle` 的 `task` 和 `ant` 很类似，不过更加的强大。
 
-因为是groovy脚本，所以我们可以在其中执行代码：
+因为是 `groovy` 脚本，所以我们可以在其中执行代码：
 
 ```java
 task upper {
@@ -882,7 +882,7 @@ task count {
 
 #### 3.3.2.task依赖
 
-gradle中的一个task可以依赖其他的task：
+`gradle` 中的一个 `task` 可以依赖其他的 `task`：
 
 ```java
 task hello {
@@ -954,7 +954,7 @@ task printTaskProperties {
 
 #### 3.3.4.默认task
 
-如果不想每次都在调用gradle命令的时候手动指定某个具体的task名字，我们可以使用defaultTasks：
+如果不想每次都在调用 `gradle` 命令的时候手动指定某个具体的 `task` 名字，我们可以使用 `defaultTasks`：
 
 ```java
 defaultTasks 'clean', 'run'
@@ -978,13 +978,13 @@ task other {
 }
 ```
 
-上面的代码执行gradle和gradle clean run是相当的。
+上面的代码执行 `gradle` 和 `gradle clean run` 是相当的。
 
 #### 3.3.5.build script的外部依赖
 
-既然build script可以用groovy代码来编写，那么如果我们想要在build script中使用外部的jar包怎么办呢？
+既然 `build script` 可以用 `groovy` 代码来编写，那么如果我们想要在 `build script` 中使用外部的 `jar` 包怎么办呢？
 
-这个时候，我们可以将外部依赖放到buildscript()方法中，后面的task就可以使用引入的依赖了：
+这个时候，我们可以将外部依赖放到 `buildscript()` 方法中，后面的 `task` 就可以使用引入的依赖了：
 
 ```java
 import org.apache.commons.codec.binary.Base64
@@ -1006,13 +1006,13 @@ task encode {
 }
 ```
 
-上面的例子中，encode使用了一个外部的依赖包Base64，这个依赖包是在buildscript方法中引入的。
+上面的例子中，`encode` 使用了一个外部的依赖包 `Base64`，这个依赖包是在 `buildscript` 方法中引入的。
 
 ## 4.深入理解gradle中的task
 
 ### 4.1.定义task
 
-定义一个task可以有很多种方式，比如下面的使用string作为task的名字：
+定义一个 `task` 可以有很多种方式，比如下面的使用 `string` 作为 `task` 的名字：
 
 ```java
 task('hello') {
@@ -1042,9 +1042,9 @@ tasks.create('copy', Copy) {
 }
 ```
 
-上面的例子中，我们使用tasks.create方法，将新创建的task加到tasks集合中。
+上面的例子中，我们使用 `tasks.create` 方法，将新创建的 `task` 加到 `tasks` 集合中。
 
-我们还可以使用groovy特有的语法来定义一个task：
+我们还可以使用 `groovy` 特有的语法来定义一个 `task`：
 
 ```java
 task(hello) {
@@ -1061,23 +1061,23 @@ task(copy, type: Copy) {
 
 ### 4.2.tasks 集合类
 
-上面我们在创建task的时候，使用了tasks集合类来创建task。
+上面我们在创建 `task` 的时候，使用了 `tasks` 集合类来创建 `task`。
 
-实际上，tasks集合类是一个非常有用的工具类，我们可以使用它来做很多事情。
+实际上，`tasks` 集合类是一个非常有用的工具类，我们可以使用它来做很多事情。
 
-直接在build文件中使用tasks，实际上是引用了TaskContainer的一个实例对象。我们还可以使用 `Project.getTasks()` 来获取这个实例对象。
+直接在 `build` 文件中使用 `tasks`，实际上是引用了 `TaskContainer` 的一个实例对象。我们还可以使用 `Project.getTasks()` 来获取这个实例对象。
 
-我们看下TaskContainer的定义：
+我们看下 `TaskContainer` 的定义：
 
 ```java
 public interface TaskContainer extends TaskCollection<Task>, PolymorphicDomainObjectContainer<Task> 
 ```
 
-从定义上，我们可以看出TaskContainer是一个task的集合和域对象的集合。
+从定义上，我们可以看出 `TaskContainer`是一个 `task` 的集合和域对象的集合。
 
-taskContainer中有四类非常重要的方法：
+`taskContainer` 中有四类非常重要的方法：
 
-第一类是定位task的方法，有个分别是findByPath和getByPath。两个方法的区别就是findByPath如果没找到会返回null，而getByPath没找到的话会抛出UnknownTaskException。
+第一类是定位 `task` 的方法，有个分别是 `findByPath` 和 `getByPath` 。两个方法的区别就是 `findByPath` 如果没找到会返回null，而`getByPath` 没找到的话会抛出 `UnknownTaskException`。
 
 看下怎么使用：
 
@@ -1266,6 +1266,7 @@ task notALib {
 在gradle中有两种order：分别是must run after和should run after。
 
 taskA.mustRunAfter(taskB)表示必须遵守的顺序关系，而taskA.shouldRunAfter(taskB)则不是必须的，在下面两种情况下可以忽略这样的顺序关系：
+
 第一种情况是如果shouldRunAfter引入了order循环的时候。
 
 第二种情况是如果在并行执行的情况下，task所有的依赖关系都已经满足了，那么也会忽略这个顺序。
@@ -1444,7 +1445,7 @@ gradle为了提升构建的效率，提出了增量构建的概念，为了实�
 gradle支持三种主要的inputs和outputs类型：
 
 1. 简单类型：简单类型就是所有实现了Serializable接口的类型，比如说string和数字。
-2. 文件类型：文件类型就是 File 或者 FileCollection 的衍生类型，或者其他可以作为参数传递给 Project.file(java.lang.Object) 和 Project.files(java.lang.Object...) 的类型。
+2. 文件类型：文件类型就是 File 或者 FileCollection 的衍生类型，或者其他可以作为参数传递给 `Project.file(java.lang.Object)` 和 `Project.files(java.lang.Object...)` 的类型。
 3. 嵌套类型：有些自定义类型，本身不属于前面的1，2两种类型，但是它内部含有嵌套的inputs和outputs属性，这样的类型叫做嵌套类型。
 
 接下来，我们来举个例子，假如我们有一个类似于FreeMarker和Velocity这样的模板引擎，负责将模板源文件，要传递的数据最后生成对应的填充文件，我们考虑一下他的输入和输出是什么。
@@ -1495,7 +1496,7 @@ public class ProcessTemplates extends DefaultTask {
 }
 ```
 
-上面的例子中，我们定义了4个属性，分别是TemplateEngineType，FileCollection，TemplateData和File。前面三个属性是输入，后面一个属性是输出。
+上面的例子中，我们定义了4个属性，分别是 `TemplateEngineType`，`FileCollection`，`TemplateData` 和 `File`。前面三个属性是输入，后面一个属性是输出。
 
 除了getter和setter方法之外，我们还需要在getter方法中添加相应的注释： `@Input , @InputFiles ,@Nested 和 @OutputDirectory`, 除此之外，我们还定义了一个 `@TaskAction` 表示这个task要做的工作。
 
@@ -1542,22 +1543,22 @@ outputDir表示的是一个输出文件目录，所以使用的是@OutputDirecto
 
 除了上讲到的4个注解之外，gradle还提供了其他的几个有用的注解：
 
-- @InputFile： 相当于File，表示单个input文件。
-- @InputDirectory： 相当于File，表示单个input目录。
-- @Classpath： 相当于Iterable，表示的是类路径上的文件，对于类路径上的文件需要考虑文件的顺序。如果类路径上的文件是jar的话，jar中的文件创建时间戳的修改，并不会影响input。
-- @CompileClasspath：相当于Iterable，表示的是类路径上的java文件，会忽略类路径上的非java文件。
-- @OutputFile： 相当于File，表示输出文件。
-- @OutputFiles： 相当于Map<String, File> 或者 Iterable，表示输出文件。
-- @OutputDirectories： 相当于Map<String, File> 或者 Iterable，表示输出文件。
-- @Destroys： 相当于File 或者 Iterable，表示这个task将会删除的文件。
-- @LocalState： 相当于File 或者 Iterable，表示task的本地状态。
-- @Console： 表示属性不是input也不是output，但是会影响console的输出。
-- @Internal： 内部属性，不是input也不是output。
-- @ReplacedBy： 属性被其他的属性替换了，不能算在input和output中。
-- @SkipWhenEmpty： 和@InputFiles 跟 @InputDirectory一起使用，如果相应的文件或者目录为空的话，将会跳过task的执行。
-- @Incremental： 和@InputFiles 跟 @InputDirectory一起使用，用来跟踪文件的变化。
-- @Optional： 忽略属性的验证。
-- @PathSensitive： 表示需要考虑paths中的哪一部分作为增量的依据。
+- `@InputFile`： 相当于File，表示单个input文件。
+- `@InputDirectory`： 相当于File，表示单个input目录。
+- `@Classpath`： 相当于Iterable，表示的是类路径上的文件，对于类路径上的文件需要考虑文件的顺序。如果类路径上的文件是jar的话，jar中的文件创建时间戳的修改，并不会影响input。
+- `@CompileClasspath`：相当于Iterable，表示的是类路径上的java文件，会忽略类路径上的非java文件。
+- `@OutputFile`： 相当于File，表示输出文件。
+- `@OutputFiles`： 相当于Map<String, File> 或者 Iterable，表示输出文件。
+- `@OutputDirectories`： 相当于Map<String, File> 或者 Iterable，表示输出文件。
+- `@Destroys`： 相当于File 或者 Iterable，表示这个task将会删除的文件。
+- `@LocalState`： 相当于File 或者 Iterable，表示task的本地状态。
+- `@Console`： 表示属性不是input也不是output，但是会影响console的输出。
+- `@Internal`： 内部属性，不是input也不是output。
+- `@ReplacedBy`： 属性被其他的属性替换了，不能算在input和output中。
+- `@SkipWhenEmpty`： 和@InputFiles 跟 @InputDirectory一起使用，如果相应的文件或者目录为空的话，将会跳过task的执行。
+- `@Incremental`： 和@InputFiles 跟 @InputDirectory一起使用，用来跟踪文件的变化。
+- `@Optional`： 忽略属性的验证。
+- `@PathSensitive`： 表示需要考虑paths中的哪一部分作为增量的依据。
 
 ### 5.3.运行时API
 
@@ -2224,9 +2225,9 @@ nexusPublishing {
 }
 ```
 
-在sonatype()中，实际上定义了nexusUrl 和 snapshotRepositoryUrl。
+在sonatype()中，实际上定义了 `nexusUrl` 和 `snapshotRepositoryUrl`。
 
-发布到中央仓库是需要用户名密码的，我们需要设置sonatypeUsername 和 sonatypePassword 这两个项目的属性。一种方法是在~/.gradle/gradle.properties 中进行配置，或者设置 ORG_GRADLE_PROJECT_sonatypeUsername 和 ORG_GRADLE_PROJECT_sonatypePassword 这两个环境变量。
+发布到中央仓库是需要用户名密码的，我们需要设置 `sonatypeUsername` 和 `sonatypePassword` 这两个项目的属性。一种方法是在`~/.gradle/gradle.properties` 中进行配置，或者设置 `ORG_GRADLE_PROJECT_sonatypeUsername` 和 `ORG_GRADLE_PROJECT_sonatypePassword` 这两个环境变量。
 
 或者，可以直接在sonatype 中进行定义：
 

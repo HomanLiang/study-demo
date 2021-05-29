@@ -6,24 +6,24 @@
 
 ## 1.Maven概念
 
-Maven是一个项目管理和整合工具。Maven为开发者提供了一套完整的构建生命周期框架。开发团队几乎不用花多少时间就能够自动完成工程的基础构建配置，因为Maven使用了一个标准的目录结构和一个默认的构建生命周期。
+`Maven` 是一个项目管理和整合工具。`Maven` 为开发者提供了一套完整的构建生命周期框架。开发团队几乎不用花多少时间就能够自动完成工程的基础构建配置，因为 `Maven` 使用了一个标准的目录结构和一个默认的构建生命周期。
 
-若有多个开发团队环境的情况下，Maven能够在很短的时间内使得每项工作都按照标准进行。因为大部分的工程配置都非常简单且可复用，在创建报告、检查、构建和测试自动配置时，Maven可以让开发者的工作变得更简单。
+若有多个开发团队环境的情况下，`Maven` 能够在很短的时间内使得每项工作都按照标准进行。因为大部分的工程配置都非常简单且可复用，在创建报告、检查、构建和测试自动配置时，`Maven` 可以让开发者的工作变得更简单。
 
-Maven的主要目的是为开发者提供：
+`Maven` 的主要目的是为开发者提供：
 
 - 一个可复用、可维护、更易理解的工程综合模型，与这个模型交互的插件或工具
-- Maven工程结构和内容定义在一个xml文件中（一般是pom.xml）
+- `Maven` 工程结构和内容定义在一个 `xml` 文件中（一般是 `pom.xml`）
 
-利用Maven构建项目过程阶段：
+利用 `Maven` 构建项目过程阶段：
 
 ![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/project-design/20210424105509.png)
 
 ## 2.Maven安装配置
 
-- JDK安装
+- `JDK` 安装
 
-  Maven是基于Java的工具，所以配置Maven要做的第一件事就是安装JDK
+  `Maven` 是基于 `Java` 的工具，所以配置 `Maven` 要做的第一件事就是安装 `JDK`
 
 - Windows安装
 
@@ -51,37 +51,37 @@ Maven的主要目的是为开发者提供：
 
 ## 3.Maven初体验
 
-Maven主要是用来打jar、war包以及管理jar包
+`Maven` 主要是用来打 `jar`、`war` 包以及管理 `jar` 包
 
 ### 3.1.原始的javac打包方式
 
-假如我们有一个Hello.java文件，想要将它打成可执行jar包，一般这样做。
+假如我们有一个 `Hello.java` 文件，想要将它打成可执行 `jar` 包，一般这样做。
 
 ![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/project-design/20210424110250.png)
 
-使用 javac 命令和 jar 命令打包：
+使用 `javac` 命令和 `jar` 命令打包：
 
 ![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/project-design/20210424110308.png)
 
-生成的jar包文件，由两部分组成，class文件和META-INF目录，如下：
+生成的 `jar` 包文件，由两部分组成，`class` 文件和 `META-INF` 目录，如下：
 
-此时的jar包，是不可直接运行的，需要指定入口main类
+此时的 `jar` 包，是不可直接运行的，需要指定入口 `main` 类
 
-进入META-INF目录，编辑MANIFEST.MF文件，如下：
+进入 `META-INF`  目录，编辑 `MANIFEST.MF` 文件，如下：
 
 ![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/project-design/20210424110322.png)
 
-运行此jar包，得到运行结果：
+运行此 `jar` 包，得到运行结果：
 
 ![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/project-design/20210424110330.png)
 
 ### 3.2.maven打包
 
-在pom文件内配置入口类
+在 `pom` 文件内配置入口类
 
 ![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/project-design/20210424110345.png)
 
-执行maven打包命令
+执行 `maven` 打包命令
 
 ```
 mvn package
@@ -89,7 +89,7 @@ mvn package
 
 ![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/project-design/20210424110400.png)
 
-运行生成的jar，结果与原始方式无区别
+运行生成的 `jar`，结果与原始方式无区别
 
 ![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/project-design/20210424110408.png)
 
@@ -99,13 +99,13 @@ mvn package
 
 ## 5.Maven流程
 
-### maven的理想
+### 5.1.maven的理想
 
-maven像一种什么设计模式？答案：模板方法模式
+`maven` 像一种什么设计模式？答案：模板方法模式
 
-自动走完标准的构建流程：清理->编译->测试->报告->打包->部署
+自动走完标准的构建流程：`清理->编译->测试->报告->打包->部署`
 
-统一入口，所有配置在一个pom里搞定
+统一入口，所有配置在一个 `pom` 里搞定
 
 ## 6.maven的约定
 
@@ -113,17 +113,17 @@ maven像一种什么设计模式？答案：模板方法模式
 
 约定的目录（不可改）：
 
-| src/main/java –存放项目的.java文件                           |
+| `src/main/java` –存放项目的 `.java` 文件                     |
 | ------------------------------------------------------------ |
-| src/main/resources –存放项目资源文件。比方spring,hibernate配置文件 |
-| src/test/java –存放全部測试.java文件，比方JUnit測试类        |
-| src/test/resources ---測试资源文件                           |
-| target ---项目输出位置,编译完毕后的东西放到这里面            |
-| pom.xml                                                      |
+| `src/main/resources` –存放项目资源文件。比方 `spring`,`hibernate`配置文件 |
+| `src/test/java` –存放全部測试 `.java` 文件，比方 `JUnit` 測试类 |
+| `src/test/resources` ---測试资源文件                         |
+| `target` ---项目输出位置,编译完毕后的东西放到这里面          |
+| `pom.xml`                                                    |
 
 ### 6.1.maven的生命周期
 
-maven的构建生命周期，只是一个抽象的规范流程。周期内的每个阶段的具体执行，是在插件里面来实现的。
+`maven` 的构建生命周期，只是一个抽象的规范流程。周期内的每个阶段的具体执行，是在插件里面来实现的。
 
 ![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/project-design/20210424110537.png)
 
@@ -141,13 +141,13 @@ maven的构建生命周期，只是一个抽象的规范流程。周期内的每
 
 运行任何一个阶段，都会从其所在生命周期的第一个阶段开始，顺序执行到指定的阶段，如：
 
-`mvn package`（本义：执行default周期的package阶段，maven会自动从process-resources阶段开始运行到package阶段结束）
+`mvn package`（本义：执行 `default` 周期的 `package` 阶段，`maven` 会自动从 `process-resources` 阶段开始运行到 `package` 阶段结束）
 
 ### 6.2.maven的插件
 
-插件plugin是绑定到生命周期，承担实际功能的组件。mvn运行时，自动关联插件来运行
+插件 `plugin` 是绑定到生命周期，承担实际功能的组件。`mvn` 运行时，自动关联插件来运行
 
-下图是maven默认的各阶段对应的插件列表：
+下图是 `maven` 默认的各阶段对应的插件列表：
 
 | 生命周期 | 生命周期阶段           | 插件目标                                                | 执行任务                     |
 | -------- | ---------------------- | ------------------------------------------------------- | ---------------------------- |
@@ -177,7 +177,7 @@ maven的构建生命周期，只是一个抽象的规范流程。周期内的每
 
 `mvn install` 安装jar到本地库
 
-使用maven命令生成项目（idea和eclipse生成项目最终也是依赖maven插件生成的）：
+使用 `maven` 命令生成项目（`idea` 和 `eclipse` 生成项目最终也是依赖 `maven` 插件生成的）：
 
 ```
 mvn archetype:generate -DgroupId=enjoy -DartifactId=simple -DarchetypeArtifactId=maven-archetype-quickstart -Dversion=1.0
@@ -189,7 +189,7 @@ mvn archetype:generate -DgroupId=enjoy -DartifactId=simple-web -DarchetypeArtifa
 
 可以自定义插件，来扩展maven的功能。插件的开发步骤如下：
 
-- 引入maven api依赖
+- 引入 `maven api` 依赖
 
   ![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/project-design/20210424110844.png)
 
@@ -219,9 +219,9 @@ mvn archetype:generate -DgroupId=enjoy -DartifactId=simple-web -DarchetypeArtifa
 
 --------在数学中, 任何一个坐标可以唯一确定一个“点”
 
-Maven 中坐标是Jar包的唯一标识
+`Maven` 中坐标是 `Jar` 包的唯一标识
 
-坐标元素包括groupId、artifactId、version、packaging：
+坐标元素包括 `groupId`、`artifactId`、`version`、`packaging`：
 
 | 元素       | 描述                            | 说明                                                         |
 | ---------- | ------------------------------- | ------------------------------------------------------------ |
@@ -233,33 +233,33 @@ Maven 中坐标是Jar包的唯一标识
 
 ### 9.2.依赖
 
-依赖即：A->B，B->C，C->D这种项目间的依存关系。
+依赖即：`A->B`，`B->C`，`C->D` 这种项目间的依存关系。
 
-在java的jvm内，依赖的最终表现是，项目A启动时，其依赖的jar包必须都对应放入其classpath路径内。
+在 `java` 的 `jvm` 内，依赖的最终表现是，项目A启动时，其依赖的 `jar` 包必须都对应放入其 `classpath` 路径内。
 
 ### 9.3.依赖传递
 
 ![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/project-design/20210424113652.jpeg)
 
-上述过程中，项目Mall归结起来，依赖的fastjson会有三个版本。
+上述过程中，项目 `Mall` 归结起来，依赖的 `fastjson` 会有三个版本。
 
 而我们的jvm最终肯定只能接受一个版本的jar，所以必须有所取舍。
 
 maven默认的取舍规则是：
 
-- 路径最短原则：product和customer里的fastjson引用路径较短，路径为两步；pay项目里的fastjson引用路径较长，路径为三步。因此pay中的fastjson被淘汰；
+- 路径最短原则：`product` 和 `customer` 里的 `fastjson` 引用路径较短，路径为两步；`pay` 项目里的 `fastjson` 引用路径较长，路径为三步。因此 `pay` 中的 `fastjson` 被淘汰；
 
-- 同路径长度下，谁先声明谁优先：product和customer中的fastjson路径相同，那么就看在pom中是先声明product还是先声明customer，谁先用谁的。
+- 同路径长度下，谁先声明谁优先：`product` 和 `customer` 中的 `fastjson` 路径相同，那么就看在 `pom` 中是先声明 `product` 还是先声明 `customer`，谁先用谁的。
 
 ### 9.4.依赖冲突及解决
 
-在依赖传递里，我们看到，maven根据自己的规则为我们取舍出了一个版本的jar，但此jar版本选择可能会与我们的项目预期不符：
+在依赖传递里，我们看到，`maven` 根据自己的规则为我们取舍出了一个版本的jar，但此jar版本选择可能会与我们的项目预期不符：
 
-例如：我们最终想的版本是fastjson:1.2.30版本（但它在第一步即被淘汰掉了）
+例如：我们最终想的版本是 `fastjson:1.2.30` 版本（但它在第一步即被淘汰掉了）
 
-当出现此类情况时，我们项目运行可能会出错（项目中使用到了1.2.30版本的特性），此问题即是我们常遇到的jar包冲突问题。
+当出现此类情况时，我们项目运行可能会出错（项目中使用到了 `1.2.30` 版本的特性），此问题即是我们常遇到的jar包冲突问题。
 
-补救方式：使用exclusions将product和customer中的fastjson包排除掉，用法如下图：
+补救方式：使用 `exclusions` 将 `product` 和 `customer` 中的 `fastjson` 包排除掉，用法如下图：
 
 ![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/project-design/20210424113739.png)
 
@@ -271,25 +271,25 @@ maven默认的取舍规则是：
 
 ### 9.5.依赖范围scope
 
-mvn在运行时，生命周期的不同阶段，会有不同的依赖范围，一般有以下依赖范围scope：
+`mvn` 在运行时，生命周期的不同阶段，会有不同的依赖范围，一般有以下依赖范围 `scope`：
 
-\- compile：默认范围，用于编译（依赖的jar在打包时会包含进去）    
+`- compile`：默认范围，用于编译（依赖的 `jar` 在打包时会包含进去）    
 
-\- provided：类似于编译，但支持你期待jdk或者容器提供，类似于classpath（依赖的jar在打包时不会包含进去）
+`- provided`：类似于编译，但支持你期待 `jdk` 或者容器提供，类似于 `classpath`（依赖的 `jar` 在打包时不会包含进去）
 
-\- runtime：在执行时需要使用（依赖的jar在打包时会包含进去）
+`- runtime`：在执行时需要使用（依赖的 `jar` 在打包时会包含进去）
 
-\- test：用于test任务时使用（依赖的jar在打包时不会包含进去）
+`- test`：用于test任务时使用（依赖的 `jar` 在打包时不会包含进去）
 
-\- system：需要外在提供相应的元素。通过systemPath来取得（一般禁止使用）
+`- system`：需要外在提供相应的元素。通过 `systemPath` 来取得（一般禁止使用）
 
-每个scope实际上是配置了一个不同的classpath，jvm根据选择不同的classpath来达到依赖不同
+每个 `scope` 实际上是配置了一个不同的 `classpath`，`jvm` 根据选择不同的 `classpath` 来达到依赖不同
 
 ![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/project-design/20210424113812.png)
 
 ### 9.6.项目聚合与继承
 
-**聚合**
+**9.6.1.聚合**
 
 聚合是指将多个模块整合在一起，统一构建，避免一个一个的构建。聚合需要个父工程，然后使用 `<modules></modules>` 进行配置其中对应的是子工程的相对路径。例如下面的配置。
 
@@ -300,7 +300,7 @@ mvn在运行时，生命周期的不同阶段，会有不同的依赖范围，�
 </modules>
 ```
 
-**继承**
+**9.6.2.继承**
 
 继承是指子工程直接继承父工程 当中的属性、依赖、插件等配置，避免重复配置。继承包括如下几种方式。
 
@@ -310,7 +310,7 @@ mvn在运行时，生命周期的不同阶段，会有不同的依赖范围，�
 
 **注意：上面的三个配置子工程都可以进行重写，重写之后以子工程的为准。**
 
-**依赖管理**
+**9.6.3.依赖管理**
 
 通过继承的特性，子工程是可以间接依赖父工程的依赖，但多个子工程依赖有时并不一至，这时就可以在父工程中加入`<dependencyManagement></dependencyManagement>` 声明该工程需要的JAR包，然后在子工程中引入。例如下面的配置。
 
@@ -332,7 +332,7 @@ mvn在运行时，生命周期的不同阶段，会有不同的依赖范围，�
 </dependency>
 ```
 
-**项目属性**
+**9.6.4.项目属性**
 
 通过 `<properties></properties>` 配置属性参数，可以简化配置。例如下面的配置。
 
@@ -343,7 +343,7 @@ mvn在运行时，生命周期的不同阶段，会有不同的依赖范围，�
 </properties>
 ```
 
-我们可以在pom.xml文件中使用下面的形式来引入配置的参数。
+我们可以在 `pom.xml` 文件中使用下面的形式来引入配置的参数。
 
 ```xml
 ${projectName}
@@ -351,19 +351,19 @@ ${projectName}
 
 接下来，我们再来看几个Maven的默认属性，如下所示。
 
-- ${basedir} 项目根目录
-- ${version}表示项目版本;
-- `${project.basedir}同${basedir};`
-- `${project.version}表示项目版本,与${version}相同;`
-- ${project.build.directory} 构建目录，缺省为target
-- ${project.build.sourceEncoding}表示主源码的编码格式;
-- ${project.build.sourceDirectory}表示主源码路径;
-- ${project.build.finalName}表示输出文件名称;
-- ${project.build.outputDirectory} 构建过程输出目录，缺省为target/classes
+- `${basedir}` 项目根目录
+- `${version}` 表示项目版本;
+- `${project.basedir}` 同 `${basedir}`;
+- `${project.version}` 表示项目版本,与 `${version}` 相同;
+- `${project.build.directory}` 构建目录，缺省为 `target`
+- `${project.build.sourceEncoding}` 表示主源码的编码格式;
+- `${project.build.sourceDirectory}` 表示主源码路径;
+- `${project.build.finalName}` 表示输出文件名称;
+- `${project.build.outputDirectory}` 构建过程输出目录，缺省为 `target/classes`
 
 ### 9.7.项目构建配置
 
-**构建资源配置**
+**9.7.1.构建资源配置**
 
 基本配置示例：
 
@@ -375,11 +375,11 @@ ${projectName}
 
 说明：
 
-- defaultGoal：执行构建时默认的goal或phase，如jar:jar或者package等
-- directory：构建的结果所在的路径，默认为${basedir}/target目录
-- finalName：构建的最终结果的名字，该名字可能在其他plugin中被改变
+- `defaultGoal`：执行构建时默认的 `goal` 或 `phase`，如 `jar:jar` 或者 `package` 等
+- `directory`：构建的结果所在的路径，默认为 `${basedir}/target` 目录
+- `finalName`：构建的最终结果的名字，该名字可能在其他 `plugin` 中被改变
 
-**resources 配置示例**
+**9.7.2.resources 配置示例**
 
 ```xml
 <resources>
@@ -404,64 +404,64 @@ ${projectName}
 
 说明：
 
-- resources：build过程中涉及的资源文件
-- targetPath：资源文件的目标路径
-- directory：资源文件的路径，默认位于${basedir}/src/main/resources/目录下
-- includes：一组文件名的匹配模式，被匹配的资源文件将被构建过程处理
-- excludes：一组文件名的匹配模式，被匹配的资源文件将被构建过程忽略。同时被includes和excludes匹配的资源文件，将被忽略。
-- filtering：默认false ，true 表示 通过参数 对 资源文件中 的${key} 在编译时进行动态变更。替换源 -Dkey 和pom 中的 值 或 中指定的properties 文件。
+- `resources`：`build` 过程中涉及的资源文件
+- `targetPath`：资源文件的目标路径
+- `directory`：资源文件的路径，默认位于 `${basedir}/src/main/resources/` 目录下
+- `includes`：一组文件名的匹配模式，被匹配的资源文件将被构建过程处理
+- `excludes`：一组文件名的匹配模式，被匹配的资源文件将被构建过程忽略。同时被 `includes` 和 `excludes` 匹配的资源文件，将被忽略。
+- `filtering`：默认 `false` ，`true` 表示 通过参数 对 资源文件中的 `${key}` 在编译时进行动态变更。替换源 `-Dkey` 和 `pom` 中的 值 或 中指定的 `properties` 文件。
 
 ## 10.环境激活-profiles使用
 
-在springmvc项目中，开发/测试/线上三个不同环境，配置文件往往也不同。
+在 `springmvc` 项目中，开发/测试/线上三个不同环境，配置文件往往也不同。
 
-打包时需要对配置文件做出选择（maven提供了profiles机制供我们使用）。
+打包时需要对配置文件做出选择（`maven` 提供了 `profiles` 机制供我们使用）。
 
 ### 10.1.profiles的场景
 
 ![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/project-design/20210424113848.png)
 
-这个选择，实际发生在default生命周期的resource阶段（maven-resources-plugin执行过程里）
+这个选择，实际发生在 `default` 生命周期的 `resource` 阶段（`maven-resources-plugin` 执行过程里）
 
 ### 10.2.定义profiles
 
-为了指导插件将对应的resource文件打入classpath里，先定出profiles
+为了指导插件将对应的 `resource` 文件打入 `classpath` 里，先定出 `profiles`
 
 ![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/project-design/20210424113937.png)
 
-此定义即指，当mvn命令执行时，我们需要通过 -P dev或者-P test方式传入我们的意图：
+此定义即指，当 `mvn` 命令执行时，我们需要通过 `-P dev` 或者 `-P test` 方式传入我们的意图：
 
-dev/test选择，会导致properties里的变量值含义不同，我们主要关注package.environment变量
+`dev/test` 选择，会导致 `properties` 里的变量值含义不同，我们主要关注 `package.environment` 变量
 
 ### 10.3.资源插件的配置指定
 
 ![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/project-design/20210424113956.png)
 
-配置maven-resources-plugin插件执行时，要复制的目录资源
+配置 `maven-resources-plugin` 插件执行时，要复制的目录资源
 
 ### 10.4.mvn约定的资源中需要过滤掉环境目录
 
 ![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/project-design/20210424114018.png)
 
-需要将mvn约定的资源目录里，过滤掉环境目录
+需要将 `mvn` 约定的资源目录里，过滤掉环境目录
 
 ### 10.5.小属性更轻便的用法
 
 对于简单的属性，我们可以选择更轻便的用法
 
-**直接在环境中定义属性值**
+**10.5.1.直接在环境中定义属性值**
 
 ![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/project-design/20210424114054.png)
 
-**项目属性文件配置**
+**10.5.2.项目属性文件配置**
 
 ![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/project-design/20210424114104.png)
 
-**约定的资源启用替换过滤**
+**10.5.3.约定的资源启用替换过滤**
 
 ![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/project-design/20210424114116.png)
 
-最后有对pom.xml里面各标签有疑惑的小伙伴，下面附上pom.xml文件标签的详细注释解释，可以花时间好好去看一下对应的标签的作用是什么。
+最后有对 `pom.xml` 里面各标签有疑惑的小伙伴，下面附上 `pom.xml` 文件标签的详细注释解释，可以花时间好好去看一下对应的标签的作用是什么。
 
 ```
 <project xmlns="http://maven.apache.org/POM/4.0.0"
@@ -1398,17 +1398,17 @@ dev/test选择，会导致properties里的变量值含义不同，我们主要�
 
 ### 11.1.环境说明
 
-环境： CentOS 6.8、 JDK8、 Sonatype Nexus、 Maven
-IP：192.168.50.131
+环境：`CentOS 6.8`、 `JDK8`、 `Sonatype Nexus`、 `Maven`
+IP：`192.168.50.131`
 root 用户操作
 
 ### 11.2.安装Nexus
 
 前提： 已安装 JDK8 并配置好了环境变量，小伙伴们自行搭建JDK8环境，这里我就不再赘述了。相信小伙伴们都能够正确搭建JDK8环境。
 
-**下载Nexus**
+**11.2.1.下载Nexus**
 
-下载Nexus（这里，我使用的是： nexus-2.11.2-03-bundle.tar.gz） ,下载地址：http://www.sonatype.org/nexus/go/ ，我们也可以在服务器的命令行输入如下命令下载nexus-2.11.2-03-bundle.tar.gz安装文件。
+下载Nexus（这里，我使用的是： `nexus-2.11.2-03-bundle.tar.gz`） ,下载地址：http://www.sonatype.org/nexus/go/ ，我们也可以在服务器的命令行输入如下命令下载 `nexus-2.11.2-03-bundle.tar.gz` 安装文件。
 
 ```bash
 # wget https://sonatype-download.global.ssl.fastly.net/nexus/oss/nexus-2.11.2-03-bundle.tar.gz
@@ -1416,7 +1416,7 @@ root 用户操作
 
 也可以到链接：https://download.csdn.net/download/l1028386804/12523592 下载
 
-**解压Nexus**
+**11.2.2.解压Nexus**
 
 ```bash
 # mkdir nexus
@@ -1427,7 +1427,7 @@ nexus-2.11.2-03 sonatype-work
 (一个 nexus 服务，一个私有库目录)
 ```
 
-**编辑 Nexus**
+**11.2.3.编辑 Nexus**
 
 编辑 Nexus 的 nexus.properties 文件，配置端口和 work 目录信息（保留默认）
 
@@ -1452,7 +1452,7 @@ nexus-work=${bundleBasedir}/../sonatype-work/nexus
 runtime=${bundleBasedir}/nexus/WEB-INF
 ```
 
-**编辑 nexus 脚本，配置 RUN_AS_USER 参数**
+**11.2.4.编辑 nexus 脚本，配置 RUN_AS_USER 参数**
 
 ```bash
 # vi /usr/local/nexus/nexus-2.11.2-03/bin/nexus
@@ -1465,7 +1465,7 @@ runtime=${bundleBasedir}/nexus/WEB-INF
 RUN_AS_USER=root
 ```
 
-**防火墙中打开 8081 端口**
+**11.2.5.防火墙中打开 8081 端口**
 
 ```bash
 # vi /etc/sysconfig/iptables
@@ -1483,7 +1483,7 @@ RUN_AS_USER=root
 # service iptables restart
 ```
 
-**启动 nexus**
+**11.2.6.启动 nexus**
 
 ```bash
 # /usr/local/nexus/nexus-2.11.2-03/bin/nexus start
@@ -1494,13 +1494,13 @@ Starting Nexus OSS...
 Started Nexus OSS.
 ```
 
-**访问nexus**
+**11.2.7.访问nexus**
 
 浏览器中打开： http://192.168.50.131:8081/nexus/
 
 ![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/project-design/20210424114510.png)
 
-**登录nexus**
+**11.2.8.登录nexus**
 
 默认用户名admin,默认密码admin123。
 
@@ -1519,13 +1519,13 @@ Started Nexus OSS.
 菜单 Administration/Server 配置邮箱服务地址(如果忘记密码，可以通过该邮箱找回密码)
 ![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/project-design/20210424114659.png)
 
-**设置用户邮箱**
+**11.3.1.设置用户邮箱**
 
 给用户配置邮箱地址，方便忘记密码时找回：
 
 ![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/project-design/20210424114715.png)
 
-**用户修改密码**
+**11.3.2.用户修改密码**
 
 ![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/project-design/20210424114732.png)
 
@@ -1533,7 +1533,7 @@ Started Nexus OSS.
 
 ![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/project-design/20210424114740.png)
 
-**仓库类型**
+**11.3.3.仓库类型**
 
 ![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/project-design/20210424114757.png)
 
@@ -1551,7 +1551,7 @@ Hosted 仓库常用类型说明：
 
 如果构建的 Maven 项目本地仓库没有对应的依赖包，那么就会去 Nexus 私服去下载，如果Nexus私服也没有此依赖包，就回去远程中央仓库下载依赖，这些中央仓库就是 proxy。Nexus 私服下载成功后再下载至本地 Maven 库供项目引用。
 
-**设置 proxy 代理仓库**
+**11.3.4.设置 proxy 代理仓库**
 
 设置 proxy 代理仓库(Apache Snapshots/Central/Codehaus Snapshots)准许远程下载，如下所示。
 
@@ -1563,11 +1563,11 @@ Hosted 仓库常用类型说明：
 
 ### 11.4.Maven 本地库的安装与配置
 
-**下载Maven**
+**11.4.1.下载Maven**
 
 到链接http://maven.apache.org/download.cgi 下载Maven
 
-**配置Maven环境变量**
+**11.4.2.配置Maven环境变量**
 
 ```bash
 vim /etc/profile
@@ -1581,7 +1581,7 @@ export JAVA_HOME MAVEN_HOME CLASS_PATH PATH
 source /etc/profile
 ```
 
-**配置本地Maven**
+**11.4.3.配置本地Maven**
 
 拷贝Maven的conf目录下的配置文件settings.xml，重命名为settings-lyz.xml，修改配置文件后的内容如下：
 
@@ -1675,15 +1675,16 @@ source /etc/profile
 ```
 
 与下图中的链接一致：
+
 ![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/project-design/20210424114906.png)
 
-**配置Eclipse Maven**
+**11.4.4.配置Eclipse Maven**
 
 ![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/project-design/20210424114935.png)
 
 ![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/project-design/20210424114942.png)
 
-**项目的构建与发布**
+**11.4.5.项目的构建与发布**
 
 首先我们要在项目的pom.xml文件中加入如下内容，将项目构建成的Jar发布到Maven私有仓库
 
@@ -1704,7 +1705,7 @@ source /etc/profile
 
 配置说明
 
-项目中的pom.xml文件中，如果版本配置如下：
+项目中的 `pom.xml` 文件中，如果版本配置如下：
 
 ```xml
 <version>0.0.1-SNAPSHOT</version>
@@ -1782,12 +1783,12 @@ source /etc/profile
 
 具体发布步骤如下：
 
-右键pom.xml->Run as->Maven build->
+右键 `pom.xml->Run as->Maven build->`
 ![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/project-design/20210424115034.png)
 
 ![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/project-design/20210424115044.png)
 
-上图中的私有库为空，我们右键pom.xml->Run as->Maven build(此时pom.xml文件的version为0.0.1-SNAPSHOT)。
+上图中的私有库为空，我们右键 `pom.xml->Run as->Maven build`(此时 `pom.xml` 文件的 `version` 为 `0.0.1-SNAPSHOT`)。
 
 构建完毕后
 
@@ -1797,17 +1798,18 @@ source /etc/profile
 
 ![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/project-design/20210424115103.png)
 
-此时，上图中的Release目录为空，此时，我们修改pom.xml的version为0.0.1-RELEASE，再次右键pom.xml->Run as->Maven build，构建项目，此时发布的目录如下图：
+此时，上图中的 `Release` 目录为空，此时，我们修改 `pom.xml` 的 `version` 为 `0.0.1-RELEASE`，再次右键 `pom.xml->Run as->Maven build`，构建项目，此时发布的目录如下图：
 
 ![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/project-design/20210424115112.png)
 
-说明已经将项目构建并发布到了我们的Maven私有仓库。
+说明已经将项目构建并发布到了我们的 `Maven` 私有仓库。
 
-最后，我们添加第三方的Jar依赖到我们的Maven私有仓库，具体操作如下：
+最后，我们添加第三方的Jar依赖到我们的 `Maven` 私有仓库，具体操作如下：
 
 ![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/project-design/20210424115126.png)
 
 如上图，第三方依赖私有仓库为空,我们按照以下步骤上传第三方依赖到我们的Maven私有仓库。
+
 ![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/project-design/20210424115134.png)
 
 ![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/project-design/20210424115142.png)
@@ -1818,10 +1820,10 @@ source /etc/profile
 
 如上图，第三方依赖已经上传到我们的Maven私有仓库。
 
-## 常见问题
+## X.常见问题
 
-### 解决Maven Jar包冲突
-#### 定位冲突
+### X.1.解决Maven Jar包冲突
+#### X.1.1.定位冲突
 IDEA提供了一个maven依赖分析神器：Maven Helper
 
 ![Image [4]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/project-design/20210424121820.png)
@@ -1830,17 +1832,17 @@ IDEA提供了一个maven依赖分析神器：Maven Helper
 
 ![Image [5]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/project-design/20210424121854.png)
 
-这里面红色高亮的部分，就表明这个Jar包有了冲突。选中这个jar包，可以看到这2个版本的冲突的来源。
+这里面红色高亮的部分，就表明这个Jar包有了冲突。选中这个 `jar` 包，可以看到这2个版本的冲突的来源。
 
-上图的例子，表明cruator-client这个Jar包，有2个传递依赖，分别为2.5.0版本和4.0.1版本。冲突的描述为：
+上图的例子，表明 `cruator-client`这个 `Jar` 包，有2个传递依赖，分别为 `2.5.0` 版本和 `4.0.1` 版本。冲突的描述为：
 ```
 omitted for conflict with 2.5.0. 由于与2.5.0版本冲突而被省略
 ```
-具体的层级在右边也一目了然了，所以maven最终根据最短路径优先原则选择了2.5.0版本，4.0.1版本被忽略。
+具体的层级在右边也一目了然了，所以 `maven` 最终根据最短路径优先原则选择了 `2.5.0` 版本，`4.0.1` 版本被忽略。
 
-这时候有同学会问：本地环境我可以利用Maven Helper来定位，那么预生产或者生产环境呢。又没有IDEA，如何定位冲突的细节？
+这时候有同学会问：本地环境我可以利用 `Maven Helper` 来定位，那么预生产或者生产环境呢。又没有IDEA，如何定位冲突的细节？
 
-可以利用mvn命令来解决：
+可以利用 `mvn` 命令来解决：
 ```
 mvn dependency:tree -Dverbose
 
@@ -1849,14 +1851,14 @@ mvn dependency:tree -Dverbose
 ![Image [6]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/project-design/20210424121925.png)
 其实mvn命令行一样好用。非常清晰明确。
 
-#### 解决Jar包冲突的几个实用技巧
-**排除法**
+#### X.1.2.解决Jar包冲突的几个实用技巧
+**X.1.2.1.排除法**
 
 还是上面的那个例子，现在生效的是2.5.0，如果想生效4.0.1。只需要在2.5.0上面点exclude就行了。
 
 ![Image [3]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/project-design/20210424121650.png)
 
-**版本锁定法**
+**X.1.2.2.版本锁定法**
 
 如果很多个依赖都传递了Jar包A，涉及了很多个版本，但是你只想指定一个版本。用排除法一个个去exclude太麻烦，而且exclude在pom文件中也会体现，太多的话，也影响代码整洁和阅读感受。
 
@@ -1880,7 +1882,7 @@ mvn dependency:tree -Dverbose
 
 都统一变成4.0.1，锁定版本有一个好处：版本锁定并不排除Jar包，而且显示的把所有版本不一致的Jar包变成统一一个版本，这样在阅读代码时比较友好。也不用忍受一大堆的exclude标签。
 
-**如何写一个干净依赖关系的POM文件**
+**X.1.2.3.如何写一个干净依赖关系的POM文件**
 
 我本人是有些轻度代码洁癖的人，所以即便是pom文件的依赖关系也想干净而整洁。如何写好干净的POM呢，作者认为有几点技巧要注意：
 - 尽量在父POM中定义 `<dependencyManagement>`，来进行本项目一些依赖版本的管理，这样可以从很大程度上解决一定的冲突
@@ -1888,14 +1890,14 @@ mvn dependency:tree -Dverbose
 - 使用 `mvn dependency:analyze-only` 命令用于检测那些声明了但是没被使用的依赖，如有有一些是你自己声明的，那尽量去掉
 - 使用 `mvn dependency:analyze-duplicate` 命令用来分析重复定义的依赖，清理那些重复定义的依赖
 
-**最后**
+**X.1.2.4.最后**
 
 其实庞大的项目依赖传递也一定多。但是不管多复杂的依赖关系，看到不要害怕。就这么几条原则，细心的去分析，所有的依赖都有迹可循。
 
 这些传递依赖如果管理的好，能让你的维护成本大大降低。如果管不好，这群野孩子每一个都可能是引发下一个NoSuchMethodError的导火索。
 
 
-### 项目版本号升级快速修改版本号
+### X.2.项目版本号升级快速修改版本号
 如图所示分布式项目修改版本号40多处需要修改，手动改太累了
 
 ![Image](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/project-design/20210424121523.png)

@@ -14,27 +14,27 @@
 
 #### 1.2.1.新建红包
 
-**在DB**、**Redis**分别**新增一条记录**
+在 `DB`、`Redis` 分别新增一条记录
 
 #### 1.2.2.抢红包(并发)
 
-**请求Redis**，**红包剩余个数**，**大于0**才可以**拆**，**等会0**时，提示用户，**红包已抢完**
+请求Redis**，**红包剩余个数，大于0才可以拆，等会0时，提示用户，红包已抢完
 
 #### 1.2.3.拆红包(并发)
 
 ##### 1.2.3.1.用到技术
 
-**Redis**中数据类型的**String特性**的**原子递减**（**DECR key**）和**减少指定值**（**DECRBY key decrement**）
+`Redis` 中数据类型的 `String` 特性的原子递减（`DECR key`）和减少指定值（`DECRBY key decrement`）
 
 ##### 1.2.3.2.业务
 
-1. **请求Redis**，当**剩余红包个数大于0**，**红包个数**原子**递减**，随机**获取红包**
-2. **计算金额**，当最后一个红包时，最后一个红包金额=总金额-总已抢红包金额
-3. **更新数据库**
+1. 请求 `Redis`，当剩余红包个数大于0，红包个数原子递减，随机获取红包
+2. 计算金额，当最后一个红包时，`最后一个红包金额=总金额-总已抢红包金额`
+3. 更新数据库
 
 #### 1.2.4.查看红包记录
 
-**查询DB**即可
+查询DB即可
 
 ### 1.3.数据库表设计
 
@@ -42,19 +42,19 @@
 
 ```
 CREATE TABLE `red_packet_info` (
- `id` int(11) NOT NULL AUTO_INCREMENT, 
- `red_packet_id` bigint(11) NOT NULL DEFAULT 0 COMMENT '红包id，采⽤
-timestamp+5位随机数', 
- `total_amount` int(11) NOT NULL DEFAULT 0 COMMENT '红包总⾦额，单位分',
- `total_packet` int(11) NOT NULL DEFAULT 0 COMMENT '红包总个数',
- `remaining_amount` int(11) NOT NULL DEFAULT 0 COMMENT '剩余红包⾦额，单位
-分',
- `remaining_packet` int(11) NOT NULL DEFAULT 0 COMMENT '剩余红包个数',
- `uid` int(20) NOT NULL DEFAULT 0 COMMENT '新建红包⽤户的⽤户标识',
- `create_time` timestamp COMMENT '创建时间',
- `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE
-CURRENT_TIMESTAMP COMMENT '更新时间',
- PRIMARY KEY (`id`)
+    `id` int(11) NOT NULL AUTO_INCREMENT, 
+    `red_packet_id` bigint(11) NOT NULL DEFAULT 0 COMMENT '红包id，采⽤
+    timestamp+5位随机数', 
+    `total_amount` int(11) NOT NULL DEFAULT 0 COMMENT '红包总⾦额，单位分',
+    `total_packet` int(11) NOT NULL DEFAULT 0 COMMENT '红包总个数',
+    `remaining_amount` int(11) NOT NULL DEFAULT 0 COMMENT '剩余红包⾦额，单位
+    分',
+    `remaining_packet` int(11) NOT NULL DEFAULT 0 COMMENT '剩余红包个数',
+    `uid` int(20) NOT NULL DEFAULT 0 COMMENT '新建红包⽤户的⽤户标识',
+    `create_time` timestamp COMMENT '创建时间',
+    `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE
+    CURRENT_TIMESTAMP COMMENT '更新时间',
+    PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COMMENT='红包信息
 表，新建⼀个红包插⼊⼀条记录';
 ```
@@ -63,18 +63,18 @@ CURRENT_TIMESTAMP COMMENT '更新时间',
 
 ```
 CREATE TABLE `red_packet_record` (
- `id` int(11) NOT NULL AUTO_INCREMENT, 
- `amount` int(11) NOT NULL DEFAULT '0' COMMENT '抢到红包的⾦额',
- `nick_name` varchar(32) NOT NULL DEFAULT '0' COMMENT '抢到红包的⽤户的⽤户
-名',
- `img_url` varchar(255) NOT NULL DEFAULT '0' COMMENT '抢到红包的⽤户的头像',
- `uid` int(20) NOT NULL DEFAULT '0' COMMENT '抢到红包⽤户的⽤户标识',
- `red_packet_id` bigint(11) NOT NULL DEFAULT '0' COMMENT '红包id，采⽤
-timestamp+5位随机数', 
- `create_time` timestamp COMMENT '创建时间',
- `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE
-CURRENT_TIMESTAMP COMMENT '更新时间',
- PRIMARY KEY (`id`)
+    `id` int(11) NOT NULL AUTO_INCREMENT, 
+    `amount` int(11) NOT NULL DEFAULT '0' COMMENT '抢到红包的⾦额',
+    `nick_name` varchar(32) NOT NULL DEFAULT '0' COMMENT '抢到红包的⽤户的⽤户
+    名',
+    `img_url` varchar(255) NOT NULL DEFAULT '0' COMMENT '抢到红包的⽤户的头像',
+    `uid` int(20) NOT NULL DEFAULT '0' COMMENT '抢到红包⽤户的⽤户标识',
+    `red_packet_id` bigint(11) NOT NULL DEFAULT '0' COMMENT '红包id，采⽤
+    timestamp+5位随机数', 
+    `create_time` timestamp COMMENT '创建时间',
+    `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE
+    CURRENT_TIMESTAMP COMMENT '更新时间',
+    PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COMMENT='抢红包记
 录表，抢⼀个红包插⼊⼀条记录';
 ```

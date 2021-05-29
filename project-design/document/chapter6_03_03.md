@@ -21,113 +21,114 @@
 
 1. 点击eclipse上方工具栏的Help，选择Install New Software
 
-  ![Image](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/project-design/20210505183111.png)
+   ![Image](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/project-design/20210505183111.png)
 
 2. 弹出如下窗口，然后填写插件名称和安装地址
 
-  Name: Activiti BPMN 2.0 designer
+   Name: Activiti BPMN 2.0 designer
 
-  Location: http://activiti.org/designer/update/
-  然后便是不停的next和finish了，组图如下：
+   Location: http://activiti.org/designer/update/
 
-  ![Image [2]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/project-design/20210505183124.png)
+   然后便是不停的next和finish了，组图如下：
 
-  ![Image [3]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/project-design/20210505183134.png)
+   ![Image [2]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/project-design/20210505183124.png)
 
-  ![Image [4]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/project-design/20210505183143.png)
+   ![Image [3]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/project-design/20210505183134.png)
 
-  ![Image [5]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/project-design/20210505183150.png)
+     ![Image [4]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/project-design/20210505183143.png)
+
+     ![Image [5]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/project-design/20210505183150.png)
 
 3. 安装完成后，我们在new的时候，操作面板中便有activiti的相关文件了。
 
-  ![Image [6]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/project-design/20210505183210.png)
+     ![Image [6]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/project-design/20210505183210.png)
 
 ### 2.2.IDEA 安装插件
 #### 2.2.1.安装Activiti插件
 1. 搜索插件
 
-  点击菜单【File】-->【Settings...】打开【Settings】窗口。
+   点击菜单【File】-->【Settings...】打开【Settings】窗口。
 
-  点击左侧【Plugins】按钮，在右侧输出＂actiBPM＂，点击下面的【Search in repositories】链接会打开【Browse Repositories】窗口。
+   点击左侧【Plugins】按钮，在右侧输出＂actiBPM＂，点击下面的【Search in repositories】链接会打开【Browse Repositories】窗口。
 
-  ![Image [7]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/project-design/20210505183225.png)
+   ![Image [7]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/project-design/20210505183225.png)
 
 2. 开始安装
 
-  进入【Browse Repositories】窗口，选中左侧的【actiBPM】，点击右侧的【Install】按钮，开始安装。
+   进入【Browse Repositories】窗口，选中左侧的【actiBPM】，点击右侧的【Install】按钮，开始安装。
 
-  ![Image [8]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/project-design/20210505183245.png)
+   ![Image [8]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/project-design/20210505183245.png)
 
 3. 安装进度
 
-  ![Image [9]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/project-design/20210505183257.png)
+   ![Image [9]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/project-design/20210505183257.png)
 
 4. 安装完成
 
-  安装完成后，会提示【Restart IntelliJ IDEA】，重启IDEA即可完成安装。
+    安装完成后，会提示【Restart IntelliJ IDEA】，重启IDEA即可完成安装。
 
-  ![Image [10]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/project-design/20210505183312.png)
+   ![Image [10]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/project-design/20210505183312.png)
 
 5. 查看结果
 
-  打开【Settings】窗口，在【Plugins】中可看到安装的【actiBPM】插件，表示安装成功。
+   打开【Settings】窗口，在【Plugins】中可看到安装的【actiBPM】插件，表示安装成功。
 
-  ![Image [11]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/project-design/20210505183325.png)
+   ![Image [11]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/project-design/20210505183325.png)
 
 #### 2.2.2.使用Activiti
 1. 创建BPMN文件
 
-  点击菜单【File】-->【New】-->【BpmnFile】
+   点击菜单【File】-->【New】-->【BpmnFile】
 
-  ![Image [12]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/project-design/20210505183339.png)
+   ![Image [12]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/project-design/20210505183339.png)
 
-  输入文件名称，点击【OK】按钮
+   输入文件名称，点击【OK】按钮
 
-  ![Image [13]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/project-design/20210505183352.png)
+     ![Image [13]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/project-design/20210505183352.png)
 
-  会出现如下绘制界面
+   会出现如下绘制界面
 
-  ![Image [14]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/project-design/20210505183400.png)
+   ![Image [14]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/project-design/20210505183400.png)
 
 2. 绘制流程图
 
-  鼠标左键拖拽右侧图标，将其拖下左侧界面上，同样的方式再拖拽其他图标
+     鼠标左键拖拽右侧图标，将其拖下左侧界面上，同样的方式再拖拽其他图标
 
-  ![Image [15]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/project-design/20210505183433.png)
+   ![Image [15]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/project-design/20210505183433.png)
 
-  鼠标移至图标的中心会变成黑白色扇形，拖拽到另一图标，即可连接
+   鼠标移至图标的中心会变成黑白色扇形，拖拽到另一图标，即可连接
 
-  ![Image [16]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/project-design/20210505183440.png)
+   ![Image [16]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/project-design/20210505183440.png)
 
-  双击图标，可修改名称
+   双击图标，可修改名称
 
-  ![Image [17]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/project-design/20210505183445.png)
+   ![Image [17]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/project-design/20210505183445.png)
 
 3. 导出图片
 
-  右击bpmn文件，选择【Refactor】-->【Rename】，修改其扩展名为.xml，点击【Refactor】
+   右击bpmn文件，选择【Refactor】-->【Rename】，修改其扩展名为.xml，点击【Refactor】
 
-  ![Image [18]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/project-design/20210505183453.png)
+   ![Image [18]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/project-design/20210505183453.png)
 
-  接着右击此xml文件，选择【Diagrams】-->【Show BPMN 2.0 Diagrams...】，打开如下界面
+   接着右击此xml文件，选择【Diagrams】-->【Show BPMN 2.0 Diagrams...】，打开如下界面
 
-  ![Image [19]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/project-design/20210505183459.png)
+   ![Image [19]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/project-design/20210505183459.png)
 
-  点击上图中【Export to file】图标，弹出【Save as image】窗口，点击【OK】即可导出png图片
+   点击上图中【Export to file】图标，弹出【Save as image】窗口，点击【OK】即可导出png图片
 
-  ![Image [20]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/project-design/20210505183507.png)
+   ![Image [20]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/project-design/20210505183507.png)
 
 4. 解决中文乱码问题
 
-  在IDEA的安装目录，在下面两个文件中加上-Dfile.encoding=UTF-8
+   在IDEA的安装目录，在下面两个文件中加上-Dfile.encoding=UTF-8
 
-  ![Image [21]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/project-design/20210505183515.png)
+   ![Image [21]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/project-design/20210505183515.png)
 
-  ![Image [22]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/project-design/20210505183524.png)
+   ![Image [22]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/project-design/20210505183524.png)
 
-  重启IDEA，乱码问题解决
+   重启IDEA，乱码问题解决
 
-  ![Image [23]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/project-design/20210505183529.png)
+   ![Image [23]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/project-design/20210505183529.png)
 
 ## 3.为什么选择Activiti
 ![Image [24]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/project-design/20210505183537.png)

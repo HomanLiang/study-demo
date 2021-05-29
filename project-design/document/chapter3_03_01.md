@@ -72,9 +72,9 @@ public ResponseData<Object> defaultErrorHandler(HttpServletRequest req, Exceptio
 
 ## 4.APM 监控
 
-apm(Application Performance Management) 除了对服务的调用链，性能进行详情的监控，同时对异常信息也有较好的监控。
+`apm` (`Application Performance Management`) 除了对服务的调用链，性能进行详情的监控，同时对异常信息也有较好的监控。
 
-常见的 apm 有 skywalking，pinpoint，cat 等，以 cat 来举例，problem 报表中展示的就是应用的错误信息，而且在 cat 的首页大盘中会按分钟展示各个应用的错误情况，如果有大量错误，大盘的颜色的就是红色，当你看到一片飘红的时候，那就是异常太多了。
+常见的 `apm` 有 `skywalking`，`pinpoint`，`cat` 等，以 `cat` 来举例，`problem` 报表中展示的就是应用的错误信息，而且在 `cat` 的首页大盘中会按分钟展示各个应用的错误情况，如果有大量错误，大盘的颜色的就是红色，当你看到一片飘红的时候，那就是异常太多了。
 
 ![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/project-design/20210424002511.png)
 

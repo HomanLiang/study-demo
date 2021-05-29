@@ -4,25 +4,25 @@
 
 # 日志库
 
-## 日志框架，选择Logback Or Log4j2？
+## 1.日志框架，选择Logback Or Log4j2？
 
 总结一下就是：
 
 - logback性能测试同步和异步TPS相差不大
 - 都9102年了还在用logback
 
-### 服务器硬件
+### 1.1.服务器硬件
 
 - CPU 六核
 - 内存 8G
 
-### 测试工具
+### 1.2.测试工具
 
 - JMeter
 - JProfile
 - APM(New Relic)
 
-### logback日志框架同步和异步测试
+### 1.3.logback日志框架同步和异步测试
 
 之前的测试结果存在以下几点问题：
 
@@ -60,7 +60,7 @@ TPS变化不明显的原因如下： TPS为每秒处理事务数，每个事务�
 
 服务器自己的内部请求包括访问数据库、处理逻辑和打印日志，同步和异步中唯一不同的就是打印日志的方式。而从测试结果来看，打印日志耗时只占API访问请求的5.3%，所以缩短打印日志耗时不能很明显的提高TPS，因为打印时间和网络请求、业务处理消耗时间可以忽略不计 但是测试结果表明，虽然使用异步输出方式不能明显提高TPS，但是能够减少打印日志的耗时。所以使用logback日志框架还是推荐使用异步输出方式
 
-### 推荐使用log4j2而不是logback
+### 1.4.推荐使用log4j2而不是logback
 
 log4j2是log4j 1.x 的升级版，参考了logback的一些优秀的设计，并且修复了一些问题，带来了一些重大的提升，在异步方面的性能得到了巨大提升，其除了提供Async Append异步实现外还提供了Async Log异步实现，其中Async Append异步实现方式和logback的异步实现差不多，而Async Log基于LMAX Disruptor库，实现了一个高性能的异步记录器。本次测试中log4j2异步实现是基于Async Log。 JMeter测试参数和之前的logback测试一样，线程数200，循环次数100，重复五轮。并且logj2日志配置文件基本和logback异步配置相同，满足：
 
@@ -81,7 +81,7 @@ log4j2是log4j 1.x 的升级版，参考了logback的一些优秀的设计，并
 
 **TPS提升了6倍！！！**，并且打印日志的耗时都快到统计不出来了 官方提供的测试报告中，log4j2和logback相比性能提升更明显。附官方测试报告：[Asynchronous Loggers for Low-Latency Logging](https://logging.apache.org/log4j/log4j-2.3/manual/async.html)
 
-### 结论
+### 1.5.结论
 
 - 如果使用logback框架，推荐使用异步输出日志方式
 - 选择日志框架，推荐使用log4j2

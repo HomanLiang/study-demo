@@ -9,22 +9,22 @@
 [官方文档](https://arthas.aliyun.com/doc/)
 
 ## 2.简介
-Arthas是Alibaba开源的Java诊断工具，深受开发者喜爱。它采用命令行交互模式，同时提供丰富的 Tab 自动补全功能，进一步方便进行问题的定位和诊断。
+`Arthas` 是 `Alibaba` 开源的 `Java` 诊断工具，深受开发者喜爱。它采用命令行交互模式，同时提供丰富的 `Tab` 自动补全功能，进一步方便进行问题的定位和诊断。
 
 ## 3.安装
 > 为了还原一个真实的线上环境，我们将通过Arthas来对Docker容器中的Java程序进行诊断。
 
-1. 使用arthas-boot，下载对应jar包，下载地址：https://alibaba.github.io/arthas/arthas-boot.jar
+1. 使用 `arthas-boot`，下载对应 `jar` 包，下载地址：https://alibaba.github.io/arthas/arthas-boot.jar
 
-2. 将我们的Spring Boot应用mall-tiny-arthas使用Docker容器的方式启动起来，打包和运行脚本在项目的src\main\docker目录下；
+2. 将我们的 `Spring Boot` 应用 `mall-tiny-arthas` 使用 `Docker` 容器的方式启动起来，打包和运行脚本在项目的 `src\main\docker` 目录下；
 
-1. 将arthas-boot.jar拷贝到我们应用容器的\目录下；
+1. 将 `arthas-boot.jar` 拷贝到我们应用容器的 `\` 目录下；
 
     ```
     docker container cp arthas-boot.jar mall-tiny-arthas:/
     ```
 
-4. 进入容器并启动arthas-boot，直接当做jar包启动即可；
+4. 进入容器并启动 `arthas-boot`，直接当做 `jar` 包启动即可；
 
     ```
     docker exec -it mall-tiny-arthas /bin/bash
@@ -33,21 +33,21 @@ Arthas是Alibaba开源的Java诊断工具，深受开发者喜爱。它采用命
 
 5. 启动成功后，选择当前需要诊断的Java程序的序列号，这里是1，就可以开始诊断了；
 
-  ![Image](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/project-design/20210424182319.png)
+    ![Image](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/project-design/20210424182319.png)
 
 6. 期间会下载一些所需的文件，完成后控制台打印信息如下，至此Arthas就安装启动完成了。
 
-  ![Image [2]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/project-design/20210424182336.png)
+   ![Image [2]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/project-design/20210424182336.png)
 
 ## 4.常用命令
 > 我们先来介绍一些Arthas的常用命令，会结合实际应用来讲解，带大家了解下Arthas的使用。
 
-### dashboard
-使用dashboard命令可以显示当前系统的实时数据面板，包括线程信息、JVM内存信息及JVM运行时参数。
+### 4.1.dashboard
+使用 `dashboard` 命令可以显示当前系统的实时数据面板，包括线程信息、JVM内存信息及JVM运行时参数。
 
 ![Image [3]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/project-design/20210424182353.png)
 
-### thread
+### 4.2.thread
 查看当前线程信息，查看线程的堆栈，可以找出当前最占CPU的线程。
 
 ![Image [4]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/project-design/20210424182405.png)
@@ -64,7 +64,7 @@ thread -b
 thread -state WAITING
 ```
 
-### sysprop
+### 4.3.sysprop
 查看当前JVM的系统属性，比如当容器时区与宿主机不一致时，可以使用如下命令查看时区信息。
 ```
 sysprop |grep timezone
@@ -73,20 +73,20 @@ sysprop |grep timezone
 user.timezone                  Asia/Shanghai
 ```
 
-### sysenv
+### 4.4.sysenv
 查看JVM的环境属性，比如查看下我们当前启用的是什么环境的Spring Boot配置。
 
 ![Image [5]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/project-design/20210424182415.png)
 
-### logger
-使用logger命令可以查看日志信息，并改变日志级别，这个命令非常有用。
+### 4.5.logger
+使用 `logger` 命令可以查看日志信息，并改变日志级别，这个命令非常有用。
 
-比如我们在生产环境上一般是不会打印DEBUG级别的日志的，当我们在线上排查问题时可以临时开启DEBUG级别的日志，帮助我们排查问题，下面介绍下如何操作。
-- 我们的应用默认使用的是INFO级别的日志，使用logger命令可以查看；
+比如我们在生产环境上一般是不会打印 `DEBUG` 级别的日志的，当我们在线上排查问题时可以临时开启 `DEBUG` 级别的日志，帮助我们排查问题，下面介绍下如何操作。
+- 我们的应用默认使用的是 `INFO` 级别的日志，使用 `logger` 命令可以查看；
 
   ![Image [6]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/project-design/20210424182426.png)
 
-- 使用如下命令改变日志级别为DEBUG，需要使用-c参数指定类加载器的HASH值；
+- 使用如下命令改变日志级别为 `DEBUG` ，需要使用 `-c` 参数指定类加载器的HASH值；
 
     ```
     logger -c 21b8d17c --name ROOT --level debug
@@ -96,7 +96,7 @@ user.timezone                  Asia/Shanghai
 
   ![Image [7]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/project-design/20210424182443.png)
 
-- 使用docker logs -f mall-tiny-arthas命令查看容器日志，发现已经打印了DEBUG级别的日志；
+- 使用 `docker logs -f mall-tiny-arthas` 命令查看容器日志，发现已经打印了DEBUG级别的日志；
 
   ![Image [8]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/project-design/20210424182452.png)
 
@@ -106,9 +106,9 @@ user.timezone                  Asia/Shanghai
     logger -c 21b8d17c --name ROOT --level info
     ```
 
-### sc
-查看JVM已加载的类信息，Search-Class的简写，搜索出所有已经加载到 JVM 中的类信息。
-- 搜索com.macro.mall包下所有的类；
+### 4.6.sc
+查看JVM已加载的类信息，`Search-Class` 的简写，搜索出所有已经加载到 JVM 中的类信息。
+- 搜索 `com.macro.mall` 包下所有的类；
 
     ```
     sc com.macro.mall.*
@@ -124,7 +124,7 @@ user.timezone                  Asia/Shanghai
 
 	![Image [10]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/project-design/20210424182805.png)
 
-- 打印出类的Field信息，使用-f参数。
+- 打印出类的Field信息，使用 `-f` 参数。
 
     ```
     sc -d -f com.macro.mall.tiny.common.api.CommonResult
@@ -132,8 +132,8 @@ user.timezone                  Asia/Shanghai
 
 	![Image [11]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/project-design/20210424182828.png)
 
-### sm
-查看已加载类的方法信息，Search-Method的简写，搜索出所有已经加载的类的方法信息。
+### 4.7.sm
+查看已加载类的方法信息，`Search-Method` 的简写，搜索出所有已经加载的类的方法信息。
 - 查看类中的所有方法；
 
     ```
@@ -142,7 +142,7 @@ user.timezone                  Asia/Shanghai
 
 	![Image [12]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/project-design/20210424182933.png)
 
-- 查看指定方法信息，使用-d参数并指定方法名称；
+- 查看指定方法信息，使用 `-d` 参数并指定方法名称；
 
     ```
     sm -d com.macro.mall.tiny.common.api.CommonResult getCode
@@ -150,7 +150,7 @@ user.timezone                  Asia/Shanghai
 
 	![Image [13]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/project-design/20210424182957.png)
 
-### jad
+### 4.8.jad
 反编译已加载类的源码，觉得线上代码和预期不一致，可以反编译看看。
 - 查看启动类的相关信息，默认会带有ClassLoader信息；
 
@@ -160,7 +160,7 @@ user.timezone                  Asia/Shanghai
 
 	![Image [14]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/project-design/20210424183023.png)
 
-- 使用--source-only参数可以只打印类信息。
+- 使用 `--source-only` 参数可以只打印类信息。
 
     ```
     jad --source-only com.macro.mall.tiny.MallTinyApplication
@@ -168,20 +168,20 @@ user.timezone                  Asia/Shanghai
 
 	![Image [15]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/project-design/20210424183045.png)
 
-### mc
-内存编译器，Memory Compiler的缩写，编译.java文件生成.class。
+### 4.9.mc
+内存编译器，`Memory Compiler` 的缩写，编译 `.java` 文件生成 `.class`。
 
-### redefine
-加载外部的.class文件，覆盖掉 JVM中已经加载的类。
+### 4.10.redefine
+加载外部的 `.class` 文件，覆盖掉 `JVM` 中已经加载的类。
 
-### monitor
+### 4.11.monitor
 实时监控方法执行信息，可以查看方法执行成功此时、失败次数、平均耗时等信息。
 ```
 monitor -c 5 com.macro.mall.tiny.controller.PmsBrandController listBrand
 ```
 ![Image [16]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/project-design/20210424183056.png)
 
-### watch
+### 4.12.watch
 方法执行数据观测，可以观察方法执行过程中的参数和返回值。
 
 使用如下命令观察方法执行参数和返回值，-x表示结果属性遍历深度。
@@ -191,9 +191,9 @@ watch com.macro.mall.tiny.service.impl.PmsBrandServiceImpl listBrand "{params,re
 ![Image [17]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/project-design/20210424183106.png)
 
 ## 5.热更新
-> 尽管在线上环境热更代码并不是一个很好的行为，但有的时候我们真的很需要热更代码。下面介绍下如何使用jad/mc/redefine来热更新代码。
+> 尽管在线上环境热更代码并不是一个很好的行为，但有的时候我们真的很需要热更代码。下面介绍下如何使用 `jad/mc/redefine` 来热更新代码。
 
-- 首先我们有一个商品详情的接口，当我们传入id<=0时，会抛出IllegalArgumentException；
+- 首先我们有一个商品详情的接口，当我们传入 `id<=0` 时，会抛出 `IllegalArgumentException` ；
 
     ```
     /**
@@ -233,7 +233,7 @@ watch com.macro.mall.tiny.service.impl.PmsBrandServiceImpl listBrand "{params,re
     }
     ```
 
-- 我们想对该问题进行修复，如果传入id<=0时，直接返回空数据的CommonResult，代码修改内容如下；
+- 我们想对该问题进行修复，如果传入 `id<=0` 时，直接返回空数据的 `CommonResult` ，代码修改内容如下；
 
     ```
     /**
@@ -262,7 +262,7 @@ watch com.macro.mall.tiny.service.impl.PmsBrandServiceImpl listBrand "{params,re
     }
     ```
 
-- 首先我们需要对PmsBrandController类代码进行修改，接着上传到服务器，然后使用如下命令将java文件拷贝到容器的/tmp目录下；
+- 首先我们需要对 `PmsBrandController` 类代码进行修改，接着上传到服务器，然后使用如下命令将 `java` 文件拷贝到容器的 `/tmp` 目录下；
 
     ```
     docker container cp /tmp/PmsBrandController.java mall-tiny-arthas:/tmp/
@@ -276,7 +276,7 @@ watch com.macro.mall.tiny.service.impl.PmsBrandServiceImpl listBrand "{params,re
 
 	![Image [18]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/project-design/20210424183319.png)
 
-- 之后使用内存编译器把改.java文件编译成.class文件，注意需要使用-c指定类加载器；
+- 之后使用内存编译器把改 `.java` 文件编译成 `.class` 文件，注意需要使用 `-c` 指定类加载器；
 
     ```
     mc -c 21b8d17c /tmp/PmsBrandController.java -d /tmp
@@ -284,7 +284,7 @@ watch com.macro.mall.tiny.service.impl.PmsBrandServiceImpl listBrand "{params,re
 
 	![Image [19]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/project-design/20210424183329.png)
 
-- 最后使用redefine命令加载.class文件，将原来加载的类覆盖掉；
+- 最后使用 `redefine` 命令加载 `.class` 文件，将原来加载的类覆盖掉；
 
     ```
     redefine -c 21b8d17c /tmp/com/macro/mall/tiny/controller/PmsBrandController.class
@@ -292,7 +292,7 @@ watch com.macro.mall.tiny.service.impl.PmsBrandServiceImpl listBrand "{params,re
 
 	![Image [20]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/project-design/20210424183341.png)
 
-- 我们再次调用接口进行测试，发现已经返回了预期的结果，调用地址：http://192.168.3.101:8088/brand/0
+- 我们再次调用接口进行测试，发现已经返回了预期的结果，调用地址：`http://192.168.3.101:8088/brand/0`
 
     ```
     {
@@ -318,11 +318,11 @@ watch com.macro.mall.tiny.service.impl.PmsBrandServiceImpl listBrand "{params,re
 
 ##### 6.1.2.1.分析代码
 
-渠道系统是一个常见的spring-boot web工程，使用了集成的tomcat。分析了代码之后，发现并没有特殊的地方，没有特殊的过滤器或者拦截器，所以初步排除是业务代码问题
+渠道系统是一个常见的 `spring-boot web`工程，使用了集成的 `tomcat`。分析了代码之后，发现并没有特殊的地方，没有特殊的过滤器或者拦截器，所以初步排除是业务代码问题
 
 ##### 6.1.2.2.分析调用流程
 
-出现这个问题之后，首先确认了下接口的调用流程。由于是内部测试，所以调用流程较少。关注公众号码猿技术专栏获取更多面试资源。
+出现这个问题之后，首先确认了下接口的调用流程。由于是内部测试，所以调用流程较少。
 
 ```
 Nginx -反向代理-> 渠道系统
@@ -330,7 +330,7 @@ Nginx -反向代理-> 渠道系统
 
 公司是云服务器，网络走的也是云的内网。由于不明确问题的原因，所以用排除法，首先确认服务器网络是否有问题。
 
-先确认发送端到Nginx Host是否有问题：
+先确认发送端到 `Nginx Host` 是否有问题：
 
 ```
 [jboss@VM_0_139_centos ~]$ ping 10.0.0.139
