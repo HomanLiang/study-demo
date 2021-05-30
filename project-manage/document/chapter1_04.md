@@ -6,7 +6,7 @@
 
 ## 1.仅仅判断是否存在时，select count 比 select 具体的列，更好。
 
-我们经常遇到类似的业务场景，如，判断某个用户`userId`是否是会员。
+我们经常遇到类似的业务场景，如，判断某个用户 `userId` 是否是会员。
 
 **反例：**一些小伙伴会这样实现，先从用户信息表查出用户记录，然后再去判断是否是会员:
 
@@ -21,7 +21,7 @@ boolean isVip (String userId){
 }
 ```
 
-**正例：**针对这种业务场景，其实更好的实现，是直接`select count`一下，或者`select limit 1`，如下：
+**正例：**针对这种业务场景，其实更好的实现，是直接 `select count` 一下，或者 `select limit 1`，如下：
 
 ```
 <select id="countVipUserByUserId" resultType="java.lang.Integer">
@@ -44,11 +44,11 @@ if(isUserVip && isFirstLogin){
 }
 ```
 
-假设总共有 5 个请求进来，isUserVip 通过的有 3 个请求，isFirstLogin 通过的有 1 个请求。那么以上代码，isUserVip 执行的次数为 5 次，isFirstLogin 执行的次数是 3 次，如下：
+假设总共有 5 个请求进来，`isUserVip` 通过的有 3 个请求，`isFirstLogin` 通过的有 1 个请求。那么以上代码，`isUserVip` 执行的次数为 5 次，`isFirstLogin` 执行的次数是 3 次，如下：
 
 ![图片](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/project-manage/20210503193618.png)
 
-如果调整一下 isUserVip 和 isFirstLogin 的顺序呢？
+如果调整一下 `isUserVip` 和 `isFirstLogin` 的顺序呢？
 
 ```
 if(isFirstLogin && isUserVip ){
@@ -60,9 +60,9 @@ isFirstLogin 执行的次数是 5 次，isUserVip 执行的次数是 1 次，如
 
 ![图片](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/project-manage/20210503193623.png)
 
-如果你的 isFirstLogin，判断逻辑只是 select count 一下数据库表，isUserVip 也是 select count 一下数据库表的话，显然，把 isFirstLogin 放在前面更高效。
+如果你的 `isFirstLogin`，判断逻辑只是 `select count` 一下数据库表，`isUserVip` 也是 `select count` 一下数据库表的话，显然，把 `isFirstLogin` 放在前面更高效。
 
-## 3.写查询 Sql 的时候，只查你需要用到的字段，还有通用的字段，拒绝反手的 select *。 
+## 3.写查询 Sql 的时候，只查你需要用到的字段，还有通用的字段，拒绝反手的 `select *`。 
 
 **反例：**
 
@@ -83,7 +83,7 @@ select * from user_info where user_id =#{userId};
 
 ## 4. 优化你的程序，拒绝创建不必要的对象。 
 
-如果你的变量，后面的逻辑判断，一定会被赋值；或者说，只是一个字符串变量，直接初始化字符串常量就可以了，没有必要愣是要 new String().
+如果你的变量，后面的逻辑判断，一定会被赋值；或者说，只是一个字符串变量，直接初始化字符串常量就可以了，没有必要愣是要 `new String()`.
 
 反例：
 
@@ -103,7 +103,7 @@ String s=  "捡田螺的小男孩 ”;
 
 ![图片](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/project-manage/20210503193647.png)
 
-假设你的 map 要存储的元素个数是 15 个左右，最优写法如下：
+假设你的 `map` 要存储的元素个数是 15 个左右，最优写法如下：
 
 ```
  //initialCapacity = 15/0.75+1=21
@@ -121,7 +121,7 @@ String s=  "捡田螺的小男孩 ”;
 try{
   // do something
 }catch(Exception e){
-  log.info("捡田螺的小男孩，你的程序有异常啦");
+  log.error("捡田螺的小男孩，你的程序有异常啦");
 }
 ```
 
@@ -131,17 +131,17 @@ try{
 try{
   // do something
 }catch(Exception e){
-  log.info("捡田螺的小男孩，你的程序有异常啦：",e); //把exception打印出来
+  log.error("捡田螺的小男孩，你的程序有异常啦：",e); //把exception打印出来
 }
 ```
 
 **理由：**
 
-- 反例中，并没有把 exception 打印出来，到时候排查问题就不好查了，到底是 SQl 写错的异常还是 IO 异常，还是其他呢？所以应该把 exception 打印到日志中哦~
+- 反例中，并没有把 `exception` 打印出来，到时候排查问题就不好查了，到底是 SQl 写错的异常还是 IO 异常，还是其他呢？所以应该把 `exception` 打印到日志中哦~
 
 ## 7. 打印日志的时候，对象没有覆盖 Object 的 toString 的方法，直接把类名打印出来了。
 
-我们在打印日志的时候，经常想看下一个请求参数对象 request 是什么。于是很容易有类似以下这些代码：
+我们在打印日志的时候，经常想看下一个请求参数对象 `request` 是什么。于是很容易有类似以下这些代码：
 
 ```
 publick Response dealWithRequest(Request request){
@@ -155,7 +155,7 @@ publick Response dealWithRequest(Request request){
 请求参数是：local.Request@49476842
 ```
 
-这是因为对象的 toString 方法，默认的实现是“类名@散列码的无符号十六进制”。所以你看吧，这样子打印日志就没啥意思啦，你都不知道打印的是什么内容。
+这是因为对象的 `toString` 方法，默认的实现是 `类名@散列码的无符号十六进制`。所以你看吧，这样子打印日志就没啥意思啦，你都不知道打印的是什么内容。
 
 所以一般对象（尤其作为传参的对象），**都覆盖重写 toString() 方法**：
 
@@ -241,7 +241,7 @@ public class MainTest {
     public static void main(String[] args) throws FileNotFoundException {
         long begin = System.currentTimeMillis();
         try (FileInputStream input = new FileInputStream("C:/456.png");
-             FileOutputStream output = new FileOutputStream("C:/789.png")) {
+            FileOutputStream output = new FileOutputStream("C:/789.png")) {
             byte[] bytes = new byte[1024];
             int i;
             while ((i = input.read(bytes)) != -1) {
@@ -321,7 +321,7 @@ private int insertUserVip（String userId）{
 }
 ```
 
-很显然，以上程序代码，已经查到 userInfo，然后又把 userId 传下去，又查多了一次。实际上，可以把 userInfo 传下去的，这样可以省去一次查表操作，程序更高效。
+很显然，以上程序代码，已经查到 `userInfo`，然后又把 `userId` 传下去，又查多了一次。实际上，可以把 `userInfo` 传下去的，这样可以省去一次查表操作，程序更高效。
 
 **正例：**
 
@@ -409,7 +409,7 @@ public class Task {
 
 ## 13. 注意检验空指针，不要轻易相信业务，说正常逻辑某个参数不可能为空。
 
-NullPointerException 在我们日常开发中非常常见，我们代码开发过程中，一定要对空指针保持灵敏的嗅觉。
+`NullPointerException` 在我们日常开发中非常常见，我们代码开发过程中，一定要对空指针保持灵敏的嗅觉。
 
 主要有这几类空指针问题：
 
@@ -495,7 +495,7 @@ JDK8 出现了新特性-Lambda 表达式。Lambda 表达式不仅比匿名内部
 
 ![图片](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/project-manage/20210503193709.png)
 
-假设提供 sendMsgNotify 服务的系统挂了，或者调用 sendMsgNotify 失败了，那么用户登录就失败了。一个通知功能导致了登录主流程不可用，明显的捡了芝麻丢西瓜。那么有没有鱼熊掌兼得的方法呢？有的，给发短信接口捕获异常处理，或者另开线程异步处理，如下：
+假设提供 `sendMsgNotify` 服务的系统挂了，或者调用 `sendMsgNotify` 失败了，那么用户登录就失败了。一个通知功能导致了登录主流程不可用，明显的捡了芝麻丢西瓜。那么有没有鱼熊掌兼得的方法呢？有的，给发短信接口捕获异常处理，或者另开线程异步处理，如下：
 
 ![图片](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/project-manage/20210503193712.png)
 
@@ -503,7 +503,7 @@ JDK8 出现了新特性-Lambda 表达式。Lambda 表达式不仅比匿名内部
 
 ## 17. 处理 Java 日期时，当心 YYYY 格式设置的问题。
 
-日常开发中，我们经常需要处理日期。我们要当心日期格式化的时候，年份是大写`YYYY`的坑。
+日常开发中，我们经常需要处理日期。我们要当心日期格式化的时候，年份是大写 `YYYY` 的坑。
 
 ```
 Calendar calendar = Calendar.getInstance();
@@ -537,17 +537,17 @@ public final class Tools {
 }
 ```
 
-一个类指定了 final 修饰符，它就不会被继承了，并且其所有方法都是 final 的了。Java 编译器会找机会内联所有的 final 方法，提升了 Java 运行效率。
+一个类指定了 `final` 修饰符，它就不会被继承了，并且其所有方法都是 `final` 的了。`Java` 编译器会找机会内联所有的 `final` 方法，提升了 `Java` 运行效率。
 
 ## 19.static 静态变量不要依赖 spring 实例化变量，可能会导致初始化出错。
 
-之前看到项目有类似的代码，静态变量依赖于 spring 容器的 bean。
+之前看到项目有类似的代码，静态变量依赖于 `spring` 容器的 `bean`。
 
 ```
  private static SmsService smsService = SpringContextUtils.getBean(SmsService.class);
 ```
 
-这个静态的 smsService 有可能获取不到，因为类加载顺序不是确定的，而以上的代码，静态的 smsService 初始化强制依赖 spring 容器的实例了。正确的写法可以这样，如下：
+这个静态的 `smsService` 有可能获取不到，因为类加载顺序不是确定的，而以上的代码，静态的 `smsService` 初始化强制依赖 `spring` 容器的实例了。正确的写法可以这样，如下：
 
 ```
  private static SmsService  smsService =null;
@@ -565,7 +565,7 @@ public final class Tools {
 
 有些方法，与实例成员变量无关，就可以声明为静态方法。这一点，工具类用得很多。
 
-**反例****：**
+**反例**：
 
 ```
 /**
@@ -573,7 +573,7 @@ public final class Tools {
  */
 public class BigDecimalUtils {
  
-    public  BigDecimal ifNullSetZERO(BigDecimal in) {
+    public BigDecimal ifNullSetZERO(BigDecimal in) {
         return in != null ？ in : BigDecimal.ZERO;
     }
  
@@ -586,7 +586,7 @@ public class BigDecimalUtils {
     }
 ```
 
-因为 BigDecimalUtils 工具类的方法都没有 static 修饰，所以，你要使用的时候，每次都要 new 一下，那不就耗资源去**反复创建对象**了嘛！！
+因为 `BigDecimalUtils` 工具类的方法都没有 `static` 修饰，所以，你要使用的时候，每次都要 `new` 一下，那不就耗资源去**反复创建对象**了嘛！！
 
 ```
 BigDecimalUtils bigDecimalUtils = new BigDecimalUtils（）;
@@ -794,7 +794,7 @@ System.out.println(new BigDecimal(0.1).add(new BigDecimal(0.2)));
 
 大家应该都有过这样的经历，windows 系统桌面如果打开太多文件或者系统软件，就会觉得电脑很卡。当然，我们 linux 服务器也一样，平时操作文件，或者数据库连接，IO 资源流如果没关闭，那么这个 IO 资源就会被它占着，这样别人就没有办法用了，这就造成资源浪费。
 
-所以使用完 IO 流，记得关闭。可以使用 try-with-resource 关闭：
+所以使用完 IO 流，记得关闭。可以使用 `try-with-resource` 关闭：
 
 ```
 /*
@@ -839,7 +839,7 @@ public class AccumulatorUtil {
 
 ## 28. 如果数据库一次查询的数量过多，建议分页处理。
 
-如果你的 Sql 一次性查出来的数据量比较多，建议分页处理。
+如果你的 `Sql` 一次性查出来的数据量比较多，建议分页处理。
 
 **反例：**
 
@@ -885,7 +885,7 @@ for (int i = 0,  length = list.size; i < length; i++){
 
 理由：
 
-- 对方法的调用，即使是只有一个语句，也是有消耗的，比如创建栈帧。如果 list 比较大时，多次调用 list.size 也是会有资源消耗的。
+- 对方法的调用，即使是只有一个语句，也是有消耗的，比如创建栈帧。如果 `list` 比较大时，多次调用 `list.size` 也是会有资源消耗的。
 
 ## 30.修改对外老接口的时候，思考接口的兼容性。
 
@@ -936,7 +936,7 @@ public class ArrayListTest {
 }
 ```
 
-因为返回的是 Object 类型，Object 类型数组强转 String 数组，会发生 ClassCastException。解决方案是，使用 toArray() 重载方法 toArray(T[] a)。
+因为返回的是 `Object` 类型，`Object` 类型数组强转 `String` 数组，会发生 `ClassCastException`。解决方案是，使用 `toArray()` 重载方法 `toArray(T[] a)`。
 
 ```
 String[] array1 = list.toArray(new String[0]);//可以正常运行
@@ -1029,9 +1029,9 @@ if(deleteAvailableTicketById(ticketId) == 1){ //原子操作
 
 ## 37. 直接大文件或者一次性从数据库读取太多数据到内存，可能导致 OOM 问题。
 
-如果一次性把大文件或者数据库太多数据读取到内存，是会导致 OOM 的。所以，为什么查询 DB 数据库，一般都建议分批。
+如果一次性把大文件或者数据库太多数据读取到内存，是会导致 `OOM` 的。所以，为什么查询 DB 数据库，一般都建议分批。
 
-读取文件的话，一般文件不会太大，才使用 Files.readAllLines()。为什么呢？因为它是直接把文件都读到内存的，预估下不会 OOM 才使用这个。可以看下它的源码：
+读取文件的话，一般文件不会太大，才使用 `Files.readAllLines()`。为什么呢？因为它是直接把文件都读到内存的，预估下不会 `OOM` 才使用这个。可以看下它的源码：
 
 ```
 public static List<String> readAllLines(Path path, Charset cs) throws IOException {
@@ -1048,7 +1048,7 @@ public static List<String> readAllLines(Path path, Charset cs) throws IOExceptio
 }
 ```
 
-如果是太大的文件，可以使用 Files.line() 按需读取。当然读取文件这些，一般是使用完需要关闭资源流的。
+如果是太大的文件，可以使用 `Files.line()` 按需读取。当然读取文件这些，一般是使用完需要关闭资源流的。
 
 ## 38. 调用第三方接口，需要考虑异常处理、安全性、超时重试这几个点。
 
@@ -1100,20 +1100,20 @@ public List<UserInfo> copyMergeList(List<UserInfo> user1List, List<UserInfo> use
 
 ## 41. 多线程情况下，考虑线性安全问题。
 
-在高并发情况下，HashMap 可能会出现死循环。因为它是非线性安全的，可以考虑使用 ConcurrentHashMap。所以这个也尽量养成习惯，不要上来反手就是一个 new HashMap()。
+在高并发情况下，`HashMap` 可能会出现死循环。因为它是非线性安全的，可以考虑使用 `ConcurrentHashMap`。所以这个也尽量养成习惯，不要上来反手就是一个 `new HashMap()`。
 
-- Hashmap、Arraylist、LinkedList、TreeMap 等都是线性不安全的；
-- Vector、Hashtable、ConcurrentHashMap 等都是线性安全的。
+- `Hashmap`、`Arraylist`、`LinkedList`、`TreeMap` 等都是线性不安全的；
+- `Vector`、`Hashtable`、`ConcurrentHashMap` 等都是线性安全的。
 
 ## 42. 使用 spring 事务功能时，注意这几个事务未生效的坑。
 
 日常业务开发中，我们经常跟事务打交道，事务失效主要有以下几个场景：
 
 - 底层数据库引擎不支持事务；
-- 在非 public 修饰的方法使用；
-- rollbackFor 属性设置错误；
+- 在非 `public` 修饰的方法使用；
+- `rollbackFor` 属性设置错误；
 - 本类方法直接调用；
-- 异常被 try...catch 吃了，导致事务失效。
+- 异常被 `try...catch` 吃了，导致事务失效。
 
 **反例：**
 
@@ -1149,7 +1149,7 @@ public class TransactionTest{
         }
 ```
 
-IDE 指定 JVM 参数：-Xmx8m -Xms8m :
+IDE 指定 JVM 参数：`-Xmx8m -Xms8m`:
 
 ![图片](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/project-manage/20210503193746.png)
 
@@ -1207,17 +1207,17 @@ try{
 
 ## 45. 接口需要考虑幂等性。
 
-接口是需要考虑幂等性的，尤其抢红包、转账这些重要接口。最直观的业务场景，就是用户连着点两次，你的接口有没有 hold 住。
+接口是需要考虑幂等性的，尤其抢红包、转账这些重要接口。最直观的业务场景，就是用户连着点两次，你的接口有没有 `hold` 住。
 
 一般幂等技术方案有这几种:
 
 - 查询操作；
 - 唯一索引；
-- token 机制，防止重复提交；
-- 数据库的 delete/update 操作；
+- `token` 机制，防止重复提交；
+- 数据库的 `delete`/`update` 操作；
 - 乐观锁；
 - 悲观锁；
-- Redis、zookeeper 分布式锁（以前抢红包需求，用了 Redis 分布式锁）；
+- `Redis`、`zookeeper` 分布式锁（以前抢红包需求，用了 `Redis` 分布式锁）；
 - 状态机幂等。
 
 ## 46. 对于行数比较多的函数，建议划分小函数，增强可读性。
@@ -1297,31 +1297,28 @@ public class Test {
 
 关键业务代码无论身处何地，都应该有足够的日志保驾护航。
 
-> ❝
->
 > 比如：你实现转账业务，转个几百万，然后转失败了，接着客户投诉，然后你还没有打印到日志，想想那种水深火热的困境下，你却毫无办法。。。
 >
-> ❞
 
 那么，你的转账业务都需要哪些日志信息呢？至少，方法调用前，入参需要打印需要吧，接口调用后，需要捕获一下异常吧，同时，要打印异常相关日志，如下：
 
 ```
 public void transfer(TransferDTO transferDTO){
-    log.info("invoke tranfer begin");
-    //打印入参
-    log.info("invoke tranfer,paramters:{}",transferDTO);
-    try {
-      res=  transferService.transfer(transferDTO);
-    }catch(Exception e){
-     log.error("transfer fail,cifno:{}，account：{}",transferDTO.getCifno（），
-     transferDTO.getaccount（）)
-     log.error("transfer fail,exception:{}",e);
-    }
-    log.info("invoke tranfer end");
-    }
+	log.info("invoke tranfer begin");
+	//打印入参
+	log.info("invoke tranfer,paramters:{}",transferDTO);
+	try {
+		res=  transferService.transfer(transferDTO);
+	}catch(Exception e){
+		log.error("transfer fail,cifno:{}，account：{}",transferDTO.getCifno（），
+		transferDTO.getaccount（）)
+		log.error("transfer fail,exception:{}",e);
+	}
+	log.info("invoke tranfer end");
+}
 ```
 
-除了打印足够的日志，我们还需要注意一点的是，日志级别别混淆使用，别本该打印 info 的日志，你却打印成 error 级别，告警半夜三更催你起来排查问题就不好了。
+除了打印足够的日志，我们还需要注意一点的是，日志级别别混淆使用，别本该打印 `info` 的日志，你却打印成 `error` 级别，告警半夜三更催你起来排查问题就不好了。
 
 ## 48. 某些可变因素，如红包皮肤等等，做成配置化是否会更好呢。
 
@@ -1451,68 +1448,7 @@ ublic class Test {
 
 如果你的数据库字段设置为varchar(16),对方传了一个32位的字符串过来，你不校验参数，**「插入数据库直接异常」**了。
 
-## 52.修改老接口的时候，思考接口的兼容性
-
-很多bug都是因为修改了对外老接口，但是却**「不做兼容导致」**的。关键这个问题多数是比较严重的，可能直接导致系统发版失败的。新手程序员很容易就犯这个错误了哦~
-
-所以，如果你的需求是在原来接口上修改，，尤其这个接口是对外提供服务的话，一定要考虑接口兼容。举个例子吧，比如dubbo接口，原本是只接收A，B参数，现在你加了一个参数C，就可以考虑这样处理。
-
-```
-//老接口
-void oldService(A,B);{
-  //兼容新接口，传个null代替C
-  newService(A,B,null);
-}
-
-//新接口，暂时不能删掉老接口，需要做兼容。
-void newService(A,B,C);
-```
-
-- **对于复杂的代码逻辑，添加清楚的注释**
-
-  写代码的时候，是没有必要写太多的注释的，好的方法变量命名就是最好的注释。但是，如果是**「业务逻辑很复杂的代码」**，真的非常有必要写**「清楚注释」**。清楚的注释，更有利于后面的维护。
-
-- **使用完IO资源流，需要关闭**
-
-  应该大家都有过这样的经历，windows系统桌面如果**「打开太多文件」**或者系统软件，就会觉得电脑很卡。当然，我们linux服务器也一样，平时操作文件，或者数据库连接，IO资源流如果没关闭，那么这个IO资源就会被它占着，这样别人就没有办法用了，这就造成**「资源浪费」**。
-
-  所以使用完IO流，可以使用finally关闭哈
-
-  ```
-  FileInputStream fdIn = null;
-  try {
-      fdIn = new FileInputStream(new File("/jay.txt"));
-  } catch (FileNotFoundException e) {
-      log.error(e);
-  } catch (IOException e) {
-      log.error(e);
-  }finally {
-      try {
-          if (fdIn != null) {
-              fdIn.close();
-          }
-      } catch (IOException e) {
-          log.error(e);
-      }
-  }
-  ```
-
-  JDK 7 之后还有更帅的关闭流写法，使用**「try-with-resource」**。
-
-  ```
-  /*
-   * 关注公众号，捡田螺的小男孩
-   */
-  try (FileInputStream inputStream = new FileInputStream(new File("jay.txt")) {
-      // use resources   
-  } catch (FileNotFoundException e) {
-      log.error(e);
-  } catch (IOException e) {
-      log.error(e);
-  }
-  ```
-
-## 53.手动写完代码业务的SQL，先拿去数据库跑一下，同时也explain看下执行计划。
+## 52.手动写完代码业务的SQL，先拿去数据库跑一下，同时也explain看下执行计划。
 
 手动写完业务代码的SQL，可以先把它拿到数据库跑一下，看看有没有语法错误嘛。有些小伙伴不好的习惯就是，写完就把代码打包上去测试服务器，其实把SQL放到数据库执行一下，可以规避很多错误的。
 
@@ -1522,7 +1458,7 @@ void newService(A,B,C);
 explain select * from user where userid =10086 or age =18;
 ```
 
-## 54.主从延迟问题考虑
+## 53.主从延迟问题考虑
 
 先插入，接着就去查询,这类代码逻辑比较常见，这**「可能」**会有问题的。一般数据库都是有主库，从库的。写入的话是写主库，读一般是读从库。如果发生主从延迟，，很可能出现你插入成功了，但是你查询不到的情况。
 
@@ -1530,7 +1466,7 @@ explain select * from user where userid =10086 or age =18;
 - 但是呢，有些业务场景是可以接受主从稍微延迟一点的，但是这个习惯还是要有吧。
 - 写完操作数据库的代码，想下是否存在主从延迟问题。
 
-## 55.使用缓存的时候，考虑跟DB的一致性，还有（缓存穿透、缓存雪崩和缓存击穿）
+## 54.使用缓存的时候，考虑跟DB的一致性，还有（缓存穿透、缓存雪崩和缓存击穿）
 
 通俗点说，我们使用缓存就是为了**「查得快，接口耗时小」**。但是呢，用到缓存，就需要**「注意缓存与数据库的一致性」**问题。同时，还需要规避缓存穿透、缓存雪崩和缓存击穿三大问题。
 
@@ -1538,7 +1474,7 @@ explain select * from user where userid =10086 or age =18;
 - 缓存穿透：指查询一个一定不存在的数据，由于缓存是不命中时需要从数据库查询，查不到数据则不写入缓存，这将导致这个不存在的数据每次请求都要到数据库去查询，进而给数据库带来压力。
 - 缓存击穿：指热点key在某个时间点过期的时候，而恰好在这个时间点对这个Key有大量的并发请求过来，从而大量的请求打到db。
 
-## 56.永远不要在代码中使用「User」这个单词！
+## 55.永远不要在代码中使用「User」这个单词！
 
 今天，我要告诉你的是一个经常犯的错误，一个会给你带来无穷无尽的问题的单词，那就是“users”。
 
@@ -1549,13 +1485,13 @@ explain select * from user where userid =10086 or age =18;
 
 “user” 的概念是模糊不清的，使用更精准的术语几乎总是能起到更好的效果。
 
-### 56.1.你没有使用者
+### 55.1.你没有使用者
 
 最开始，没有任何一个软件系统真的有使用者存在。乍一看“user”是一个好的描述，但是你稍微一想就会意识到你的业务逻辑实际上比这要复杂的多。
 
 我会使用三个例子，从一个极端的情况出发。
 
-**56.1.1.机票预订系统没有“users”**
+**55.1.1.机票预订系统没有“users”**
 
 我曾经给机票预订系统写过访问控制逻辑，下面只是一小部分需求：
 
@@ -1566,7 +1502,7 @@ explain select * from user where userid =10086 or age =18;
 
 不再一一列举。一些与人类相关的基本概念是“旅客”，“代理”（网站也可是看作代理）和“购买者”。“user”这个概念根本没用，并且在许多请求中我根本不会使用这个单词，举个例子，我们的请求必须包括旅客和代理人的证件，而不是使用者的证件。
 
-**56.1.2.Unix 没有 “users”**
+**55.1.2.Unix 没有 “users”**
 
 我们看一个不太一样的例子。Unix （这些天被称为POSIX）有用户，他们可以登录并执行代码。这样看起来很不错吧？我们深入看一下。
 
@@ -1580,7 +1516,7 @@ explain select * from user where userid =10086 or age =18;
 
 在操作上，因为POSIX的用户模型边界存在，我们甚至不能找到一种方式说“只能让 Alice 和 Bob 通过这个账号登录”。
 
-**56.1.3.SaaS 服务提供商没有 “users”**
+**55.1.3.SaaS 服务提供商没有 “users”**
 
 Jeremy Green 最近就用户模型在SaaS中的应用在推特上发文，它第一次提醒了我写下这篇文章，他的基本观点是SaaS 服务几乎总是：
 
@@ -1591,7 +1527,7 @@ Jeremy Green 最近就用户模型在SaaS中的应用在推特上发文，它第
 
 但是这只是众多例子中的一个：“users”的概念太模糊了。如果你开始怀疑“user”这个词，最终你可能发现最终你其实只需要两个概念：团队（用来组织关系和支付）和成员（实际使用服务的人）。
 
-### 56.2.“Users” 是一个安全问题
+### 55.2.“Users” 是一个安全问题
 
 “user” 这个单词不仅是业务逻辑的问题，它也导致了一系列安全问题。“user” 这个单词如此的模糊以至于从根本上将两个概念合并了：
 
@@ -1604,7 +1540,7 @@ Jeremy Green 最近就用户模型在SaaS中的应用在推特上发文，它第
 
 这就是被称为Confused Deputy的问题。如果你使用“用户”这个词来描述两个根本不同的东西，那么这个问题就更有可能成为你设计的一部分。
 
-### 56.3.前期设计的价值
+### 55.3.前期设计的价值
 
 花更少的功夫处理相同的问题是成为高产程序员的关键。使用模糊不清的概念比如“用户”来组织你的软件，将会话费大量时间和精力来解决未来发生的问题。一上来就开始编码看起来是高产的，事实恰好相反。
 
