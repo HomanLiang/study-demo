@@ -57,6 +57,8 @@
    1. [异常监控方式](https://github.com/HomanLiang/study-demo/blob/main/project-design/document/chapter3_03_01.md)
 4. 微信接口对接
    1. 微信扫码登录
+5. 钉钉开发
+   1. [企业内部应用开发](https://github.com/HomanLiang/study-demo/blob/main/project-design/document/chapter3_05_01.md)
 
 ## 分布式
 
