@@ -29,6 +29,8 @@
 
 [快速入门--开发小程序](https://developers.dingtalk.com/document/app/develop-org-mini-programs)
 
+[错误码](https://developers.dingtalk.com/document/app/server-api-error-codes-1)
+
 
 
 CorpId: ding604330ee9b78aaf035c2f4657eb6378f
