@@ -4,8 +4,8 @@
 
 # Redis Java API
 
-## Jedis
-1. 引用Jedis.jar
+## 1.Jedis
+1. 引用 `Jedis.jar`
 2. 连接到 redis 服务
 ```java
 import redis.clients.jedis.Jedis;
@@ -83,7 +83,7 @@ public class RedisKeyJava {
 
 
 
-## Jedis vs Lettuce
+## 2.Jedis vs Lettuce
 
 redis官方提供的java client有如图所示几种：
 ![Image](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/redis-demo/20210305211001.png)
@@ -95,8 +95,8 @@ Lettuce 是 一种可伸缩，线程安全，完全非阻塞的Redis客户端，
 
 下面介绍 springboot 2.0分别使用 jedis和 lettuce集成 redis服务
 
-### springboot 2.0 通过 lettuce集成Redis服务
-#### 导入依赖
+### 2.1.springboot 2.0 通过 lettuce集成Redis服务
+#### 2.1.1.导入依赖
 ```
 <dependencies>
         <dependency>
@@ -118,7 +118,7 @@ Lettuce 是 一种可伸缩，线程安全，完全非阻塞的Redis客户端，
         </dependency>
     </dependencies>
 ```
-#### application.properties配置文件
+#### 2.1.2.application.properties配置文件
 ```
 spring.redis.host=localhost
 spring.redis.port=6379
@@ -132,8 +132,8 @@ spring.redis.lettuce.pool.max-idle=8
 # 连接池中的最小空闲连接 默认为 0
 spring.redis.lettuce.pool.min-idle=0
 ```
-#### 自定义 RedisTemplate
-默认情况下的模板只能支持 RedisTemplate<String,String>，只能存入字符串，很多时候，我们需要自定义 RedisTemplate ，设置序列化器，这样我们可以很方便的操作实例对象。如下所示：
+#### 2.1.3.自定义 RedisTemplate
+默认情况下的模板只能支持 `RedisTemplate<String,String>`，只能存入字符串，很多时候，我们需要自定义 RedisTemplate ，设置序列化器，这样我们可以很方便的操作实例对象。如下所示：
 ```java
 @Configuration
 public class RedisConfig {
@@ -147,7 +147,7 @@ public class RedisConfig {
     }
 }
 ```
-#### 定义测试实体类
+#### 2.1.4.定义测试实体类
 ```java
 public class User implements Serializable {
     private static final long serialVersionUID = 4220515347228129741L;
@@ -166,7 +166,7 @@ public class User implements Serializable {
     //getter/setter 省略
 }
 ```
-#### 测试
+#### 2.1.5.测试
 ```java
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -184,8 +184,8 @@ public class RedisTest {
     }
 }
 ```
-### springboot 2.0 通过 jedis 集成Redis服务
-#### 导入依赖
+### 2.2.springboot 2.0 通过 jedis 集成Redis服务
+#### 2.2.1.导入依赖
 因为 springboot2.0中默认是使用 Lettuce来集成Redis服务，spring-boot-starter-data-redis默认只引入了 Lettuce包，并没有引入 jedis包支持。所以在我们需要手动引入 jedis的包，并排除掉 lettuce的包，pom.xml配置如下:
 ```
 <dependency>
@@ -216,7 +216,7 @@ public class RedisTest {
     <artifactId>jedis</artifactId>
 </dependency>
 ```
-#### application.properties配置
+#### 2.2.2.application.properties配置
 使用jedis的连接池
 ```
 spring.redis.host=localhost
@@ -227,7 +227,7 @@ spring.redis.jedis.pool.max-wait=-1ms
 spring.redis.jedis.pool.min-idle=0
 spring.redis.jedis.pool.max-active=8
 ```
-#### 配置 JedisConnectionFactory
+#### 2.2.3.配置 JedisConnectionFactory
 因为在 springoot 2.x版本中，默认采用的是 Lettuce实现的，所以无法初始化出 Jedis的连接对象 JedisConnectionFactory，所以我们需要手动配置并注入：
 ```java
 public class RedisConfig {
@@ -238,8 +238,10 @@ public class RedisConfig {
     }
 ```
 但是启动项目后发现报出了如下的异常：
+
 ![Image [2]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/redis-demo/20210305211101.png)
-redis连接失败，springboot2.x通过以上方式集成Redis并不会读取配置文件中的 spring.redis.host等这样的配置，需要手动配置,如下：
+
+redis连接失败，`springboot2.x` 通过以上方式集成Redis并不会读取配置文件中的 `spring.redis.host` 等这样的配置，需要手动配置,如下：
 
 ```java
 @Configuration
@@ -269,16 +271,18 @@ public class RedisConfig2 {
     }
 }
 ```
-通过以上方式就可以连接上 redis了，不过这里要提醒的一点就是，在springboot 2.x版本中 JedisConnectionFactory设置连接的方法已过时，如图所示：
+通过以上方式就可以连接上 redis了，不过这里要提醒的一点就是，在 `springboot 2.x` 版本中 `JedisConnectionFactory` 设置连接的方法已过时，如图所示：
+
 ![Image [3]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/redis-demo/20210305211201.png)
+
 在 springboot 2.x版本中推荐使用 RedisStandaloneConfiguration类来设置连接的端口，地址等属性
 
 然后是单元测试，与上面 Lettuce的例子代码一样，并且测试通过。
 
 
 
-## JedisPool
-### 连接池 JedisPool，为什么要用 JedisPool
+## 3.JedisPool
+### 3.1.连接池 JedisPool，为什么要用 JedisPool
 首先我们如果每次使用缓存都生成一个 Jedis 对象的话，这样意味着会建立很多 socket 连接，造成系统资源被不可控调用，甚至会导致奇怪错误的发生。
 
 如果使用单例模式，在线程安全模式下适应不了高并发的需求，非线程安全模式又可能会出现与时间相关的错误。
@@ -287,13 +291,13 @@ public class RedisConfig2 {
 
 我们可以理解成项目中的数据库连接池，例如：阿里巴巴的 druid~
 
-#### 直连和使用连接池的对比
+#### 3.1.1.直连和使用连接池的对比
 |        | 优点                                                      | 缺点                                                         |
 | :----- | :-------------------------------------------------------- | :----------------------------------------------------------- |
 | 直连   | 简单方便适用于少量长期连接的场景                          | 存在每次新建/关闭TCP开销，资源无法控制，存在连接泄露的可能，Jedis对象线程不安全 |
 | 连接池 | Jedis预先生成，降低开销，连接池的形式保护和控制资源的使用 | 相对于直连，使用相对麻烦，尤其在资源管理上需要很多参数来保证，一旦规划不合理也会出现问题。 |
 
-### 如何创建 JedisPool 实例和 Jedis 实例对象
+### 3.2.如何创建 JedisPool 实例和 Jedis 实例对象
 ![Image [4]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/redis-demo/20210305211501.png)
 ```java
 private static JedisPool pool = null;
@@ -328,12 +332,13 @@ public static void returnResource(Jedis jedis) {
     }
 }
 ```
-### JedisPool 属性配置（JedisPoolConfig）
+### 3.3.JedisPool 属性配置（JedisPoolConfig）
 JedisPool的配置参数大部分是由JedisPoolConfig的对应项来赋值的。
+
 ![Image [5]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/redis-demo/20210305211601.png)
 
-### JedisPool优化
-#### maxTotal：最大连接数
+### 3.4.JedisPool优化
+#### 3.4.1.maxTotal：最大连接数
 实际上这个是一个很难回答的问题，考虑的因素比较多：
 - 业务希望Redis并发量
 - 客户端执行命令时间
@@ -348,13 +353,14 @@ JedisPool的配置参数大部分是由JedisPoolConfig的对应项来赋值的�
 
 但这个值不是越大越好，一方面连接太多占用客户端和服务端资源，另一方面对于Redis这种高QPS的服务器，一个大命令的阻塞即使设置再大资源池仍然会无济于事。
 
-#### maxIdle minIdle
+#### 3.4.2.maxIdle minIdle
 maxIdle实际上才是业务需要的最大连接数，maxTotal是为了给出余量，所以maxIdle不要设置过小，否则会有new Jedis(新连接)开销，而minIdle是为了控制空闲资源监测。
 
 连接池的最佳性能是maxTotal = maxIdle ,这样就避免连接池伸缩带来的性能干扰。但是如果并发量不大或者maxTotal设置过高，会导致不必要的连接资源浪费。
+
 可以根据实际总OPS和调用redis客户端的规模整体评估每个节点所使用的连接池。
 
-#### maxIdle和maxtotal参数
+#### 3.4.3.maxIdle和maxtotal参数
 1. 我们一般连接redis都需要用到连接池，最常用的就是jedis连接池，连接池中有两个参数的设置对高性能有较大影响：maxIdle和maxTotal
 2. maxIdle的意思是连接池中空闲连接的最大数量，maxTotal是连接池中总连接的最大数量
 3. 之前我一般设置这两者的时候是没有设置成相等的值的，也就是比如设置maxIdle=10，然后maxTotal=30这样，但是基础架构的压测报告发现在高并发的情况下这样设置的后果竟然会产生大量的短连接，这样的结果令人非常意外，这些这么多的短链接是怎么产生的？
@@ -362,10 +368,10 @@ maxIdle实际上才是业务需要的最大连接数，maxTotal是为了给出�
 
 
 
- ## Redission
+ ## 4.Redission
  [github](https://github.com/redisson/redisson)
 [官网](https://redisson.org/)
-### 简介
+### 4.1.简介
  Redisson是架设在Redis基础上的一个Java驻内存数据网格（In-Memory Data Grid）。
 
 Redisson在基于NIO的Netty框架上，充分的利用了Redis键值数据库提供的一系列优势，在Java实用工具包中常用接口的基础上，为使用者提供了一系列具有分布式特性的常用工具类。使得原本作为协调单机多线程并发程序的工具包获得了协调分布式多机多线程并发系统的能力，大大降低了设计和研发大规模分布式系统的难度。同时结合各富特色的分布式服务，更进一步简化了分布式环境中程序相互之间的协作。
@@ -377,14 +383,14 @@ redission可以支持redis cluster、master-slave、redis哨兵和redis单机。
 每个Redis服务实例都能管理多达1TB的内存。
 
 能够完美的在云计算环境里使用，并且支持AWS ElastiCache主备版，AWS ElastiCache集群版，Azure Redis Cache和阿里云（Aliyun）的云数据库Redis版。
-### 适用场景
+### 4.2.适用场景
  - 分布式应用
 - 分布式缓存
 - 分布式回话管理
 - 分布式服务（任务，延迟任务，执行器）
 - 分布式redis客户端
 
- ### Redisson功能
+ ### 4.3.Redisson功能
 - 支持同步/异步/异步流/管道流方式连接
 - 多样化数据序列化
 - 集合数据分片
@@ -395,8 +401,8 @@ redission可以支持redis cluster、master-slave、redis哨兵和redis单机。
 - 独立节点模式
 - 三方框架整合
 
- ### 分布式锁
-#### Maven依赖
+ ### 4.4.分布式锁
+#### 4.4.1.Maven依赖
 ```
 <dependency>
     <groupId>org.redisson</groupId>
@@ -410,8 +416,8 @@ redission可以支持redis cluster、master-slave、redis哨兵和redis单机。
 </dependency>
 ```
 
- #### Redission是怎么实现的？
-##### 加锁机制
+ #### 4.4.2.Redission是怎么实现的？
+##### 4.4.2.1.加锁机制
 假设是一个redis cluster，客户端1会根据hash算法选择一个节点，发送lua脚本，之所以发送lua脚本，是因为要保证原子性。
  ```
 "if(redis.call('exist'),KEYS[1]==0) then" +  // KEY[1]就是key，我们假设是mylock
@@ -427,17 +433,19 @@ redission可以支持redis cluster、master-slave、redis哨兵和redis单机。
  ```
 客户端1成功加锁，客户端2来了，一看发现第一个if，发现mylock这个锁key已经存在了，就走第二个if，一看发现没有自己的客户端ID，所以客户端ID会获取到mylock这个key的剩余时间。之后客户端2会进入一个while循环，不停的尝试加锁。
 
-##### watch dog自动延期
+##### 4.4.2.2.watch dog自动延期
 redission还提供了watch dog线程，客户端1加锁的key默认是30s，但是客户端1业务还没有执行完，时间就过了，客户端1还想持有锁的话，就会启动一个watch dog后台线程，不断的延长锁key的生存时间。
-##### 可重入锁
+##### 4.4.2.3.可重入锁
 同时，如果客户端1重复加锁，也是支持，无非就是hset +1，代表的加锁的次数+1，不过代码中记得要unlock()掉。
-##### 释放锁
+##### 4.4.2.4.释放锁
 释放锁，其实就是将加锁次数-1，如果发现加锁次数是0，说明这个客户端已经不再持有锁，就会执行del mylock命令，从redis里把这个kv删掉，这样客户端2就可以加锁了。
-##### 缺点
+##### 4.4.2.5.缺点
 因为是redis cluster，这个kv会被异步复制给其他节点。但是在这过程中主节点挂了，还没来得及复制。虽然客户端1以为加锁成功了，其实这个key已经丢失。
+
 主备切换后，客户端2也来加锁，也成功了，这样就导致了多个客户端对一个分布式锁完成了加锁，可能会造成脏数据。
-#### 配置
-##### 单机配置
+
+#### 4.4.3.配置
+##### 4.4.3.1.单机配置
 ```
 @Configurationpublic class RedissonConfig {
     @Value("${spring.redis.host}")
@@ -453,8 +461,8 @@ redission还提供了watch dog线程，客户端1加锁的key默认是30s，但�
     }}
 ```
 
-#### 分布式锁
-##### 可重入锁（Reentrant Lock）
+#### 4.4.4.分布式锁
+##### 4.4.4.1.可重入锁（Reentrant Lock）
 ```
 Redisson的分布式可重入锁RLock Java对象实现了java.util.concurrent.locks.Lock接口，同时还支持自动过期解锁。
  public void testReentrantLock(RedissonClient redisson){
@@ -505,7 +513,7 @@ public void testAsyncReentrantLock(RedissonClient redisson){
 
     }
 ```
-##### 公平锁（Fair Lock）
+##### 4.4.4.2.公平锁（Fair Lock）
 Redisson分布式可重入公平锁也是实现了java.util.concurrent.locks.Lock接口的一种RLock对象。在提供了自动过期解锁功能的同时，保证了当多个Redisson客户端线程同时请求加锁时，优先分配给先发出请求的线程。
 ```
 public void testFairLock(RedissonClient redisson){
@@ -535,7 +543,7 @@ fairLock.lockAsync(10, TimeUnit.SECONDS);
 Future<Boolean> res = fairLock.tryLockAsync(100, 10, TimeUnit.SECONDS);
 ```
 
-##### 联锁（MultiLock）
+##### 4.4.4.3.联锁（MultiLock）
 Redisson的RedissonMultiLock对象可以将多个RLock对象关联为一个联锁，每个RLock对象实例可以来自于不同的Redisson实例。
 ```
 public void testMultiLock(RedissonClient redisson1,
@@ -561,7 +569,7 @@ public void testMultiLock(RedissonClient redisson1,
         }
     }
 ```
-##### 红锁（RedLock）
+##### 4.4.4.4.红锁（RedLock）
  Redisson的RedissonRedLock对象实现了Redlock介绍的加锁算法。该对象也可以用来将多个RLock
 对象关联为一个红锁，每个RLock对象实例可以来自于不同的Redisson实例。
 ```
@@ -587,8 +595,8 @@ public void testMultiLock(RedissonClient redisson1,
         }
     }
 ```
-##### 读写锁（ReadWriteLock）
- Redisson的分布式可重入读写锁RReadWriteLock Java对象实现了java.util.concurrent.locks.ReadWriteLock接口。同时还支持自动过期解锁。该对象允许同时有多个读取锁，但是最多只能有一个写入锁。
+##### 4.4.4.5.读写锁（ReadWriteLock）
+ Redisson的分布式可重入读写锁RReadWriteLock Java对象实现了 `java.util.concurrent.locks.ReadWriteLock` 接口。同时还支持自动过期解锁。该对象允许同时有多个读取锁，但是最多只能有一个写入锁。
 ```
 RReadWriteLock rwlock = redisson.getLock("anyRWLock");
 // 最常见的使用方法
@@ -609,8 +617,8 @@ boolean res = rwlock.writeLock().tryLock(100, 10, TimeUnit.SECONDS);
 ...
 lock.unlock();
 ```
-##### 信号量（Semaphore）
-Redisson的分布式信号量（Semaphore）Java对象RSemaphore采用了与java.util.concurrent.Semaphore相似的接口和用法。
+##### 4.4.4.6.信号量（Semaphore）
+Redisson的分布式信号量（Semaphore）Java对象RSemaphore采用了与 `java.util.concurrent.Semaphore` 相似的接口和用法。
 ```
 RSemaphore semaphore = redisson.getSemaphore("semaphore");
 semaphore.acquire();
@@ -628,7 +636,7 @@ semaphore.release();
 //或
 semaphore.releaseAsync();
 ```
-##### 可过期性信号量（PermitExpirableSemaphore）
+##### 4.4.4.7.可过期性信号量（PermitExpirableSemaphore）
 Redisson的可过期性信号量（PermitExpirableSemaphore）实在RSemaphore对象的基础上，为每个信号增加了一个过期时间。每个信号可以通过独立的ID来辨识，释放时只能通过提交这个ID才能释放。
 ```
 RPermitExpirableSemaphore semaphore = redisson.getPermitExpirableSemaphore("mySemaphore");
@@ -638,7 +646,7 @@ String permitId = semaphore.acquire(2, TimeUnit.SECONDS);
 // ...
 semaphore.release(permitId);
 ```
-##### 闭锁（CountDownLatch）
+##### 4.4.4.8.闭锁（CountDownLatch）
 Redisson的分布式闭锁（CountDownLatch）Java对象RCountDownLatch采用了与java.util.concurrent.CountDownLatch相似的接口和用法。
 ```
 RCountDownLatch latch = redisson.getCountDownLatch("anyCountDownLatch");
@@ -650,7 +658,7 @@ RCountDownLatch latch = redisson.getCountDownLatch("anyCountDownLatch");
 latch.countDown();
 ```
 
-### 使用 RList 操作 Redis 列表
+### 4.5.使用 RList 操作 Redis 列表
 下面的代码简单演示了如何在 Redisson 中使用 RList 对象。RList 是 Java 的 List 集合的分布式并发实现。考虑以下代码：
 ```
  import org.redisson.Redisson;
@@ -686,7 +694,7 @@ Is list contains name 'yanglbme': true
 bingo
 yanglbme
 ```
-### 使用 RMap 操作 Redis 哈希
+### 4.6.使用 RMap 操作 Redis 哈希
 Redisson 还包括 RMap，它是 Java Map 集合的分布式并发实现，考虑以下代码：
 ```
 import org.redisson.Redisson;
@@ -722,7 +730,7 @@ Value mapped by key 'name': yanglbme
 Is value mapped by key 'link' added: false
 ```
 
-### 使用 RAtomicLong 实现 Redis 原子操作
+### 4.7.使用 RAtomicLong 实现 Redis 原子操作
 RAtomicLong 是 Java 中 AtomicLong 类的分布式“替代品”，用于在并发环境中保存长值。以下示例代码演示了 RAtomicLong 的用法：
 ```
 import org.redisson.Redisson;
@@ -756,7 +764,7 @@ Final value: 11
 
 
 
-## Redis 客户端 Jedis、lettuce 和 Redisson 对比
+## 5.Redis 客户端 Jedis、lettuce 和 Redisson 对比
 
 Redis 支持多种语言的客户端，下面列举了部分 Redis 支持的客户端语言，大家可以通过[官网](https://redis.io/clients)查看 Redis 支持的客户端详情。
 
@@ -770,13 +778,13 @@ Redis 支持多种语言的客户端，下面列举了部分 Redis 支持的客�
 
 Redis 是用单线程来处理多个客户端的访问，因此作为 Redis 的开发和运维人员需要了解 Redis 服务端和客户端的通信协议，以及主流编程语言的 Redis 客户端使用方法，同时还需要了解客户端管理的相应 API 以及开发运维中可能遇到的问题。
 
-### Redis 客户端通信协议
+### 5.1.Redis 客户端通信协议
 
 Redis制定了RESP（Redis Serialization Protocol，Redis序列化协议）实现客户端与服务端的正常交互，这种协议简单高效，既能够被机器解析，又容易被人类识别。
 
 `RESP`可以序列化不同的数据类型，如整型、字符串、数组还有一种特殊的`Error`类型。需要执行的`Redis`命令会封装为类似于**字符串数组**的请求然后通过`Redis`客户端发送到`Redis`服务端。`Redis`服务端会基于特定的命令类型选择对应的一种数据类型进行回复。
 
-**1. RESP 发送命令格式**
+**5.1.1. RESP 发送命令格式**
 
 在`RESP`中，发送的数据类型取决于数据报的第一个字节：
 
@@ -825,7 +833,7 @@ world
 *3\r\n$3\r\nSET\r\n$5\r\nhello\r\n$5\r\nworld\r\n
 ```
 
-**2. RESP 响应内容**
+**5.1.2. RESP 响应内容**
 
 ```
 Redis的返回结果类型分为以下五种：
@@ -848,11 +856,11 @@ Redis的返回结果类型分为以下五种：
 
 有了这个协议，我们就可以编写程序来和 Redis 服务端进行通信。由于 Redis 的流行，已经存在了很多流行的开源客户端。本文主要选择 Java 领域 Redis 官方推荐的客户端进行介绍。
 
-### Redis 的 Java 客户端
+### 5.2.Redis 的 Java 客户端
 
 Redis 官方推荐的 Java 客户端有Jedis、lettuce 和 Redisson。
 
-**1. Jedis**
+**5.2.1. Jedis**
 
 Jedis 是老牌的 Redis 的 Java 实现客户端，提供了比较全面的 Redis 命令的支持，其官方网址是：http://tool.oschina.net/uploads/apidocs/redis/clients/jedis/Jedis.html。
 
@@ -865,7 +873,7 @@ Jedis 是老牌的 Redis 的 Java 实现客户端，提供了比较全面的 Red
 - 使用阻塞的 I/O，且其方法调用都是同步的，程序流需要等到 sockets 处理完 I/O 才能执行，不支持异步；
 - Jedis 客户端实例不是线程安全的，所以需要通过连接池来使用 Jedis。
 
-**2. lettuce**
+**5.2.2. lettuce**
 
 lettuce （[ˈletɪs]），是一种可扩展的线程安全的 Redis 客户端，支持异步模式。如果避免阻塞和事务操作，如BLPOP和MULTI/EXEC，多个线程就可以共享一个连接。lettuce 底层基于 Netty，支持高级的 Redis 特性，比如哨兵，集群，管道，自动重新连接和Redis数据模型。lettuce 的官网地址是：https://lettuce.io/
 
@@ -874,7 +882,7 @@ lettuce （[ˈletɪs]），是一种可扩展的线程安全的 Redis 客户端�
 - 支持同步异步通信模式；
 - Lettuce 的 API 是线程安全的，如果不是执行阻塞和事务操作，如BLPOP和MULTI/EXEC，多个线程就可以共享一个连接。
 
-**3. Redisson**
+**5.2.3. Redisson**
 
 Redisson 是一个在 Redis 的基础上实现的 Java 驻内存数据网格（In-Memory Data Grid）。它不仅提供了一系列的分布式的 Java 常用对象，还提供了许多分布式服务。其中包括( BitSet, Set, Multimap, SortedSet, Map, List, Queue, BlockingQueue, Deque, BlockingDeque, Semaphore, Lock, AtomicLong, CountDownLatch, Publish / Subscribe, Bloom filter, Remote service, Spring cache, Executor service, Live Object service, Scheduler service) Redisson 提供了使用Redis 的最简单和最便捷的方法。Redisson 的宗旨是促进使用者对Redis的关注分离（Separation of Concern），从而让使用者能够将精力更集中地放在处理业务逻辑上。Redisson的官方网址是：https://redisson.org/
 
@@ -895,29 +903,9 @@ Jedis 和 lettuce 是比较纯粹的 Redis 客户端，几乎没提供什么高�
 
 Redisson 的优势是提供了很多开箱即用的 Redis 高级功能，如果你的应用中需要使用到 Redis 的高级功能，建议使用 Redisson。具体 Redisson 的高级功能可以参考：https://redisson.org/
 
-## 参考
-
-- RESP协议1：https://www.cnblogs.com/4a8a08f09d37b73795649038408b5f33/p/9998245.html
-- RESP协议2：https://my.oschina.net/u/2474629/blog/913805
-- RESP协议3：https://www.cnblogs.com/throwable/p/11644790.html
-- Redis的三个框架：Jedis,Redisson,Lettuce：https://www.cnblogs.com/williamjie/p/11287292.html
-- redis客户端选型-Jedis、lettuce、Redisson：https://blog.csdn.net/a5569449/article/details/106891111/
-
-作者：程序员自由之路
-
-出处：https://www.cnblogs.com/54chensongxia/p/13815761.html
-
-版权：本作品采用「[署名-非商业性使用-相同方式共享 4.0 国际](https://creativecommons.org/licenses/by-nc-sa/4.0/)」许可协议进行许可。
 
 
-
-
-
-
-
-
-
-## shiro-redis-sentinel
+## 6.shiro-redis-sentinel
 
 [springboot+shiro-redis 使用Redis sentinel（哨兵）主从实现](https://blog.51cto.com/1745012/2115011)
 [SoftWindDay/shiro-redis-sentinel](https://github.com/SoftWindDay/shiro-redis-sentinel)

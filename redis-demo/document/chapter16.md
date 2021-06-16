@@ -6,6 +6,7 @@
 
 ## 1.Redis的模糊查询在生产环境出现严重的性能问题
 Redis是一个高性能高效率的key-value存储的nosql数据库，由于数据是存储在内存中，因此访问速度非常快，由于项目涉及到数据库的查询非常多，而数据变大并不是非常频繁，所以在项目中采用Redis分担大部分MySQL的压力。
+
 在项目中实际使用我用的Redis提供的客户端连接工具包jedis，在项目中引入jedis.Jar即可
 
 ```java
@@ -60,9 +61,11 @@ Set<String> keys = RedisApi.searchLike(key_like);
 ```
 
 到这里从需求到逻辑到编码一气呵成，简单测试没什么问题后，就发布到线上，由于平时网站的流量不算非常高，所以运行了几天也没发生什么异常，直到今天早上，拥有几十万粉丝的公众号发推文，推文的内容直接链接到网站，因此说瞬间流量是非常高
+
 ![Image](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/redis-demo/20210305213801.png)
 
 运行了大约十分钟之后，运营突然发疯的过来说网站访问非常慢，甚至出现错误码，心里一慌，赶紧上去看日志，我了个乖乖啊，简直是吓人，error日志想流水一样蹦出来，但五一不例外都是下面图示的错误：从Redis池中获取不大连接数，马上上redis服务器查看，发现CPU已经到达了100%以上
+
 ![Image [2]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/redis-demo/20210305213806.png)
 
 能让Redis的CPU到100%的，我想出了一下几个可能：
@@ -111,25 +114,25 @@ RedisApi.addSet(setKey, token);
 
 1. 在spring配置文件中的stringRedisTemplate对象配置参数中打开了事务支持，而redis的事务支持是用MUTI和EXEC指令来支持
 
-![Image [2]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/redis-demo/20210305214109.png)
+   ![Image [2]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/redis-demo/20210305214109.png)
 
   ![Image [3]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/redis-demo/20210305214101.png)
 
 2. 如果要保证在事务能正常执行，那么在一个方法中多次操作redis必须是同一条连接，这样才能保证事务能正常执行，所以在stringRedisTemplate会将连接绑定在当前线程，当第二次访问redis时直接从当前线程中获取连接，绑定连接源码如下：
 
-  ![Image [4]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/redis-demo/20210305214203.png)
+   ![Image [4]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/redis-demo/20210305214203.png)
 
 3. 按照流程，先绑定连接，最后在finally代码块中释放连接，看起来并没有问题，但跳进去releaseConnection方法的代码发现连接需要在事务提交后才能释放，也就是说service方法上必须使用@Transation注解修饰，但因为业务方法上少写了@Transation注解导致连接将一直绑定第一次获取他的线程上，当线程池的线程被获取完之后，其他线程就会就如阻塞等待状态，导致服务不可用
 
-  ![Image [5]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/redis-demo/20210305214207.png)
+   ![Image [5]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/redis-demo/20210305214207.png)
 
 4. 如果加上@Transation注解，那么方法执行完之后将会执行TransactionSynchronizationUtils.invokeAfterCompletion这个方法，mysql事务也是在这个方法执行commit操作，如下图所示方法的第一个参数是List<TransactionSynchronization> synchronizations，代表可以有多个事务，redis，mysql等，都会此进行事务提交操作，这里使用多态，根据对象的具体类型执行不同的方法，redis则执行redis的事务提交操作，mysql则执行mysql的事务提交操作
 
-  ![Image [6]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/redis-demo/20210305214204.png)
+   ![Image [6]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/redis-demo/20210305214204.png)
 
 5. 以下为redis事务提交的代码，也跟我们上面提到的一样，发送exec指令提交事务
 
-  ![Image [7]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/redis-demo/20210305214301.png)
+   ![Image [7]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/redis-demo/20210305214301.png)
 
 ### 2.4.如何修改代码
 1. 确认实际需求是否需要事务支持，如果需要则在对应方法上加上@Transaction注解
