@@ -4,15 +4,15 @@
 
 # Spring 事务
 
-## 事务类型
+## 1.事务类型
 
 - 划分本地事务和分布式事务：
-  - 本地事务：就是普通事务，能保证单台数据库上的操作的ACID,被限定在一台数据库上
-  - 分布式事务：涉及多个数据源的事务，即跨越多台同类或异类数据库的事务（由每台数据库的本地事务组务），分布式事务旨在保证这些本地事务的所有操作的ACID，使事务可以跨越多台数据库；
+  - 本地事务：就是普通事务，能保证单台数据库上的操作的 `ACID`,被限定在一台数据库上
+  - 分布式事务：涉及多个数据源的事务，即跨越多台同类或异类数据库的事务（由每台数据库的本地事务组务），分布式事务旨在保证这些本地事务的所有操作的 `ACID`，使事务可以跨越多台数据库；
 
-- 划分JDBC事务和JTA事务：
-  - JDBC事务：就是数据库事务中的本地事务。通过Connection对象的控制来管理事务
-  - JTA指(Java Transaction API),是Java EE数据库事务规范，JTA只提供了事务管理接口，由应用程序服务器厂商提供实现 ，JTA事务比JDBC更强大，支持分布式事务
+- 划分 `JDBC` 事务和 `JTA` 事务：
+  - `JDBC` 事务：就是数据库事务中的本地事务。通过 `Connection` 对象的控制来管理事务
+  - `JTA` 指( `Java Transaction API`)，是 `Java EE` 数据库事务规范，`JTA` 只提供了事务管理接口，由应用程序服务器厂商提供实现 ，`JTA` 事务比 `JDBC` 更强大，支持分布式事务
 
 - 按是否通过编程实现事务:
   - 编程式事务：通过编写代码来管理事务
@@ -20,17 +20,17 @@
 
 
 
-## Spring事务管理
+## 2.Spring事务管理
 
  Spring的事务管理主要包括3个接口：
 
-- **PlatformTransactionManager**：根据TransactionDefinition提供的事务属性配置信息，创建事务.
+- **PlatformTransactionManager**：根据 `TransactionDefinition` 提供的事务属性配置信息，创建事务.
 
 - **TransactionDefinition**：封状事务的隔离级别、超时时间、是否只读事务和传播规则等事务属性.
 
-- **TransactionStatus**：封装了事务的具体运行状态，如是否是新事务，是否已经提交事务，设置当前事务为rollback-only等；
+- **TransactionStatus**：封装了事务的具体运行状态，如是否是新事务，是否已经提交事务，设置当前事务为 `rollback-only` 等；
 
-### PlatformTransactionManager
+### 2.1.PlatformTransactionManager
 
 接口统一抽象处理事务操作相关的方法，是其他事务的规范,方法解析:
 
@@ -38,9 +38,9 @@
 
 - `TransactionStatus getTransaction(@Nullable TransactionDefinition definition)`：根据事务定义信息从事事务环境返回一个已存在的事务，或者创建一个新的事务。
 
-- `void commit(TransactionStatus status)`：根据事务的状态提交事务，如果事务状态已经标识为rollback-only,该方法执行回滚事务的操作
+- `void commit(TransactionStatus status)`：根据事务的状态提交事务，如果事务状态已经标识为 `rollback-only`,该方法执行回滚事务的操作
 
-- `void rollback(TransactionStatus status)`：将事务回滚，当commit方法抛出异常时，rollback会被隐式调用 
+- `void rollback(TransactionStatus status)`：将事务回滚，当 `commit` 方法抛出异常时，`rollback` 会被隐式调用 
 
 常用的事务管理器: 
 
@@ -48,7 +48,7 @@
 
 - **HibernateTransactionManager**:支持Hibernate
 
-###  TransactionDefinition
+###  2.2.TransactionDefinition
 
 ![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/spring-demo/20210329234215.png)
 
@@ -71,29 +71,29 @@
 
   **情况一：遵从当前事务**
   
-  - REQUIRED:必须存在事务，如果当前存在一个事务，则加入该事务，否则将新建一个事务（缺省）
-  - SUPPORTS：支持当前事务，指如果当前存在逻辑事务，就加入到该事务，如果当前没有事务，就以非事务方式执行
-- MANDATORY：必须有事务，使用当前事务执行，如果当前没有事务，则抛出异常IllegalTransactionStateException
+  - `REQUIRED`：必须存在事务，如果当前存在一个事务，则加入该事务，否则将新建一个事务（缺省）
+  - `SUPPORTS`：支持当前事务，指如果当前存在逻辑事务，就加入到该事务，如果当前没有事务，就以非事务方式执行
+  - `MANDATORY`：必须有事务，使用当前事务执行，如果当前没有事务，则抛出异常 `IllegalTransactionStateException`
   
   **情况二：不遵从当前事务**
   
-  - REQUIRES_NEW：不管当前是否存在事务，每次都创建新事务
-- NOT_SUPPORTED：以非事务方式执行，如果当前存在事务，就把当前事务暂停，以非事务方式执行
-  - NEVER：不支持事务，如果当前存在事务，则抛出异常：IllegalTransactionStateException
+  - `REQUIRES_NEW`：不管当前是否存在事务，每次都创建新事务
+  - `NOT_SUPPORTED`：以非事务方式执行，如果当前存在事务，就把当前事务暂停，以非事务方式执行
+  - `NEVER`：不支持事务，如果当前存在事务，则抛出异常：`IllegalTransactionStateException`
   
   **情况三：寄生事务（外部事务和寄生事务）**
   
-  - NESTED：如果当前存在事务，则在内部事务内执行，如果当前不存在事务，则创建一个新的事务，嵌套事务使用数据库中的保存点来实现，即嵌套事务回滚不影响外部事务，但外部事务回滚将导致嵌套事务回滚。 
+  - `NESTED`：如果当前存在事务，则在内部事务内执行，如果当前不存在事务，则创建一个新的事务，嵌套事务使用数据库中的保存点来实现，即嵌套事务回滚不影响外部事务，但外部事务回滚将导致嵌套事务回滚。 
 
 
 
-## 使用XML配置JDBC事务 
+## 3.使用XML配置JDBC事务 
 
- **1.表account结构**
+ **3.1.表account结构**
 
 ![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/spring-demo/20210329234550.png)
 
-**2.domain类**
+**3.2.domain类**
 
 ```
 @Data
@@ -103,7 +103,7 @@ public class Account {
 }
 ```
 
-**3.dao接口及实现类**
+**3.3.dao接口及实现类**
 
     public interface IAccountDAO {
      
@@ -145,7 +145,7 @@ public class Account {
      
     }
 
-**3.service接口及实现类**
+**3.4.service接口及实现类**
 
     public interface IAccountService {
         /**
@@ -179,7 +179,7 @@ public class AccountServiceImpl implements IAccountService {
 }
 ```
 
-**4.XML配置**
+**3.5.XML配置**
 
 ```
 <?xml version="1.0" encoding="UTF-8"?>
@@ -243,7 +243,7 @@ public class AccountServiceImpl implements IAccountService {
 
 **注意以上关联关系** 
 
-**5.测试代码**
+**3.6.测试代码**
 
     @SpringJUnitConfig
     public class App {
@@ -256,23 +256,20 @@ public class AccountServiceImpl implements IAccountService {
             service.trans(10002L, 10010L, 100);
         }
     }
-**6.tx:method标签设置**
+**3.7.tx:method标签设置**
 
 ![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/spring-demo/20210329234932.png)
 
-- name：匹配到的方法模拟，必须配置；
+- `name`：匹配到的方法模拟，必须配置；
+- `read-only`：如果为true,开启一个只读事务，只读事务的性能较高，但是不能只读事务中操作DML;
+- `isolation`：代表数据库事务隔离级别（就使用默认）
+  - `DEFAULT`：让 Spring使用数据库默认的事务隔离级别；
+  - 其他：Spring模拟
+- `no-rollback-for`：如果遇到的异常是匹配的异常类型，就不回滚事务
+- `rollback-for`：如果遇到的异常是指定匹配的异常类型，才回滚事务；
+- `propagation`：事务的传播方式（当一个方法已在一个开启的事务当中了，应该怎么处理自身的事务）；
 
-- read-only:如果为true,开启一个只读事务，只读事务的性能较高，但是不能只读事务中操作DML;
-
-- isolation:代表数据库事务隔离级别（就使用默认），DEFAULT：让Spring使用数据库默认的事务隔离级别；其他：Spring模拟
-
-- no-rollback-for:如果遇到的异常是匹配的异常类型，就不回滚事务
-
-- rollback-for:如果遇到的异常是指定匹配的异常类型，才回滚事务；
-
-- propagation:事务的传播方式（当一个方法已在一个开启的事务当中了，应该怎么处理自身的事务）；
-
-**7.配置一个CRUD通用的事务配置**
+**3.8.配置一个CRUD通用的事务配置**
 
 ```
 <tx:advice id="crudAdvice" transaction-manager="txManager">
@@ -288,9 +285,9 @@ public class AccountServiceImpl implements IAccountService {
 
 
 
-## 使用注解配置JDBC事务
+## 4.使用注解配置JDBC事务
 
-**1.XML配置**
+**4.1.XML配置**
 
 ```
 <?xml version="1.0" encoding="UTF-8"?>
@@ -334,9 +331,9 @@ public class AccountServiceImpl implements IAccountService {
 </beans>
 ```
 
-**2.domain类似上面JDBC的方式**
+**4.2.domain类似上面JDBC的方式**
 
-**3.dao接口同上，实现类如下，添加注解:@Repository**
+**4.3.dao接口同上，实现类如下，添加注解:@Repository**
 
 ```
 @Repository
@@ -366,7 +363,7 @@ public class AccountDAOImpl implements IAccountDAO {
 }
 ```
 
-**4.service接口同上，实现类如下，添加注解:@Service@Transactional**
+**4.4.service接口同上，实现类如下，添加注解:@Service@Transactional**
 
 ```
 @Service
@@ -394,23 +391,23 @@ public class AccountServiceImpl implements IAccountService {
 }
 ```
 
-可以在指定方法配置指定规则，如上述: @Transactional(readOnly=true)
+可以在指定方法配置指定规则，如上述:`@Transactional(readOnly=true)`
 
-**5.测试类同上** 
+**4.5.测试类同上** 
 
 
 
-## Spring事务传播行为
+## 5.Spring事务传播行为
 
-Spring 在 TransactionDefinition 接口中规定了 7 种类型的事务传播行为。事务传播行为是 Spring 框架独有的事务增强特性，他不属于的事务实际提供方数据库行为。
+`Spring` 在 `TransactionDefinition` 接口中规定了 7 种类型的事务传播行为。事务传播行为是 `Spring` 框架独有的事务增强特性，他不属于的事务实际提供方数据库行为。
 
-这是 Spring 为我们提供的强大的工具箱，使用事务传播行可以为我们的开发工作提供许多便利。
+这是 `Spring` 为我们提供的强大的工具箱，使用事务传播行可以为我们的开发工作提供许多便利。
 
 但是人们对他的误解也颇多，你一定也听过“service 方法事务最好不要嵌套”的传言。
 
-### 基础概念
+### 5.1.基础概念
 
-#### 1. 什么是事务传播行为？
+#### 5.1.1. 什么是事务传播行为？
 
 事务传播行为用来描述由某一个事务传播行为修饰的方法被嵌套进另一个方法的时事务如何传播。
 
@@ -430,15 +427,15 @@ Spring 在 TransactionDefinition 接口中规定了 7 种类型的事务传播�
 
 代码中`methodA()`方法嵌套调用了`methodB()`方法，`methodB()`的事务传播行为由`@Transaction(Propagation=XXX)`设置决定。这里需要注意的是`methodA()`并没有开启事务，某一个事务传播行为修饰的方法并不是必须要在开启事务的外围方法中调用。
 
-#### 2. Spring 中七种事务传播行为
+#### 5.1.2. Spring 中七种事务传播行为
 
 ![图片](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/spring-demo/20210330001632.png)
 
 定义非常简单，也很好理解，下面我们就进入代码测试部分，验证我们的理解是否正确。
 
-### 代码验证
+### 5.2.代码验证
 
-文中代码以传统三层结构中两层呈现，即 Service 和 Dao 层，由 Spring 负责依赖注入和注解式事务管理，DAO 层由 Mybatis 实现，你也可以使用任何喜欢的方式，例如，Hibernate,JPA,JDBCTemplate 等。数据库使用的是 MySQL 数据库，你也可以使用任何支持事务的数据库，并不会影响验证结果。
+文中代码以传统三层结构中两层呈现，即 `Service` 和 `Dao` 层，由 `Spring` 负责依赖注入和注解式事务管理，`DAO` 层由 `Mybatis` 实现，你也可以使用任何喜欢的方式，例如，`Hibernate`,`JPA`,`JDBCTemplate` 等。数据库使用的是 `MySQL` 数据库，你也可以使用任何支持事务的数据库，并不会影响验证结果。
 
 首先我们在数据库中创建两张表：
 
@@ -464,7 +461,7 @@ CREATE TABLE `user2` (
 ENGINE = InnoDB;
 ```
 
-然后编写相应的 Bean 和 DAO 层代码：
+然后编写相应的 `Bean` 和 `DAO` 层代码：
 
 **User1**
 
@@ -506,11 +503,11 @@ public interface User2Mapper {
 }
 ```
 
-最后也是具体验证的代码由 service 层实现，下面我们分情况列举。
+最后也是具体验证的代码由 `service` 层实现，下面我们分情况列举。
 
-#### 1.PROPAGATION_REQUIRED
+#### 5.2.1.PROPAGATION_REQUIRED
 
-我们为 User1Service 和 User2Service 相应方法加上`Propagation.REQUIRED`属性。
+我们为 `User1Service` 和 `User2Service` 相应方法加上`Propagation.REQUIRED`属性。
 
 **User1Service 方法：**
 
@@ -547,7 +544,7 @@ public class User2ServiceImpl implements User2Service {
 }
 ```
 
-##### 1.1 场景一
+##### 5.2.1.1 场景一
 
 此场景外围方法没有开启事务。
 
@@ -587,9 +584,9 @@ public class User2ServiceImpl implements User2Service {
 
 ![图片](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/spring-demo/20210330001719.webp)
 
-**结论：通过这两个方法我们证明了在外围方法未开启事务的情况下`Propagation.REQUIRED`修饰的内部方法会新开启自己的事务，且开启的事务相互独立，互不干扰。**
+结论：通过这两个方法我们证明了在外围方法未开启事务的情况下`Propagation.REQUIRED`修饰的内部方法会新开启自己的事务，且开启的事务相互独立，互不干扰。
 
-##### 1.2 场景二
+##### 5.2.1.2 场景二
 
 外围方法开启事务，这个是使用率比较高的场景。
 
@@ -651,9 +648,9 @@ public class User2ServiceImpl implements User2Service {
 
 ![图片](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/spring-demo/20210330001949.webp)
 
-**结论：以上试验结果我们证明在外围方法开启事务的情况下`Propagation.REQUIRED`修饰的内部方法会加入到外围方法的事务中，所有`Propagation.REQUIRED`修饰的内部方法和外围方法均属于同一事务，只要一个方法回滚，整个事务均回滚。**
+结论：以上试验结果我们证明在外围方法开启事务的情况下`Propagation.REQUIRED`修饰的内部方法会加入到外围方法的事务中，所有`Propagation.REQUIRED`修饰的内部方法和外围方法均属于同一事务，只要一个方法回滚，整个事务均回滚。
 
-#### 2.PROPAGATION_REQUIRES_NEW
+#### 5.2.2.PROPAGATION_REQUIRES_NEW
 
 我们为 User1Service 和 User2Service 相应方法加上`Propagation.REQUIRES_NEW`属性。
 
@@ -697,7 +694,7 @@ public class User2ServiceImpl implements User2Service {
 }
 ```
 
-##### 2.1 场景一
+##### 5.2.2.1 场景一
 
 外围方法没有开启事务。
 
@@ -737,9 +734,9 @@ public class User2ServiceImpl implements User2Service {
 
 ![图片](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/spring-demo/20210330001942.webp)
 
-**结论：通过这两个方法我们证明了在外围方法未开启事务的情况下`Propagation.REQUIRES_NEW`修饰的内部方法会新开启自己的事务，且开启的事务相互独立，互不干扰。**
+结论：通过这两个方法我们证明了在外围方法未开启事务的情况下 `Propagation.REQUIRES_NEW` 修饰的内部方法会新开启自己的事务，且开启的事务相互独立，互不干扰。
 
-##### 2.2 场景二
+##### 5.2.2.2 场景二
 
 外围方法开启事务。
 
@@ -811,9 +808,9 @@ public class User2ServiceImpl implements User2Service {
 
 ![图片](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/spring-demo/20210330002015.png)
 
-**结论：在外围方法开启事务的情况下`Propagation.REQUIRES_NEW`修饰的内部方法依然会单独开启独立事务，且与外部方法事务也独立，内部方法之间、内部方法和外部方法事务均相互独立，互不干扰。**
+结论：在外围方法开启事务的情况下`Propagation.REQUIRES_NEW`修饰的内部方法依然会单独开启独立事务，且与外部方法事务也独立，内部方法之间、内部方法和外部方法事务均相互独立，互不干扰。
 
-#### 3.PROPAGATION_NESTED
+#### 5.2.3.PROPAGATION_NESTED
 
 我们为 User1Service 和 User2Service 相应方法加上`Propagation.NESTED`属性。**User1Service 方法：**
 
@@ -850,7 +847,7 @@ public class User2ServiceImpl implements User2Service {
 }
 ```
 
-##### 3.1 场景一
+##### 5.2.3.1 场景一
 
 此场景外围方法没有开启事务。
 
@@ -889,9 +886,9 @@ public class User2ServiceImpl implements User2Service {
 
 ![图片](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/spring-demo/20210330002030.png)
 
-**结论：通过这两个方法我们证明了在外围方法未开启事务的情况下`Propagation.NESTED`和`Propagation.REQUIRED`作用相同，修饰的内部方法都会新开启自己的事务，且开启的事务相互独立，互不干扰。**
+结论：通过这两个方法我们证明了在外围方法未开启事务的情况下 `Propagation.NESTED` 和 `Propagation.REQUIRED` 作用相同，修饰的内部方法都会新开启自己的事务，且开启的事务相互独立，互不干扰。
 
-##### 3.2 场景二
+##### 5.2.3.2 场景二
 
 外围方法开启事务。
 
@@ -952,19 +949,19 @@ public class User2ServiceImpl implements User2Service {
 
 ![图片](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/spring-demo/20210330002040.png)
 
-**结论：以上试验结果我们证明在外围方法开启事务的情况下`Propagation.NESTED`修饰的内部方法属于外部事务的子事务，外围主事务回滚，子事务一定回滚，而内部子事务可以单独回滚而不影响外围主事务和其他子事务**
+结论：以上试验结果我们证明在外围方法开启事务的情况下 `Propagation.NESTED` 修饰的内部方法属于外部事务的子事务，外围主事务回滚，子事务一定回滚，而内部子事务可以单独回滚而不影响外围主事务和其他子事务。
 
-#### 4. REQUIRED,REQUIRES_NEW,NESTED 异同
+#### 5.2.4. REQUIRED,REQUIRES_NEW,NESTED 异同
 
-由“1.2 场景二”和“3.2 场景二”对比，我们可知：**NESTED 和 REQUIRED 修饰的内部方法都属于外围方法事务，如果外围方法抛出异常，这两种方法的事务都会被回滚。但是 REQUIRED 是加入外围方法事务，所以和外围事务同属于一个事务，一旦 REQUIRED 事务抛出异常被回滚，外围方法事务也将被回滚。而 NESTED 是外围方法的子事务，有单独的保存点，所以 NESTED 方法抛出异常被回滚，不会影响到外围方法的事务。**
+- NESTED 和 REQUIRED 修饰的内部方法都属于外围方法事务，如果外围方法抛出异常，这两种方法的事务都会被回滚。但是 REQUIRED 是加入外围方法事务，所以和外围事务同属于一个事务，一旦 REQUIRED 事务抛出异常被回滚，外围方法事务也将被回滚。而 NESTED 是外围方法的子事务，有单独的保存点，所以 NESTED 方法抛出异常被回滚，不会影响到外围方法的事务。
 
-由“2.2 场景二”和“3.2 场景二”对比，我们可知：**NESTED 和 REQUIRES_NEW 都可以做到内部方法事务回滚而不影响外围方法事务。但是因为 NESTED 是嵌套事务，所以外围方法回滚之后，作为外围方法事务的子事务也会被回滚。而 REQUIRES_NEW 是通过开启新的事务实现的，内部事务和外围事务是两个事务，外围事务回滚不会影响内部事务。**
+- NESTED 和 REQUIRES_NEW 都可以做到内部方法事务回滚而不影响外围方法事务。但是因为 NESTED 是嵌套事务，所以外围方法回滚之后，作为外围方法事务的子事务也会被回滚。而 REQUIRES_NEW 是通过开启新的事务实现的，内部事务和外围事务是两个事务，外围事务回滚不会影响内部事务。
 
-#### 5. 其他事务传播行为
+#### 5.2.5. 其他事务传播行为
 
 鉴于文章篇幅问题，其他事务传播行为的测试就不在此一一描述了，感兴趣的读者可以去源码中自己寻找相应测试代码和结果解释。传送门：**https://github.com/TmTse/transaction-test**
 
-### 模拟用例
+### 5.3.模拟用例
 
 介绍了这么多事务传播行为，我们在实际工作中如何应用呢？下面我来举一个示例：
 
@@ -1040,7 +1037,7 @@ public class User2ServiceImpl implements User2Service {
 
 #### X.1.1.数据库层面
 
-数据库层面，数据库使用的存储引擎是否支持事务？默认情况下MySQL数据库使用的是Innodb存储引擎（5.5版本之后），它是支持事务的，但是如果你的表特地修改了存储引擎，例如，你通过下面的语句修改了表使用的存储引擎为`MyISAM`，而`MyISAM`又是不支持事务的
+数据库层面，数据库使用的存储引擎是否支持事务？默认情况下 `MySQL` 数据库使用的是 `Innodb` 存储引擎（5.5版本之后），它是支持事务的，但是如果你的表特地修改了存储引擎，例如，你通过下面的语句修改了表使用的存储引擎为`MyISAM`，而`MyISAM`又是不支持事务的
 
 ```sql
 alter table table_name engine=myisam;
@@ -1391,7 +1388,7 @@ public class IndexService {
 
 ##### X.4.2.1.少用@Transactional注解
 
-大家在实际项目开发中，我们在业务方法加上@Transactional注解开启事务功能，这是非常普遍的做法，它被称为声明式事务。
+大家在实际项目开发中，我们在业务方法加上 `@Transactional` 注解开启事务功能，这是非常普遍的做法，它被称为声明式事务。
 
 部分代码如下：
 
@@ -1402,17 +1399,17 @@ public class IndexService {
    }
 ```
 
-然而，我要说的第一条是：少用@Transactional注解。
+然而，我要说的第一条是：少用 `@Transactional` 注解。
 
 **为什么？**
 
-我们知道 @Transactional 注解是通过spring的aop起作用的，但是如果使用不当，事务功能可能会失效。如果恰巧你经验不足，这种问题不太好排查。
+我们知道 `@Transactional` 注解是通过 `spring` 的 `aop` 起作用的，但是如果使用不当，事务功能可能会失效。如果恰巧你经验不足，这种问题不太好排查。
 
-@Transactional注解一般加在某个业务方法上，会导致整个业务方法都在同一个事务中，粒度太粗，不好控制事务范围，是出现大事务问题的最常见的原因。
+`@Transactional` 注解一般加在某个业务方法上，会导致整个业务方法都在同一个事务中，粒度太粗，不好控制事务范围，是出现大事务问题的最常见的原因。
 
 **那我们该怎么办呢？**
 
-可以使用编程式事务，在spring项目中使用TransactionTemplate类的对象，手动执行事务。
+可以使用编程式事务，在 `spring` 项目中使用 `TransactionTemplate` 类的对象，手动执行事务。
 
 部分代码如下：
 
@@ -1430,9 +1427,9 @@ public class IndexService {
    }
 ```
 
-从上面的代码中可以看出，使用TransactionTemplate的编程式事务功能自己灵活控制事务的范围，是避免大事务问题的首选办法。
+从上面的代码中可以看出，使用 `TransactionTemplate` 的编程式事务功能自己灵活控制事务的范围，是避免大事务问题的首选办法。
 
-当然，我说少使用@Transactional注解开启事务，并不是说一定不能用它，如果项目中有些业务逻辑比较简单，而且不经常变动，使用@Transactional注解开启事务开启事务也无妨，因为它更简单，开发效率更高，但是千万要小心事务失效的问题。
+当然，我说少使用 `@Transactional` 注解开启事务，并不是说一定不能用它，如果项目中有些业务逻辑比较简单，而且不经常变动，使用 `@Transactional` 注解开启事务开启事务也无妨，因为它更简单，开发效率更高，但是千万要小心事务失效的问题。
 
 ##### X.4.2.2.将查询(select)方法放到事务外
 
@@ -1450,9 +1447,9 @@ public class IndexService {
    }
 ```
 
-可以将queryData1和queryData2两个查询方法放在事务外执行，将真正需要事务执行的代码才放到事务中，比如：addData1和updateData2方法，这样就能有效的减少事务的粒度。
+可以将 `queryData1` 和 `queryData2` 两个查询方法放在事务外执行，将真正需要事务执行的代码才放到事务中，比如：`addData1` 和`updateData2` 方法，这样就能有效的减少事务的粒度。
 
-如果使用TransactionTemplate的编程式事务这里就非常好修改。
+如果使用 `TransactionTemplate` 的编程式事务这里就非常好修改。
 
 ```java
    @Autowired
@@ -1471,7 +1468,7 @@ public class IndexService {
    }
 ```
 
-但是如果你实在还是想用@Transactional注解，该怎么拆分呢？
+但是如果你实在还是想用 `@Transactional` 注解，该怎么拆分呢？
 
 ```java
    public void save(User user) {
@@ -1487,13 +1484,13 @@ public class IndexService {
     }
 ```
 
-这个例子是非常经典的错误，这种直接方法调用的做法事务不会生效，给正在坑中的朋友提个醒。因为@Transactional注解的声明式事务是通过spring aop起作用的，而spring aop需要生成代理对象，直接方法调用使用的还是原始对象，所以事务不会生效。
+这个例子是非常经典的错误，这种直接方法调用的做法事务不会生效，给正在坑中的朋友提个醒。因为 `@Transactional` 注解的声明式事务是通过 `spring aop` 起作用的，而 `spring aop` 需要生成代理对象，直接方法调用使用的还是原始对象，所以事务不会生效。
 
 有没有办法解决这个问题呢？
 
 **1.新加一个Service方法**
 
-这个方法非常简单，只需要新加一个Service方法，把@Transactional注解加到新Service方法上，把需要事务执行的代码移到新方法中。具体代码如下：
+这个方法非常简单，只需要新加一个 `Service` 方法，把 `@Transactional` 注解加到新 `Service` 方法上，把需要事务执行的代码移到新方法中。具体代码如下：
 
 ```java
   @Servcie
@@ -1520,7 +1517,7 @@ public class IndexService {
    }
 ```
 
-2.在该Service类中注入自己
+**2.在该Service类中注入自己**
 
 如果不想再新加一个Service类，在该Service类中注入自己也是一种选择。具体代码如下：
 
@@ -1546,9 +1543,9 @@ public class IndexService {
 
 可能有些人可能会有这样的疑问：这种做法会不会出现循环依赖问题？
 
-其实spring ioc内部的三级缓存保证了它，不会出现循环依赖问题。如果你想进一步了解循环依赖问题，可以看看我之前文章《spring解决循环依赖为什么要用三级缓存？》。
+其实 `spring ioc` 内部的三级缓存保证了它，不会出现循环依赖问题。如果你想进一步了解循环依赖问题，可以看看我之前文章《spring解决循环依赖为什么要用三级缓存？》。
 
-3.在该Service类中使用AopContext.currentProxy()获取代理对象
+**3.在该 `Service` 类中使用 `AopContext.currentProxy()` 获取代理对象**
 
 上面的方法2确实可以解决问题，但是代码看起来并不直观，还可以通过在该Service类中使用AOPProxy获取代理对象，实现相同的功能。具体代码如下：
 
@@ -1693,7 +1690,7 @@ order方法用于下单，delivery方法用于发货，是不是下单后就一�
 
 本人从网友的一个问题出发，结合自己实际的工作经验分享了处理大事务的6种办法：
 
-- 少用@Transactional注解
+- 少用 `@Transactional` 注解
 - 将查询(select)方法放到事务外
 - 事务中避免远程调用
 - 事务中避免一次性处理太多数据

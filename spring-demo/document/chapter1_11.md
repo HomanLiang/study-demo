@@ -6,20 +6,18 @@
 
 ## 1.总体说下Spring ORM框架的结构
 
-说到ORM，就是所谓的对象关系映射，可以简单地理解成将java中的对象与数据库中的表对应起来的一种模型。那么Spring ORM到底是什么东西呢？我们来看看Spring ORM的源码结构就知道了！下面我贴一张图：
+说到 `ORM`，就是所谓的对象关系映射，可以简单地理解成将java中的对象与数据库中的表对应起来的一种模型。那么 `Spring ORM` 到底是什么东西呢？我们来看看 `Spring ORM` 的源码结构就知道了！下面我贴一张图：
 
 ![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/spring-demo/20210330212515.webp)
 
-从图中可以看到在Spring ORM模块中默认对两种技术提供了支持，分别是hibernate5和jpa，hibernate是一个ORM框架，jpa它是java持久化API，下面我将会重点结合hibernate来讲解Spring ORM。关于这两种技术的详细信息，请自行谷哥咯！
-
-在对下面第二节的阅读前，我想以我的理解讲讲我们一般是如何对数据库进行操作的，方便我们从根本上来了解操作原理，不至于被Spring ORM中的各种类给弄蒙蔽了！
+从图中可以看到在 `Spring ORM` 模块中默认对两种技术提供了支持，分别是 `hibernate5` 和 `jpa`，`hibernate` 是一个 `ORM` 框架，jpa它是 `java` 持久化 `API` ，下面我将会重点结合 `hibernate` 来讲解 `Spring ORM`。
 
 一般程序操作数据库有以下步骤：
 
-- 1、配置一个数据库源`(DataSource)`，这个很好理解，既然你要对数据库进行操作，那么你的数据是从哪里来的呢？肯定是数据库嘛！
-- 2、建立与数据库的链接`(Connection)`，非常好理解，你要和小编通电话，总得有个链接你我的工具吧！没错，那就是电话线！
-- 3、获取会话`(Session)`，会话就是你和小编的一次通话，通话完，上面的链接可以关闭，也可以不关闭，看心情！哈哈！
-- 4、然后就是对数据库进行操作啦！
+- 配置一个数据库源`(DataSource)`，这个很好理解，既然你要对数据库进行操作，那么你的数据是从哪里来的呢？肯定是数据库嘛！
+- 建立与数据库的链接`(Connection)`，非常好理解，你要和小编通电话，总得有个链接你我的工具吧！没错，那就是电话线！
+- 获取会话`(Session)`，会话就是你和小编的一次通话，通话完，上面的链接可以关闭，也可以不关闭，看心情！哈哈！
+- 然后就是对数据库进行操作啦！
 
 ## 2.详细讲下Spring ORM重要类及其使用
 
@@ -29,8 +27,8 @@
 
 源码中我们重点关注几个重要的类及接口，分别是：
 
-- `HibernateOperations`接口，该接口封装了很多基于hibernate api的操作，该接口被`HibernateTemplate`实现，虽然该接口不经常使用，但是在Spring中可以用于测试。
-- `HibernateTemplate`类，该类实现了`HibernateOperations`接口，因此该类同样拥有了很对基于hibernate的数据库操作。但细心的小伙伴会发现，它的命名中出现了Template模板，可以推测它是一个模板类，没错，该类是模板方法设计模式的一个体现，该类中提供了一个模板方法，具体如下：
+- `HibernateOperations`接口，该接口封装了很多基于 `hibernate api` 的操作，该接口被`HibernateTemplate`实现，虽然该接口不经常使用，但是在 `Spring` 中可以用于测试。
+- `HibernateTemplate`类，该类实现了`HibernateOperations`接口，因此该类同样拥有了很对基于 `hibernate` 的数据库操作。但细心的小伙伴会发现，它的命名中出现了 `Template` 模板，可以推测它是一个模板类，没错，该类是模板方法设计模式的一个体现，该类中提供了一个模板方法，具体如下：
 
     ```
     @Override
@@ -40,7 +38,7 @@
     }
     ```
 
-	该模板方法超级简单，传入一个Hibernate回调实例，然后执行`doExecute()`方法。你可能会问，那这个`HibernateCallback`是什么？`doExecute()`又是什么？ 打开`HibernateCallback`源码：
+	该模板方法超级简单，传入一个 `Hibernate` 回调实例，然后执行`doExecute()`方法。你可能会问，那这个`HibernateCallback`是什么？`doExecute()`又是什么？ 打开`HibernateCallback`源码：
 
     ```
     @FunctionalInterface

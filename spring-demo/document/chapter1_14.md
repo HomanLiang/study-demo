@@ -8,23 +8,23 @@
 
 ### 1.1.Assert类目的
 
-Spring Assert类帮助我们校验参数。通过使用Assert类方法，我们可以写出我们认为是正确的假设，反之，会抛出运行时异常。
+`Spring Assert` 类帮助我们校验参数。通过使用 `Assert` 类方法，我们可以写出我们认为是正确的假设，反之，会抛出运行时异常。
 
-每个Assert的方法可以与java assert表达式进行比较。java assert表达式在运行时如果条件校验失败，则抛出Error，有趣的是，这些断言可以被禁用。
+每个 `Assert` 的方法可以与 `java assert` 表达式进行比较。`java assert` 表达式在运行时如果条件校验失败，则抛出 `Error`，有趣的是，这些断言可以被禁用。
 
-Spring Assert的方法有一些特点： 
+`Spring Assert` 的方法有一些特点： 
 
-- 都是static方法 
-- 抛出IllegalArgumentException 或 IllegalStateException异常 
+- 都是 `static` 方法 
+- 抛出 `IllegalArgumentException` 或 `IllegalStateException` 异常 
 - 第一个参数通常是需验证的对象或逻辑条件 
 - 最后参数通常是异常消息，用于验证失败时显示 
-- 消息可以作为String参数或Supplier 参数传输
+- 消息可以作为 `String` 参数或 `Supplier` 参数传输
 
-尽管Spring Assert与其他框架的名称类似，如JUnit或其他框架，但其实没有任何共同之处。Spring Assert不是为了测试，而是为了调试。
+尽管 `Spring Assert` 与其他框架的名称类似，如 `JUnit` 或其他框架，但其实没有任何共同之处。`Spring Assert` 不是为了测试，而是为了调试。
 
 ### 1.2.使用示例
 
-让我们定义Car类，并有public方法drive():
+让我们定义 `Car` 类，并有 `public` 方法 `drive()`:
 
     public class Car {
         private String state = "stop";
@@ -36,28 +36,29 @@ Spring Assert的方法有一些特点：
         }
     }
 
-我们看到speed必须是正数，上面一行简短的代码用于检测条件，如果失败抛出异常：
+我们看到 `speed` 必须是正数，上面一行简短的代码用于检测条件，如果失败抛出异常：
 
     if (!(speed > 0)) {
         throw new IllegalArgumentException("speed must be positive");
     }
 
 每个Assert的方法包含大概类似上面的条件代码块，校验失败抛出运行时异常，应用程序不期望恢复。 
-如果我们尝试带负数参数调用drive方法，会抛出IllegalArgumentException异常：
+
+如果我们尝试带负数参数调用 `drive` 方法，会抛出 `IllegalArgumentException` 异常：
 
     Exception in thread "main" java.lang.IllegalArgumentException: speed must be positive
 
 **逻辑断言**
 
-- isTrue()
+- `isTrue()`
 
-  上面已经看到示例，其接受布尔条件，如果条件为假抛出IllegalArgumentException 异常。
+  上面已经看到示例，其接受布尔条件，如果条件为假抛出 `IllegalArgumentException` 异常。
 
-- state()
+- `state()`
 
-  该方法与isTrue一样，但抛出IllegalStateException异常。
+  该方法与 `isTrue` 一样，但抛出 `IllegalStateException` 异常。
 
-  如名称所示，通常用在因对象的非法状态时，方法不能继续执行。假设骑车运行是不能加油，我们可以使用state方法断言：
+  如名称所示，通常用在因对象的非法状态时，方法不能继续执行。假设骑车运行是不能加油，我们可以使用 `state` 方法断言：
 
   ```
   public void fuel() {
@@ -70,9 +71,9 @@ Spring Assert的方法有一些特点：
 
 **对象和类型断言**
 
-- notNull()
+- `notNull()`
 
-  通过notNull()方法可以假设对象不null：
+  通过 `notNull()` 方法可以假设对象不 `null`：
 
   ```
   public void сhangeOil(String oil) {
@@ -81,9 +82,9 @@ Spring Assert的方法有一些特点：
   }
   ```
 
-- isNull()
+- `isNull()`
 
-  另外一方面，我们能使用isNull()方法检查对象为null:
+  另外一方面，我们能使用 `isNull()` 方法检查对象为 `null`:
 
   ```
   public void replaceBattery(CarBattery carBattery) {
@@ -94,9 +95,9 @@ Spring Assert的方法有一些特点：
   }
   ```
 
-- isInstanceOf()
+- `isInstanceOf()`
 
-  使用isInstanceOf()方法检查对象必须为另一个特定类型的实例：
+  使用 `isInstanceOf()` 方法检查对象必须为另一个特定类型的实例：
 
   ```
   public void сhangeEngine(Engine engine) {
@@ -105,11 +106,11 @@ Spring Assert的方法有一些特点：
   }
   ```
 
-  示例中，ToyotaEngine 是类 Engine的子类，所以检查通过.
+  示例中，`ToyotaEngine` 是类 `Engine` 的子类，所以检查通过.
 
-- isAssignable()
+- `isAssignable()`
 
-  使用Assert.isAssignable()方法检查类型：
+  使用 `Assert.isAssignable()` 方法检查类型：
 
   ```
   public void repairEngine(Engine engine) {
@@ -118,15 +119,15 @@ Spring Assert的方法有一些特点：
   }
   ```
 
-  这两个断言代表 is-a 关系.
+  这两个断言代表 `is-a` 关系.
 
 **文本断言**
 
 通常用来检查字符串参数。
 
-- hasLength()
+- `hasLength()`
 
-  如果检查字符串不是空符串，意味着至少包含一个空白，可以使用hasLength()方法：
+  如果检查字符串不是空符串，意味着至少包含一个空白，可以使用 `hasLength()` 方法：
 
   ```
   public void startWithHasLength(String key) {
@@ -135,9 +136,9 @@ Spring Assert的方法有一些特点：
   }
   ```
 
-- hasText()
+- `hasText()`
 
-  我们能增强检查条件，字符串至少包含一个非空白字符，可以使用hasText()方法：
+  我们能增强检查条件，字符串至少包含一个非空白字符，可以使用 `hasText()` 方法：
 
   ```
   public void startWithHasText(String key) {
@@ -148,9 +149,9 @@ Spring Assert的方法有一些特点：
   }
   ```
 
-- doesNotContain()
+- `doesNotContain()`
 
-  我们能通过doesNotContain()方法检查参数不包含特定子串：
+  我们能通过 `doesNotContain()` 方法检查参数不包含特定子串：
 
   ```
   public void startWithNotContain(String key) {
@@ -161,9 +162,9 @@ Spring Assert的方法有一些特点：
 
 **Collection和map断言**
 
-- Collection应用notEmpty()
+- `Collection` 应用 `notEmpty()`
 
-  如其名称所示，notEmpty()方法断言collection不空，意味着不是null并包含至少一个元素：
+  如其名称所示，`notEmpty()` 方法断言 `collection` 不空，意味着不是 `null` 并包含至少一个元素：
 
   ```
   public void repair(Collection<String> repairParts) {
@@ -174,9 +175,9 @@ Spring Assert的方法有一些特点：
   }
   ```
 
-- map应用notEmpty()
+- `map` 应用 `notEmpty()`
 
-  同样的方法重载用于map，检查map不null，并至少包含一个entry（key，value键值对）：
+  同样的方法重载用于 `map`，检查 `map` 不 `null`，并至少包含一个 `entry`（`key，value`键值对）：
 
   ```
   public void repair(Map<String, String> repairParts) {
@@ -189,9 +190,9 @@ Spring Assert的方法有一些特点：
 
 **数组断言**
 
-- notEmpty()
+- `notEmpty()`
 
-  notEmpty()方法可以检查数组不null，且至少包括一个元素：
+  `notEmpty()` 方法可以检查数组不 `null`，且至少包括一个元素：
 
   ```
   public void repair(String[] repairParts) {
@@ -202,9 +203,9 @@ Spring Assert的方法有一些特点：
   }
   ```
 
-- noNullElements()
+- `noNullElements()`
 
-  noNullElements()方法确保数组不包含null元素：
+  `noNullElements()` 方法确保数组不包含 `null` 元素：
 
   ```
   public void repairWithNoNull(String[] repairParts) {
@@ -215,11 +216,11 @@ Spring Assert的方法有一些特点：
   }
   ```
 
-注意，如果数组为空检查可以通过，只要没有null元素。
+注意，如果数组为空检查可以通过，只要没有 `null` 元素。
 
 ### 1.3.总结
 
-我们浏览Assert类，在spring框架中应用广泛，充分利用它可以很容易写出强壮的代码。
+我们浏览 `Assert` 类，在 `spring` 框架中应用广泛，充分利用它可以很容易写出强壮的代码。
 
 
 
@@ -380,9 +381,9 @@ public class OpLogAspect {
 
 以上切面中，有几个点需要大家注意的：
 
-1、使用@Around注解来指定对标注了OpLog的方法设置切面。
+1、使用 `@Around` 注解来指定对标注了 `OpLog` 的方法设置切面。
 
- 2、使用Spel的相关方法，通过指定的表示，从对应的参数中获取到目标对象的唯一性标识。 
+ 2、使用 `Spel` 的相关方法，通过指定的表示，从对应的参数中获取到目标对象的唯一性标识。 
 
 3、再方法执行成功后，输出日志。
 
@@ -410,7 +411,7 @@ HashMap update(OrderVO orderVo)
 }
 ```
 
-以上，即可从入参的OrderVO对象的id属性的值获取。
+以上，即可从入参的 `OrderVO` 对象的 `id` 属性的值获取。
 
 如果我们要记录的唯一性标识，在入参中没有的话，应该怎么办呢？最典型的就是插入方法，插入成功之前，根本不知道主键ID是什么，这种怎么办呢？
 
@@ -433,7 +434,7 @@ InsertResult insert(OrderVO orderVo)
 
 当我们对外部提供接口的时候，会对其中的部分参数有一定的要求，比如某些参数值不能为空等。大多数情况下我们都需要自己主动进行校验，判断对方传入的值是否合理。
 
-这里推荐一个使用HibernateValidator + 自定义注解 + AOP实现参数校验的方式。
+这里推荐一个使用 `HibernateValidator` + 自定义注解 + AOP实现参数校验的方式。
 
 首先我们会有一个具体的入参类，定义如下：
 
@@ -475,7 +476,7 @@ public class BeanValidator {
 }
 ```
 
-以上代码，会对一个bean进行校验，一旦失败，就会抛出ValidationException。
+以上代码，会对一个 `bean` 进行校验，一旦失败，就会抛出 `ValidationException`。
 
 接下来定义一个注解：
 
@@ -561,7 +562,7 @@ public class FacadeAspect {
 }
 ```
 
-以上代码，和前面的切面有点类似，主要是定义了一个切面，会对所有标注@Facade的方法进行统一处理，即在开始方法调用前进行参数校验，一旦校验失败，则返回一个固定的失败的Response，特别需要注意的是，这里之所以可以返回一个固定的BaseResponse，是因为我们会要求我们的所有对外提供的接口的response必须继承BaseResponse类，这个类里面会定义一些默认的参数，如错误码等。
+以上代码，和前面的切面有点类似，主要是定义了一个切面，会对所有标注 `@Facade` 的方法进行统一处理，即在开始方法调用前进行参数校验，一旦校验失败，则返回一个固定的失败的 `Response`，特别需要注意的是，这里之所以可以返回一个固定的 `BaseResponse`，是因为我们会要求我们的所有对外提供的接口的 `response` 必须继承 `BaseResponse` 类，这个类里面会定义一些默认的参数，如错误码等。
 
 之后，只需要对需要参数校验的方法增加对应注解即可：
 
@@ -574,7 +575,7 @@ public TestResponse query(User user) {
 
 这样，有了以上注解和切面，我们就可以对所有的对外方法做统一的控制了。
 
-其实，以上这个facadeAspect我省略了很多东西，我们真正使用的那个切面，不仅仅做了参数检查，还可以做很多其他事情。比如异常的统一处理、错误码的统一转换、记录方法执行时长、记录方法的入参出参等等。
+其实，以上这个 `facadeAspect` 我省略了很多东西，我们真正使用的那个切面，不仅仅做了参数检查，还可以做很多其他事情。比如异常的统一处理、错误码的统一转换、记录方法执行时长、记录方法的入参出参等等。
 
 总之，使用切面+自定义注解，我们可以统一做很多事情。除了以上的这几个场景，我们还有很多相似的用法，比如：
 
@@ -596,7 +597,7 @@ public TestResponse query(User user) {
 
 ### 3.2.添加依赖
 
-Spring Boot整合JSR-303只需要添加一个`starter`即可，如下：
+`Spring Boot` 整合 `JSR-303` 只需要添加一个`starter`即可，如下：
 
 ```
 <dependency>
@@ -844,11 +845,11 @@ public class ArticleDTO {
 
 #### 3.5.1.BindingResult 接收
 
-这种方式需要在`Controller`层的每个接口方法参数中指定，Validator会将校验的信息自动封装到其中。这也是上面例子中一直用的方式。如下：
+这种方式需要在 `Controller` 层的每个接口方法参数中指定，`Validator` 会将校验的信息自动封装到其中。这也是上面例子中一直用的方式。如下：
 
 ```
 @PostMapping("/add")
-    public String add(@Valid @RequestBody ArticleDTO articleDTO, BindingResult bindingResult){}
+public String add(@Valid @RequestBody ArticleDTO articleDTO, BindingResult bindingResult){}
 ```
 
 这种方式的弊端很明显，每个接口方法参数都要声明，同时每个方法都要处理校验信息，显然不现实，舍弃。
@@ -1039,15 +1040,17 @@ public class AuthorDTO {
 
 数据校验作为客户端和服务端的一道屏障，有着重要的作用，通过这篇文章希望能够对`JSR-303`数据校验有着全面的认识。
 
+
+
 ## 4.Spring 中的重试机制
 
 ### 4.1.概要
 
-Spring实现了一套重试机制，功能简单实用。Spring Retry是从Spring Batch独立出来的一个功能，已经广泛应用于Spring Batch,Spring Integration, Spring for Apache Hadoop等Spring项目。本文将讲述如何使用Spring Retry及其实现原理。
+`Spring` 实现了一套重试机制，功能简单实用。`Spring Retry` 是从 `Spring Batch` 独立出来的一个功能，已经广泛应用于 `Spring Batch`,`Spring Integration`, `Spring for Apache Hadoop` 等 `Spring` 项目。本文将讲述如何使用 `Spring Retry` 及其实现原理。
 
 ### 4.2.背景
 
-重试，其实我们其实很多时候都需要的，为了保证容错性，可用性，一致性等。一般用来应对外部系统的一些不可预料的返回、异常等，特别是网络延迟，中断等情况。还有在现在流行的微服务治理框架中，通常都有自己的重试与超时配置，比如dubbo可以设置retries=1，timeout=500调用失败只重试1次，超过500ms调用仍未返回则调用失败。如果我们要做重试，要为特定的某个操作做重试功能，则要硬编码，大概逻辑基本都是写个循环，根据返回或异常，计数失败次数，然后设定退出条件。这样做，且不说每个操作都要写这种类似的代码，而且重试逻辑和业务逻辑混在一起，给维护和扩展带来了麻烦。从面向对象的角度来看，我们应该把重试的代码独立出来。
+重试，其实我们其实很多时候都需要的，为了保证容错性，可用性，一致性等。一般用来应对外部系统的一些不可预料的返回、异常等，特别是网络延迟，中断等情况。还有在现在流行的微服务治理框架中，通常都有自己的重试与超时配置，比如 `dubbo` 可以设置`retries=1，timeout=500` 调用失败只重试1次，超过 `500ms` 调用仍未返回则调用失败。如果我们要做重试，要为特定的某个操作做重试功能，则要硬编码，大概逻辑基本都是写个循环，根据返回或异常，计数失败次数，然后设定退出条件。这样做，且不说每个操作都要写这种类似的代码，而且重试逻辑和业务逻辑混在一起，给维护和扩展带来了麻烦。从面向对象的角度来看，我们应该把重试的代码独立出来。
 
 ### 4.3.使用介绍
 
@@ -1090,25 +1093,29 @@ public class RetryService {
 }
 ```
 
-@EnableRetry - 表示开启重试机制 @Retryable - 表示这个方法需要重试，它有很丰富的参数，可以满足你对重试的需求 @Backoff - 表示重试中的退避策略 @Recover - 兜底方法，即多次重试后还是失败就会执行这个方法
+- `@EnableRetry` - 表示开启重试机制
 
-Spring-Retry 的功能丰富在于其重试策略和退避策略，还有兜底，监听器等操作。
+- `@Retryable` - 表示这个方法需要重试，它有很丰富的参数，可以满足你对重试的需求
+
+- `@Backoff` - 表示重试中的退避策略 @Recover - 兜底方法，即多次重试后还是失败就会执行这个方法
+
+`Spring-Retry` 的功能丰富在于其重试策略和退避策略，还有兜底，监听器等操作。
 
 然后每个注解里面的参数，都是很简单的，大家看一下就知道是什么意思，怎么用了，我就不多讲了。
 
 #### 4.3.2.重试策略
 
-看一下Spring Retry自带的一些重试策略，主要是用来判断当方法调用异常时是否需要重试。（下文原理部分会深入分析实现）
+看一下 `Spring Retry` 自带的一些重试策略，主要是用来判断当方法调用异常时是否需要重试。（下文原理部分会深入分析实现）
 
 ![图片](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/spring-demo/20210504232333.webp)
 
-- SimpleRetryPolicy 默认最多重试3次
-- TimeoutRetryPolicy 默认在1秒内失败都会重试
-- ExpressionRetryPolicy 符合表达式就会重试
-- CircuitBreakerRetryPolicy 增加了熔断的机制，如果不在熔断状态，则允许重试
-- CompositeRetryPolicy 可以组合多个重试策略
-- NeverRetryPolicy 从不重试（也是一种重试策略哈）
-- AlwaysRetryPolicy 总是重试
+- `SimpleRetryPolicy` 默认最多重试3次
+- `TimeoutRetryPolicy` 默认在1秒内失败都会重试
+- `ExpressionRetryPolicy` 符合表达式就会重试
+- `CircuitBreakerRetryPolicy` 增加了熔断的机制，如果不在熔断状态，则允许重试
+- `CompositeRetryPolicy` 可以组合多个重试策略
+- `NeverRetryPolicy 从不重试`（也是一种重试策略哈）
+- `AlwaysRetryPolicy` 总是重试
 
 ….等等
 
@@ -1118,11 +1125,11 @@ Spring-Retry 的功能丰富在于其重试策略和退避策略，还有兜底�
 
 ![图片](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/spring-demo/20210504232338.webp)
 
-- FixedBackOffPolicy 默认固定延迟1秒后执行下一次重试
-- ExponentialBackOffPolicy 指数递增延迟执行重试，默认初始0.1秒，系数是2，那么下次延迟0.2秒，再下次就是延迟0.4秒，如此类推，最大30秒。
-- ExponentialRandomBackOffPolicy 在上面那个策略上增加随机性
-- UniformRandomBackOffPolicy 这个跟上面的区别就是，上面的延迟会不停递增，这个只会在固定的区间随机
-- StatelessBackOffPolicy 这个说明是无状态的，所谓无状态就是对上次的退避无感知，从它下面的子类也能看出来
+- `FixedBackOffPolicy` 默认固定延迟1秒后执行下一次重试
+- `ExponentialBackOffPolicy` 指数递增延迟执行重试，默认初始0.1秒，系数是2，那么下次延迟0.2秒，再下次就是延迟0.4秒，如此类推，最大30秒。
+- `ExponentialRandomBackOffPolicy` 在上面那个策略上增加随机性
+- `UniformRandomBackOffPolicy` 这个跟上面的区别就是，上面的延迟会不停递增，这个只会在固定的区间随机
+- `StatelessBackOffPolicy` 这个说明是无状态的，所谓无状态就是对上次的退避无感知，从它下面的子类也能看出来
 
 ### 4.4.原理
 
@@ -1140,13 +1147,13 @@ Spring-Retry 的功能丰富在于其重试策略和退避策略，还有兜底�
 @Documented
 public @interface EnableRetry {
 
- /**
-  * Indicate whether subclass-based (CGLIB) proxies are to be created as opposed
-  * to standard Java interface-based proxies. The default is {@code false}.
-  *
-  * @return whether to proxy or not to proxy the class
-  */
- boolean proxyTargetClass() default false;
+    /**
+    * Indicate whether subclass-based (CGLIB) proxies are to be created as opposed
+    * to standard Java interface-based proxies. The default is {@code false}.
+    *
+    * @return whether to proxy or not to proxy the class
+    */
+    boolean proxyTargetClass() default false;
 
 }
 ```
@@ -1157,59 +1164,59 @@ public @interface EnableRetry {
 
 ![图片](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/spring-demo/20210504232344.webp)
 
-它是一个AbstractPointcutAdvisor，它有一个pointcut和一个advice。我们知道，在IOC过程中会根据PointcutAdvisor类来对Bean进行Pointcut的过滤，然后生成对应的AOP代理类，用advice来加强处理。看看RetryConfiguration的初始化:
+它是一个 `AbstractPointcutAdvisor`，它有一个 `pointcut` 和一个 `advice`。我们知道，在 `IOC` 过程中会根据 `PointcutAdvisor` 类来对 `Bean` 进行 `Pointcut` 的过滤，然后生成对应的 `AOP` 代理类，用 `advice` 来加强处理。看看 `RetryConfiguration` 的初始化:
 
 ```
 @PostConstruct
- public void init() {
-  Set<Class<? extends Annotation>> retryableAnnotationTypes = new LinkedHashSet<Class<? extends Annotation>>(1);
-  retryableAnnotationTypes.add(Retryable.class);
-        //创建pointcut
-  this.pointcut = buildPointcut(retryableAnnotationTypes);
-        //创建advice
-  this.advice = buildAdvice();
-  if (this.advice instanceof BeanFactoryAware) {
-   ((BeanFactoryAware) this.advice).setBeanFactory(beanFactory);
-  }
- }
+public void init() {
+    Set<Class<? extends Annotation>> retryableAnnotationTypes = new LinkedHashSet<Class<? extends Annotation>>(1);
+    retryableAnnotationTypes.add(Retryable.class);
+    //创建pointcut
+    this.pointcut = buildPointcut(retryableAnnotationTypes);
+    //创建advice
+    this.advice = buildAdvice();
+    if (this.advice instanceof BeanFactoryAware) {
+        ((BeanFactoryAware) this.advice).setBeanFactory(beanFactory);
+    }
+}
 protected Pointcut buildPointcut(Set<Class<? extends Annotation>> retryAnnotationTypes) {
-  ComposablePointcut result = null;
-  for (Class<? extends Annotation> retryAnnotationType : retryAnnotationTypes) {
-   Pointcut filter = new AnnotationClassOrMethodPointcut(retryAnnotationType);
-   if (result == null) {
-    result = new ComposablePointcut(filter);
-   }
-   else {
-    result.union(filter);
-   }
-  }
-  return result;
- }
+    ComposablePointcut result = null;
+    for (Class<? extends Annotation> retryAnnotationType : retryAnnotationTypes) {
+        Pointcut filter = new AnnotationClassOrMethodPointcut(retryAnnotationType);
+        if (result == null) {
+        	result = new ComposablePointcut(filter);
+        }
+        else {
+        	result.union(filter);
+        }
+    }
+    return result;
+}
 ```
 
-上面代码用到了AnnotationClassOrMethodPointcut，其实它最终还是用到了AnnotationMethodMatcher来根据注解进行切入点的过滤。这里就是@Retryable注解了。
+上面代码用到了 `AnnotationClassOrMethodPointcut`，其实它最终还是用到了 `AnnotationMethodMatcher` 来根据注解进行切入点的过滤。这里就是 `@Retryable` 注解了。
 
 ```
 //创建advice对象，即拦截器
-   protected Advice buildAdvice() {
+protected Advice buildAdvice() {
     //下面关注这个对象
- AnnotationAwareRetryOperationsInterceptor interceptor = new AnnotationAwareRetryOperationsInterceptor();
- if (retryContextCache != null) {
-  interceptor.setRetryContextCache(retryContextCache);
- }
- if (retryListeners != null) {
-  interceptor.setListeners(retryListeners);
- }
- if (methodArgumentsKeyGenerator != null) {
-  interceptor.setKeyGenerator(methodArgumentsKeyGenerator);
- }
- if (newMethodArgumentsIdentifier != null) {
-  interceptor.setNewItemIdentifier(newMethodArgumentsIdentifier);
- }
- if (sleeper != null) {
-  interceptor.setSleeper(sleeper);
- }
- return interceptor;
+    AnnotationAwareRetryOperationsInterceptor interceptor = new AnnotationAwareRetryOperationsInterceptor();
+    if (retryContextCache != null) {
+    	interceptor.setRetryContextCache(retryContextCache);
+    }
+    if (retryListeners != null) {
+    	interceptor.setListeners(retryListeners);
+    }
+    if (methodArgumentsKeyGenerator != null) {
+    	interceptor.setKeyGenerator(methodArgumentsKeyGenerator);
+    }
+    if (newMethodArgumentsIdentifier != null) {
+    	interceptor.setNewItemIdentifier(newMethodArgumentsIdentifier);
+    }
+    if (sleeper != null) {
+        interceptor.setSleeper(sleeper);
+    }
+    return interceptor;
 }
 ```
 
@@ -1230,413 +1237,400 @@ protected Pointcut buildPointcut(Set<Class<? extends Annotation>> retryAnnotatio
  }
 ```
 
-这里用到了委托，主要是需要根据配置委托给具体“有状态”的interceptor还是“无状态”的interceptor。
+这里用到了委托，主要是需要根据配置委托给具体“有状态”的 `interceptor` 还是“无状态”的 `interceptor`。
 
 ```
 private MethodInterceptor getDelegate(Object target, Method method) {
-  if (!this.delegates.containsKey(target) || !this.delegates.get(target).containsKey(method)) {
-   synchronized (this.delegates) {
-    if (!this.delegates.containsKey(target)) {
-     this.delegates.put(target, new HashMap<Method, MethodInterceptor>());
+    if (!this.delegates.containsKey(target) || !this.delegates.get(target).containsKey(method)) {
+        synchronized (this.delegates) {
+            if (!this.delegates.containsKey(target)) {
+                this.delegates.put(target, new HashMap<Method, MethodInterceptor>());
+            }
+            Map<Method, MethodInterceptor> delegatesForTarget = this.delegates.get(target);
+            if (!delegatesForTarget.containsKey(method)) {
+                Retryable retryable = AnnotationUtils.findAnnotation(method, Retryable.class);
+                if (retryable == null) {
+                    retryable = AnnotationUtils.findAnnotation(method.getDeclaringClass(), Retryable.class);
+                }
+                if (retryable == null) {
+                    retryable = findAnnotationOnTarget(target, method);
+                }
+                if (retryable == null) {
+                    return delegatesForTarget.put(method, null);
+                }
+                MethodInterceptor delegate;
+                //支持自定义MethodInterceptor，而且优先级最高
+                if (StringUtils.hasText(retryable.interceptor())) {
+                    delegate = this.beanFactory.getBean(retryable.interceptor(), MethodInterceptor.class);
+                }
+                else if (retryable.stateful()) {
+                    //得到“有状态”的interceptor
+                    delegate = getStatefulInterceptor(target, method, retryable);
+                }
+                else {
+                    //得到“无状态”的interceptor
+                    delegate = getStatelessInterceptor(target, method, retryable);
+                }
+                delegatesForTarget.put(method, delegate);
+            }
+        }
     }
-    Map<Method, MethodInterceptor> delegatesForTarget = this.delegates.get(target);
-    if (!delegatesForTarget.containsKey(method)) {
-     Retryable retryable = AnnotationUtils.findAnnotation(method, Retryable.class);
-     if (retryable == null) {
-      retryable = AnnotationUtils.findAnnotation(method.getDeclaringClass(), Retryable.class);
-     }
-     if (retryable == null) {
-      retryable = findAnnotationOnTarget(target, method);
-     }
-     if (retryable == null) {
-      return delegatesForTarget.put(method, null);
-     }
-     MethodInterceptor delegate;
-     //支持自定义MethodInterceptor，而且优先级最高
-     if (StringUtils.hasText(retryable.interceptor())) {
-      delegate = this.beanFactory.getBean(retryable.interceptor(), MethodInterceptor.class);
-     }
-     else if (retryable.stateful()) {
-                     //得到“有状态”的interceptor
-      delegate = getStatefulInterceptor(target, method, retryable);
-     }
-     else {
-                     //得到“无状态”的interceptor
-      delegate = getStatelessInterceptor(target, method, retryable);
-     }
-     delegatesForTarget.put(method, delegate);
-    }
-   }
-  }
-  return this.delegates.get(target).get(method);
- }
+    return this.delegates.get(target).get(method);
+}
 ```
 
-getStatefulInterceptor和getStatelessInterceptor都是差不多，我们先看看比较简单的getStatelessInterceptor。
+`getStatefulInterceptor` 和 `getStatelessInterceptor` 都是差不多，我们先看看比较简单的 `getStatelessInterceptor`。
 
 ```
 private MethodInterceptor getStatelessInterceptor(Object target, Method method, Retryable retryable) {
-  //生成一个RetryTemplate
-  RetryTemplate template = createTemplate(retryable.listeners());
-  //生成retryPolicy
-  template.setRetryPolicy(getRetryPolicy(retryable));
-  //生成backoffPolicy
-  template.setBackOffPolicy(getBackoffPolicy(retryable.backoff()));
-  return RetryInterceptorBuilder.stateless()
-    .retryOperations(template)
-    .label(retryable.label())
-    .recoverer(getRecoverer(target, method))
-    .build();
- }
+    //生成一个RetryTemplate
+    RetryTemplate template = createTemplate(retryable.listeners());
+    //生成retryPolicy
+    template.setRetryPolicy(getRetryPolicy(retryable));
+    //生成backoffPolicy
+    template.setBackOffPolicy(getBackoffPolicy(retryable.backoff()));
+    return RetryInterceptorBuilder.stateless()
+        .retryOperations(template)
+        .label(retryable.label())
+        .recoverer(getRecoverer(target, method))
+        .build();
+}
 ```
 
-具体生成retryPolicy和backoffPolicy的规则，我们等下再回头来看。RetryInterceptorBuilder其实就是为了生成`RetryOperationsInterceptor`。RetryOperationsInterceptor也是一个MethodInterceptor，我们来看看它的`invoke`方法。
+具体生成 `retryPolicy` 和 `backoffPolicy` 的规则，我们等下再回头来看。`RetryInterceptorBuilder` 其实就是为了生成`RetryOperationsInterceptor`。`RetryOperationsInterceptor` 也是一个 `MethodInterceptor`，我们来看看它的`invoke`方法。
 
 ```
 public Object invoke(final MethodInvocation invocation) throws Throwable {
 
-  String name;
-  if (StringUtils.hasText(label)) {
-   name = label;
-  } else {
-   name = invocation.getMethod().toGenericString();
-  }
-  final String label = name;
-
-  //定义了一个RetryCallback，其实看它的doWithRetry方法，调用了invocation的proceed()方法，是不是有点眼熟，这就是AOP的拦截链调用，如果没有拦截链，那就是对原来方法的调用。
-  RetryCallback<Object, Throwable> retryCallback = new RetryCallback<Object, Throwable>() {
-
-   public Object doWithRetry(RetryContext context) throws Exception {
-    
-    context.setAttribute(RetryContext.NAME, label);
-
-    /*
-     * If we don't copy the invocation carefully it won't keep a reference to
-     * the other interceptors in the chain. We don't have a choice here but to
-     * specialise to ReflectiveMethodInvocation (but how often would another
-     * implementation come along?).
-     */
-    if (invocation instanceof ProxyMethodInvocation) {
-     try {
-      return ((ProxyMethodInvocation) invocation).invocableClone().proceed();
-     }
-     catch (Exception e) {
-      throw e;
-     }
-     catch (Error e) {
-      throw e;
-     }
-     catch (Throwable e) {
-      throw new IllegalStateException(e);
-     }
+    String name;
+    if (StringUtils.hasText(label)) {
+        name = label;
+    } else {
+        name = invocation.getMethod().toGenericString();
     }
-    else {
-     throw new IllegalStateException(
-       "MethodInvocation of the wrong type detected - this should not happen with Spring AOP, " +
-         "so please raise an issue if you see this exception");
+    final String label = name;
+
+    //定义了一个RetryCallback，其实看它的doWithRetry方法，调用了invocation的proceed()方法，是不是有点眼熟，这就是AOP的拦截链调用，如果没有拦截链，那就是对原来方法的调用。
+    RetryCallback<Object, Throwable> retryCallback = new RetryCallback<Object, Throwable>() {
+
+        public Object doWithRetry(RetryContext context) throws Exception {
+
+            context.setAttribute(RetryContext.NAME, label);
+
+            /*
+            * If we don't copy the invocation carefully it won't keep a reference to
+            * the other interceptors in the chain. We don't have a choice here but to
+            * specialise to ReflectiveMethodInvocation (but how often would another
+            * implementation come along?).
+            */
+            if (invocation instanceof ProxyMethodInvocation) {
+                try {
+                    return ((ProxyMethodInvocation) invocation).invocableClone().proceed();
+                }
+                catch (Exception e) {
+                    throw e;
+                }
+                catch (Error e) {
+                    throw e;
+                }
+                catch (Throwable e) {
+                    throw new IllegalStateException(e);
+                }
+            }
+            else {
+                throw new IllegalStateException(
+                    "MethodInvocation of the wrong type detected - this should not happen with Spring AOP, " +
+                    "so please raise an issue if you see this exception");
+            }
+        }
+
+    };
+
+    if (recoverer != null) {
+        ItemRecovererCallback recoveryCallback = new ItemRecovererCallback(
+            invocation.getArguments(), recoverer);
+        return this.retryOperations.execute(retryCallback, recoveryCallback);
     }
-   }
+    //最终还是进入到retryOperations的execute方法，这个retryOperations就是在之前的builder set进来的RetryTemplate。
+    return this.retryOperations.execute(retryCallback);
 
-  };
-
-  if (recoverer != null) {
-   ItemRecovererCallback recoveryCallback = new ItemRecovererCallback(
-     invocation.getArguments(), recoverer);
-   return this.retryOperations.execute(retryCallback, recoveryCallback);
-  }
-  //最终还是进入到retryOperations的execute方法，这个retryOperations就是在之前的builder set进来的RetryTemplate。
-  return this.retryOperations.execute(retryCallback);
-
- }
+}
 ```
 
-无论是`RetryOperationsInterceptor`还是`StatefulRetryOperationsInterceptor`，最终的拦截处理逻辑还是调用到RetryTemplate的execute方法，从名字也看出来，RetryTemplate作为一个模板类，里面包含了重试统一逻辑。不过，我看这个RetryTemplate并不是很“模板”，因为它没有很多可以扩展的地方。
+无论是`RetryOperationsInterceptor`还是`StatefulRetryOperationsInterceptor`，最终的拦截处理逻辑还是调用到 `RetryTemplate` 的 `execute` 方法，从名字也看出来，`RetryTemplate` 作为一个模板类，里面包含了重试统一逻辑。不过，我看这个`RetryTemplate` 并不是很“模板”，因为它没有很多可以扩展的地方。
 
 #### 4.4.2.重试逻辑及策略实现
 
-上面介绍了Spring Retry利用了AOP代理使重试机制对业务代码进行“入侵”。下面我们继续看看重试的逻辑做了什么。RetryTemplate的doExecute方法。
+上面介绍了 `Spring Retry` 利用了AOP代理使重试机制对业务代码进行“入侵”。下面我们继续看看重试的逻辑做了什么。`RetryTemplate` 的 `doExecute` 方法。
 
 ```
 protected <T, E extends Throwable> T doExecute(RetryCallback<T, E> retryCallback,
-   RecoveryCallback<T> recoveryCallback, RetryState state)
-   throws E, ExhaustedRetryException {
+RecoveryCallback<T> recoveryCallback, RetryState state)
+throws E, ExhaustedRetryException {
 
-  RetryPolicy retryPolicy = this.retryPolicy;
-  BackOffPolicy backOffPolicy = this.backOffPolicy;
+    RetryPolicy retryPolicy = this.retryPolicy;
+    BackOffPolicy backOffPolicy = this.backOffPolicy;
 
-  //新建一个RetryContext来保存本轮重试的上下文
-  RetryContext context = open(retryPolicy, state);
-  if (this.logger.isTraceEnabled()) {
-   this.logger.trace("RetryContext retrieved: " + context);
-  }
-
-  // Make sure the context is available globally for clients who need
-  // it...
-  RetrySynchronizationManager.register(context);
-
-  Throwable lastException = null;
-
-  boolean exhausted = false;
-  try {
-
-   //如果有注册RetryListener，则会调用它的open方法，给调用者一个通知。
-   boolean running = doOpenInterceptors(retryCallback, context);
-
-   if (!running) {
-    throw new TerminatedRetryException(
-      "Retry terminated abnormally by interceptor before first attempt");
-   }
-
-   // Get or Start the backoff context...
-   BackOffContext backOffContext = null;
-   Object resource = context.getAttribute("backOffContext");
-
-   if (resource instanceof BackOffContext) {
-    backOffContext = (BackOffContext) resource;
-   }
-
-   if (backOffContext == null) {
-    backOffContext = backOffPolicy.start(context);
-    if (backOffContext != null) {
-     context.setAttribute("backOffContext", backOffContext);
+    //新建一个RetryContext来保存本轮重试的上下文
+    RetryContext context = open(retryPolicy, state);
+    if (this.logger.isTraceEnabled()) {
+        this.logger.trace("RetryContext retrieved: " + context);
     }
-   }
 
-   //判断能否重试，就是调用RetryPolicy的canRetry方法来判断。
-   //这个循环会直到原方法不抛出异常，或不需要再重试
-   while (canRetry(retryPolicy, context) && !context.isExhaustedOnly()) {
+    // Make sure the context is available globally for clients who need
+    // it...
+    RetrySynchronizationManager.register(context);
 
+    Throwable lastException = null;
+
+    boolean exhausted = false;
     try {
-     if (this.logger.isDebugEnabled()) {
-      this.logger.debug("Retry: count=" + context.getRetryCount());
-     }
-     //清除上次记录的异常
-     lastException = null;
-     //doWithRetry方法，一般来说就是原方法
-     return retryCallback.doWithRetry(context);
+
+        //如果有注册RetryListener，则会调用它的open方法，给调用者一个通知。
+        boolean running = doOpenInterceptors(retryCallback, context);
+
+        if (!running) {
+            throw new TerminatedRetryException(
+            "Retry terminated abnormally by interceptor before first attempt");
+        }
+
+        // Get or Start the backoff context...
+        BackOffContext backOffContext = null;
+        Object resource = context.getAttribute("backOffContext");
+
+        if (resource instanceof BackOffContext) {
+            backOffContext = (BackOffContext) resource;
+        }
+
+        if (backOffContext == null) {
+            backOffContext = backOffPolicy.start(context);
+            if (backOffContext != null) {
+                context.setAttribute("backOffContext", backOffContext);
+            }
+        }
+
+        //判断能否重试，就是调用RetryPolicy的canRetry方法来判断。
+        //这个循环会直到原方法不抛出异常，或不需要再重试
+        while (canRetry(retryPolicy, context) && !context.isExhaustedOnly()) {
+
+        try {
+            if (this.logger.isDebugEnabled()) {
+                this.logger.debug("Retry: count=" + context.getRetryCount());
+            }
+            //清除上次记录的异常
+            lastException = null;
+            //doWithRetry方法，一般来说就是原方法
+            return retryCallback.doWithRetry(context);
+        }
+        catch (Throwable e) {
+            //原方法抛出了异常
+            lastException = e;
+
+            try {
+                //记录异常信息
+                registerThrowable(retryPolicy, state, context, e);
+            }
+            catch (Exception ex) {
+                throw new TerminatedRetryException("Could not register throwable",ex);
+            }
+            finally {
+                //调用RetryListener的onError方法
+                doOnErrorInterceptors(retryCallback, context, e);
+            }
+            //再次判断能否重试
+            if (canRetry(retryPolicy, context) && !context.isExhaustedOnly()) {
+                try {
+                    //如果可以重试则走退避策略
+                    backOffPolicy.backOff(backOffContext);
+                }
+                catch (BackOffInterruptedException ex) {
+                    lastException = e;
+                    // back off was prevented by another thread - fail the retry
+                    if (this.logger.isDebugEnabled()) {
+                        this.logger
+                        .debug("Abort retry because interrupted: count="
+                        + context.getRetryCount());
+                    }
+                    throw ex;
+                }
+            }
+
+            if (this.logger.isDebugEnabled()) {
+                this.logger.debug("Checking for rethrow: count=" + context.getRetryCount());
+            }
+
+            if (shouldRethrow(retryPolicy, context, state)) {
+                if (this.logger.isDebugEnabled()) {
+                    this.logger.debug("Rethrow in retry for policy: count=" + context.getRetryCount());
+                }
+                throw RetryTemplate.<E>wrapIfNecessary(e);
+            }
+
+        }
+
+        /*
+        * A stateful attempt that can retry may rethrow the exception before now,
+        * but if we get this far in a stateful retry there's a reason for it,
+        * like a circuit breaker or a rollback classifier.
+        */
+        if (state != null && context.hasAttribute(GLOBAL_STATE)) {
+        break;
+        }
+        }
+
+        if (state == null && this.logger.isDebugEnabled()) {
+        this.logger.debug(
+        "Retry failed last attempt: count=" + context.getRetryCount());
+        }
+
+        exhausted = true;
+        //重试结束后如果有兜底Recovery方法则执行，否则抛异常
+        return handleRetryExhausted(recoveryCallback, context, state);
+
+    } catch (Throwable e) {
+        throw RetryTemplate.<E>wrapIfNecessary(e);
+    } finally {
+        //处理一些关闭逻辑
+        close(retryPolicy, context, state, lastException == null || exhausted);
+        //调用RetryListener的close方法
+        doCloseInterceptors(retryCallback, context, lastException);
+        RetrySynchronizationManager.clear();
     }
-    catch (Throwable e) {
-     //原方法抛出了异常
-     lastException = e;
-
-     try {
-      //记录异常信息
-      registerThrowable(retryPolicy, state, context, e);
-     }
-     catch (Exception ex) {
-      throw new TerminatedRetryException("Could not register throwable",
-        ex);
-     }
-     finally {
-      //调用RetryListener的onError方法
-      doOnErrorInterceptors(retryCallback, context, e);
-     }
-     //再次判断能否重试
-     if (canRetry(retryPolicy, context) && !context.isExhaustedOnly()) {
-      try {
-       //如果可以重试则走退避策略
-       backOffPolicy.backOff(backOffContext);
-      }
-      catch (BackOffInterruptedException ex) {
-       lastException = e;
-       // back off was prevented by another thread - fail the retry
-       if (this.logger.isDebugEnabled()) {
-        this.logger
-          .debug("Abort retry because interrupted: count="
-            + context.getRetryCount());
-       }
-       throw ex;
-      }
-     }
-
-     if (this.logger.isDebugEnabled()) {
-      this.logger.debug(
-        "Checking for rethrow: count=" + context.getRetryCount());
-     }
-
-     if (shouldRethrow(retryPolicy, context, state)) {
-      if (this.logger.isDebugEnabled()) {
-       this.logger.debug("Rethrow in retry for policy: count="
-         + context.getRetryCount());
-      }
-      throw RetryTemplate.<E>wrapIfNecessary(e);
-     }
-
-    }
-
-    /*
-     * A stateful attempt that can retry may rethrow the exception before now,
-     * but if we get this far in a stateful retry there's a reason for it,
-     * like a circuit breaker or a rollback classifier.
-     */
-    if (state != null && context.hasAttribute(GLOBAL_STATE)) {
-     break;
-    }
-   }
-
-   if (state == null && this.logger.isDebugEnabled()) {
-    this.logger.debug(
-      "Retry failed last attempt: count=" + context.getRetryCount());
-   }
-
-   exhausted = true;
-   //重试结束后如果有兜底Recovery方法则执行，否则抛异常
-   return handleRetryExhausted(recoveryCallback, context, state);
-
-  }
-  catch (Throwable e) {
-   throw RetryTemplate.<E>wrapIfNecessary(e);
-  }
-  finally {
-   //处理一些关闭逻辑
-   close(retryPolicy, context, state, lastException == null || exhausted);
-   //调用RetryListener的close方法
-   doCloseInterceptors(retryCallback, context, lastException);
-   RetrySynchronizationManager.clear();
-  }
-
- }
+}
 ```
 
-主要核心重试逻辑就是上面的代码了，看上去还是挺简单的。在上面，我们漏掉了RetryPolicy的canRetry方法和BackOffPolicy的backOff方法，以及这两个Policy是怎么来的。我们回头看看`getStatelessInterceptor`方法中的`getRetryPolicy`和`getRetryPolicy`方法。
+主要核心重试逻辑就是上面的代码了，看上去还是挺简单的。在上面，我们漏掉了 `RetryPolicy` 的 `canRetry` 方法和 `BackOffPolicy` 的 `backOff` 方法，以及这两个 `Policy` 是怎么来的。我们回头看看`getStatelessInterceptor`方法中的`getRetryPolicy`和`getRetryPolicy`方法。
 
 ```
 private RetryPolicy getRetryPolicy(Annotation retryable) {
-  Map<String, Object> attrs = AnnotationUtils.getAnnotationAttributes(retryable);
-  @SuppressWarnings("unchecked")
-  Class<? extends Throwable>[] includes = (Class<? extends Throwable>[]) attrs.get("value");
-  String exceptionExpression = (String) attrs.get("exceptionExpression");
-  boolean hasExpression = StringUtils.hasText(exceptionExpression);
-  if (includes.length == 0) {
-   @SuppressWarnings("unchecked")
-   Class<? extends Throwable>[] value = (Class<? extends Throwable>[]) attrs.get("include");
-   includes = value;
-  }
-  @SuppressWarnings("unchecked")
-  Class<? extends Throwable>[] excludes = (Class<? extends Throwable>[]) attrs.get("exclude");
-  Integer maxAttempts = (Integer) attrs.get("maxAttempts");
-  String maxAttemptsExpression = (String) attrs.get("maxAttemptsExpression");
-  if (StringUtils.hasText(maxAttemptsExpression)) {
-   maxAttempts = PARSER.parseExpression(resolve(maxAttemptsExpression), PARSER_CONTEXT)
-     .getValue(this.evaluationContext, Integer.class);
-  }
-  if (includes.length == 0 && excludes.length == 0) {
-   SimpleRetryPolicy simple = hasExpression ? new ExpressionRetryPolicy(resolve(exceptionExpression))
-               .withBeanFactory(this.beanFactory)
-              : new SimpleRetryPolicy();
-   simple.setMaxAttempts(maxAttempts);
-   return simple;
-  }
-  Map<Class<? extends Throwable>, Boolean> policyMap = new HashMap<Class<? extends Throwable>, Boolean>();
-  for (Class<? extends Throwable> type : includes) {
-   policyMap.put(type, true);
-  }
-  for (Class<? extends Throwable> type : excludes) {
-   policyMap.put(type, false);
-  }
-  boolean retryNotExcluded = includes.length == 0;
-  if (hasExpression) {
-   return new ExpressionRetryPolicy(maxAttempts, policyMap, true, exceptionExpression, retryNotExcluded)
-     .withBeanFactory(this.beanFactory);
-  }
-  else {
-   return new SimpleRetryPolicy(maxAttempts, policyMap, true, retryNotExcluded);
-  }
- }
+    Map<String, Object> attrs = AnnotationUtils.getAnnotationAttributes(retryable);
+    @SuppressWarnings("unchecked")
+    Class<? extends Throwable>[] includes = (Class<? extends Throwable>[]) attrs.get("value");
+    String exceptionExpression = (String) attrs.get("exceptionExpression");
+    boolean hasExpression = StringUtils.hasText(exceptionExpression);
+    if (includes.length == 0) {
+        @SuppressWarnings("unchecked")
+        Class<? extends Throwable>[] value = (Class<? extends Throwable>[]) attrs.get("include");
+        includes = value;
+    }
+    @SuppressWarnings("unchecked")
+    Class<? extends Throwable>[] excludes = (Class<? extends Throwable>[]) attrs.get("exclude");
+    Integer maxAttempts = (Integer) attrs.get("maxAttempts");
+    String maxAttemptsExpression = (String) attrs.get("maxAttemptsExpression");
+    if (StringUtils.hasText(maxAttemptsExpression)) {
+    	maxAttempts = PARSER.parseExpression(resolve(maxAttemptsExpression), PARSER_CONTEXT).getValue(this.evaluationContext, Integer.class);
+    }
+    if (includes.length == 0 && excludes.length == 0) {
+    	SimpleRetryPolicy simple = hasExpression ? new ExpressionRetryPolicy(resolve(exceptionExpression)).withBeanFactory(this.beanFactory) : new SimpleRetryPolicy();
+    	simple.setMaxAttempts(maxAttempts);
+    	return simple;
+    }
+    Map<Class<? extends Throwable>, Boolean> policyMap = new HashMap<Class<? extends Throwable>, Boolean>();
+    for (Class<? extends Throwable> type : includes) {
+    	policyMap.put(type, true);
+    }
+    for (Class<? extends Throwable> type : excludes) {
+    	policyMap.put(type, false);
+    }
+    boolean retryNotExcluded = includes.length == 0;
+    if (hasExpression) {
+    	return new ExpressionRetryPolicy(maxAttempts, policyMap, true, exceptionExpression, retryNotExcluded).withBeanFactory(this.beanFactory);
+    }
+    else {
+    	return new SimpleRetryPolicy(maxAttempts, policyMap, true, retryNotExcluded);
+    }
+}
 ```
 
-嗯～，代码不难，这里简单做一下总结好了。就是通过@Retryable注解中的参数，来判断具体使用文章开头说到的哪个重试策略，是SimpleRetryPolicy还是ExpressionRetryPolicy等。
+嗯～，代码不难，这里简单做一下总结好了。就是通过 `@Retryable` 注解中的参数，来判断具体使用文章开头说到的哪个重试策略，是`SimpleRetryPolicy` 还是 `ExpressionRetryPolicy` 等。
 
 ```
 private BackOffPolicy getBackoffPolicy(Backoff backoff) {
-  long min = backoff.delay() == 0 ? backoff.value() : backoff.delay();
-  if (StringUtils.hasText(backoff.delayExpression())) {
-   min = PARSER.parseExpression(resolve(backoff.delayExpression()), PARSER_CONTEXT)
-     .getValue(this.evaluationContext, Long.class);
-  }
-  long max = backoff.maxDelay();
-  if (StringUtils.hasText(backoff.maxDelayExpression())) {
-   max = PARSER.parseExpression(resolve(backoff.maxDelayExpression()), PARSER_CONTEXT)
-     .getValue(this.evaluationContext, Long.class);
-  }
-  double multiplier = backoff.multiplier();
-  if (StringUtils.hasText(backoff.multiplierExpression())) {
-   multiplier = PARSER.parseExpression(resolve(backoff.multiplierExpression()), PARSER_CONTEXT)
-     .getValue(this.evaluationContext, Double.class);
-  }
-  if (multiplier > 0) {
-   ExponentialBackOffPolicy policy = new ExponentialBackOffPolicy();
-   if (backoff.random()) {
-    policy = new ExponentialRandomBackOffPolicy();
-   }
-   policy.setInitialInterval(min);
-   policy.setMultiplier(multiplier);
-   policy.setMaxInterval(max > min ? max : ExponentialBackOffPolicy.DEFAULT_MAX_INTERVAL);
-   if (this.sleeper != null) {
-    policy.setSleeper(this.sleeper);
-   }
-   return policy;
-  }
-  if (max > min) {
-   UniformRandomBackOffPolicy policy = new UniformRandomBackOffPolicy();
-   policy.setMinBackOffPeriod(min);
-   policy.setMaxBackOffPeriod(max);
-   if (this.sleeper != null) {
-    policy.setSleeper(this.sleeper);
-   }
-   return policy;
-  }
-  FixedBackOffPolicy policy = new FixedBackOffPolicy();
-  policy.setBackOffPeriod(min);
-  if (this.sleeper != null) {
-   policy.setSleeper(this.sleeper);
-  }
-  return policy;
- }
+    long min = backoff.delay() == 0 ? backoff.value() : backoff.delay();
+    if (StringUtils.hasText(backoff.delayExpression())) {
+        min = PARSER.parseExpression(resolve(backoff.delayExpression()), PARSER_CONTEXT).getValue(this.evaluationContext, Long.class);
+    }
+    long max = backoff.maxDelay();
+    if (StringUtils.hasText(backoff.maxDelayExpression())) {
+   		max = PARSER.parseExpression(resolve(backoff.maxDelayExpression()), PARSER_CONTEXT).getValue(this.evaluationContext, Long.class);
+    }
+    double multiplier = backoff.multiplier();
+    if (StringUtils.hasText(backoff.multiplierExpression())) {
+    	multiplier = PARSER.parseExpression(resolve(backoff.multiplierExpression()), PARSER_CONTEXT).getValue(this.evaluationContext, Double.class);
+    }
+    if (multiplier > 0) {
+    	ExponentialBackOffPolicy policy = new ExponentialBackOffPolicy();
+        if (backoff.random()) {
+            policy = new ExponentialRandomBackOffPolicy();
+        }
+        policy.setInitialInterval(min);
+        policy.setMultiplier(multiplier);
+        policy.setMaxInterval(max > min ? max : ExponentialBackOffPolicy.DEFAULT_MAX_INTERVAL);
+        if (this.sleeper != null) {
+            policy.setSleeper(this.sleeper);
+        }
+        return policy;
+    }
+    if (max > min) {
+        UniformRandomBackOffPolicy policy = new UniformRandomBackOffPolicy();
+        policy.setMinBackOffPeriod(min);
+        policy.setMaxBackOffPeriod(max);
+        if (this.sleeper != null) {
+            policy.setSleeper(this.sleeper);
+        }
+        return policy;
+    }
+    FixedBackOffPolicy policy = new FixedBackOffPolicy();
+    policy.setBackOffPeriod(min);
+    if (this.sleeper != null) {
+    	policy.setSleeper(this.sleeper);
+    }
+    return policy;
+}
 ```
 
-嗯～，一样的味道。就是通过@Backoff注解中的参数，来判断具体使用文章开头说到的哪个退避策略，是FixedBackOffPolicy还是UniformRandomBackOffPolicy等。
+嗯～，一样的味道。就是通过 `@Backoff` 注解中的参数，来判断具体使用文章开头说到的哪个退避策略，是 `FixedBackOffPolicy` 还是`UniformRandomBackOffPolicy` 等。
 
-那么每个RetryPolicy都会重写canRetry方法，然后在RetryTemplate判断是否需要重试。我们看看SimpleRetryPolicy的
+那么每个 `RetryPolicy` 都会重写 `canRetry` 方法，然后在 `RetryTemplate` 判断是否需要重试。我们看看 `SimpleRetryPolicy` 的
 
 ```
 @Override
- public boolean canRetry(RetryContext context) {
-  Throwable t = context.getLastThrowable();
-  //判断抛出的异常是否符合重试的异常
-  //还有，是否超过了重试的次数
-  return (t == null || retryForException(t)) && context.getRetryCount() < maxAttempts;
- }
+public boolean canRetry(RetryContext context) {
+    Throwable t = context.getLastThrowable();
+    //判断抛出的异常是否符合重试的异常
+    //还有，是否超过了重试的次数
+    return (t == null || retryForException(t)) && context.getRetryCount() < maxAttempts;
+}
 ```
 
-同样，我们看看FixedBackOffPolicy的退避方法。
+同样，我们看看 `FixedBackOffPolicy` 的退避方法。
 
 ```
 protected void doBackOff() throws BackOffInterruptedException {
-  try {
-   //就是sleep固定的时间
-   sleeper.sleep(backOffPeriod);
-  }
-  catch (InterruptedException e) {
-   throw new BackOffInterruptedException("Thread interrupted while sleeping", e);
-  }
- }
+    try {
+        //就是sleep固定的时间
+        sleeper.sleep(backOffPeriod);
+    } catch (InterruptedException e) {
+        throw new BackOffInterruptedException("Thread interrupted while sleeping", e);
+    }
+}
 ```
 
 至此，重试的主要原理以及逻辑大概就是这样了。
 
 #### 4.4.3.RetryContext
 
-我觉得有必要说说RetryContext，先看看它的继承关系。
+我觉得有必要说说 `RetryContext`，先看看它的继承关系。
+
 ![图片](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/spring-demo/20210504232358.webp)
 
-可以看出对每一个策略都有对应的Context。
+可以看出对每一个策略都有对应的 `Context`。
 
-在Spring Retry里，其实每一个策略都是单例来的。我刚开始直觉是对每一个需要重试的方法都会new一个策略，这样重试策略之间才不会产生冲突，但是一想就知道这样就可能多出了很多策略对象出来，增加了使用者的负担，这不是一个好的设计。Spring Retry采用了一个更加轻量级的做法，就是针对每一个需要重试的方法只new一个上下文Context对象，然后在重试时，把这个Context传到策略里，策略再根据这个Context做重试，而且Spring Retry还对这个Context做了cache。这样就相当于对重试的上下文做了优化。
+在 `Spring Retry` 里，其实每一个策略都是单例来的。我刚开始直觉是对每一个需要重试的方法都会 `new` 一个策略，这样重试策略之间才不会产生冲突，但是一想就知道这样就可能多出了很多策略对象出来，增加了使用者的负担，这不是一个好的设计。`Spring Retry` 采用了一个更加轻量级的做法，就是针对每一个需要重试的方法只 `new` 一个上下文 `Context` 对象，然后在重试时，把这个 `Context` 传到策略里，策略再根据这个 `Context` 做重试，而且 `Spring Retry` 还对这个 `Context` 做了 `cache`。这样就相当于对重试的上下文做了优化。
 
 ### 4.5.总结
 
-Spring Retry通过AOP机制来实现对业务代码的重试”入侵“，RetryTemplate中包含了核心的重试逻辑，还提供了丰富的重试策略和退避策略。
+`Spring Retry` 通过 `AOP` 机制来实现对业务代码的重试”入侵“，`RetryTemplate` 中包含了核心的重试逻辑，还提供了丰富的重试策略和退避策略。
 
 
 

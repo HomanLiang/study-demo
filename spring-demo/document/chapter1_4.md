@@ -4,11 +4,11 @@
 
 # Spring 核心容器 - Bean
 
-## Bean的基础知识
+## 1.Bean的基础知识
 
 1. 在xml配置文件中，bean的标识（id 和 name）
 
-    id:指定在benafactory中管理该bean的唯一的标识。name可用来唯一标识bean 或给bean起别名。
+    `id`:指定在benafactory中管理该bean的唯一的标识。name可用来唯一标识bean 或给bean起别名。
 
    ```
     <bean id="helloWorld" class="com.name.HelloWorld">
@@ -24,9 +24,9 @@
 
    在spring中，bean可被定义为2中部署模式中的一种。singleton和prototype模式。
 
-   singloeton:只有一个共享的实例存在，所有对这个bean的请求都会返回这个唯一实例。
+   `singleton`:只有一个共享的实例存在，所有对这个bean的请求都会返回这个唯一实例。
 
-   prototype:对这个bean的每次请求都会都会创建一个新的bean实例。根据已经存在的bean而clone出来的bean。默认为singleton模式。
+   `prototype`:对这个bean的每次请求都会都会创建一个新的bean实例。根据已经存在的bean而clone出来的bean。默认为singleton模式。
 
     改写成prototype模式写法如下：
 
@@ -108,7 +108,7 @@
 
 8. ref local指定同一个xml文件中的引用 
 
-## Bean的生命周期
+## 2.Bean的生命周期
 
 **首先简单说一下**
 
@@ -138,7 +138,7 @@
 
 **结合代码理解一下**
 
-### Bean的定义
+### 2.1.Bean的定义
 
 Spring通常通过配置文件定义Bean。如：
 
@@ -160,13 +160,13 @@ xsi:schemaLocation=”http://www.springframework.org/schema/beans http://www.spr
 
 这个配置文件就定义了一个标识为 HelloWorld 的Bean。在一个配置文档中可以定义多个Bean。
 
-### Bean的初始化
+### 2.2.Bean的初始化
 
 有两种方式初始化Bean。
 
-**1、在配置文档中通过指定init-method 属性来完成**
+**2.2.1.在配置文档中通过指定init-method 属性来完成**
 
-在Bean的类中实现一个初始化Bean属性的方法，如init()，如：
+在Bean的类中实现一个初始化Bean属性的方法，如 `init()`，如：
 
 ```
 public class HelloWorld{
@@ -181,9 +181,9 @@ public class HelloWorld{
 }
 ```
 
-然后，在配置文件中设置init-mothod属性：
+然后，在配置文件中设置 `init-mothod` 属性：
 
-**2、实现 org.springframwork.beans.factory.InitializingBean接口**
+**2.2.2.实现 org.springframwork.beans.factory.InitializingBean接口**
 
 Bean实现InitializingBean接口，并且增加 afterPropertiesSet() 方法：
 
@@ -200,13 +200,13 @@ public class HelloWorld implement InitializingBean {
 }
 ```
 
-那么，当这个Bean的所有属性被Spring的BeanFactory设置完后，会自动调用afterPropertiesSet()方法对Bean进行初始化，于是，配置文件就不用指定 init-method属性了。
+那么，当这个 `Bean` 的所有属性被 `Spring` 的 `BeanFactory` 设置完后，会自动调用 `afterPropertiesSet()` 方法对Bean进行初始化，于是，配置文件就不用指定 `init-method` 属性了。
 
-### Bean的调用
+### 2.3.Bean的调用
 
 有三种方式可以得到Bean并进行调用：
 
-**1、使用BeanWrapper**
+**2.3.1.使用BeanWrapper**
 
 ```
 HelloWorld hw=new HelloWorld();
@@ -215,7 +215,7 @@ bw.setPropertyvalue(”msg”,”HelloWorld”);
 system.out.println(bw.getPropertyCalue(”msg”));
 ```
 
-**2、使用BeanFactory**
+**2.3.2.使用BeanFactory**
 
 ```
 InputStream is=new FileInputStream(”config.xml”);
@@ -224,7 +224,7 @@ HelloWorld hw=(HelloWorld) factory.getBean(”HelloWorld”);
 system.out.println(hw.getMsg());
 ```
 
-**3、使用ApplicationConttext**
+**2.3.3.使用ApplicationContext**
 
 ```
 ApplicationContext actx=new FleSystemXmlApplicationContext(”config.xml”);
@@ -232,13 +232,13 @@ HelloWorld hw=(HelloWorld) actx.getBean(”HelloWorld”);
 System.out.println(hw.getMsg());
 ```
 
-### Bean的销毁
+### 2.4.Bean的销毁
 
-**1、使用配置文件中的 destory-method 属性**
+**2.4.1.使用配置文件中的 destory-method 属性**
 
-与初始化属性 init-methods类似，在Bean的类中实现一个撤销Bean的方法，然后在配置文件中通过 destory-method指定，那么当bean销毁时，Spring将自动调用指定的销毁方法。
+与初始化属性 `init-methods` 类似，在Bean的类中实现一个撤销Bean的方法，然后在配置文件中通过 `destory-method` 指定，那么当bean销毁时，Spring将自动调用指定的销毁方法。
 
-**2、实现 org.springframwork.bean.factory.DisposebleBean接口**
+**2.4.2.实现 org.springframwork.bean.factory.DisposebleBean接口**
 
 如果实现了DisposebleBean接口，那么Spring将自动调用bean中的Destory方法进行销毁，所以，Bean中必须提供Destory方法。
 
@@ -248,17 +248,17 @@ System.out.println(hw.getMsg());
 
 
 
-## Bean对象创建时机
+## 3.Bean对象创建时机
 
-- 默认lazy-init=default||false：当spring容器实例化的时候，并把容器中对象全部完成实例化
+- 默认 `lazy-init=default||false`：当spring容器实例化的时候，并把容器中对象全部完成实例化
 
     ```
     <bean id="bean" class="com.tarena.entity.Bean"  lazy-init="false"/>
     ```
 
-- lazy-init="true"：当从spring容器中获取对象时候在对对象实例始化
+- `lazy-init="true"`：当从spring容器中获取对象时候在对对象实例始化
 
-- 设置全局default-lazy-init="true"： 整个配置文件中对象都实例化延迟
+- 设置全局 `default-lazy-init="true"`： 整个配置文件中对象都实例化延迟
 
   ```
   <beans  ... 
@@ -269,7 +269,7 @@ System.out.println(hw.getMsg());
 
   注意：在使用定时器的时候，不能使用 `lazy-init="true"`
 
-## Bean 的5种作用域介绍
+## 4.Bean 的5种作用域介绍
 
 Spring Bean 中所说的作用域，在配置文件中即是“scope”。在面向对象程序设计中作用域一般指对象或变量之间的可见范围。而在Spring容器中是指其创建的Bean对象相对于其他Bean对象的请求可见范围。在Spring 容器当中，一共提供了5种作用域类型，在配置文件中，通过属性scope来设置bean的作用域范围。
 
@@ -374,7 +374,7 @@ Spring Bean 中所说的作用域，在配置文件中即是“scope”。在面
 
 
 
-## Bean对象初始化和销毁
+## 5.Bean对象初始化和销毁
 
 - 在spring配置文件定义销毁方法和初始化方法
 

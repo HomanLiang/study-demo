@@ -10,7 +10,7 @@
 
 **1.1.1.实现方式**：
 
-BeanFactory。Spring中的BeanFactory就是简单工厂模式的体现，根据传入一个唯一的标识来获得Bean对象，但是否是在传入参数后创建还是传入参数前创建这个要根据具体情况来定。
+`BeanFactory`。`Spring` 中的 `BeanFactory` 就是简单工厂模式的体现，根据传入一个唯一的标识来获得 `Bean` 对象，但是否是在传入参数后创建还是传入参数前创建这个要根据具体情况来定。
 
 **1.1.2.实质：**
 
@@ -20,42 +20,42 @@ BeanFactory。Spring中的BeanFactory就是简单工厂模式的体现，根据�
 
 **bean容器的启动阶段：**
 
-- 读取bean的xml配置文件,将bean元素分别转换成一个BeanDefinition对象。
+- 读取 `bean` 的 `xml` 配置文件,将 `bean` 元素分别转换成一个 `BeanDefinition` 对象。
 
-- 然后通过BeanDefinitionRegistry将这些bean注册到beanFactory中，保存在它的一个ConcurrentHashMap中。
+- 然后通过 `BeanDefinitionRegistry` 将这些 `bean` 注册到 `beanFactory` 中，保存在它的一个 `ConcurrentHashMap` 中。
 
-- 将BeanDefinition注册到了beanFactory之后，在这里Spring为我们提供了一个扩展的切口，允许我们通过实现接口BeanFactoryPostProcessor 在此处来插入我们定义的代码。
+- 将 `BeanDefinition` 注册到了 `beanFactory` 之后，在这里 `Spring` 为我们提供了一个扩展的切口，允许我们通过实现接口`BeanFactoryPostProcessor`  在此处来插入我们定义的代码。
 
-  典型的例子就是：PropertyPlaceholderConfigurer，我们一般在配置数据库的dataSource时使用到的占位符的值，就是它注入进去的。
+  典型的例子就是：`PropertyPlaceholderConfigurer`，我们一般在配置数据库的 `dataSource` 时使用到的占位符的值，就是它注入进去的。
 
 **容器中bean的实例化阶段：**
 
-实例化阶段主要是通过反射或者CGLIB对bean进行实例化，在这个阶段Spring又给我们暴露了很多的扩展点：
+实例化阶段主要是通过反射或者 `CGLIB` 对 `bean` 进行实例化，在这个阶段 `Spring` 又给我们暴露了很多的扩展点：
 
-- **各种的Aware接口**，比如 BeanFactoryAware，对于实现了这些Aware接口的bean，在实例化bean时Spring会帮我们注入对应的BeanFactory的实例。
-- **BeanPostProcessor接口**，实现了BeanPostProcessor接口的bean，在实例化bean时Spring会帮我们调用接口中的方法。
-- **InitializingBean接口**，实现了InitializingBean接口的bean，在实例化bean时Spring会帮我们调用接口中的方法。
-- **DisposableBean接口**，实现了BeanPostProcessor接口的bean，在该bean死亡时Spring会帮我们调用接口中的方法。
+- **各种的Aware接口**，比如 `BeanFactoryAware`，对于实现了这些 `Aware` 接口的 `bean` ，在实例化 `bean` 时 `Spring` 会帮我们注入对应的 `BeanFactory` 的实例。
+- **BeanPostProcessor接口**，实现了 `BeanPostProcessor` 接口的 `bean` ，在实例化`bean` 时 `Spring` 会帮我们调用接口中的方法。
+- **InitializingBean接口**，实现了 `InitializingBean` 接口的 `bean`，在实例化 `bean` 时 `Spring` 会帮我们调用接口中的方法。
+- **DisposableBean接口**，实现了 `BeanPostProcessor` 接口的 `bean`，在该 `bean` 死亡时 `Spring` 会帮我们调用接口中的方法。
 
 **1.1.4.设计意义：**
 
-**松耦合。**可以将原来硬编码的依赖，通过Spring这个beanFactory这个工厂来注入依赖，也就是说原来只有依赖方和被依赖方，现在我们引入了第三方——spring这个beanFactory，由它来解决bean之间的依赖问题，达到了松耦合的效果.
+**松耦合。**可以将原来硬编码的依赖，通过 `Spring` 这个 `beanFactory` 这个工厂来注入依赖，也就是说原来只有依赖方和被依赖方，现在我们引入了第三方—— `spring` 这个 `beanFactory`，由它来解决 `bean` 之间的依赖问题，达到了松耦合的效果.
 
-**bean的额外处理。**通过Spring接口的暴露，在实例化bean的阶段我们可以进行一些额外的处理，这些额外的处理只需要让bean实现对应的接口即可，那么spring就会在bean的生命周期调用我们实现的接口来处理该bean。`[非常重要]`
+**bean的额外处理。**通过 `Spring` 接口的暴露，在实例化 `bean` 的阶段我们可以进行一些额外的处理，这些额外的处理只需要让 `bean` 实现对应的接口即可，那么 `spring` 就会在 `bean` 的生命周期调用我们实现的接口来处理该 `bean`。`[非常重要]`
 
 ### 1.2.工厂方法
 
 **1.2.1.实现方式：**
 
-FactoryBean接口。
+`FactoryBean` 接口。
 
 **1.2.2.实现原理：**
 
-实现了FactoryBean接口的bean是一类叫做factory的bean。其特点是，spring会在使用getBean()调用获得该bean时，会自动调用该bean的getObject()方法，所以返回的不是factory这个bean，而是这个bean.getOjbect()方法的返回值。
+实现了 `FactoryBean` 接口的 `bean` 是一类叫做 `factory` 的 `bean`。其特点是，`spring` 会在使用 `getBean()` 调用获得该 `bean` 时，会自动调用该 `bean` 的 `getObject()` 方法，所以返回的不是 `factory` 这个 `bean`，而是这个 `bean.getOjbect()` 方法的返回值。
 
 **1.2.3.例子：**
 
-典型的例子有spring与mybatis的结合。
+典型的例子有 `spring` 与 `mybatis` 的结合。
 
 **代码示例：**
 
@@ -63,15 +63,15 @@ FactoryBean接口。
 
 **1.2.4.说明：**
 
-我们看上面该bean，因为实现了FactoryBean接口，所以返回的不是 SqlSessionFactoryBean 的实例，而是它的 SqlSessionFactoryBean.getObject() 的返回值。
+我们看上面该 `bean`，因为实现了 `FactoryBean` 接口，所以返回的不是 `SqlSessionFactoryBean` 的实例，而是它的 `SqlSessionFactoryBean.getObject()` 的返回值。
 
 ### 1.3.单例模式
 
-Spring依赖注入Bean实例默认是单例的。
+`Spring`依赖注入 `Bean` 实例默认是单例的。
 
-Spring的依赖注入（包括lazy-init方式）都是发生在AbstractBeanFactory的getBean里。getBean的doGetBean方法调用getSingleton进行bean的创建。
+`Spring` 的依赖注入（包括 `lazy-init` 方式）都是发生在 `AbstractBeanFactory` 的 `getBean` 里。`getBean` 的 `doGetBean` 方法调用`getSingleton` 进行 `bean` 的创建。
 
-分析getSingleton()方法
+分析 `getSingleton()` 方法
 
 ```
 public Object getSingleton(String beanName){
@@ -113,47 +113,47 @@ ps：spring依赖注入时，使用了 双重判断加锁 的单例模式
 
 **单例模式定义：**保证一个类仅有一个实例，并提供一个访问它的全局访问点。
 
-**spring对单例的实现：**spring中的单例模式完成了后半句话，即提供了全局的访问点BeanFactory。但没有从构造器级别去控制单例，这是因为spring管理的是任意的java对象。
+**spring对单例的实现：**`spring` 中的单例模式完成了后半句话，即提供了全局的访问点 `BeanFactory`。但没有从构造器级别去控制单例，这是因为 `spring` 管理的是任意的 `java` 对象。
 
 ### 1.4.适配器模式
 
 **1.4.1.实现方式：**
 
-SpringMVC中的适配器HandlerAdatper。
+`SpringMVC` 中的适配器 `HandlerAdatper`。
 
 **1.4.2.实现原理：**
 
-HandlerAdatper根据Handler规则执行不同的Handler。
+`HandlerAdatper` 根据 `Handler` 规则执行不同的 `Handler`。
 
 **1.4.3.实现过程：**
 
-DispatcherServlet根据HandlerMapping返回的handler，向HandlerAdatper发起请求，处理Handler。
+`DispatcherServlet` 根据 `HandlerMapping` 返回的 `handler`，向 `HandlerAdatper` 发起请求，处理 `Handler`。
 
-HandlerAdapter根据规则找到对应的Handler并让其执行，执行完毕后Handler会向HandlerAdapter返回一个ModelAndView，最后由HandlerAdapter向DispatchServelet返回一个ModelAndView。
+`HandlerAdapter` 根据规则找到对应的 `Handler` 并让其执行，执行完毕后 `Handler` 会向 `HandlerAdapter` 返回一个 `ModelAndView`，最后由 `HandlerAdapter` 向 `DispatchServelet` 返回一个 `ModelAndView`。
 
 **1.4.4.实现意义：**
 
-HandlerAdatper使得Handler的扩展变得容易，只需要增加一个新的Handler和一个对应的HandlerAdapter即可。
+`HandlerAdatper` 使得 `Handler` 的扩展变得容易，只需要增加一个新的 `Handler` 和一个对应的 `HandlerAdapter` 即可。
 
-因此Spring定义了一个适配接口，使得每一种Controller有一种对应的适配器实现类，让适配器代替controller执行相应的方法。这样在扩展Controller时，只需要增加一个适配器类就完成了SpringMVC的扩展了。
+因此 `Spring` 定义了一个适配接口，使得每一种 `Controller` 有一种对应的适配器实现类，让适配器代替 `controller` 执行相应的方法。这样在扩展 `Controller` 时，只需要增加一个适配器类就完成了 `SpringMVC` 的扩展了。
 
 ### 1.5.装饰器模式
 
 **1.5.1.实现方式：**
 
-Spring中用到的包装器模式在类名上有两种表现：一种是类名中含有Wrapper，另一种是类名中含有Decorator。
+`Spring` 中用到的包装器模式在类名上有两种表现：一种是类名中含有 `Wrapper`，另一种是类名中含有 `Decorator`。
 
 **1.5.2.实质：**
 
 动态地给一个对象添加一些额外的职责。
 
-就增加功能来说，Decorator模式相比生成子类更为灵活。
+就增加功能来说，`Decorator` 模式相比生成子类更为灵活。
 
 ### 1.6.代理模式
 
 **1.6.1.实现方式：**
 
-AOP底层，就是动态代理模式的实现。
+`AOP` 底层，就是动态代理模式的实现。
 
 **1.6.2.动态代理：**
 
@@ -173,17 +173,17 @@ AOP底层，就是动态代理模式的实现。
 
 **1.7.1.实现方式：**
 
-spring的事件驱动模型使用的是 观察者模式 ，Spring中Observer模式常用的地方是listener的实现。
+`spring` 的事件驱动模型使用的是 观察者模式 ，`Spring` 中 `Observer` 模式常用的地方是 `listener` 的实现。
 
 **1.7.2.具体实现：**
 
 事件机制的实现需要三个部分,事件源,事件,事件监听器
 
-ApplicationEvent抽象类`[事件]`
+`ApplicationEvent` 抽象类`[事件]`
 
-继承自jdk的EventObject,所有的事件都需要继承ApplicationEvent,并且通过构造器参数source得到事件源.
+继承自 `jdk` 的 `EventObject`,所有的事件都需要继承 `ApplicationEvent`,并且通过构造器参数 `source` 得到事件源.
 
-该类的实现类ApplicationContextEvent表示ApplicaitonContext的容器事件.
+该类的实现类 `ApplicationContextEvent` 表示 `ApplicaitonContext` 的容器事件.
 
 代码：
 
@@ -201,11 +201,11 @@ public abstract class ApplicationEvent extends EventObject {
 }
 ```
 
-ApplicationListener接口`[事件监听器]`
+`ApplicationListener` 接口`[事件监听器]`
 
-继承自jdk的EventListener,所有的监听器都要实现这个接口。
+继承自 `jdk` 的 `EventListener`,所有的监听器都要实现这个接口。
 
-这个接口只有一个onApplicationEvent()方法,该方法接受一个ApplicationEvent或其子类对象作为参数,在方法体中,可以通过不同对Event类的判断来进行相应的处理。
+这个接口只有一个 `onApplicationEvent()` 方法,该方法接受一个 `ApplicationEvent` 或其子类对象作为参数,在方法体中,可以通过不同对Event类的判断来进行相应的处理。
 
 当事件触发时所有的监听器都会收到消息。
 
@@ -217,15 +217,15 @@ public interface ApplicationListener<E extends ApplicationEvent> extends EventLi
 } 
 ```
 
-ApplicationContext接口`[事件源]`
+`ApplicationContext` 接口`[事件源]`
 
-ApplicationContext是spring中的全局容器，翻译过来是”应用上下文”。
+`ApplicationContext` 是 `spring` 中的全局容器，翻译过来是”应用上下文”。
 
-实现了ApplicationEventPublisher接口。
+实现了 `ApplicationEventPublisher` 接口。
 
 **1.7.3.职责：**
 
-负责读取bean的配置文档,管理bean的加载,维护bean之间的依赖关系,可以说是负责bean的整个生命周期,再通俗一点就是我们平时所说的IOC容器。
+负责读取 `bean` 的配置文档,管理 `bean` 的加载,维护 `bean` 之间的依赖关系,可以说是负责 `bean` 的整个生命周期,再通俗一点就是我们平时所说的 `IOC` 容器。
 
 代码：
 
@@ -246,9 +246,9 @@ public void publishEvent(ApplicationEvent event) {
 }
 ```
 
-ApplicationEventMulticaster抽象类`[事件源中publishEvent方法需要调用其方法getApplicationEventMulticaster]`
+`ApplicationEventMulticaster` 抽象类`[事件源中publishEvent方法需要调用其方法getApplicationEventMulticaster]`
 
-属于事件广播器,它的作用是把Applicationcontext发布的Event广播给所有的监听器.
+属于事件广播器,它的作用是把 `Applicationcontext` 发布的 `Event`广播给所有的监听器.
 
 代码：
 
@@ -275,13 +275,13 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 
 **1.8.1.实现方式：**
 
-Spring框架的资源访问Resource接口。该接口提供了更强的资源访问能力，Spring 框架本身大量使用了 Resource 接口来访问底层资源。
+`Spring` 框架的资源访问 `Resource` 接口。该接口提供了更强的资源访问能力，`Spring` 框架本身大量使用了 `Resource` 接口来访问底层资源。
 
 **1.8.2.Resource 接口介绍**
 
-source 接口是具体资源访问策略的抽象，也是所有资源访问类所实现的接口。
+`source` 接口是具体资源访问策略的抽象，也是所有资源访问类所实现的接口。
 
-Resource 接口主要提供了如下几个方法:
+`Resource` 接口主要提供了如下几个方法:
 
 - **getInputStream()：**定位并打开资源，返回资源对应的输入流。每次调用都返回新的输入流。调用者必须负责关闭输入流。
 - **exists()：**返回 Resource 所指向的资源是否存在。
@@ -290,11 +290,11 @@ Resource 接口主要提供了如下几个方法:
 - **getFile：**返回资源对应的 File 对象。
 - **getURL：**返回资源对应的 URL 对象。
 
-最后两个方法通常无须使用，仅在通过简单方式访问无法实现时，Resource 提供传统的资源访问的功能。
+最后两个方法通常无须使用，仅在通过简单方式访问无法实现时，`Resource` 提供传统的资源访问的功能。
 
-Resource 接口本身没有提供访问任何底层资源的实现逻辑，**针对不同的底层资源，Spring 将会提供不同的 Resource 实现类，不同的实现类负责不同的资源访问逻辑。**
+`Resource` 接口本身没有提供访问任何底层资源的实现逻辑，**针对不同的底层资源，Spring 将会提供不同的 Resource 实现类，不同的实现类负责不同的资源访问逻辑。**
 
-Spring 为 Resource 接口提供了如下实现类：
+`Spring` 为 `Resource` 接口提供了如下实现类：
 
 - **UrlResource：**访问网络资源的实现类。
 - **ClassPathResource：**访问类加载路径里资源的实现类。
@@ -303,7 +303,7 @@ Spring 为 Resource 接口提供了如下实现类：
 - **InputStreamResource：**访问输入流资源的实现类。
 - **ByteArrayResource：**访问字节数组资源的实现类。
 
-这些 Resource 实现类，针对不同的的底层资源，提供了相应的资源访问逻辑，并提供便捷的包装，以利于客户端程序的资源访问。
+这些 `Resource` 实现类，针对不同的的底层资源，提供了相应的资源访问逻辑，并提供便捷的包装，以利于客户端程序的资源访问。
 
 ### 1.9.模版方法模式
 
@@ -326,13 +326,13 @@ Spring 为 Resource 接口提供了如下实现类：
 
 **1.9.2.Spring模板方法模式实质：**
 
-是模板方法模式和回调模式的结合，是Template Method不需要继承的另一种实现方式。Spring几乎所有的外接扩展都采用这种模式。
+是模板方法模式和回调模式的结合，是 `Template Method` 不需要继承的另一种实现方式。`Spring` 几乎所有的外接扩展都采用这种模式。
 
 **1.9.3.具体实现：**
 
-JDBC的抽象和对Hibernate的集成，都采用了一种理念或者处理方式，那就是模板方法模式与相应的Callback接口相结合。
+`JDBC` 的抽象和对 `Hibernate` 的集成，都采用了一种理念或者处理方式，那就是模板方法模式与相应的 `Callback` 接口相结合。
 
-采用模板方法模式是为了以一种统一而集中的方式来处理资源的获取和释放，以JdbcTempalte为例:
+采用模板方法模式是为了以一种统一而集中的方式来处理资源的获取和释放，以 `JdbcTempalte` 为例:
 
 ```
 public abstract class JdbcTemplate {  
@@ -357,7 +357,7 @@ public abstract class JdbcTemplate {
 
 **1.9.4.引入回调原因：**
 
-JdbcTemplate是抽象类，不能够独立使用，我们每次进行数据访问的时候都要给出一个相应的子类实现,这样肯定不方便，所以就引入了回调。
+`JdbcTemplate` 是抽象类，不能够独立使用，我们每次进行数据访问的时候都要给出一个相应的子类实现,这样肯定不方便，所以就引入了回调。
 
 回调代码
 
@@ -406,11 +406,11 @@ jdbcTemplate.execute(callback);
 
 **1.9.5.为什么JdbcTemplate没有使用继承？**
 
-因为这个类的方法太多，但是我们还是想用到JdbcTemplate已有的稳定的、公用的数据库连接，那么我们怎么办呢？
+因为这个类的方法太多，但是我们还是想用到 `JdbcTemplate` 已有的稳定的、公用的数据库连接，那么我们怎么办呢？
 
-我们可以把变化的东西抽出来作为一个参数传入JdbcTemplate的方法中。但是变化的东西是一段代码，而且这段代码会用到JdbcTemplate中的变量。怎么办？
+我们可以把变化的东西抽出来作为一个参数传入 `JdbcTemplate` 的方法中。但是变化的东西是一段代码，而且这段代码会用到`JdbcTemplate` 中的变量。怎么办？
 
-那我们就用回调对象吧。在这个回调对象中定义一个操纵JdbcTemplate中变量的方法，我们去实现这个方法，就把变化的东西集中到这里了。然后我们再传入这个回调对象到JdbcTemplate，从而完成了调用。
+那我们就用回调对象吧。在这个回调对象中定义一个操纵 `JdbcTemplate` 中变量的方法，我们去实现这个方法，就把变化的东西集中到这里了。然后我们再传入这个回调对象到 `JdbcTemplate`，从而完成了调用。
 
 
 
@@ -420,9 +420,9 @@ jdbcTemplate.execute(callback);
 
 循环依赖问题，算是一道烂大街的面试题了，解毒之前，我们先来回顾两个知识点：
 
-初学 Spring 的时候，我们就知道 IOC，控制反转么，它将原本在程序中手动创建对象的控制权，交由 Spring 框架来管理，不需要我们手动去各种 `new XXX`。
+初学 `Spring` 的时候，我们就知道 `IOC`，控制反转么，它将原本在程序中手动创建对象的控制权，交由 `Spring` 框架来管理，不需要我们手动去各种 `new XXX`。
 
-尽管是 Spring 管理，不也得创建对象吗， Java 对象的创建步骤很多，可以 `new XXX`、序列化、`clone()` 等等， 只是 Spring 是通过反射 + 工厂的方式创建对象并放在容器的，创建好的对象我们一般还会对对象属性进行赋值，才去使用，可以理解是分了两个步骤。
+尽管是 `Spring` 管理，不也得创建对象吗， Java 对象的创建步骤很多，可以 `new XXX`、序列化、`clone()` 等等， 只是 `Spring` 是通过反射 + 工厂的方式创建对象并放在容器的，创建好的对象我们一般还会对对象属性进行赋值，才去使用，可以理解是分了两个步骤。
 
 好了，对这两个步骤有个印象就行，接着我们进入循环依赖，先说下循环依赖的概念
 
@@ -462,9 +462,9 @@ public class BeanA {
 </bean>
 ```
 
-Spring 启动后，读取如上的配置文件，会按顺序先实例化 A，但是创建的时候又发现它依赖了 B，接着就去实例化 B ，同样又发现它依赖了 A ，这尼玛咋整？无限循环呀
+`Spring` 启动后，读取如上的配置文件，会按顺序先实例化 A，但是创建的时候又发现它依赖了 B，接着就去实例化 B ，同样又发现它依赖了 A ，这尼玛咋整？无限循环呀
 
-Spring “肯定”不会让这种事情发生的，如前言我们说的 Spring 实例化对象分两步，第一步会先创建一个原始对象，只是没有设置属性，可以理解为"半成品"—— 官方叫 A 对象的早期引用（EarlyBeanReference），所以当实例化 B 的时候发现依赖了 A， B 就会把这个“半成品”设置进去先完成实例化，既然 B 完成了实例化，所以 A 就可以获得 B 的引用，也完成实例化了，这其实就是 Spring 解决循环依赖的思想。
+`Spring` “肯定”不会让这种事情发生的，如前言我们说的 `Spring` 实例化对象分两步，第一步会先创建一个原始对象，只是没有设置属性，可以理解为"半成品"—— 官方叫 A 对象的早期引用（`EarlyBeanReference`），所以当实例化 B 的时候发现依赖了 A， B 就会把这个“半成品”设置进去先完成实例化，既然 B 完成了实例化，所以 A 就可以获得 B 的引用，也完成实例化了，这其实就是 Spring 解决循环依赖的思想。
 
 不理解没关系，先有个大概的印象，然后我们从源码来看下 Spring 具体是怎么解决的。
 
@@ -472,21 +472,21 @@ Spring “肯定”不会让这种事情发生的，如前言我们说的 Spring
 
 > 代码版本：5.0.16.RELEASE
 
-在 Spring IOC 容器读取 Bean 配置创建 Bean 实例之前, 必须对它进行实例化。只有在容器实例化后，才可以从 IOC 容器里获取 Bean 实例并使用，循环依赖问题也就是发生在实例化 Bean 的过程中的，所以我们先回顾下获取 Bean 的过程。
+在 `Spring IOC` 容器读取 `Bean` 配置创建 `Bean` 实例之前, 必须对它进行实例化。只有在容器实例化后，才可以从 `IOC` 容器里获取 `Bean` 实例并使用，循环依赖问题也就是发生在实例化 Bean 的过程中的，所以我们先回顾下获取 `Bean` 的过程。
 
 #### 2.2.1.获取 Bean 流程
 
-Spring IOC 容器中获取 bean 实例的简化版流程如下（排除了各种包装和检查的过程）
+`Spring IOC` 容器中获取 `bean` 实例的简化版流程如下（排除了各种包装和检查的过程）
 
 ![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/spring-demo/20210331231947.png)
 
 大概的流程顺序（可以结合着源码看下，我就不贴了，贴太多的话，呕~呕呕，想吐）：
 
 1. 流程从 `getBean` 方法开始，`getBean` 是个空壳方法，所有逻辑直接到 `doGetBean` 方法中
-2. `transformedBeanName` 将 name 转换为真正的 beanName（name 可能是 FactoryBean 以 & 字符开头或者有别名的情况，所以需要转化下）
-3. 然后通过 `getSingleton(beanName)` 方法尝试从缓存中查找是不是有该实例 sharedInstance（单例在 Spring 的同一容器只会被创建一次，后续再获取 bean，就直接从缓存获取即可）
-4. 如果有的话，sharedInstance 可能是完全实例化好的 bean，也可能是一个原始的 bean，所以再经 `getObjectForBeanInstance` 处理即可返回
-5. 当然 sharedInstance 也可能是 null，这时候就会执行创建 bean 的逻辑，将结果返回
+2. `transformedBeanName` 将 `name` 转换为真正的 `beanName`（`name` 可能是 `FactoryBean` 以 `&` 字符开头或者有别名的情况，所以需要转化下）
+3. 然后通过 `getSingleton(beanName)` 方法尝试从缓存中查找是不是有该实例 `sharedInstance`（单例在 `Spring` 的同一容器只会被创建一次，后续再获取 `bean`，就直接从缓存获取即可）
+4. 如果有的话，`sharedInstance` 可能是完全实例化好的 `bean`，也可能是一个原始的 `bean`，所以再经 `getObjectForBeanInstance` 处理即可返回
+5. 当然 `sharedInstance` 也可能是 `null`，这时候就会执行创建 `bean` 的逻辑，将结果返回
 
 第三步的时候我们提到了一个缓存的概念，这个就是 Spring 为了解决单例的循环依赖问题而设计的 **三级缓存**
 
@@ -503,11 +503,11 @@ private final Map<String, Object> earlySingletonObjects = new HashMap<>(16);
 
 这三级缓存的作用分别是：
 
-- `singletonObjects`：完成初始化的单例对象的 cache，这里的 bean 经历过 `实例化->属性填充->初始化` 以及各种后置处理（一级缓存）
-- `earlySingletonObjects`：存放原始的 bean 对象（**完成实例化但是尚未填充属性和初始化**），仅仅能作为指针提前曝光，被其他 bean 所引用，用于解决循环依赖的 （二级缓存）
-- `singletonFactories`：在 bean 实例化完之后，属性填充以及初始化之前，如果允许提前曝光，Spring 会将实例化后的 bean 提前曝光，也就是把该 bean 转换成 `beanFactory` 并加入到 `singletonFactories`（三级缓存）
+- `singletonObjects`：完成初始化的单例对象的 `cache`，这里的 `bean` 经历过 `实例化->属性填充->初始化` 以及各种后置处理（一级缓存）
+- `earlySingletonObjects`：存放原始的 `bean` 对象（**完成实例化但是尚未填充属性和初始化**），仅仅能作为指针提前曝光，被其他 `bean` 所引用，用于解决循环依赖的 （二级缓存）
+- `singletonFactories`：在 `bean` 实例化完之后，属性填充以及初始化之前，如果允许提前曝光，`Spring` 会将实例化后的 `bean` 提前曝光，也就是把该 `bean` 转换成 `beanFactory` 并加入到 `singletonFactories`（三级缓存）
 
-我们首先从缓存中试着获取 bean，就是从这三级缓存中查找
+我们首先从缓存中试着获取 `bean`，就是从这三级缓存中查找
 
 ```java
 protected Object getSingleton(String beanName, boolean allowEarlyReference) {
@@ -534,11 +534,11 @@ protected Object getSingleton(String beanName, boolean allowEarlyReference) {
 }
 ```
 
-如果缓存没有的话，我们就要创建了，接着我们以单例对象为例，再看下创建 bean 的逻辑（大括号表示内部类调用方法）：
+如果缓存没有的话，我们就要创建了，接着我们以单例对象为例，再看下创建 `bean` 的逻辑（大括号表示内部类调用方法）：
 
 ![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/spring-demo/20210331232526.png)
 
-1. 创建 bean 从以下代码开始，一个匿名内部类方法参数（总觉得 Lambda 的方式可读性不如内部类好理解）
+1. 创建 `bean` 从以下代码开始，一个匿名内部类方法参数（总觉得 `Lambda` 的方式可读性不如内部类好理解）
 
    ```java
    if (mbd.isSingleton()) {
@@ -570,7 +570,7 @@ protected Object getSingleton(String beanName, boolean allowEarlyReference) {
 
 3. 往里走，主要的实现逻辑在 `doCreateBean`方法，先通过 `createBeanInstance` 创建一个原始 bean 对象
 
-4. 接着 `addSingletonFactory` 添加 bean 工厂对象到 singletonFactories 缓存（三级缓存）
+4. 接着 `addSingletonFactory` 添加 `bean` 工厂对象到  `singletonFactories` 缓存（三级缓存）
 
 5. 通过 `populateBean` 方法向原始 bean 对象中填充属性，并解析依赖，假设这时候创建 A 之后填充属性时发现依赖 B，然后创建依赖对象 B 的时候又发现依赖 A，还是同样的流程，又去 `getBean(A)`，这个时候三级缓存已经有了 beanA 的“半成品”，这时就可以把 A 对象的原始引用注入 B 对象（并将其移动到二级缓存）来解决循环依赖问题。这时候 `getObject()` 方法就算执行结束了，返回完全实例化的 bean
 
@@ -584,18 +584,18 @@ protected Object getSingleton(String beanName, boolean allowEarlyReference) {
 
 流程其实上边都已经说过了，结合着上图我们再看下具体细节，用大白话再捋一捋：
 
-1. Spring 创建 bean 主要分为两个步骤，创建原始 bean 对象，接着去填充对象属性和初始化
-2. 每次创建 bean 之前，我们都会从缓存中查下有没有该 bean，因为是单例，只能有一个
-3. 当我们创建 beanA 的原始对象后，并把它放到三级缓存中，接下来就该填充对象属性了，这时候发现依赖了 beanB，接着就又去创建 beanB，同样的流程，创建完 beanB 填充属性时又发现它依赖了 beanA，又是同样的流程，不同的是，这时候可以在三级缓存中查到刚放进去的原始对象 beanA，所以不需要继续创建，用它注入 beanB，完成 beanB 的创建
-4. 既然 beanB 创建好了，所以 beanA 就可以完成填充属性的步骤了，接着执行剩下的逻辑，闭环完成
+1. `Spring` 创建 `bean` 主要分为两个步骤，创建原始 `bean` 对象，接着去填充对象属性和初始化
+2. 每次创建 `bean` 之前，我们都会从缓存中查下有没有该 `bean`，因为是单例，只能有一个
+3. 当我们创建 `beanA` 的原始对象后，并把它放到三级缓存中，接下来就该填充对象属性了，这时候发现依赖了 `beanB`，接着就又去创建 `beanB`，同样的流程，创建完 `beanB` 填充属性时又发现它依赖了 `beanA`，又是同样的流程，不同的是，这时候可以在三级缓存中查到刚放进去的原始对象 `beanA`，所以不需要继续创建，用它注入 `beanB`，完成 `beanB` 的创建
+4. 既然 `beanB` 创建好了，所以 `beanA` 就可以完成填充属性的步骤了，接着执行剩下的逻辑，闭环完成
 
-这就是单例模式下 Spring 解决循环依赖的流程了。
+这就是单例模式下 `Spring` 解决循环依赖的流程了。
 
 但是这个地方，不管是谁看源码都会有个小疑惑，为什么需要三级缓存呢，我赶脚二级他也够了呀
 
 革命尚未成功，同志仍需努力
 
-跟源码的时候，发现在创建 beanB 需要引用 beanA 这个“半成品”的时候，就会触发"前期引用"，即如下代码：
+跟源码的时候，发现在创建 `beanB` 需要引用 `beanA` 这个“半成品”的时候，就会触发"前期引用"，即如下代码：
 
 ```java
 ObjectFactory<?> singletonFactory = this.singletonFactories.get(beanName);
@@ -628,11 +628,11 @@ protected Object getEarlyBeanReference(String beanName, RootBeanDefinition mbd, 
 }
 ```
 
-这个方法就是 Spring 为什么使用三级缓存，而不是二级缓存的原因，它的目的是为了后置处理，如果没有 AOP 后置处理，就不会走进 if 语句，直接返回了 exposedObject ，相当于啥都没干，二级缓存就够用了。
+这个方法就是 `Spring` 为什么使用三级缓存，而不是二级缓存的原因，它的目的是为了后置处理，如果没有 `AOP` 后置处理，就不会走进 `if` 语句，直接返回了 `exposedObject` ，相当于啥都没干，二级缓存就够用了。
 
-所以又得出结论，这个三级缓存应该和 AOP 有关系，继续。
+所以又得出结论，这个三级缓存应该和 `AOP` 有关系，继续。
 
-在 Spring 的源码中`getEarlyBeanReference` 是 `SmartInstantiationAwareBeanPostProcessor` 接口的默认方法，真正实现这个方法的只有**`AbstractAutoProxyCreator`** 这个类，用于提前曝光的 AOP 代理。
+在 Spring 的源码中`getEarlyBeanReference` 是 `SmartInstantiationAwareBeanPostProcessor` 接口的默认方法，真正实现这个方法的只有**`AbstractAutoProxyCreator`** 这个类，用于提前曝光的 `AOP` 代理。
 
 ```java
 @Override
@@ -644,7 +644,7 @@ public Object getEarlyBeanReference(Object bean, String beanName) throws BeansEx
 }
 ```
 
-这么说有点干，来个小 demo 吧，我们都知道 **Spring AOP、事务**等都是通过代理对象来实现的，而**事务**的代理对象是由自动代理创建器来自动完成的。也就是说 Spring 最终给我们放进容器里面的是一个代理对象，**而非原始对象**，假设我们有如下一段业务代码：
+这么说有点干，来个小 `demo` 吧，我们都知道 **Spring AOP、事务**等都是通过代理对象来实现的，而**事务**的代理对象是由自动代理创建器来自动完成的。也就是说 `Spring` 最终给我们放进容器里面的是一个代理对象，**而非原始对象**，假设我们有如下一段业务代码：
 
 ```java
 @Service
@@ -676,11 +676,11 @@ public class HelloProcessor implements SmartInstantiationAwareBeanPostProcessor 
 }
 ```
 
-可以看到，调用方法栈中有我们自己实现的 `HelloProcessor`，说明这个 bean 会通过 AOP 代理处理。
+可以看到，调用方法栈中有我们自己实现的 `HelloProcessor`，说明这个 `bean` 会通过 `AOP` 代理处理。
 
 ![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/spring-demo/20210331232633.png)
 
-再从源码看下这个自己循环自己的 bean 的创建流程：
+再从源码看下这个自己循环自己的 `bean` 的创建流程：
 
 ```java
 protected Object doCreateBean( ... ){
@@ -771,7 +771,7 @@ if (earlySingletonExposure) {
 
 **再问：AOP 代理对象提前放入了三级缓存，没有经过属性填充和初始化，这个代理又是如何保证依赖属性的注入的呢？**
 
-这个又涉及到了 Spring 中动态代理的实现，不管是`cglib`代理还是`jdk`动态代理生成的代理类，代理时，会将目标对象 target 保存在最后生成的代理 `$proxy` 中，当调用 `$proxy` 方法时会回调 `h.invoke`，而 `h.invoke` 又会回调目标对象 target 的原始方法。所有，其实在 AOP 动态代理时，原始 bean 已经被保存在 **提前曝光代理**中了，之后 `原始 bean` 继续完成`属性填充`和`初始化`操作。因为 AOP 代理`$proxy`中保存着 `traget` 也就是是 `原始bean` 的引用，因此后续 `原始bean` 的完善，也就相当于Spring AOP中的 `target` 的完善，这样就保证了 AOP 的`属性填充`与`初始化`了！
+这个又涉及到了 `Spring` 中动态代理的实现，不管是`cglib`代理还是`jdk`动态代理生成的代理类，代理时，会将目标对象 `target` 保存在最后生成的代理 `$proxy` 中，当调用 `$proxy` 方法时会回调 `h.invoke`，而 `h.invoke` 又会回调目标对象 `target` 的原始方法。所有，其实在 `AOP` 动态代理时，原始 `bean` 已经被保存在 **提前曝光代理**中了，之后 `原始 bean` 继续完成`属性填充`和`初始化`操作。因为 `AOP` 代理`$proxy`中保存着 `traget` 也就是是 `原始bean` 的引用，因此后续 `原始bean` 的完善，也就相当于 `Spring AOP` 中的 `target` 的完善，这样就保证了 `AOP` 的`属性填充`与`初始化`了！
 
 #### 2.2.3.非单例循环依赖
 
@@ -797,9 +797,9 @@ Error creating bean with name 'beanB' defined in class path resource [applicatio
 Caused by: org.springframework.beans.factory.BeanCurrentlyInCreationException: Error creating bean with name 'beanA': Requested bean is currently in creation: Is there an unresolvable circular reference?
 ```
 
-对于 `prototype` 作用域的 bean，Spring 容器无法完成依赖注入，因为 Spring 容器不进行缓存 `prototype` 作用域的 bean ，因此无法提前暴露一个创建中的bean 。
+对于 `prototype` 作用域的 `bean`，`Spring` 容器无法完成依赖注入，因为 `Spring` 容器不进行缓存 `prototype` 作用域的 `bean` ，因此无法提前暴露一个创建中的 `bean`。
 
-原因也挺好理解的，原型模式每次请求都会创建一个实例对象，即使加了缓存，循环引用太多的话，就比较麻烦了就，所以 Spring 不支持这种方式，直接抛出异常：
+原因也挺好理解的，原型模式每次请求都会创建一个实例对象，即使加了缓存，循环引用太多的话，就比较麻烦了就，所以 `Spring` 不支持这种方式，直接抛出异常：
 
 ```java
 if (isPrototypeCurrentlyInCreation(beanName)) {
@@ -809,7 +809,7 @@ if (isPrototypeCurrentlyInCreation(beanName)) {
 
 #### 2.2.4.构造器循环依赖
 
-上文我们讲的是通过 Setter 方法注入的单例 bean 的循环依赖问题，用 Spring 的小伙伴也都知道，依赖注入的方式还有**构造器注入**、工厂方法注入的方式（很少使用），那如果构造器注入方式也有循环依赖，可以搞不？
+上文我们讲的是通过 `Setter` 方法注入的单例 `bean` 的循环依赖问题，用 `Spring` 的小伙伴也都知道，依赖注入的方式还有**构造器注入**、工厂方法注入的方式（很少使用），那如果构造器注入方式也有循环依赖，可以搞不？
 
 我们再改下代码和配置文件
 
@@ -856,9 +856,9 @@ public class BeanB {
 
 如果您主要使用构造器注入，循环依赖场景是无法解决的。建议你用 setter 注入方式代替构造器注入
 
-其实也不是说只要是构造器注入就会有循环依赖问题，Spring 在创建 Bean 的时候默认是**按照自然排序来进行创建的**，我们暂且把先创建的 bean 叫主 bean，上文的 A 即主 bean，**只要主 bean 注入依赖 bean 的方式是 setter 方式，依赖 bean 的注入方式无所谓，都可以解决，反之亦然**
+其实也不是说只要是构造器注入就会有循环依赖问题，`Spring` 在创建 `Bean` 的时候默认是**按照自然排序来进行创建的**，我们暂且把先创建的 `bean` 叫主 `bean`，上文的 `A` 即主 `bean`，**只要主 bean 注入依赖 bean 的方式是 setter 方式，依赖 bean 的注入方式无所谓，都可以解决，反之亦然**
 
-所以上文我们 AB 循环依赖问题，只要 A 的注入方式是 setter ，就不会有循环依赖问题。
+所以上文我们 `AB` 循环依赖问题，只要 `A` 的注入方式是 `setter` ，就不会有循环依赖问题。
 
 面试官问：为什么呢？
 
@@ -882,31 +882,31 @@ Spring 为了解决单例的循环依赖问题，使用了三级缓存。其中�
 
 ## 3.面试官：什么是AOP？Spring AOP和AspectJ的区别是什么？
 
-AOP（Aspect Orient Programming），它是面向对象编程的一种补充，主要应用于处理一些具有横切性质的系统级服务，如日志收集、事务管理、安全检查、缓存、对象池管理等。
+`AOP`（`Aspect Orient Programming`），它是面向对象编程的一种补充，主要应用于处理一些具有横切性质的系统级服务，如日志收集、事务管理、安全检查、缓存、对象池管理等。
 
-AOP实现的关键就在于AOP框架自动创建的AOP代理，AOP代理则可分为静态代理和动态代理两大类，其中静态代理是指使用AOP框架提供的命令进行编译，从而在编译阶段就可生成 AOP 代理类，因此也称为编译时增强；而动态代理则在运行时借助于JDK动态代理、CGLIB等在内存中“临时”生成AOP动态代理类，因此也被称为运行时增强。
+`AOP` 实现的关键就在于 `AOP` 框架自动创建的 `AOP` 代理，`AOP` 代理则可分为静态代理和动态代理两大类，其中静态代理是指使用 `AOP` 框架提供的命令进行编译，从而在编译阶段就可生成 `AOP` 代理类，因此也称为编译时增强；而动态代理则在运行时借助于JDK动态代理、`CGLIB` 等在内存中“临时”生成 `AOP` 动态代理类，因此也被称为运行时增强。
 
-面向切面的编程（AOP） 是一种编程范式，旨在通过允许横切关注点的分离，提高模块化。AOP提供切面来将跨越对象关注点模块化。
+面向切面的编程（`AOP`） 是一种编程范式，旨在通过允许横切关注点的分离，提高模块化。`AOP` 提供切面来将跨越对象关注点模块化。
 
-AOP要实现的是在我们写的代码的基础上进行一定的包装，如在方法执行前、或执行后、或是在执行中出现异常后这些地方进行拦截处理或叫做增强处理
+`AOP` 要实现的是在我们写的代码的基础上进行一定的包装，如在方法执行前、或执行后、或是在执行中出现异常后这些地方进行拦截处理或叫做增强处理
 
-## 3.1.Aop的概念
+### 3.1.Aop的概念
 
 **Pointcut**：是一个（组）基于正则表达式的表达式，有点绕，就是说他本身是一个表达式，但是他是基于正则语法的。通常一个pointcut，会选取程序中的某些我们感兴趣的执行点，或者说是程序执行点的集合。
 
-**JoinPoint**：通过pointcut选取出来的集合中的具体的一个执行点，我们就叫JoinPoint.
+**JoinPoint**：通过pointcut选取出来的集合中的具体的一个执行点，我们就叫 `JoinPoint`
 
 **Advice**：在选取出来的JoinPoint上要执行的操作、逻辑。关于５种类型，我不多说，不懂的同学自己补基础。
 
-**Aspect**：就是我们关注点的模块化。这个关注点可能会横切多个对象和模块，事务管理是横切关注点的很好的例子。它是一个抽象的概念，从软件的角度来说是指在应用程序不同模块中的某一个领域或方面。又pointcut 和advice组成。
+**Aspect**：就是我们关注点的模块化。这个关注点可能会横切多个对象和模块，事务管理是横切关注点的很好的例子。它是一个抽象的概念，从软件的角度来说是指在应用程序不同模块中的某一个领域或方面。又 `pointcut` 和  `advice` 组成。
 
-**Weaving**：把切面应用到目标对象来创建新的 advised 对象的过程。
+**Weaving**：把切面应用到目标对象来创建新的 `advised` 对象的过程。
 
-## 3.2.AspectJ是什么？能做什么？
+### 3.2.AspectJ是什么？能做什么？
 
-AspectJ是一个易用的功能强大的AOP框架
+`AspectJ` 是一个易用的功能强大的 `AOP` 框架
 
-AspectJ全称是Eclipse AspectJ， 其官网地址是：http://www.eclipse.org/aspectj/，目前最新版本为：1.9.0
+`AspectJ` 全称是 `Eclipse AspectJ`， 其官网地址是：`http://www.eclipse.org/aspectj/`，目前最新版本为：`1.9.0`
 
 引用官网描述：
 
@@ -916,38 +916,38 @@ AspectJ全称是Eclipse AspectJ， 其官网地址是：http://www.eclipse.org/a
 
 可以单独使用，也可以整合到其它框架中。
 
-单独使用AspectJ时需要使用专门的编译器ajc。
+单独使用 `AspectJ` 时需要使用专门的编译器 `ajc`。
 
-java的编译器是javac，AspectJ的编译器是ajc，aj是首字母缩写，c即compiler。
+`java` 的编译器是 `javac`，`AspectJ` 的编译器是 `ajc`，`aj` 是首字母缩写，`c` 即 `compiler`。
 
-## 3.3.AspectJ和Spring AOP的区别？
+### 3.3.AspectJ和Spring AOP的区别？
 
-相信作为Java开发者我们都很熟悉Spring这个框架，在spring框架中有一个主要的功能就是AOP，提到AOP就往往会想到AspectJ，下面我对AspectJ和Spring AOP作一个简单的比较：
+相信作为 `Java` 开发者我们都很熟悉 `Spring` 这个框架，在 `spring` 框架中有一个主要的功能就是 `AOP`，提到 `AOP` 就往往会想到`AspectJ` ，下面我对 `AspectJ` 和 `Spring AOP` 作一个简单的比较：
 
-### 3.3.1.Spring AOP
+#### 3.3.1.Spring AOP
 
-- 基于动态代理来实现，默认如果使用接口的，用JDK提供的动态代理实现，如果是方法则使用CGLIB实现
+- 基于动态代理来实现，默认如果使用接口的，用 `JDK` 提供的动态代理实现，如果是方法则使用CGLIB实现
 
-- Spring AOP需要依赖IOC容器来管理，并且只能作用于Spring容器，使用纯Java代码实现
+- `Spring AOP` 需要依赖 `IOC` 容器来管理，并且只能作用于 `Spring` 容器，使用纯Java代码实现
 
-- 在性能上，由于Spring AOP是基于动态代理来实现的，在容器启动时需要生成代理实例，在方法调用上也会增加栈的深度，使得Spring AOP的性能不如AspectJ的那么好
+- 在性能上，由于 `Spring AOP` 是基于动态代理来实现的，在容器启动时需要生成代理实例，在方法调用上也会增加栈的深度，使得`Spring AOP` 的性能不如 `AspectJ` 的那么好
 
-### 3.3.2.AspectJ
+#### 3.3.2.AspectJ
 
-- AspectJ来自于Eclipse基金会
-- AspectJ属于静态织入，通过修改代码来实现，有如下几个织入的时机：
-  - 编译期织入（Compile-time weaving）： 如类 A 使用 AspectJ 添加了一个属性，类 B 引用了它，这个场景就需要编译期的时候就进行织入，否则没法编译类 B。
-  - 编译后织入（Post-compile weaving）： 也就是已经生成了 .class 文件，或已经打成 jar 包了，这种情况我们需要增强处理的话，就要用到编译后织入。
-  - 类加载后织入（Load-time weaving）： 指的是在加载类的时候进行织入，要实现这个时期的织入，有几种常见的方法。
-    - 自定义类加载器来干这个，这个应该是最容易想到的办法，在被织入类加载到 JVM 前去对它进行加载，这样就可以在加载的时候定义行为了。
+- `AspectJ` 来自于 `Eclipse` 基金会
+- `AspectJ` 属于静态织入，通过修改代码来实现，有如下几个织入的时机：
+  - 编译期织入（`Compile-time weaving`）： 如类 A 使用 `AspectJ` 添加了一个属性，类 `B` 引用了它，这个场景就需要编译期的时候就进行织入，否则没法编译类 B。
+  - 编译后织入（`Post-compile weaving`）： 也就是已经生成了 `.class` 文件，或已经打成 `jar` 包了，这种情况我们需要增强处理的话，就要用到编译后织入。
+  - 类加载后织入（`Load-time weaving`）： 指的是在加载类的时候进行织入，要实现这个时期的织入，有几种常见的方法。
+    - 自定义类加载器来干这个，这个应该是最容易想到的办法，在被织入类加载到 `JVM` 前去对它进行加载，这样就可以在加载的时候定义行为了。
     - 在 JVM 启动的时候指定 AspectJ 提供的 agent：`-javaagent:xxx/xxx/aspectjweaver.jar`。
 
-- AspectJ可以做Spring AOP干不了的事情，它是AOP编程的完全解决方案，Spring AOP则致力于解决企业级开发中最普遍的AOP（方法织入）。而不是成为像AspectJ一样的AOP方案
-- 因为AspectJ在实际运行之前就完成了织入，所以说它生成的类是没有额外运行时开销的
+- `AspectJ` 可以做 `Spring AOP` 干不了的事情，它是 `AOP` 编程的完全解决方案，`Spring AOP` 则致力于解决企业级开发中最普遍的`AOP`（方法织入）。而不是成为像 `AspectJ` 一样的 `AOP` 方案
+- 因为 `AspectJ` 在实际运行之前就完成了织入，所以说它生成的类是没有额外运行时开销的
 
-### 3.3.3.对比总结
+#### 3.3.3.对比总结
 
-下表总结了 Spring AOP 和 AspectJ 之间的关键区别:
+下表总结了 `Spring AOP` 和 `AspectJ` 之间的关键区别:
 
 | Spring AOP                                       | AspectJ                                                      |
 | ------------------------------------------------ | ------------------------------------------------------------ |
