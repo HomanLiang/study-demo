@@ -34,7 +34,7 @@ Spring Boot 对多环境整合已经有了很好的支持，能够在打包，�
 
 虽然你创建了各个环境的配置文件，但是`Spring Boot` 仍然不知道你要运行哪个环境，有以下两种方式指定：
 
-**配置文件中指定**
+**1.2.2.1.配置文件中指定**
 
 在`application.properties`或者`application.yml`文件中指定，内容如下：
 
@@ -47,7 +47,7 @@ spring.profiles.active=test
 
 如果没有指定运行的环境，`Spring Boot` 默认会加载`application.properties`文件，而这个的文件又告诉`Spring Boot` 去找`test`环境的配置文件。
 
-**运行 jar 的时候指定**
+**1.2.2.2.运行 jar 的时候指定**
 
 `Spring Boot` 内置的环境切换能够在运行`Jar`包的时候指定环境，命令如下：
 
@@ -201,7 +201,7 @@ mvn clean package package -P test
 
 ### 1.4.配置文件加载位置
 
-springboot 启动会扫描以下位置的application.properties或者application.yml文件作为Spring boot的默认配置文件
+`springboot` 启动会扫描以下位置的 `application.properties` 或者 `application.yml` 文件作为 `Spring boot` 的默认配置文件
 
 - `–file:./config/`
 
@@ -213,9 +213,9 @@ springboot 启动会扫描以下位置的application.properties或者application
 
 优先级由高到底，高优先级的配置会覆盖低优先级的配置；
 
-SpringBoot会从这四个位置全部加载主配置文件；**互补配置**；
+`SpringBoot` 会从这四个位置全部加载主配置文件；**互补配置**；
 
-我们还可以通过spring.config.location来改变默认的配置文件位置
+我们还可以通过 `spring.config.location` 来改变默认的配置文件位置
 
 **项目打包好以后，我们可以使用命令行参数的形式，启动项目的时候来指定配置文件的新位置；指定配置文件和默认加载的这些配置文件共同起作用形成互补配置；**
 
@@ -247,18 +247,18 @@ SpringBoot会从这四个位置全部加载主配置文件；**互补配置**；
 
    **优先加载带profile**
 
-6. jar包外部的application-{profile}.properties或application.yml(带spring.profile)配置文件
+6. `jar` 包外部的 `application-{profile}.properties` 或 `application.yml` (带 `spring.profile`)配置文件
 
-7. jar包内部的application-{profile}.properties或application.yml(带spring.profile)配置文件
+7. `jar` 包内部的 `application-{profile}.properties` 或 `application.yml` (带 `spring.profile`)配置文件
 
    **再来加载不带profile**
 
-8. jar包外部的application.properties或application.yml(不带spring.profile)配置文件
+8. `jar` 包外部的 `application.properties`或 `application.yml`(不带 `spring.profile`)配置文件
 
-9. jar包内部的application.properties或application.yml(不带spring.profile)配置文件
+9. `jar` 包内部的 `application.properties` 或 `application.yml` (不带 `spring.profile`)配置文件
 
-10. @Configuration注解类上的@PropertySource
+10. `@Configuration` 注解类上的 `@PropertySource`
 
-11. 通过SpringApplication.setDefaultProperties指定的默认属性
+11. 通过 `SpringApplication.setDefaultProperties` 指定的默认属性
 
     所有支持的配置加载来源；

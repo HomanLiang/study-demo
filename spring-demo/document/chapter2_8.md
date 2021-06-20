@@ -201,8 +201,8 @@ public class TestController {
 
 ### 2.1.为什么使用JUnit5
 
-- JUnit4被广泛使用，但是许多场景下使用起来语法较为繁琐，JUnit5中支持lambda表达式，语法简单且代码不冗余。
-- JUnit5易扩展，包容性强，可以接入其他的测试引擎。
+- `JUnit4` 被广泛使用，但是许多场景下使用起来语法较为繁琐，`JUnit5` 中支持 `lambda` 表达式，语法简单且代码不冗余。
+- `JUnit5` 易扩展，包容性强，可以接入其他的测试引擎。
 - 功能更强大提供了新的断言机制、参数化测试、重复性测试等新功能。
 - ps：开发人员为什么还要测试，单测写这么规范有必要吗？其实单测是开发人员必备技能，只不过很多开发人员开发任务太重导致调试完就不管了，没有系统化得单元测试，单元测试在系统重构时能发挥巨大的作用，可以在重构后快速测试新的接口是否与重构前有出入。
 
@@ -210,11 +210,11 @@ public class TestController {
 
 ![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/spring-demo/20210401235116.png)
 
-如图，JUnit5结构如下：
+如图，`JUnit5` 结构如下：
 
-- **JUnit Platform**： 这是Junit提供的平台功能模块，通过它，其它的测试引擎都可以接入Junit实现接口和执行。
-- **JUnit JUpiter**：这是JUnit5的核心，是一个基于JUnit Platform的引擎实现，它包含许多丰富的新特性来使得自动化测试更加方便和强大。
-- **JUnit Vintage**：这个模块是兼容JUnit3、JUnit4版本的测试引擎，使得旧版本的自动化测试也可以在JUnit5下正常运行。
+- **JUnit Platform**： 这是 `Junit` 提供的平台功能模块，通过它，其它的测试引擎都可以接入 `Junit` 实现接口和执行。
+- **JUnit JUpiter**：这是 `JUnit5` 的核心，是一个基于 `JUnit Platform` 的引擎实现，它包含许多丰富的新特性来使得自动化测试更加方便和强大。
+- **JUnit Vintage**：这个模块是兼容 `JUnit3`、`JUnit4` 版本的测试引擎，使得旧版本的自动化测试也可以在 `JUnit5` 下正常运行。
 
 ### 2.3.依赖引入
 
@@ -246,9 +246,9 @@ public class TestController {
 
 ### 2.5.断言
 
-JUnit Jupiter提供了强大的断言方法用以验证结果，在使用时需要借助java8的新特性lambda表达式，均是来自`org.junit.jupiter.api.Assertions`包的`static`方法。
+`JUnit Jupiter` 提供了强大的断言方法用以验证结果，在使用时需要借助 `java8` 的新特性 `lambda` 表达式，均是来自`org.junit.jupiter.api.Assertions`包的`static`方法。
 
-assertTrue`与`assertFalse`用来判断条件是否为`true`或`false
+`assertTrue`与`assertFalse`用来判断条件是否为`true`或`false`
 
 ```
 	@Test
@@ -258,7 +258,7 @@ assertTrue`与`assertFalse`用来判断条件是否为`true`或`false
     }    
 ```
 
-assertNull`与`assertNotNull`用来判断条件是否为·`null
+`assertNull` 与 `assertNotNull` 用来判断条件是否为 `null`
 
 ```
 @Test
@@ -322,7 +322,7 @@ void testNotNull() {
 
 在许多场景中我们需要对同一个接口方法进行重复测试，例如对幂等性接口的测试。
 
-JUnit Jupiter通过使用`@RepeatedTest(n)`指定需要重复的次数
+`JUnit Jupiter` 通过使用`@RepeatedTest(n)`指定需要重复的次数
 
 ```java
     @RepeatedTest(3)
@@ -349,7 +349,7 @@ JUnit Jupiter通过使用`@RepeatedTest(n)`指定需要重复的次数
 
 ### 2.8.内嵌测试
 
-JUnit5提供了嵌套单元测试的功能，可以更好展示测试类之间的业务逻辑关系，我们通常是一个业务对应一个测试类，有业务关系的类其实可以写在一起。这样有利于进行测试。而且内联的写法可以大大减少不必要的类，精简项目，防止类爆炸等一系列问题。
+`JUnit5` 提供了嵌套单元测试的功能，可以更好展示测试类之间的业务逻辑关系，我们通常是一个业务对应一个测试类，有业务关系的类其实可以写在一起。这样有利于进行测试。而且内联的写法可以大大减少不必要的类，精简项目，防止类爆炸等一系列问题。
 
 ```java
 @SpringBootTest
@@ -374,13 +374,13 @@ public class MockTest {
 
 在实际生产项目中，经常需要对如身份证信息、手机号、真实姓名等的敏感数据进行加密数据库存储，但在业务代码中对敏感信息进行手动加解密则十分不优雅，甚至会存在错加密、漏加密、业务人员需要知道实际的加密规则等的情况。
 
-本文将介绍使用springboot+mybatis拦截器+自定义注解的形式对敏感数据进行存储前拦截加密的详细过程。
+本文将介绍使用 `springboot` + `mybatis` 拦截器+自定义注解的形式对敏感数据进行存储前拦截加密的详细过程。
 
 ### 3.1.什么是Mybatis Plugin
 
-在mybatis官方文档中，对于Mybatis plugin的的介绍是这样的：
+在 `mybatis` 官方文档中，对于 `Mybatis plugin` 的的介绍是这样的：
 
-MyBatis 允许你在已映射语句执行过程中的某一点进行拦截调用。默认情况下，MyBatis 允许使用插件来拦截的方法调用包括：
+`MyBatis` 允许你在已映射语句执行过程中的某一点进行拦截调用。默认情况下，`MyBatis` 允许使用插件来拦截的方法调用包括：
 
 ```
 //语句执行拦截
@@ -396,7 +396,7 @@ ResultSetHandler (handleResultSets, handleOutputParameters)
 StatementHandler (prepare, parameterize, batch, update, query)
 ```
 
-简而言之，即在执行sql的整个周期中，我们可以任意切入到某一点对sql的参数、sql执行结果集、sql语句本身等进行切面处理。基于这个特性，我们便可以使用其对我们需要进行加密的数据进行切面统一加密处理了（分页插件 pageHelper 就是这样实现数据库分页查询的）。
+简而言之，即在执行 `sql` 的整个周期中，我们可以任意切入到某一点对 `sql` 的参数、`sql` 执行结果集、`sql` 语句本身等进行切面处理。基于这个特性，我们便可以使用其对我们需要进行加密的数据进行切面统一加密处理了（分页插件 `pageHelper` 就是这样实现数据库分页查询的）。
 
 ### 3.2.实现基于注解的敏感信息加解密拦截器
 
@@ -412,7 +412,7 @@ StatementHandler (prepare, parameterize, batch, update, query)
 
 目标需要加密、解密的字段可能需要灵活变更，此时我们定义一个注解，对需要加密的字段进行注解，那么便可以配合拦截器对需要的数据进行加密与解密操作了。
 
-mybatis的interceptor接口有以下方法需要实现。
+`mybatis` 的 `interceptor` 接口有以下方法需要实现。
 
 ```
 public interface Interceptor {
@@ -476,7 +476,7 @@ public interface EncryptUtil {
 }
 ```
 
-EncryptUtil 的AES加密实现类，此处AESUtil为自封装的AES加密工具，需要的小伙伴可以自行封装，本文不提供。（搜索公众号Java知音，回复“2021”，送你一份Java面试题宝典）
+`EncryptUtil` 的 `AES` 加密实现类，此处 `AESUtil` 为自封装的 `AES` 加密工具。
 
 ```
 @Component
@@ -516,7 +516,7 @@ public class AESEncrypt implements EncryptUtil {
 
 #### 3.2.4.实现入参加密拦截器
 
-Myabtis包中的org.apache.ibatis.plugin.Interceptor拦截器接口要求我们实现以下三个方法
+`Myabtis` 包中的 `org.apache.ibatis.plugin.Interceptor` 拦截器接口要求我们实现以下三个方法
 
 ```
 public interface Interceptor {
@@ -535,15 +535,15 @@ public interface Interceptor {
 
 因此，参考官方文档的示例，我们自定义一个入参加密拦截器。
 
-@Intercepts 注解开启拦截器，@Signature 注解定义拦截器的实际类型。
+`@Intercepts` 注解开启拦截器，`@Signature` 注解定义拦截器的实际类型。
 
 **@Signature中**
 
-- type 属性指定当前拦截器使用StatementHandler 、ResultSetHandler、ParameterHandler，Executor的一种
-- method 属性指定使用以上四种类型的具体方法（可进入class内部查看其方法）。
-- args 属性指定预编译语句
+- `type` 属性指定当前拦截器使用 `StatementHandler`、`ResultSetHandler`、`ParameterHandler`，`Executor` 的一种
+- `method` 属性指定使用以上四种类型的具体方法（可进入 `class` 内部查看其方法）。
+- `args` 属性指定预编译语句
 
-此处我们使用了 ParameterHandler.setParamters()方法，拦截mapper.xml中paramsType的实例（即在每个含有paramsType属性mapper语句中，都执行该拦截器，对paramsType的实例进行拦截处理）
+此处我们使用了 `ParameterHandler.setParamters()` 方法，拦截 `mapper.xml` 中 `paramsType` 的实例（即在每个含有 `paramsType` 属性 `mapper` 语句中，都执行该拦截器，对 `paramsType` 的实例进行拦截处理）
 
 ```
 /**
@@ -611,7 +611,7 @@ public class EncryptInterceptor implements Interceptor {
 
 #### 3.2.5.定义解密接口及其实现类
 
-解密接口，其中result为mapper.xml中resultType的实例。
+解密接口，其中 `result` 为 `mapper.xml` 中 `resultType`的实例。
 
 ```
 public interface DecryptUtil {
@@ -730,17 +730,17 @@ public class DecryptInterceptor implements Interceptor {
 
 ![图片](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/spring-demo/20210504100211.webp)
 
-此时在mapper中，指定paramType=User resultType=User 便可实现脱离业务层，基于mybatis拦截器的加解密操作。
+此时在 `mapper` 中，指定 `paramType=User resultType=User` 便可实现脱离业务层，基于 `mybatis` 拦截器的加解密操作。
 
 ## 4.接口的优雅写法
 
 ### 4.1.前言
 
-一个后端接口大致分为四个部分组成：接口地址（url）、接口请求方式（get、post等）、请求数据（request）、响应数据（response）。如何构建这几个部分每个公司要求都不同，没有什么“一定是最好的”标准，但一个优秀的后端接口和一个糟糕的后端接口对比起来差异还是蛮大的，其中最重要的关键点就是看**是否规范!** 本文就一步一步演示如何构建起一个优秀的后端接口体系，体系构建好了自然就有了规范，同时再构建新的后端接口也会十分轻松。
+一个后端接口大致分为四个部分组成：接口地址（ `url`）、接口请求方式（`get`、`post` 等）、请求数据（`request`）、响应数据（`response`）。如何构建这几个部分每个公司要求都不同，没有什么“一定是最好的”标准，但一个优秀的后端接口和一个糟糕的后端接口对比起来差异还是蛮大的，其中最重要的关键点就是看**是否规范!** 本文就一步一步演示如何构建起一个优秀的后端接口体系，体系构建好了自然就有了规范，同时再构建新的后端接口也会十分轻松。
 
 ### 4.2.所需依赖包
 
-这里用的是SpringBoot配置项目，本文讲解的重点是后端接口，所以只需要导入一个spring-boot-starter-web包就可以了：
+这里用的是 `SpringBoot` 配置项目，本文讲解的重点是后端接口，所以只需要导入一个 `spring-boot-starter-web` 包就可以了：
 
 ```
 <!--web依赖包，web应用必备-->
@@ -750,7 +750,7 @@ public class DecryptInterceptor implements Interceptor {
 </dependency>
 ```
 
-本文还用了swagger来生成API文档，lombok来简化类，不过这两者不是必须的，可用可不用。
+本文还用了 `swagger` 来生成 `API` 文档，`lombok` 来简化类，不过这两者不是必须的，可用可不用。
 
 ### 4.3.参数校验
 
@@ -782,11 +782,11 @@ public String addUser(User user) {
  }
 ```
 
-这样做当然是没有什么错的，而且格式排版整齐也一目了然，不过这样太繁琐了，这还没有进行业务操作呢光是一个参数校验就已经这么多行代码，实在不够优雅。我们来改进一下，使用Spring Validator和Hibernate Validator这两套Validator来进行方便的参数校验！这两套Validator依赖包已经包含在前面所说的web依赖包里了，所以可以直接使用。
+这样做当然是没有什么错的，而且格式排版整齐也一目了然，不过这样太繁琐了，这还没有进行业务操作呢光是一个参数校验就已经这么多行代码，实在不够优雅。我们来改进一下，使用 `Spring Validator` 和 `Hibernate Validator` 这两套 `Validator` 来进行方便的参数校验！这两套 `Validator` 依赖包已经包含在前面所说的 `web` 依赖包里了，所以可以直接使用。
 
 #### 4.3.2.Validator + BindResult进行校验
 
-Validator可以非常方便的制定校验规则，并自动帮你完成校验。首先在入参里需要校验的字段加上注解,每个注解对应不同的校验规则，并可制定校验失败后的信息：
+`Validator` 可以非常方便的制定校验规则，并自动帮你完成校验。首先在入参里需要校验的字段加上注解,每个注解对应不同的校验规则，并可制定校验失败后的信息：
 
 ```
 @Data
@@ -828,7 +828,7 @@ public class UserController {
 }
 ```
 
-这样当请求数据传递到接口的时候Validator就自动完成校验了，校验的结果就会封装到BindingResult中去，如果有错误信息我们就直接返回给前端，业务逻辑代码也根本没有执行下去。此时，业务层里的校验代码就已经不需要了：
+这样当请求数据传递到接口的时候 `Validator` 就自动完成校验了，校验的结果就会封装到 `BindingResult` 中去，如果有错误信息我们就直接返回给前端，业务逻辑代码也根本没有执行下去。此时，业务层里的校验代码就已经不需要了：
 
 ```
 public String addUser(User user) {
@@ -852,17 +852,17 @@ public String addUser(User user) {
 
 ![图片](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/spring-demo/20210504104555.webp)
 
-这样是不是方便很多？不难看出使用Validator校验有如下几个好处：
+这样是不是方便很多？不难看出使用 `Validator` 校验有如下几个好处：
 
 1. 简化代码，之前业务层那么一大段校验代码都被省略掉了。
-2. 使用方便，那么多校验规则可以轻而易举的实现，比如邮箱格式验证，之前自己手写正则表达式要写那么一长串，还容易出错，用Validator直接一个注解搞定。（还有更多校验规则注解，可以自行去了解哦）
-3. 减少耦合度，使用Validator能够让业务层只关注业务逻辑，从基本的参数校验逻辑中脱离出来。
+2. 使用方便，那么多校验规则可以轻而易举的实现，比如邮箱格式验证，之前自己手写正则表达式要写那么一长串，还容易出错，用`Validator` 直接一个注解搞定。（还有更多校验规则注解，可以自行去了解哦）
+3. 减少耦合度，使用 `Validator` 能够让业务层只关注业务逻辑，从基本的参数校验逻辑中脱离出来。
 
-使用Validator+ BindingResult已经是非常方便实用的参数校验方式了，在实际开发中也有很多项目就是这么做的，不过这样还是不太方便，因为你每写一个接口都要添加一个BindingResult参数，然后再提取错误信息返回给前端。这样有点麻烦，并且重复代码很多（尽管可以将这个重复代码封装成方法）。我们能否去掉BindingResult这一步呢？当然是可以的！
+使用 `Validator+ BindingResult` 已经是非常方便实用的参数校验方式了，在实际开发中也有很多项目就是这么做的，不过这样还是不太方便，因为你每写一个接口都要添加一个 `BindingResult` 参数，然后再提取错误信息返回给前端。这样有点麻烦，并且重复代码很多（尽管可以将这个重复代码封装成方法）。我们能否去掉 `BindingResult` 这一步呢？当然是可以的！
 
 #### 4.3.3.Validator + 自动抛出异常
 
-我们完全可以将BindingResult这一步给去掉：
+我们完全可以将 `BindingResult` 这一步给去掉：
 
 ```
 @PostMapping("/addUser")
@@ -883,7 +883,7 @@ public String addUser(@RequestBody @Valid User user) {
 
 ### 4.4.全局异常处理
 
-参数校验失败会自动引发异常，我们当然不可能再去手动捕捉异常进行处理，不然还不如用之前BindingResult方式呢。**又不想手动捕捉这个异常，又要对这个异常进行处理**，那正好使用SpringBoot全局异常处理来达到一劳永逸的效果！
+参数校验失败会自动引发异常，我们当然不可能再去手动捕捉异常进行处理，不然还不如用之前 `BindingResult` 方式呢。**又不想手动捕捉这个异常，又要对这个异常进行处理**，那正好使用SpringBoot全局异常处理来达到一劳永逸的效果！
 
 #### 4.4.1.基本使用
 

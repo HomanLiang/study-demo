@@ -8,15 +8,15 @@
 
 ### 1.1.PropertySource 简介
 
-**org.springframework.context.annotation.PropertySource** 是一个注解，可以标记在类上、接口上、枚举上，在运行时起作用。而`@Repeatable(value = PropertySources.class)` 表示在PropertySources 中此注解时可以重复使用的。如下：
+**org.springframework.context.annotation.PropertySource** 是一个注解，可以标记在类上、接口上、枚举上，在运行时起作用。而`@Repeatable(value = PropertySources.class)` 表示在 `PropertySources` 中此注解时可以重复使用的。如下：
 
 ![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/spring-demo/20210401212907.png)
 
 ### 1.2.@PropertySource与Environment读取配置文件
 
-此注解@PropertySource 为Spring 中的 Environment提供方便和声明机制，通常与Configuration一起搭配使用。
+此注解 `@PropertySource` 为 `Spring` 中的 `Environment` 提供方便和声明机制，通常与 `Configuration` 一起搭配使用。
 
-- 新建一个maven 项目，添加pom.xml 依赖：
+- 新建一个 `maven` 项目，添加 `pom.xml` 依赖：
 
     ```xml
     <?xml version="1.0" encoding="UTF-8"?>
@@ -72,14 +72,14 @@
 
 	> 一般把版本名称统一定义在 标签中，便于统一管理，如上可以通过`${…}` 来获取指定版本。
 
-- 定义一个application.properties 来写入如下配置
+- 定义一个 `application.properties` 来写入如下配置
 
     ```properties
     com.spring.name=liuXuan
     com.spring.age=18
     ```
 
-- 新建一个TestBean，定义几个属性
+- 新建一个 `TestBean`，定义几个属性
 
     ```java
     public class TestBean {
@@ -113,7 +113,7 @@
     }
     ```
 
-- 新建一个main class ，用来演示@PropertySource 的使用
+- 新建一个 `main class`，用来演示 `@PropertySource` 的使用
 
     ```java
       @Configuration
@@ -192,7 +192,7 @@
       }
     ```
 
-	> 类上加入@Component 表示这是一个组件bean，需要被spring进行管理，@PropertySource 用于获取类路径下的db.properties 配置文件，@Value用于获取properties中的key 对应的value值，printDBConfigs方法打印出来对应的值。
+	> 类上加入 `@Component` 表示这是一个组件 `bean`，需要被 `spring` 进行管理，`@PropertySource`  用于获取类路径下的`db.properties` 配置文件，`@Value` 用于获取 `properties` 中的 `key` 对应的 `value` 值，`printDBConfigs` 方法打印出来对应的值。
 
 - 新建一个**db.properties**，具体文件如下
 
@@ -207,7 +207,7 @@
 
 	> 这是一个MYSQL连接数据库驱动的配置文件。
 
-- 新建一个**SpringMainClass**，用于测试DBConection中是否能够获取到@Value的值
+- 新建一个**SpringMainClass**，用于测试 `DBConection` 中是否能够获取到 `@Value` 的值
 
     ```java
             public class SpringMainClass {
@@ -306,7 +306,7 @@
     }
     ```
 
-	在com.spring.propertysource.app 下 新增**DBConfiguration**，作用是配置管理类，管理DBConnection，并读取配置文件，代码如下：
+	在 `com.spring.propertysource.app` 下 新增 `DBConfiguration`，作用是配置管理类，管理 `DBConnection`，并读取配置文件，代码如下：
 
     ```java
     @Configuration
@@ -383,7 +383,7 @@
 
 ### 1.4.@PropertySource 与 @Import
 
-@Import 可以用来导入 @PropertySource 标注的类，具体代码如下：
+`@Import` 可以用来导入 `@PropertySource` 标注的类，具体代码如下：
 
 - 新建一个**PropertySourceReadApplication** 类，用于读取配置文件并测试，具体代码如下：
 
@@ -428,7 +428,7 @@
     }
     ```
 
-	启动PropertySourceReadApplication ，console能够发现读取到配置文件中的value值
+	启动 `PropertySourceReadApplication` ，`console` 能够发现读取到配置文件中的 `value` 值
 	
 	```
 	18
@@ -439,7 +439,7 @@
 
 ## 2.@SpringBootConfiguration
 
-@SpringBootConfiguration继承自@Configuration，二者功能也一致，标注当前类是配置类，并会将当前类内声明的一个或多个以@Bean注解标记的方法的实例纳入到spring容器中，并且实例名就是方法名。
+`@SpringBootConfiguration` 继承自 `@Configuration`，二者功能也一致，标注当前类是配置类，并会将当前类内声明的一个或多个以 `@Bean` 注解标记的方法的实例纳入到 `spring` 容器中，并且实例名就是方法名。
 
 如下所示：
 
@@ -492,7 +492,6 @@ import com.lhkj.pluto.user.entity.User;
  * 包括@ComponentScan，和@SpringBootConfiguration，@EnableAutoConfiguration
  * 
  */
-
 @RestController
 @SpringBootApplication
 public class App 
@@ -502,7 +501,6 @@ public class App
     public String Hello(){
         return "hello";
     }
-    
     
     @Bean
     public Runnable createRunnable() {
@@ -539,7 +537,7 @@ public class App
 
 ### 3.1.demo
 
-自己定义一个外部项目，core-bean，依赖如下
+自己定义一个外部项目，`core-bean`，依赖如下
 
 ```xml
 <artifactId>core-bean</artifactId>
@@ -554,7 +552,7 @@ public class App
 </dependencies>
 ```
 
-然后定义一个Cat类
+然后定义一个 `Cat` 类
 
 ```cpp
 public class Cat {
@@ -577,9 +575,9 @@ public class MyConfig {
 }
 ```
 
-我们知道这样就将Cat类装配到Spring容器了。
+我们知道这样就将 `Cat` 类装配到 `Spring` 容器了。
 
-再定义一个springboot项目，加入core-bean依赖，依赖如下：
+再定义一个 `springboot` 项目，加入 `core-bean` 依赖，依赖如下：
 
 ```xml
 <artifactId>springboot-enableAutoConfiguration</artifactId>
@@ -614,39 +612,39 @@ public class Application {
 
 ![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/spring-demo/20210401214414.webp)
 
-发现Cat类并没有纳入到springboot-enableAutoConfiguration项目中。
+发现 `Cat` 类并没有纳入到 `springboot-enableAutoConfiguration` 项目中。
 
 **解决方案**
 
-在core-bean项目resource下新建文件夹META-INF，在文件夹下面新建spring.factories文件，文件中配置，key为自定配置类EnableAutoConfiguration的全路径，value是配置类的全路径
+在 `core-bean` 项目 `resource` 下新建文件夹 `META-INF`，在文件夹下面新建 `spring.factories` 文件，文件中配置，`key` 为自定配置类 `EnableAutoConfiguration` 的全路径，`value` 是配置类的全路径
 
 ```undefined
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=core.bean.MyConfig
 ```
 
-启动springboot-enableAutoConfiguration项目，打印结果：
+启动 `springboot-enableAutoConfiguration` 项目，打印结果：
 
 ![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/spring-demo/20210401214448.webp)
 
 ### 3.2.原理分析
 
-进入EnableAutoConfiguration注解源码，发现是导入EnableAutoConfigurationImportSelector类，
+进入 `EnableAutoConfiguration` 注解源码，发现是导入 `EnableAutoConfigurationImportSelector` 类，
 
 ![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/spring-demo/20210401214459.webp)
 
 ![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/spring-demo/20210401214511.webp)
 
-跟到最后发现继承了ImportSelector接口，之前我们讲过[Springboot @Enable*注解的工作原理](https://www.jianshu.com/p/1241c1079dd6)ImportSelector接口的selectImports返回的数组（类的全类名）都会被纳入到spring容器中。
+跟到最后发现继承了 `ImportSelector` 接口，之前我们讲过[Springboot @Enable*注解的工作原理](https://www.jianshu.com/p/1241c1079dd6) `ImportSelector`接口的`selectImports` 返回的数组（类的全类名）都会被纳入到 `spring` 容器中。
 
-其在AutoConfigurationImportSelector类中的selectImports实现，进入`org.springframework.boot.autoconfigure.AutoConfigurationImportSelector`类，
+其在 `AutoConfigurationImportSelector` 类中的 `selectImports` 实现，进入`org.springframework.boot.autoconfigure.AutoConfigurationImportSelector`类，
 
 ![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/spring-demo/20210401214538.webp)
 
-进入getCandidateConfigurations方法
+进入 `getCandidateConfigurations` 方法
 
 ![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/spring-demo/20210401214552.webp)
 
-getCandidateConfigurations会到classpath下的读取 `META-INF/spring.factories` 文件的配置，并返回一个字符串数组。
+`getCandidateConfigurations` 会到 `classpath` 下的读取 `META-INF/spring.factories` 文件的配置，并返回一个字符串数组。
 
 调试的时候读取到了 `core.bean.MyConfig`，也读到了一些其他的配置，下面会讲。
 
@@ -656,7 +654,7 @@ getCandidateConfigurations会到classpath下的读取 `META-INF/spring.factories
 
 `META-INF/spring.factories` 还可以配置多个配置类。
 
-比如我们在core-bean下在定义二个类，
+比如我们在 `core-bean` 下在定义二个类，
 
 ```java
 package core.bean;
@@ -694,7 +692,7 @@ public class Myconfig2 {
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=core.bean.MyConfig,core.bean.Myconfig2,core.bean.People
 ```
 
-修改springboot-enableAutoConfiguration项目的启动类：
+修改 `springboot-enableAutoConfiguration` 项目的启动类：
 
 ```kotlin
 package com.zhihao.miao;
@@ -726,29 +724,30 @@ public class Application {
 
 ![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/spring-demo/20210401214639.webp)
 
-发现都纳入到spring容器中了。
+发现都纳入到 `spring` 容器中了。
 
-可以配置`spring.boot.enableautoconfiguration=false`禁用自动配置，这样不会启动自动配置了，默认是true。还可以排出一些自动配置类，可以在EnableAutoConfiguration注解加入参数，这边不做过多解释。
+可以配置`spring.boot.enableautoconfiguration=false`禁用自动配置，这样不会启动自动配置了，默认是true。还可以排出一些自动配置类，可以在 `EnableAutoConfiguration` 注解加入参数，这边不做过多解释。
 
 ![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/spring-demo/20210401214700.webp)
 
-总结@EnableAutoConfiguration 作用
+总结 `@EnableAutoConfiguration` 作用
 
-从classpath中搜索所有META-INF/spring.factories配置文件然后，将其中`org.springframework.boot.autoconfigure.EnableAutoConfiguration key`对应的配置项加载到spring容器。只有`spring.boot.enableautoconfiguration`为true（默认为true）的时候，才启用自动配置
-`@EnableAutoConfiguration` 还可以进行排除，排除方式有2中，一是根据class来排除（exclude），二是根据class name（excludeName）来排除
+从 `classpath` 中搜索所有 `META-INF/spring.factories` 配置文件然后，将其中`org.springframework.boot.autoconfigure.EnableAutoConfiguration key`对应的配置项加载到 `spring` 容器。只有`spring.boot.enableautoconfiguration`为 `true`（默认为true）的时候，才启用自动配置
+`@EnableAutoConfiguration` 还可以进行排除，排除方式有2中，一是根据class来排除（`exclude`），二是根据class name（`excludeName`）来排除
 其内部实现的关键点有
 
-- ImportSelector 该接口的方法的返回值都会被纳入到spring容器管理中
-- SpringFactoriesLoader 该类可以从classpath中搜索所有 `META-INF/spring.factories` 配置文件，并读取配置
+- `ImportSelector` 该接口的方法的返回值都会被纳入到 `spring` 容器管理中
+- `SpringFactoriesLoader` 该类可以从 `classpath` 中搜索所有 `META-INF/spring.factories` 配置文件，并读取配置
 
 ### 3.3.springboot内部如何使用@EnableAutoConfiguration注解
 
-我们点进去spring-boot-autoconfigure中的META-INF下的spring.factories文件，发现spring.factories文件中配置了好多的配置类，在将这些依赖依赖到自己的项目中会将其都纳入到spring容器中，不过这些类好多都是配合@Conditional***等注解一起工作的。
+我们点进去 `spring-boot-autoconfigure` 中的 `META-INF` 下的 `spring.factories` 文件，发现 `spring.factories` 文件中配置了好多的配置类，在将这些依赖依赖到自己的项目中会将其都纳入到 `spring` 容器中，不过这些类好多都是配合 `@Conditional***` 等注解一起工作的。
 
 ![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/spring-demo/20210401214737.webp)
 
 举个例子：
- 在springboot-enableAutoConfiguration加入Gson依赖：
+
+ 在 `springboot-enableAutoConfiguration` 加入 `Gson` 依赖：
 
 ```xml
 <dependency>
@@ -759,7 +758,7 @@ public class Application {
 
 ![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/spring-demo/20210401214750.webp)
 
-如果我们不在项目中配置，spring-boot-autoconfigure会自动帮我们装配一个对象实例名为gson的Gson实例。如果自己装配那么就使用自己装配的Gson实例。
+如果我们不在项目中配置，`spring-boot-autoconfigure` 会自动帮我们装配一个对象实例名为 `gson` 的 `Gson` 实例。如果自己装配那么就使用自己装配的 `Gson` 实例。
 
 启动测试类：
 
@@ -819,13 +818,13 @@ public class Application {
 
 **4.1.@ComponentScan注解是什么**
 
-其实很简单，@ComponentScan主要就是定义**扫描的路径**从中找出标识了**需要装配**的类自动装配到spring的bean容器中
+其实很简单，`@ComponentScan` 主要就是定义**扫描的路径**从中找出标识了**需要装配**的类自动装配到 `spring` 的 `bean` 容器中
 
 **4.2.@ComponentScan注解的详细使用**
 
-做过web开发的同学一定都有用过@Controller，@Service，@Repository注解，查看其源码你会发现，他们中有一个**共同的注解@Component**，没错@ComponentScan注解默认就会装配标识了@Controller，@Service，@Repository，@Component注解的类到spring容器中，好下面咱们就先来简单演示一下这个例子
+做过 `web` 开发的同学一定都有用过 `@Controller`，`@Service`，`@Repository` 注解，查看其源码你会发现，他们中有一个**共同的注解`@Component`**，没错 `@ComponentScan` 注解默认就会装配标识了`@Controller`，`@Service`，`@Repository`，`@Component` 注解的类到`spring` 容器中，好下面咱们就先来简单演示一下这个例子
 
-在包 `com.zhang.controller` 下新建一个UserController带@Controller注解如下：
+在包 `com.zhang.controller` 下新建一个 `UserController` 带 `@Controller` 注解如下：
 
 ```
 package com.zhang.controller;
@@ -835,7 +834,7 @@ public class UserController {
 }
 ```
 
-在包com.zhang.service下新建一个UserService带@Service注解如下：
+在包 `com.zhang.service` 下新建一个 `UserService` 带 `@Service` 注解如下：
 
 ```
 package com.zhang.service;
@@ -845,7 +844,7 @@ public class UserService {
 }
 ```
 
-在包com.zhang.dao下新建一个UserDao带@Repository注解如下：
+在包 `com.zhang.dao` 下新建一个 `UserDao` 带 `@Repository` 注解如下：
 
 ```
 package com.zhang.dao;
@@ -889,9 +888,9 @@ userDao
 userService
 ```
 
-怎么样，包扫描的方式比以前介绍的通过@Bean注解的方式是不是方便很多，这也就是为什么web开发的同学经常使用此方式的原因了
+怎么样，包扫描的方式比以前介绍的通过 `@Bean` 注解的方式是不是方便很多，这也就是为什么 `web` 开发的同学经常使用此方式的原因了
 
-上面只是简单的介绍了@ComponentScan注解检测包含指定注解的自动装配，接下来让我们来看看**@ComponentScan注解的更加详细的配置**，在演示详细的配置之前，让我们先看看@ComponentScan的源代码如下：
+上面只是简单的介绍了 `@ComponentScan` 注解检测包含指定注解的自动装配，接下来让我们来看看**`@ComponentScan` 注解的更加详细的配置**，在演示详细的配置之前，让我们先看看 `@ComponentScan` 的源代码如下：
 
 ```
 @Retention(RetentionPolicy.RUNTIME)
@@ -985,11 +984,11 @@ userDao
 userService
 ```
 
-只有userDao外加**basePackageClasses**指定的userService加入到了spring容器中
+只有 `userDao` 外加 `basePackageClasses` 指定的 `userService` 加入到了 `spring` 容器中
 
 **演示includeFilters参数的使用如下：**
 
-在com.zhang.service包下新建一个UserService2类如下：注意没有带@Service注解
+在 `com.zhang.service` 包下新建一个 `UserService2` 类如下：注意没有带 `@Service` 注解
 
 ```
 package com.zhang.service;
@@ -1020,9 +1019,9 @@ userService
 userService2
 ```
 
-userService2同样被加入到了spring容器
+`userService2` 同样被加入到了 `spring` 容器
 
-新增一个自定义的实现了TypeFilter的MyTypeFilter类如下：
+新增一个自定义的实现了 `TypeFilter` 的 `MyTypeFilter` 类如下：
 
 ```
 /**
@@ -1071,16 +1070,16 @@ userService
 userService2
 ```
 
-可以发现同样userService2被加入到了spring容器中 
+可以发现同样 `userService2` 被加入到了 `spring` 容器中 
 
-好了includeFilters参数就演示到这，另外一个参数excludeFilters和includeFilters用户一摸一样，只是他是过滤出不加入spring容器中，感兴趣的同学可以自己试试，我这边就不演示了
+好了 `includeFilters` 参数就演示到这，另外一个参数 `excludeFilters` 和 `includeFilters` 用户一摸一样，只是他是过滤出不加入`spring` 容器中，感兴趣的同学可以自己试试，我这边就不演示了
 
 **4.3.总结一下@ComponentScan的常用方式如下**
 
-- 自定扫描路径下边带有@Controller，@Service，@Repository，@Component注解加入spring容器
-- 通过includeFilters加入扫描路径下没有以上注解的类加入spring容器
-- 通过excludeFilters过滤出不用加入spring容器的类
-- 自定义增加了@Component注解的注解方式
+- 自定扫描路径下边带有 `@Controller`，`@Service`，`@Repository`，`@Component` 注解加入 `spring` 容器
+- 通过 `includeFilters` 加入扫描路径下没有以上注解的类加入 `spring` 容器
+- 通过 `excludeFilters` 过滤出不用加入 `spring` 容器的类
+- 自定义增加了 `@Component` 注解的注解方式
 
 
 
@@ -1088,21 +1087,21 @@ userService2
 
 ### 5.1.@Import注解须知
 
-- **@Import只能用在类上** ，@Import通过快速导入的方式实现把实例加入spring的IOC容器中
+- **@Import只能用在类上** ，`@Import` 通过快速导入的方式实现把实例加入 `spring` 的 `IOC` 容器中
 
-- 加入IOC容器的方式有很多种，@Import注解就相对很牛皮了，**@Import注解可以用于导入第三方包** ，当然@Bean注解也可以，但是@Import注解快速导入的方式更加便捷
+- 加入 `IOC` 容器的方式有很多种，`@Import` 注解就相对很牛皮了，**@Import注解可以用于导入第三方包** ，当然 `@Bean` 注解也可以，但是 `@Import` 注解快速导入的方式更加便捷
 
-- @Import注解有三种用法
+- `@Import` 注解有三种用法
 
 ### 5.2.@Import的三种用法
 
-@Import的三种用法主要包括：
+`@Import` 的三种用法主要包括：
 
-- 直接填class数组方式
+- 直接填 `class` 数组方式
 
-- ImportSelector方式【重点】
+- `ImportSelector` 方式【重点】
 
-- ImportBeanDefinitionRegistrar方式
+- `ImportBeanDefinitionRegistrar` 方式
 
 #### 5.2.1.第一种用法：直接填class数组
 
@@ -1117,17 +1116,17 @@ public class TestDemo {
 }
 ```
 
-对应的import的bean都将加入到spring容器中，这些在容器中bean名称是该类的**全类名** ，比如com.yc.类名
+对应的 `import` 的 `bean` 都将加入到 `spring` 容器中，这些在容器中 `bean` 名称是该类的**全类名** ，比如 `com.yc.类名`
 
 #### 5.2.2.第二种用法：ImportSelector方式【重点】
 
-这种方式的前提就是一个类要实现ImportSelector接口，假如我要用这种方法，目标对象是Myclass这个类，分析具体如下：
+这种方式的前提就是一个类要实现 `ImportSelector` 接口，假如我要用这种方法，目标对象是 `Myclass` 这个类，分析具体如下：
 
-创建Myclass类并实现ImportSelector接口
+创建 `Myclass` 类并实现 `ImportSelector` 接口
 
 ```
 public class Myclass implements ImportSelector {
-//既然是接口肯定要实现这个接口的方法
+	//既然是接口肯定要实现这个接口的方法
     @Override
     public String[] selectImports(AnnotationMetadata annotationMetadata) {
         return new String[0];
@@ -1135,16 +1134,16 @@ public class Myclass implements ImportSelector {
 }
 ```
 
-分析实现接口的selectImports方法中的：
+分析实现接口的 `selectImports` 方法中的：
 
 - 1、返回值： 就是我们实际上要导入到容器中的组件全类名【**重点** 】
-- 2、参数： AnnotationMetadata表示当前被@Import注解给标注的所有注解信息【不是重点】
+- 2、参数： `AnnotationMetadata` 表示当前被 `@Import` 注解给标注的所有注解信息【不是重点】
 
-> 需要注意的是selectImports方法可以返回空数组但是不能返回null，否则会报空指针异常！
+> 需要注意的是 `selectImports` 方法可以返回空数组但是不能返回 `null`，否则会报空指针异常！
 
 以上分析完毕之后，具体用法步骤如下：
 
-第一步：创建Myclass类并实现ImportSelector接口，这里用于演示就添加一个全类名给其返回值
+第一步：创建 `Myclass` 类并实现 `ImportSelector` 接口，这里用于演示就添加一个全类名给其返回值
 
 ```
 public class Myclass implements ImportSelector {
@@ -1155,7 +1154,7 @@ public class Myclass implements ImportSelector {
 }
 ```
 
-第二步：编写TestDemo 类，并标注上使用ImportSelector方式的Myclass类
+第二步：编写 `TestDemo` 类，并标注上使用 `ImportSelector` 方式的 `Myclass` 类
 
 ```
 @Import({TestDemo2.class,Myclass.class})
@@ -1168,7 +1167,7 @@ public class TestDemo {
 }
 ```
 
-可以看出，宜春故意挑了个龙套角色@Bean注解，若对@Bean注解不是很清晰的童鞋可以参考[大白话讲解Spring的@bean注解](https://blog.csdn.net/qq_44543508/article/details/103718958)
+可以看出，宜春故意挑了个龙套角色 `@Bean` 注解，若对 `@Bean` 注解不是很清晰的童鞋可以参考[大白话讲解Spring的@bean注解](https://blog.csdn.net/qq_44543508/article/details/103718958)
 
 第三步：编写打印容器中的组件测试类
 
@@ -1195,9 +1194,9 @@ public class AnnotationTestDemo {
 
 #### 5.2.3.第三种用法：ImportBeanDefinitionRegistrar方式
 
-同样是一个接口，类似于第二种ImportSelector用法，相似度80%，只不过这种用法比较自定义化注册，具体如下：
+同样是一个接口，类似于第二种 `ImportSelector` 用法，相似度80%，只不过这种用法比较自定义化注册，具体如下：
 
-第一步：创建Myclass2类并实现ImportBeanDefinitionRegistrar接口
+第一步：创建 `Myclass2` 类并实现 `ImportBeanDefinitionRegistrar` 接口
 
 ```
 public class Myclass2 implements ImportBeanDefinitionRegistrar {
@@ -1211,10 +1210,10 @@ public class Myclass2 implements ImportBeanDefinitionRegistrar {
 
 参数分析：
 
-- 第一个参数：annotationMetadata 和之前的ImportSelector参数一样都是表示当前被@Import注解给标注的所有注解信息
-- 第二个参数表示用于注册定义一个bean
+- 第一个参数：`annotationMetadata` 和之前的 `ImportSelector` 参数一样都是表示当前被 `@Import` 注解给标注的所有注解信息
+- 第二个参数表示用于注册定义一个 `bean`
 
-第二步：编写代码，自定义注册bean
+第二步：编写代码，自定义注册 `bean`
 
 ```
 public class Myclass2 implements ImportBeanDefinitionRegistrar {
@@ -1228,7 +1227,7 @@ public class Myclass2 implements ImportBeanDefinitionRegistrar {
 }
 ```
 
-第三步：编写TestDemo 类，并标注上使用ImportBeanDefinitionRegistrar方式的Myclass2类
+第三步：编写 `TestDemo` 类，并标注上使用 `ImportBeanDefinitionRegistrar` 方式的 `Myclass2` 类
 
 ```
 @Import({TestDemo2.class,Myclass.class,Myclass2.class})
@@ -1250,13 +1249,13 @@ public class TestDemo {
 
 - 第一种用法：`@Import`（{ 要导入的容器中的组件 } ）：容器会自动注册这个组件，**id默认是全类名**
 
-- 第二种用法：`ImportSelector`：返回需要导入的组件的全类名数组，springboot底层用的特别多【**重点** 】
+- 第二种用法：`ImportSelector`：返回需要导入的组件的全类名数组，`springboot` 底层用的特别多【**重点** 】
 
-- 第三种用法：`ImportBeanDefinitionRegistrar`：手动注册bean到容器
+- 第三种用法：`ImportBeanDefinitionRegistrar`：手动注册 `bean` 到容器
 
 **以上三种用法方式皆可混合在一个@Import中使用，特别注意第一种和第二种都是以全类名的方式注册，而第三中可自定义方式。**
 
-@Import注解本身在springboot中用的很多，特别是其中的第二种用法ImportSelector方式在springboot中使用的特别多，尤其要掌握！
+`@Import` 注解本身在 `springboot` 中用的很多，特别是其中的第二种用法 `ImportSelector` 方式在 `springboot` 中使用的特别多，尤其要掌握！
 
 
 
@@ -1264,9 +1263,9 @@ public class TestDemo {
 
 ### 6.1前言
 
-不知道大家在使用Spring Boot开发的日常中有没有用过`@Conditionalxxx`注解，比如`@ConditionalOnMissingBean`。相信看过Spring Boot源码的朋友一定不陌生。
+不知道大家在使用Spring Boot开发的日常中有没有用过`@Conditionalxxx`注解，比如`@ConditionalOnMissingBean`。相信看过 `Spring Boot` 源码的朋友一定不陌生。
 
-`@Conditionalxxx`这类注解表示某种判断条件成立时才会执行相关操作。掌握该类注解，有助于日常开发，框架的搭建。
+`@Conditionalxxx` 这类注解表示某种判断条件成立时才会执行相关操作。掌握该类注解，有助于日常开发，框架的搭建。
 
 ### 6.2.Spring Boot 版本
 
@@ -1463,9 +1462,9 @@ null
 条件判断的执行分为两个阶段，如下：
 
 1. **配置类解析阶段(`ConfigurationPhase.PARSE_CONFIGURATION`)**：在这个阶段会得到一批配置类的信息和一些需要注册的`Bean`。
-2. **Bean注册阶段(`ConfigurationPhase.REGISTER_BEAN`)**：将配置类解析阶段得到的配置类和需要注册的Bean注入到容器中。
+2. **Bean注册阶段(`ConfigurationPhase.REGISTER_BEAN`)**：将配置类解析阶段得到的配置类和需要注册的 `Bean` 注入到容器中。
 
-默认都是配置解析阶段，其实也就够用了，但是在Spring Boot中使用了`ConfigurationCondition`，这个接口可以自定义执行阶段，比如`@ConditionalOnMissingBean`都是在Bean注册阶段执行，因为需要从容器中判断Bean。
+默认都是配置解析阶段，其实也就够用了，但是在 `Spring Boot` 中使用了`ConfigurationCondition`，这个接口可以自定义执行阶段，比如`@ConditionalOnMissingBean`都是在Bean注册阶段执行，因为需要从容器中判断Bean。
 
 > **这个两个阶段有什么不同呢？**：其实很简单的，配置类解析阶段只是将需要加载配置类和一些Bean（被`@Conditional`注解过滤掉之后）收集起来，而Bean注册阶段是将的收集来的Bean和配置类注入到容器中，**如果在配置类解析阶段执行`Condition`接口的`matches()`接口去判断某些Bean是否存在IOC容器中，这个显然是不行的，因为这些Bean还未注册到容器中**。
 
@@ -1631,9 +1630,9 @@ Spring Boot中大量使用了这些注解，常见的注解如下：
 
 ## 7.@ConfigurationProperties
 
-读取默认配置文件（application.properties、application.yml）
+读取默认配置文件（`application.properties`、`application.yml`）
 
-实现方式一 @ConfigurationProperties + @Component作用于类上
+实现方式一 `@ConfigurationProperties` + `@Component` 作用于类上
 
 ```java
 @ConfigurationProperties(prefix="person")
@@ -1656,7 +1655,7 @@ public class TestController {
 }
 ```
 
-实现方式二 @ConfigurationProperties + @Bean作用在配置类的bean方法上
+实现方式二 `@ConfigurationProperties` + `@Bean` 作用在配置类的 `bean` 方法上
 
 ```java
 @Data
@@ -1685,7 +1684,7 @@ public class TestController {
 }
 ```
 
-实现方式三 @ConfigurationProperties注解到普通类、 @EnableConfigurationProperties注解定义为bean
+实现方式三 `@ConfigurationProperties` 注解到普通类、 `@EnableConfigurationProperties` 注解定义为 `bean`
 
 ```java
 @ConfigurationProperties(prefix="person")
@@ -1715,7 +1714,7 @@ public class TestController {
 }
 ```
 
-实现方式四 @Value作用属性上
+实现方式四 `@Value` 作用属性上
 
 ```java
 @RestController
@@ -1731,7 +1730,7 @@ public class TestController {
 }
 ```
 
-实现方式五 使用自带的Environment对象
+实现方式五 使用自带的 `Environment` 对象
 
 ```java
 @RestController

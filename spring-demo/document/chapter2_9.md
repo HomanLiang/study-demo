@@ -8,7 +8,7 @@
 
 ### 1.1.`spring-boot-devtools`简介
 
-SpringBoot官方开发工具，如果你的应用集成了它，即可实现热部署和远程调试。
+`SpringBoot` 官方开发工具，如果你的应用集成了它，即可实现热部署和远程调试。
 
 ### 1.2.实现原理
 
@@ -16,9 +16,9 @@ SpringBoot官方开发工具，如果你的应用集成了它，即可实现热�
 
 ### 1.3.热部署
 
-> 接下来我们将集成devtools，来演示下热部署功能。
+> 接下来我们将集成 `devtools`，来演示下热部署功能。
 
-- 首先需要在项目的`pom.xml`文件中，添加devtools的依赖；
+- 首先需要在项目的 `pom.xml` 文件中，添加 `devtools` 的依赖；
 
     ```
     <dependency>
@@ -59,11 +59,11 @@ SpringBoot官方开发工具，如果你的应用集成了它，即可实现热�
     }
     ```
 
-- 由于在项目构建时，devtools才会自动重启项目，而IDEA默认并没有使用自动构建，此时我们可以修改应用启动配置，设置当IDEA失去焦点时自动构建项目；
+- 由于在项目构建时，`devtools` 才会自动重启项目，而 `IDEA` 默认并没有使用自动构建，此时我们可以修改应用启动配置，设置当`IDEA` 失去焦点时自动构建项目；
 
     ![图片](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/spring-demo/20210504102516.png)
 
-- 修改Controller中的代码，只要修改下`message`变量即可；
+- 修改 `Controller` 中的代码，只要修改下`message`变量即可；
 
     ```
     /**

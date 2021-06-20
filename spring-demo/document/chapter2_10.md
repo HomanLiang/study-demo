@@ -6,11 +6,11 @@
 
 ## 1.Spring Boot 集成 WebSocket
 
-在一次项目开发中，使用到了Netty 网络应用框架，以及 MQTT 进行消息数据的收发，这其中需要后台来将获取到的消息主动推送给前端，于是就使用到了MQTT，特此记录一下。
+在一次项目开发中，使用到了 `Netty` 网络应用框架，以及 `MQTT` 进行消息数据的收发，这其中需要后台来将获取到的消息主动推送给前端，于是就使用到了 `MQTT`，特此记录一下。
 
 ### 1.1.什么是websocket？
 
-WebSocket 协议是基于 TCP 的一种新的网络协议。
+`WebSocket` 协议是基于 `TCP` 的一种新的网络协议。
 
 它实现了客户端与服务器之间的全双工通信，学过计算机网络都知道，既然是全双工，就说明了**服务器可以主动发送信息给客户端**。
 
@@ -26,7 +26,7 @@ WebSocket 协议是基于 TCP 的一种新的网络协议。
 
 ![图片](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/spring-demo/20210504103239.png)
 
-下面我们就直接开始使用 Spring Boot 开始整合。以下案例都在我自己的电脑上测试成功，你可以根据自己的功能进行修改即可。
+下面我们就直接开始使用 `Spring Boot` 开始整合。以下案例都在我自己的电脑上测试成功，你可以根据自己的功能进行修改即可。
 
 我的项目结构如下：
 
@@ -36,7 +36,7 @@ WebSocket 协议是基于 TCP 的一种新的网络协议。
 
 #### 1.2.1.添加依赖
 
-Maven 依赖：
+`Maven` 依赖：
 
 ```
 <dependency>  
@@ -47,7 +47,7 @@ Maven 依赖：
 
 #### 1.2.2.启用Springboot对WebSocket的支持
 
-启用 WebSocket 的支持也是很简单，几句代码搞定。
+启用 `WebSocket` 的支持也是很简单，几句代码搞定。
 
 ```
 import org.springframework.context.annotation.Bean;
@@ -69,11 +69,11 @@ public class WebSocketConfig {
 
 #### 1.2.3.核心配置：WebSocketServer
 
-因为 Web Socket 是类似客户端服务端的形式(采用 ws 协议)，那么这里的 WebSocketServer 其实就相当于一个 ws 协议的 Controller。
+因为 `WebSocket` 是类似客户端服务端的形式(采用 ws 协议)，那么这里的 `WebSocketServer` 其实就相当于一个 `ws` 协议的 `Controller`。
 
-@ServerEndpoint 注解这是一个类层次的注解，它的功能主要是将目前的类定义成一个 websocket 服务器端。注解的值将被用于监听用户连接的终端访问 URL 地址，客户端可以通过这个 URL 来连接到 WebSocket 服务器端
+`@ServerEndpoint` 注解这是一个类层次的注解，它的功能主要是将目前的类定义成一个 `websocket` 服务器端。注解的值将被用于监听用户连接的终端访问 `URL` 地址，客户端可以通过这个 `URL` 来连接到 `WebSocket` 服务器端
 
-再新建一个 ConcurrentHashMap webSocketMap 用于接收当前 userId 的 WebSocket，方便传递之间对 userId 进行推送消息。
+再新建一个 `ConcurrentHashMap webSocketMap` 用于接收当前 `userId` 的 `WebSocket`，方便传递之间对 `userId` 进行推送消息。
 
 下面是具体业务代码：
 
@@ -359,9 +359,9 @@ public class SystemController {
 
 ### 1.3.总结
 
-这中间我遇到一个问题，就是说 WebSocket 启动的时候优先于 spring 容器，从而导致在 WebSocketServer 中调用业务Service会报空指针异常。
+这中间我遇到一个问题，就是说 `WebSocket` 启动的时候优先于 `spring` 容器，从而导致在 `WebSocketServer` 中调用业务 `Service` 会报空指针异常。
 
-所以需要在 WebSocketServer 中将所需要用到的 service 给静态初始化一下：
+所以需要在 `WebSocketServer` 中将所需要用到的 `service` 给静态初始化一下：
 
 如图所示：
 
