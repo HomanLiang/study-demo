@@ -4,7 +4,7 @@
 
 # Zookeeper开源客户端–zkClient
 
-ZkClient是GitHub上的一个开源zookeeper客户端，再Zookeeper原生API接口上进行了包装，同时再内部还实现了Session超时重连、Watcher反复注册等功能
+`ZkClient` 是 `GitHub` 上的一个开源 `zookeeper` 客户端，再 `Zookeeper` 原生 `API` 接口上进行了包装，同时再内部还实现了 `Session` 超时重连、`Watcher` 反复注册等功能
 
 - **添加依赖**
 
@@ -50,7 +50,7 @@ ZkClient是GitHub上的一个开源zookeeper客户端，再Zookeeper原生API接
 
 - **删除节点**
 
-  ZkClient提供了递归删除节点的接口，即帮助开发者先删除所有子节点（如果存在），再删除父节点
+  `ZkClient` 提供了递归删除节点的接口，即帮助开发者先删除所有子节点（如果存在），再删除父节点
 
   ```
   import org.I0Itec.zkclient.ZkClient;

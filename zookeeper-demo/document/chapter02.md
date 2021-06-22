@@ -4,26 +4,26 @@
 
 # Zookeeper环境搭建
 
-Zookeeper搭建均以Linux环境为例
+`Zookeeper` 搭建均以 `Linux` 环境为例
 
-## 单机环境搭建
+## 1.单机环境搭建
 
 1. **下载安装包**
 
-   首先下载稳定版本的zookeeper http://zookeeper.apache.org/releases.html,如下使用的版本为3.4.14》》zookeeper-3.4.14.tar.gz
+   首先下载稳定版本的 `zookeeper`  http://zookeeper.apache.org/releases.html,如下使用的版本为3.4.14》》zookeeper-3.4.14.tar.gz
 
 2. **上传**
 
-   将zookeeper安装压缩包zookeeper-3.4.14.tar.gz上传至服务器系统
+   将 `zookeeper` 安装压缩包 `zookeeper-3.4.14.tar.gz` 上传至服务器系统
 
-3. 解压缩安装包至/usr/local
+3. 解压缩安装包至`/usr/local`
 
    ```
    cd /usr/local
    tar -zxvf zookeeper-3.4.14.tar.gz
    ```
 
-4. 创建data文件夹
+4. 创建 `data` 文件夹
 
    ```
    cd zookeeper-3.4.14
@@ -37,7 +37,7 @@ Zookeeper搭建均以Linux环境为例
    mv zoo_sample.cfg zoo.cfg
    ```
 
-6. 修改zoo.cfg中的data属性
+6. 修改 `zoo.cfg` 中的 `data` 属性
 
    ```
    dataDir=/usr/local/zookeeper-3.4.14/data
@@ -74,25 +74,23 @@ Zookeeper搭建均以Linux环境为例
 
 
 
-## 集群模式搭建
+## 2.集群模式搭建
 
-Zookeeper不但可以在单机上运行单机模式，而且可以在单机模拟集群模式。以下为单机情况下模拟集群模式的搭建。我们将不同的实例运行在一台机器，用端口区分。
+`Zookeeper` 不但可以在单机上运行单机模式，而且可以在单机模拟集群模式。以下为单机情况下模拟集群模式的搭建。我们将不同的实例运行在一台机器，用端口区分。
 
-我们在一台机器上部署了3个server，也就是说单台机器上运行多个Zookeeper实例，这种情况下我们要保证每个不同的zookeeper实例的端口号是不能冲突的，除了clientPort不同之外，dataDir也不同。另外，还要再dataDir所对应的目录中创建myid文件再指定对应的zookeeper服务器实例
+我们在一台机器上部署了3个 `server`，也就是说单台机器上运行多个 `Zookeeper` 实例，这种情况下我们要保证每个不同的 `zookeeper` 实例的端口号是不能冲突的，除了 `clientPort` 不同之外，`dataDir` 也不同。另外，还要再 `dataDir` 所对应的目录中创建 `myid` 文件再指定对应的 `zookeeper` 服务器实例
 
 - **clientPort端口**
 
-  如果在1台机器上部署多个zookeeper实例，那么每个实例需要不同的clientPort
+  如果在1台机器上部署多个 `zookeeper` 实例，那么每个实例需要不同的 `clientPort`
 
 - **dataDir和dataLogDir**
 
-  如果在1台机器上部署多个zookeeper实例，dataDir和dataLogDir也需要区分
+  如果在1台机器上部署多个 `zookeeper` 实例，`dataDir` 和 `dataLogDir` 也需要区分
 
 - **server.X和myid**
 
-  server.X这个数字就是对应data/myid中的数字。在3个server的myid文件中分别写入了1,2,3，那么每个server中的zoo.cfg都配置sever.1,server.2,server.3。在同一台机器上部署的情况下，后面连着的2个端接口都不能是一样的，否则会端口冲突
-
-
+  `server.X` 这个数字就是对应 `data/myid` 中的数字。在 `3` 个 `server` 的 `myid` 文件中分别写入了1,2,3，那么每个 `server` 中的`zoo.cfg` 都配置 `sever.1,server.2,server.3`。在同一台机器上部署的情况下，后面连着的2个端接口都不能是一样的，否则会端口冲突
 
 **安装步骤：**
 
@@ -102,9 +100,9 @@ Zookeeper不但可以在单机上运行单机模式，而且可以在单机模�
 
 2. 上传
 
-   将zookeeper安装压缩包zookeeper-3.4.14.tar.gz上传至服务器系统
+   将 `zookeeper` 安装压缩包 `zookeeper-3.4.14.tar.gz` 上传至服务器系统
 
-3. 解压缩安装包至/usr/local中创建的新目录zkcluster中
+3. 解压缩安装包至 `/usr/local` 中创建的新目录 `zkcluster` 中
 
    ```
    cd /usr/local
@@ -185,8 +183,9 @@ Zookeeper不但可以在单机上运行单机模式，而且可以在单机模�
    ```
 
 10. 启动集群
-    依次启动三个zookeeper实例
-
+    
+依次启动三个zookeeper实例
+    
     
 
 

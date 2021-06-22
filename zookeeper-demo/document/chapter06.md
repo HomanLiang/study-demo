@@ -4,17 +4,17 @@
 
 # Zookeeper的API使用
 
-Zookeeper作为一个分布式框架，主要用于解决分布一致性问题，它提供了多种编程语言API，以下为java客户端的API使用方式
+`Zookeeper` 作为一个分布式框架，主要用于解决分布一致性问题，它提供了多种编程语言 `API`，以下为 `java` 客户端的 `API` 使用方式
 
-Zookeeper API共包含5个包：
+`Zookeeper API` 共包含5个包：
 
-- org.apache.zookeeper
-- org.apache.zookeeper.data
-- org.apache.zookeeper.server
-- org.apache.zookeeper.server.quorum
-- org.apache.zookeeper.server.upgrade
+- `org.apache.zookeeper`
+- `org.apache.zookeeper.data`
+- `org.apache.zookeeper.server`
+- `org.apache.zookeeper.server.quorum`
+- `org.apache.zookeeper.server.upgrade`
 
-其中org.apache.zookeeper，包含Zookeeper类，是我们最常用的类文件。如果使用Zookeeper服务，必须先创建一个Zookeeper实例，一旦客户端和Zookeeper服务端建立起来连接，Zookeeper系统将会给本次会话分配一个ID指，并且客户端会周期性的向服务端发送心跳来维持会话连接。只要连接有效，客户端就可以使用Zookeeper API进行处理了。
+其中 `org.apache.zookeeper`，包含 `Zookeeper` 类，是我们最常用的类文件。如果使用 `Zookeeper` 服务，必须先创建一个 `Zookeeper` 实例，一旦客户端和 `Zookeeper` 服务端建立起来连接，`Zookeeper` 系统将会给本次会话分配一个ID指，并且客户端会周期性的向服务端发送心跳来维持会话连接。只要连接有效，客户端就可以使用 `Zookeeper API` 进行处理了。
 
 1. **准备工作：导入依赖**
 

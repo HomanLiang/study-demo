@@ -8,8 +8,8 @@
 6. [Zookeeper的api使用](https://github.com/HomanLiang/study-demo/blob/main/mysql-demo/document/chapter06.md)
 7. [Zookeeper开源客户端–zkClient](https://github.com/HomanLiang/study-demo/blob/main/mysql-demo/document/chapter07.md)
 8. [Zookeeper应用场景](https://github.com/HomanLiang/study-demo/blob/main/mysql-demo/document/chapter08.md)
-9. Zookeeper 选举机制
-10. [Zookeeper面试题](https://github.com/HomanLiang/study-demo/blob/main/mysql-demo/document/chapter10.md)
+9. [Zookeeper 选举机制](https://github.com/HomanLiang/study-demo/blob/main/mysql-demo/document/chapter09.md)
+10. Zookeeper面试题
 
 
 
