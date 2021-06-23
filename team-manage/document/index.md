@@ -21,6 +21,7 @@
 ## 写作技能
 
 1. [如何写出一篇技术博客](https://github.com/HomanLiang/study-demo/blob/main/team-manage/document/chapter4_01.md)
+2. [关于写好文章的3个心法和5点技巧](https://github.com/HomanLiang/study-demo/blob/main/team-manage/document/chapter4_02.md)
 
 ## 学习方法
 
