@@ -241,13 +241,13 @@
 
 7. 更改镜像源
 
-    进入/etc/docker查看有没有 daemon.json，如果没有新建，有则修改。
+    进入 `/etc/docker` 查看有没有 `daemon.json`，如果没有新建，有则修改。
 
     ![Image](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/docker-demo/20210412214650.png)
 
     ![Image [2]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/docker-demo/20210412214702.png)
 
-    daemon.json内容如下
+    `daemon.json` 内容如下
 
     ```
     {
@@ -255,7 +255,7 @@
     }
     ```
 
-	重启docker服务
+	重启 `docker` 服务
 
 	![Image [7]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/docker-demo/20210412214637.png)
 

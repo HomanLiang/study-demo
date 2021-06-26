@@ -27,21 +27,23 @@ redis               latest              857c4ab5f029        7 hours ago         
 hello-world         latest              fce289e99eb9        7 months ago        1.84kB
 ```
 各个选项说明:
-- REPOSITORY：表示镜像的仓库源
-- TAG：镜像的标签
-- IMAGE ID：镜像ID
-- CREATED：镜像创建时间
-- SIZE：镜像大小
+- `REPOSITORY`：表示镜像的仓库源
+- `TAG`：镜像的标签
+- `IMAGE ID`：镜像ID
+- `CREATED`：镜像创建时间
+- `SIZE`：镜像大小
 
-同一仓库源可以有多个 TAG，代表这个仓库源的不同个版本，我们使用 REPOSITORY:TAG 来定义不同的镜像。
-如果你不指定一个镜像的版本标签，例如你只使用 ubuntu，docker 将默认使用 ubuntu:latest 镜像(latest 最新的镜像)
+同一仓库源可以有多个 `TAG`，代表这个仓库源的不同个版本，我们使用 `REPOSITORY:TAG` 来定义不同的镜像。
 
-OPTIONS说明
-- -a :列出本地所有的镜像（含中间映像层）
+如果你不指定一个镜像的版本标签，例如你只使用 `ubuntu`，`docker` 将默认使用 `ubuntu:latest`  镜像( `latest` 最新的镜像)
 
-- -q :只显示镜像ID。
+`OPTIONS` 说明
 
-- --digests :显示镜像的摘要信息（64为表示）
+- `-a `:列出本地所有的镜像（含中间映像层）
+
+- `-q` :只显示镜像ID。
+
+- `--digests`:显示镜像的摘要信息（64位表示）
 ```
 [root@localhost ~]# docker images --digests 
 REPOSITORY          TAG                 DIGEST                                                                    IMAGE ID            CREATED             SIZE
@@ -74,11 +76,11 @@ option说明：
 ### 2.3.获取镜像(下载镜像)
 命令:`docker [image] pull NAME [ :TAG]`
 
-TAG:默认为latest
+`TAG`:默认为 `latest`
 
-一般来说， 镜像的latest 标签意味着该镜像的内容会跟踪最新版本的变更而变化， 内容是不稳定的。因此，从稳定性上考虑，不要在生产环境中忽略镜像的标签信息或使用默认的latest 标记的镜像。
+一般来说， 镜像的 `latest` 标签意味着该镜像的内容会跟踪最新版本的变更而变化， 内容是不稳定的。因此，从稳定性上考虑，不要在生产环境中忽略镜像的标签信息或使用默认的 `latest` 标记的镜像。
 
-如下：下载tomcat镜像
+如下：下载 `tomcat` 镜像
 ```
 [root@localhost ~]# docker pull  tomcat
 Using default tag: latest
@@ -108,9 +110,9 @@ option:
 - `-f, -force`: 强制删除镜像， 即使有容器依赖它；
 - `-no-prune`: 不要清理未带标签的父镜像。
 
-如删除tomcat镜像：
+如删除 `tomcat` 镜像：
 
-`docker rmi tomcat` (不加标签默认删除latet docker rmi tomcat:latest)
+`docker rmi tomcat` (不加标签默认删除 `latet docker rmi tomcat:latest`)
 
 ```
 [root@localhost ~]# docker rmi tomcat:latest 
@@ -127,7 +129,7 @@ Deleted: sha256:3ed2a85fd2cbb4d32f9be22c9f9d57d7691f64f6275e1067c850c446d5ab47d9
 Deleted: sha256:a7fb515b82afb13dc97ba73d90f6543bfc149d9b2060f5b52e15300b26b5e0f1
 Deleted: sha256:2588c3b123d0790c6e569fdce63f8d93bd1387973ac74a3b438f738121b4e2e7
 ```
-通过执行 docker rmi 命令来删除只有一个标签的镜像， 可以看出会删除这个镜像文件的所有文件层
+通过执行 `docker rmi` 命令来删除只有一个标签的镜像， 可以看出会删除这个镜像文件的所有文件层
 #### 2.4.2.使用ID删除
 命令：`docker rmi ID`
 
@@ -151,7 +153,7 @@ Deleted: sha256:857c4ab5f0291ecbb4de238be9d5f9676e63dcc9608f70c8acc3748fe9689911
 注意， 通常并不推荐使用-f参数来强制删除一个存在容器依赖的镜像。 正确的做法是，先删除依赖该镜像的所有容器， 再来删除镜像。
 
 ### 2.5.清理镜像
-使用Docker 一段时间后， 系统中可能会遗留一些临时的镜像文件， 以及用的镜像， 可以通过 `docker image prune` 命令来进行清理。
+使用 `Docker` 一段时间后， 系统中可能会遗留一些临时的镜像文件， 以及用的镜像， 可以通过 `docker image prune` 命令来进行清理。
 支待选项包括：
 
 - `-a, -all`: 删除所有无用镜像， 不光是临时镜像；
@@ -189,19 +191,20 @@ nginx               latest              3f8a4339aadd        5 weeks ago         
 
 `docker [container］ run`，等价于先执行 `docker [container] create` 命令，再执行 `docker [container] start` 命令。
 
-OPTIONS说明（常用）：有些是一个减号，有些是两个减号
-- --name="容器新名字": 为容器指定一个名称；(没有名字默认就是ID)
-- -d: 后台运行容器，并返回容器ID，也即启动守护式容器；
-- -i：以交互模式运行容器，通常与 -t 同时使用；
-- -t：为容器重新分配一个伪输入终端，通常与 -i 同时使用；
-- -P: 随机端口映射；
-- -p: 指定端口映射，有以下四种格式
+`OPTIONS` 说明（常用）：有些是一个减号，有些是两个减号
+
+- `--name="容器新名字"`: 为容器指定一个名称；(没有名字默认就是 `ID`)
+- `-d`: 后台运行容器，并返回容器 `ID`，也即启动守护式容器；
+- `-i`：以交互模式运行容器，通常与 -t 同时使用；
+- `-t`：为容器重新分配一个伪输入终端，通常与 -i 同时使用；
+- `-P`: 随机端口映射；
+- `-p`: 指定端口映射，有以下四种格式
 	- ip:hostPort(主机端口/对外暴露端口):containerPort(docker容器端口)
 	- ip::containerPort
 	- hostPort:containerPort
 	- containerPort
 
-启动交互式容器,下面命令启动一个bash终端允许用户交互
+启动交互式容器,下面命令启动一个 `bash` 终端允许用户交互
 ```
 [root@localhost ~]# docker run -it  centos /bin/bash
 [root@97a4aeea579f /]# ps
@@ -209,30 +212,31 @@ OPTIONS说明（常用）：有些是一个减号，有些是两个减号
      1 pts/0    00:00:00 bash
     14 pts/0    00:00:00 ps
 ```
-在交互模式下，用户可以通过所创建的终端来输人命令 例如 pwd ls
+在交互模式下，用户可以通过所创建的终端来输人命令 例如 `pwd ls`
 ```
 [root@97a4aeea579f /]# pwd
 /
 [root@97a4aeea579f /]# ls
 anaconda-post.log  bin  dev  etc  home  lib  lib64  media  mnt  opt  proc  root  run  sbin  srv  sys  tmp  usr  var
 ```
-用户可以按 Ctrl+d 或输入 exit 命令来退出容器：
+用户可以按 `Ctrl+d` 或输入 `exit` 命令来退出容器：
 ```
 [root@97a4aeea579f /]# exit
 exit
 [root@localhost ~]# 
 ```
-对于所创建的 bash 容器，当用户使用 exit 命令退出 bash 进程之后，容器也会自动退出 。 这是因为对于容器来说，当其中的应用退出后，容器的使命完成，也就没有继续运行的必要了 。
+对于所创建的 `bash` 容器，当用户使用 `exit` 命令退出 `bash` 进程之后，容器也会自动退出 。 这是因为对于容器来说，当其中的应用退出后，容器的使命完成，也就没有继续运行的必要了 。
 
 ### 3.2.列出当前所有正在运行的容器
 命令：`docker ps [OPTIONS]` -> 默认是当前正在运行的容器
 
-OPTIONS说明（常用）：
-- -a :列出当前所有正在运行的容器+历史上运行过的
-- -l :显示最近创建的容器。
-- -n：显示最近n个创建的容器。
-- -q :静默模式，只显示容器编号。
-- --no-trunc :不截断输出。
+`OPTIONS` 说明（常用）：
+
+- `-a`:列出当前所有正在运行的容器+历史上运行过的
+- `-l`:显示最近创建的容器。
+- `-n`：显示最近n个创建的容器。
+- `-q` :静默模式，只显示容器编号。
+- `--no-trunc` :不截断输出。
 
 ![Image [2]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/docker-demo/20210412230922.png)
 
@@ -286,27 +290,27 @@ OPTIONS说明（常用）：
 [root@localhost ~]# docker ps
 CONTAINER ID        IMAGE               COMMAND             CREATED             STATUS              PORTS               NAMES
 ```
-发现通过 `docker run -d centos` 容器启动后会返回一个唯一的 id ，可以通过 `docker ps`，容器运行状态，但是发现没有正在运行的容器。
+发现通过 `docker run -d centos` 容器启动后会返回一个唯一的 `id`，可以通过 `docker ps`，容器运行状态，但是发现没有正在运行的容器。
 
 **使用镜像centos:latest以后台模式启动一个容器**
 
 `docker run -d centos`
 
-问题：然后docker ps -a 进行查看, 会发现容器已经退出
+问题：然后 `docker ps -a` 进行查看, 会发现容器已经退出
 
-很重要的要说明的一点: Docker容器后台运行,就必须有一个前台进程.
+很重要的要说明的一点: `Docker` 容器后台运行,就必须有一个前台进程.
 
-容器运行的命令如果不是那些一直挂起的命令（比如运行top，tail），就是会自动退出的。
+容器运行的命令如果不是那些一直挂起的命令（比如运行 `top`，`tail`），就是会自动退出的。
 
-这个是docker的机制问题,比如你的web容器,我们以nginx为例，正常情况下,我们配置启动服务只需要启动响应的service即可。例如
+这个是 `docker` 的机制问题,比如你的 `web` 容器,我们以 `nginx` 为例，正常情况下,我们配置启动服务只需要启动响应的 `service` 即可。例如
 
 `systemctl start nginx`
 
-但是,这样做,nginx为后台进程模式运行,就导致docker前台没有运行的应用,这样的容器后台启动后,会立即自杀因为他觉得他没事可做了.所以，最佳的解决方案是,将你要运行的程序以前台进程的形式运行
+但是,这样做,`nginx` 为后台进程模式运行,就导致 `docker` 前台没有运行的应用,这样的容器后台启动后,会立即自杀因为他觉得他没事可做了.所以，最佳的解决方案是,将你要运行的程序以前台进程的形式运行
 
 改造上面命令：`docker run -d centos /bin/sh -c "while true;do echo hello world;sleep 2;done"`
 
-然后通过 docker ps 就可以查到运行状态是up
+然后通过 `docker ps` 就可以查到运行状态是 `up`
 ```
 [root@localhost ~]# docker ps
 CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS              PORTS               NAMES
@@ -328,9 +332,9 @@ CONTAINER ID        IMAGE               COMMAND                  CREATED        
 #### 3.9.5.进入正在运行的容器并以命令行交互
 在使用－ d 参数时，容器启动后会进入后台，用户无法看到容器中的信息，也无法进行操作。
 
-官方推荐使用 attach或exec.
+官方推荐使用 `attach` 或 `exec`.
 
-然而使用 attach 命令有时候并不方便 。 当多个窗口同时 attach 到同一个容器的时候，所有窗口都会同步显示；当某个窗口因命令阻塞时，其他窗口也无法执行操作了 。
+然而使用 `attach` 命令有时候并不方便 。 当多个窗口同时 `attach` 到同一个容器的时候，所有窗口都会同步显示；当某个窗口因命令阻塞时，其他窗口也无法执行操作了 。
 
 命令：
 
@@ -340,9 +344,9 @@ CONTAINER ID        IMAGE               COMMAND                  CREATED        
 
 `docker exec -it 容器名 /bin/sh`
 
-可以看到会打开一个新的 bash 终端，在不影响容器内其他应用的前提下，用户可以与容器进行交互。
+可以看到会打开一个新的 `bash` 终端，在不影响容器内其他应用的前提下，用户可以与容器进行交互。
 
-通过指定 － it 参数来保持标准输入打开，并且分配一个伪终端。 通过 exec 命令对容器执行操作是最为推荐的方式 。
+通过指定 `-it` 参数来保持标准输入打开，并且分配一个伪终端。 通过 `exec` 命令对容器执行操作是最为推荐的方式 。
 
 直接在宿主机中执行进入容器的命令，这样就不用再重新打开一个新的终端。
 ```
@@ -354,8 +358,8 @@ total 4
 命令：重新进入 `docker attach 容器ID`
 
 区别：
-- attach 直接进入容器启动命令的终端，不会启动新的进程
-- exec 是在容器中打开新的终端，并且可以启动新的进程
+- `attach` 直接进入容器启动命令的终端，不会启动新的进程
+- `exec` 是在容器中打开新的终端，并且可以启动新的进程
 
 #### 3.9.6.从容器内拷贝文件到主机上
 docker cp 容器ID:容器内路径 目的主机路径

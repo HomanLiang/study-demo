@@ -1044,19 +1044,21 @@ $ git branch -dr [remote/branch]
 
   刚说了会产生 `Fast-forward` 的情况，现在再说说什么情况会产生 `non-Fast-forward`，通常，当合并的分支跟 master 不存在共同祖先节点的时候，这时候在 merge 的时候 git 默认无法使用 `Fast-forward` 模式，我们先看看下图的模型：
   
+
 ![non-Fast-forward](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/project-manage/20210506200022.png)
-  
+
 可以看到 master 分支已经比 feature001 快了2个版本，master 已经没办法通过移动头指针来完成 `Fast-forward`，所以在 master 合并 feature001 的时候就不得不做出真正的合并，真正的合并会让 git 多做很多工作，具体合并的动作如下：
-  
+
 - 找出 master 和 feature001 的公共祖先，节点 c1，c6, c3 三个节点的版本 （如果有冲突需要处理）
   - 创建新的节点 c7，并且将三个版本的差异合并到 c7，并且创建 commit
   - 将 master 和 HEAD 指针移动到 c7
   
+
 补充：大家在 `git log` 看到很多类似：`Merge branch 'feature001' into master` 的 commit 就是 non-Fast-forward 产生的。
   执行完以上动作，最终分支流程图如下：
-  
+
 ![merge-non-fast-forward](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/project-manage/20210506200037.png)
-  
+
 - 如何手动设置合并模式 ？
 
   先简单介绍一下 `git merge` 的三个合并参数模式：
@@ -1752,13 +1754,428 @@ rebase 这种修改历史提交的功非常实用，能够很好地解决我们�
 - 回退暂存区（即暂存区中的内容也要回退到目标版本）
 - 回退工作区（即工作区中的内容也要回退到目标版本）
 
+### 8.5.git cherry-pick 教程
+
+对于多分支的代码库，将代码从一个分支转移到另一个分支是常见需求。
+
+这时分两种情况。一种情况是，你需要另一个分支的所有代码变动，那么就采用合并（`git merge`）。另一种情况是，你只需要部分代码变动（某几个提交），这时可以采用 Cherry pick。
+
+![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/project-manage/20210623202850.jpeg)
+
+### 8.5.1.基本用法
+
+`git cherry-pick`命令的作用，就是将指定的提交（commit）应用于其他分支。
+
+> ```bash
+> $ git cherry-pick <commitHash>
+> ```
+
+上面命令就会将指定的提交`commitHash`，应用于当前分支。这会在当前分支产生一个新的提交，当然它们的哈希值会不一样。
+
+举例来说，代码仓库有`master`和`feature`两个分支。
+
+> ```bash
+>     a - b - c - d   Master
+>          \
+>            e - f - g Feature
+> ```
+
+现在将提交`f`应用到`master`分支。
+
+> ```bash
+> # 切换到 master 分支
+> $ git checkout master
+> 
+> # Cherry pick 操作
+> $ git cherry-pick f
+> ```
+
+上面的操作完成以后，代码库就变成了下面的样子。
+
+> ```bash
+>     a - b - c - d - f   Master
+>          \
+>            e - f - g Feature
+> ```
+
+从上面可以看到，`master`分支的末尾增加了一个提交`f`。
+
+`git cherry-pick`命令的参数，不一定是提交的哈希值，分支名也是可以的，表示转移该分支的最新提交。
+
+> ```bash
+> $ git cherry-pick feature
+> ```
+
+上面代码表示将`feature`分支的最近一次提交，转移到当前分支。
+
+### 8.5.2.转移多个提交
+
+Cherry pick 支持一次转移多个提交。
+
+> ```bash
+> $ git cherry-pick <HashA> <HashB>
+> ```
+
+上面的命令将 A 和 B 两个提交应用到当前分支。这会在当前分支生成两个对应的新提交。
+
+如果想要转移一系列的连续提交，可以使用下面的简便语法。
+
+> ```bash
+> $ git cherry-pick A..B 
+> ```
+
+上面的命令可以转移从 A 到 B 的所有提交。它们必须按照正确的顺序放置：提交 A 必须早于提交 B，否则命令将失败，但不会报错。
+
+注意，使用上面的命令，提交 A 将不会包含在 Cherry pick 中。如果要包含提交 A，可以使用下面的语法。
+
+> ```bash
+> $ git cherry-pick A^..B 
+> ```
+
+### 8.5.3.配置项
+
+`git cherry-pick`命令的常用配置项如下。
+
+**（1）`-e`，`--edit`**
+
+打开外部编辑器，编辑提交信息。
+
+**（2）`-n`，`--no-commit`**
+
+只更新工作区和暂存区，不产生新的提交。
+
+**（3）`-x`**
+
+在提交信息的末尾追加一行`(cherry picked from commit ...)`，方便以后查到这个提交是如何产生的。
+
+**（4）`-s`，`--signoff`**
+
+在提交信息的末尾追加一行操作者的签名，表示是谁进行了这个操作。
+
+**（5）`-m parent-number`，`--mainline parent-number`**
+
+如果原始提交是一个合并节点，来自于两个分支的合并，那么 Cherry pick 默认将失败，因为它不知道应该采用哪个分支的代码变动。
+
+`-m`配置项告诉 Git，应该采用哪个分支的变动。它的参数`parent-number`是一个从`1`开始的整数，代表原始提交的父分支编号。
+
+> ```bash
+> $ git cherry-pick -m 1 <commitHash>
+> ```
+
+上面命令表示，Cherry pick 采用提交`commitHash`来自编号1的父分支的变动。
+
+一般来说，1号父分支是接受变动的分支（the branch being merged into），2号父分支是作为变动来源的分支（the branch being merged from）。
+
+### 8.5.4.代码冲突
+
+如果操作过程中发生代码冲突，Cherry pick 会停下来，让用户决定如何继续操作。
+
+**（1）`--continue`**
+
+用户解决代码冲突后，第一步将修改的文件重新加入暂存区（`git add .`），第二步使用下面的命令，让 Cherry pick 过程继续执行。
+
+> ```bash
+> $ git cherry-pick --continue
+> ```
+
+**（2）`--abort`**
+
+发生代码冲突后，放弃合并，回到操作前的样子。
+
+**（3）`--quit`**
+
+发生代码冲突后，退出 Cherry pick，但是不回到操作前的样子。
+
+### 8.5.5.转移到另一个代码库
+
+Cherry pick 也支持转移另一个代码库的提交，方法是先将该库加为远程仓库。
+
+> ```bash
+> $ git remote add target git://gitUrl
+> ```
+
+上面命令添加了一个远程仓库`target`。
+
+然后，将远程代码抓取到本地。
+
+> ```bash
+> $ git fetch target
+> ```
+
+上面命令将远程代码仓库抓取到本地。
+
+接着，检查一下要从远程仓库转移的提交，获取它的哈希值。
+
+> ```bash
+> $ git log target/master
+> ```
+
+最后，使用`git cherry-pick`命令转移提交。
+
+> ```bash
+> $ git cherry-pick <commitHash>
+> ```
+
+### 8.6.GIT使用rebase和merge的正确姿势
+
+**8.6.1.背景**
+
+使用GIT这么久了从来没有深层次的研究过，一般情况下，只要会用`pull`,`commit`,`push`等几个基本提交命令就可以了，公司的项目分支管理这部分操作一直都是我负责，对于分支的合并我一直都使用`merge`操作，也知道还有一个`rebase`，但是一直不会用，百度了很多，说的基本都差不多，按照步骤在公司项目里操作，简直就是噩梦，只要`rebase`就出现噩梦般的冲突，所以一直不敢用，今天自己捣腾了一番终于领略到一些，不多说直接进入干货。
+
+**8.6.2.先来两张合理使用`rebase`，`merge`和只使用`merge`的对比图**
+
+使用 rebase
+
+![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/project-manage/20210623203540.jpeg)
 
 
 
+使用 merge
+
+![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/project-manage/20210623203535.png)
 
 
 
+**8.6.3.使用 `rebase` 和 `merge` 的基本原则：**
 
+1. 下游分支更新上游分支内容的时候使用 `rebase`
+2. 上游分支合并下游分支内容的时候使用 `merge`
+3. 更新当前分支的内容时一定要使用 `--rebase` 参数
+
+例如现有上游分支 master，基于 master 分支拉出来一个开发分支 dev，在 dev 上开发了一段时间后要把 master 分支提交的新内容更新到 dev 分支，此时切换到 dev 分支，使用 `git rebase master`
+
+等 dev 分支开发完成了之后，要合并到上游分支 master 上的时候，切换到 master 分支，使用 `git merge dev`
+
+**8.6.4.创建两个GIT项目，`project1`和 `project2`,同时分别加入三个文件并提交`master`分支**
+
+```text
+$ git clone git@gitlab.xpaas.lenovo.com:baiyl3/project1.git
+$ cd project1
+$ touch file1 file2 file3
+$ git add .
+$ git commit -m '在项目一中初始化三个代码文件'
+$ git push -u origin master
+
+$ git clone git@gitlab.xpaas.lenovo.com:baiyl3/project2.git
+$ cd project2
+$ touch file1 file2 file3
+$ git add .
+$ git commit -m '在项目二中初始化三个代码文件'
+$ git push -u origin master
+```
+
+从代码提交时间轴图看两个项目现在的状态都一致
+
+![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/project-manage/20210623203529.png)
+
+![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/project-manage/20210623203525.png)
+
+**8.6.5.分别给两个项目创建三个分支 B1，B2，B3 (* 对应数字)**
+
+```text
+$ git checkout -b B*
+$ git push origin B*
+$ git branch -a
+  B1
+  B2
+* B3
+  master
+  remotes/origin/B1
+  remotes/origin/B2
+  remotes/origin/B3
+  remotes/origin/master
+$ git logs --graph
+* 891d1ed<baiyl3> - (HEAD -> B3, origin/master, origin/B3, origin/B2, origin/B1, master, B2, B1) 在项目二中初始化三个代码文件 (23 minutes ago)  
+  file1
+  file2
+  file3
+```
+
+从 `git log` 中我们看到 B1，B2，B3 都基于master最新提交点拉出来的三个新分支，如下图从时间轴也可以看出
+
+![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/project-manage/20210623203520.png)
+
+![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/project-manage/20210623203511.png)
+
+**8.6.6.现在我们分别切换分支到 B1，B2，B3，并修改对应的文件 file1，file2，file3，最后切换到 mastet 分支添加一个 README.md 文件，然后再看时间轴：**
+
+![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/project-manage/20210623203507.jpeg)
+
+
+
+从上图的结果可以看出，B1, B2, B3, master 四个分支分别在不同的时间点做了代码提交，那么最后一次 master 上做的修改在 B1, B2, B3 三个分支上肯定没有
+
+**8.6.7.此时在这三个分支上开发的同学发现他们要做的功能要在 master 最新的基础上开发，或者他们也想要 master 上最新的内容，重点来了，现在我们怎么办？方法有两种，一种是使用 `rebase` ，另一种是使用 `merge`，我们分别在 project1 和 project2 两个项目上使用这两种方式解决这个问题**
+
+在项目 project1 使用 rebase
+
+```text
+$ cd project1
+$ git checkout B1
+$ git pull origin B1 --rebase
+From gitlab.xpaas.lenovo.com:baiyl3/project1
+ * branch            B1         -> FETCH_HEAD
+Already up-to-date.
+Current branch B1 is up to date.
+
+$ git rebase master
+First, rewinding head to replay your work on top of it...
+Applying: FILE1 第一次修改
+
+$ git push origin B1
+To gitlab.xpaas.lenovo.com:baiyl3/project1.git
+ ! [rejected]        B1 -> B1 (non-fast-forward)
+error: failed to push some refs to 'git@gitlab.xpaas.lenovo.com:baiyl3/project1.git'
+hint: Updates were rejected because the tip of your current branch is behind
+hint: its remote counterpart. Integrate the remote changes (e.g.
+hint: 'git pull ...') before pushing again.
+hint: See the 'Note about fast-forwards' in 'git push --help' for details.
+
+$ git push origin B1 --force
+Counting objects: 3, done.
+Delta compression using up to 4 threads.
+Compressing objects: 100% (2/2), done.
+Writing objects: 100% (3/3), 328 bytes | 328.00 KiB/s, done.
+Total 3 (delta 0), reused 0 (delta 0)
+remote: 
+remote: To create a merge request for B1, visit:
+remote:   http://gitlab.xpaas.lenovo.com/baiyl3/project1/merge_requests/new?merge_request%5Bsource_branch%5D=B1
+remote: 
+To gitlab.xpaas.lenovo.com:baiyl3/project1.git
+ + b3052a0...00032a7 B1 -> B1 (forced update)
+
+$ ls
+README.md   file1       file2       file3
+```
+
+![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/project-manage/20210623203500.jpeg)
+
+
+
+在上面的过程中，更新代码我使用的是 `git pull origin B1 --rebase` 而不是 `git pull origin B1` 这也是平时使用 rebase 注意的一点，`git pull` 这条命令默认使用了 `--merge` 的方式更新代码，如果你不指定用 `--rebase`，有的时候就会发现日志里有这样的一次提交 `Merge branch 'dev' of gitlab.xpaas.lenovo.com:liuyy23/lenovo-mbg into dev` 什么？自己分支合并到了自己分支，显然这个没有什么必要，而且在时间轴上也不好看，平白无故多了一条线出来，对于强迫症的我来说看着就难受。。。
+
+还有就是使用 rebase 之后，如果直接使用 `git push origin B1` 发现是不好使的，提示也说明了提交失败的原因，我个人是这么理解的，使用 rebase 之后，master分支上比B1分支上多的修改，直接“插入”到了B1分支修改的内容之后，也就是 master 分支的修改在 B1 分支上重演了一遍，相对远程 B1 分支而言，本地仓库的B1分支的“基底”已经变化了，直接 `push` 是不行的，所以确保没有问题的情况下必须使用 `--force` 参数才能提交，这也就是官方对 `rebase` 作为 “变基” 的解释（个人观点）。
+
+接下来我们接着在 project2 项目上使用 merge 操作
+
+```text
+$ cd project
+$ git pull origin B1
+From gitlab.xpaas.lenovo.com:baiyl3/project2
+ * branch            B1         -> FETCH_HEAD
+Already up-to-date.
+
+$ git merge master
+Merge made by the 'recursive' strategy.
+ README.md | 0
+ 1 file changed, 0 insertions(+), 0 deletions(-)
+ create mode 100644 README.md
+
+$ git push origin B1
+Counting objects: 2, done.
+Delta compression using up to 4 threads.
+Compressing objects: 100% (2/2), done.
+Writing objects: 100% (2/2), 278 bytes | 278.00 KiB/s, done.
+Total 2 (delta 1), reused 0 (delta 0)
+remote: 
+remote: To create a merge request for B1, visit:
+remote:   http://gitlab.xpaas.lenovo.com/baiyl3/project2/merge_requests/new?merge_request%5Bsource_branch%5D=B1
+remote: 
+To gitlab.xpaas.lenovo.com:baiyl3/project2.git
+   d3ea69c..e040c7b  B1 -> B1
+
+ls
+README.md   file1       file2       file3
+```
+
+![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/project-manage/20210623203451.jpeg)
+
+
+
+可以看到 merge 之后，在 B1 分支上多出一条合并的log
+
+此时，我们的 B1 分支开发完成了，要合并到 master 分支，根据基本原则，在 master 分支上都使用 `git merge B1` 就可以合并，看下图结果：
+
+```text
+$ git checkotu master
+$ git merge B1
+Updating c782e83..00032a7
+Fast-forward
+ file1 | 1 +
+ 1 file changed, 1 insertion(+)
+
+$ git push origin master
+```
+
+![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/project-manage/20210623203445.jpeg)
+
+![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/project-manage/20210623203441.jpeg)
+
+接下来对 B2，B3 分别在 project1 和 project2 上做相同的操作，我们看结果：
+
+![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/project-manage/20210623203435.jpeg)
+
+![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/project-manage/20210623203431.jpeg)
+
+
+
+再看看命令行下log的情况
+
+```text
+$ git logs --graph
+* 5826260<baiyl3> - (HEAD -> master, origin/master, origin/B3, B3) FILE3 第一次修改 (6 minutes ago)| 
+| file3
+
+* cffcc9a<baiyl3> - (origin/B2, B2) FILE2 第一次修改 (8 minutes ago)| 
+| file2
+
+* 00032a7<baiyl3> - (origin/B1, B1) FILE1 第一次修改 (87 minutes ago)| 
+| file1
+
+* c782e83<baiyl3> - 添加README.md文件 (2 hours ago)| 
+| README.md
+
+* b783e0a<baiyl3> - 在项目一中初始化三个代码文件 (3 hours ago)  
+  file1
+  file2
+  file3
+git logs --graph
+*   bc3f385<baiyl3> - (HEAD -> master, origin/master, origin/B3, B3) Merge branch 'master' into B3 (4 minutes ago)
+|\  
+| *   64b4f3d<baiyl3> - (origin/B2, B2) Merge branch 'master' into B2 (5 minutes ago)
+| |\  
+| | *   e040c7b<baiyl3> - (origin/B1, B1) Merge branch 'master' into B1 (35 minutes ago)
+| | |\  
+| | | * 2cedfcb<baiyl3> - 添加README.md文件 (2 hours ago)| | | | 
+| | | | README.md
+
+| | * | d3ea69c<baiyl3> - FILE1 第一次修改 (2 hours ago)
+| | |/  | | |   
+| | |   file1
+
+| * | 5975eae<baiyl3> - FILE2 第一次修改 (2 hours ago)
+| |/  | |   
+| |   file2
+
+* | 37ec6de<baiyl3> - FILE3 第一次修改 (2 hours ago)
+|/  |   
+|   file3
+
+* 891d1ed<baiyl3> - 在项目二中初始化三个代码文件 (3 hours ago)  
+  file1
+  file2
+  file3
+```
+
+使用 rebase 就感觉所有人都在同一条直线上开发一样，很干净的log，看着很舒服，而一直使用 merge 的log看起来就很乱，我这只是4个分支的例子，我们项目每周基本都是十几个分支，真的是看起来乱入一团哇。。。
+
+这个例子中的操作都没有出现不同分支修改同一个文件导致冲突的情况，实际开发中这种情况非常多，rebase 的时候出现冲突后 git 也会列出来哪些文件冲突了，等你解决冲突之后使用 `git rebase --continue` 就会继续处理，所以为了避免这种冲突太多，而且不好解决，我们项目中基本都是一个需求就一个分支，而且开发过程中要随时更新上游分支的内容下来，确保在最新的代码基础上开发，这也是 GIT 推荐的方式，尽可能多建分支开发，而不是在一个开发分支上很多人操作，如果是这种情况建议不要用 rebase，另外负责分支合并的人在合并下游分支代码的时候要确保你这个上游分支不要在这段时间内提交代码，有一个方法就是把上游分支 设置 protect
+
+**8.6.8.注意事项**
+
+1. 更新当前分支代码的时候一定要使用 `git pull origin xxx --rebase`
+2. 合并代码的时候按照最新分支优先合并为原则
+3. 要经常从上游分支更新代码，如果长时间不更新上游分支代码容易出现大量冲突
 
 
 

@@ -798,9 +798,9 @@ public class test {
 
 
 
-## 面试题
+## X.面试题
 
-### 一、简单聊一下关于你对`Object`的理解
+### X.1.简单聊一下关于你对`Object`的理解
 
 在 Java 中，只有基本数据类型不是对象，比如，数值，布尔和字符类型的值都不是对象。而其余的数据类型都是继承自一个名为`Object`的类，这个类是所有类的始祖，每个类都是由`Object`类扩展而来。
 
@@ -810,7 +810,7 @@ public class test {
 
 
 
-### 二、`Object`类中有一个`registerNatives`方法，对此你了解多少？
+### X.2.`Object`类中有一个`registerNatives`方法，对此你了解多少？
 
 从方法的命名上我们就可以看出，该方法是用于注册本地（native）方法，主要是为了服务于JNI的，它主要是提供了 java 类中的方法与对应 C++ 代码中的方法的**映射**，方便jvm去查找调用 C++ 中的方法。
 
@@ -818,7 +818,7 @@ public class test {
 
 
 
-### 三、`Object`类中有`clone`方法，聊聊你对这个方法的认识
+### X.3.`Object`类中有`clone`方法，聊聊你对这个方法的认识
 
 `clone`方法是`Object`类的一个`protected`的方法，我们可以这样去应用这个方法
 
@@ -829,7 +829,7 @@ public class test {
 
 
 
-### 四、为什么我们一定要去实现`Cloneable`接口，而不是直接去重写这个方法呢？
+### X.4.为什么我们一定要去实现`Cloneable`接口，而不是直接去重写这个方法呢？
 
 我们通过源码可以发现这是一个空的接口，`clone`是从`Object`类继承的。这个接口只是作为一个标记，指示类设计者了解克隆继承。对象对于克隆也很"偏执"，如果一个对象请求克隆，但没有实现这个接口，就会生成一个异常。
 
@@ -843,7 +843,7 @@ if (obj instanceof Cloneable){
 
 
 
-### 五、说一说你对关于深克隆和浅克隆的认识
+### X.5.说一说你对关于深克隆和浅克隆的认识
 
 首先来说一下`Object`类是如何实现`clone`，它对这个对象一无所知，所以只能逐个域的进行拷贝。如果对象中的所有数据域都是数值或其他基本类型，拷贝这些域没有任何问题，但是如果对象中包含子对象的引用，拷贝域就会得到相同子对象的另一个引用，这样一来，原对象和克隆对象仍然会去共享一些信息。这种`Object`类默认实现的`clone`方法称为**浅拷贝**（Shallow Clone）。
 
@@ -873,7 +873,7 @@ public Test clone() throws CloneNotSupportedException{
 
 
 
-### 六、关于`equals`方法，说说是什么？
+### X.6.关于`equals`方法，说说是什么？
 
 `Object`类中的`equals`方法用于检测一个对象是否等于另一个对象。在`Object`类中，这个方法将判断两个对象是否具有相同的引用。如果两个对象具有相同的引用，它们一定是相等的。
 
@@ -881,7 +881,7 @@ public Test clone() throws CloneNotSupportedException{
 
 
 
-### 七、有没有自己去重写过`equals`方法呢？
+### X.7.有没有自己去重写过`equals`方法呢？
 
 当然，这个我有笔记～
 
@@ -889,7 +889,7 @@ public Test clone() throws CloneNotSupportedException{
 
 
 
-### 八、不限于`Object`，聊聊`hashCode`
+### X.8.不限于`Object`，聊聊`hashCode`
 
 在Java中，hash code是**由对象导出的一个整型值**，以下是几个常见哈希值的算法：
 
@@ -899,7 +899,7 @@ public Test clone() throws CloneNotSupportedException{
 
 
 
-### 九、说说`Equals`和 `Hashcode`的关系
+### X.9.说说`Equals`和 `Hashcode`的关系
 
 这两个其实确切意义上并没有什么联系，前提是我们不会在HashSet，HashMap这种本质是散列表的数据结构中使用，如果我们要在HashSet，HashMap这种本质是散列表的数据结构中使用，在重写equals方法的同时也要重写hashCode方法，以便用户将对象插入到散列表中，否则会导致数据不唯一，内存泄漏等各种问题。
 
@@ -919,7 +919,7 @@ public Test clone() throws CloneNotSupportedException{
 
 
 
-### 十、浅析Java中的static关键字
+### X.10.浅析Java中的static关键字
 
 面试官Q1：请说说static关键字，你在项目中是怎么使用的？
 
@@ -1049,7 +1049,7 @@ package com.ant.param;
 
 
 
-### 十一、浅析Java中的final关键字？
+### X.11.浅析Java中的final关键字？
 
 面试官Q1：请谈谈你对final关键字的理解？
 
@@ -1089,23 +1089,23 @@ final修饰一个引用类型时，则在对其初始化之后便不能再让其
 
 
 
-### 十二、说说hashCode() 和 equals() 之间的关系？
+### X.12.说说hashCode() 和 equals() 之间的关系？
 
 先祭一张图，可以思考一下为什么？
 
 ![java4-1572150703](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/java-core-demo/20210320235543.jpg)
 
-#### 介绍
+#### X.12.1.介绍
 
 `equals()` 的作用是用来判断两个对象是否相等。
 
 `hashCode()` 的作用是获取哈希码，也称为散列码；它实际上是返回一个int整数。这个哈希码的作用是确定该对象在哈希表中的索引位置。
 
-#### 关系
+#### X.12.2.关系
 
 我们以“类的用途”来将 `hashCode()`  和 `equals()` 的关系”分2种情况来说明。
 
-**1、不会创建“类对应的散列表”**
+**X.12.2.1.不会创建“类对应的散列表”**
 
 这里所说的“不会创建类对应的散列表”是说：我们不会在HashSet, Hashtable, HashMap等等这些本质是散列表的数据结构中，用到该类。例如，不会创建该类的HashSet集合。
 
@@ -1183,7 +1183,7 @@ p1.equals(p3) : false; p1(1169863946) p3(2131949076)
 
 从结果也可以看出：p1和p2相等的情况下，hashCode()也不一定相等。
 
-**2、会创建“类对应的散列表”**
+**X.12.2.2.会创建“类对应的散列表”**
 
 这里所说的“会创建类对应的散列表”是说：我们会在HashSet, Hashtable, HashMap等等这些本质是散列表的数据结构中，用到该类。例如，会创建该类的HashSet集合。
 
@@ -1381,20 +1381,20 @@ set:[aaa - 200, eee - 100]
 
 比较p1和p4，我们发现：虽然它们的hashCode()相等；但是，通过equals()比较它们返回false。所以，p1和p4被视为不相等。
 
-#### 原则
+#### X.12.3.原则
 
-**1.同一个对象（没有发生过修改）无论何时调用hashCode()得到的返回值必须一样。**
+**X.12.3.1.同一个对象（没有发生过修改）无论何时调用hashCode()得到的返回值必须一样。**
 如果一个key对象在put的时候调用hashCode()决定了存放的位置，而在get的时候调用hashCode()得到了不一样的返回值，这个值映射到了一个和原来不一样的地方，那么肯定就找不到原来那个键值对了。
 
-**2.hashCode()的返回值相等的对象不一定相等，通过hashCode()和equals()必须能唯一确定一个对象。**不相等的对象的hashCode()的结果可以相等。hashCode()在注意关注碰撞问题的时候，也要关注生成速度问题，完美hash不现实。
+**X.12.3.2.hashCode()的返回值相等的对象不一定相等，通过hashCode()和equals()必须能唯一确定一个对象。**不相等的对象的hashCode()的结果可以相等。hashCode()在注意关注碰撞问题的时候，也要关注生成速度问题，完美hash不现实。
 
-**3.一旦重写了equals()函数（重写equals的时候还要注意要满足自反性、对称性、传递性、一致性），就必须重写hashCode()函数。**而且hashCode()的生成哈希值的依据应该是equals()中用来比较是否相等的字段。
+**X.12.3.3.一旦重写了equals()函数（重写equals的时候还要注意要满足自反性、对称性、传递性、一致性），就必须重写hashCode()函数。**而且hashCode()的生成哈希值的依据应该是equals()中用来比较是否相等的字段。
 
 如果两个由equals()规定相等的对象生成的hashCode不等，对于hashMap来说，他们很可能分别映射到不同位置，没有调用equals()比较是否相等的机会，两个实际上相等的对象可能被插入不同位置，出现错误。其他一些基于哈希方法的集合类可能也会有这个问题
 
 
 
-### 十三、抽象类和接口的区别有哪些？
+### X.13.抽象类和接口的区别有哪些？
 
 - 抽象类中可以没有抽象方法；接口中的方法必须是抽象方法；
 - 抽象类中可以有普通的成员变量；接口中的变量必须是 static final 类型的，必须被初始化,接口中只有常量，没有变量
@@ -1405,7 +1405,7 @@ set:[aaa - 200, eee - 100]
 
 
 
-### 十四、创建对象初始化顺序
+### X.14.创建对象初始化顺序
 
 创建顺序如下：
 
@@ -1479,3 +1479,80 @@ class Fa{
 子类非静态代码块
 子类构造方法
 ```
+
+### X.15.Objects.equals
+
+#### X.15.1.值是null的情况
+
+1. `a.equals(b)`, a 是null, 抛出NullPointException异常。
+
+2. `a.equals(b)`, a不是null, b是null,  返回false
+
+3. `Objects.equals(a, b)`比较时， 若a 和 b 都是null, 则返回 true, 如果a 和 b 其中一个是null, 另一个不是null, 则返回false。注意：不会抛出空指针异常。
+
+```
+null.equals("abc")    →   抛出 NullPointerException 异常  
+"abc".equals(null)    →   返回 false  
+null.equals(null)     →   抛出 NullPointerException 异常  
+Objects.equals(null, "abc")    →   返回 false  
+Objects.equals("abc",null)     →   返回 false  
+Objects.equals(null, null)     →   返回 true  
+```
+
+#### X.15.2.值是空字符串的情况
+
+1. a 和 b 如果都是空值字符串："", 则 `a.equals(b)`, 返回的值是true, 如果a和b其中有一个不是空值字符串，则返回false;
+
+2. 这种情况下 `Objects.equals` 与情况1 行为一致。
+
+```
+"abc".equals("")    →   返回 false  
+"".equals("abc")    →   返回 false  
+"".equals("")       →   返回 true  
+Objects.equals("abc", "")    →   返回 false  
+Objects.equals("","abc")     →   返回 false  
+Objects.equals("","")        →   返回 true  
+```
+
+#### X.15.3.源码分析
+
+##### X.15.3.1.源码
+
+```
+public final class Objects {  
+    private Objects() {  
+        throw new AssertionError("No java.util.Objects instances for you!");  
+    }  
+   
+    /**  
+     * Returns {@code true} if the arguments are equal to each other  
+     * and {@code false} otherwise.  
+     * Consequently, if both arguments are {@code null}, {@code true}  
+     * is returned and if exactly one argument is {@code null}, {@code  
+     * false} is returned.  Otherwise, equality is determined by using  
+     * the {@link Object#equals equals} method of the first  
+     * argument.  
+     *  
+     * @param a an object  
+     * @param b an object to be compared with {@code a} for equality  
+     * @return {@code true} if the arguments are equal to each other  
+     * and {@code false} otherwise  
+     * @see Object#equals(Object)  
+     */  
+    public static boolean equals(Object a, Object b) {  
+        return (a == b) || (a != null && a.equals(b));  
+    }  
+```
+
+##### X.15.3.2.说明
+
+首先，进行了对象地址的判断，如果是真，则不再继续判断。
+
+如果不相等，后面的表达式的意思是，先判断a不为空，然后根据上面的知识点，就不会再出现空指针。
+
+所以，如果都是null，在第一个判断上就为true了。如果不为空，地址不同，就重要的是判断a.equals(b)。
+
+
+
+
+
