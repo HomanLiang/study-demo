@@ -1456,11 +1456,117 @@ EXPLAIN
 
 
 
+## 9.MySQL 默认最大连接数是多少？
 
+上午刚工作10分左右，同事说在使用jira时出现问题，具体截图如下：
 
+![图片](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mysql-demo/20210627155229.webp)
 
+通过上图的报错信息：**定位为mysql数据库连接数的问题**
 
+**解决方法：**
 
+**9.1.登录mysql进行查看**
 
+```
+Mysql –uroot –p123456
+mysql> show variables like'%max_connections%';
++-----------------+-------+
+| Variable_name   | Value |
++-----------------+-------+
+| max_connections | 151  |
++-----------------+-------+
+1 row in set (0.00 sec)
+```
 
+很奇怪，最大连接数怎么是151呢，mysql默认的最大连接数不是100么？
 
+后来想一下可能是版本不同的问题，默认连接数也不同。
+
+为了确认mysql5.5.3默认的最大连接数为151，去mysql官网查看了一下：mysql默认的最大连接数为151，上限为100000。
+
+**9.2.修改mysql默认的最大连接数为1000**
+
+在/etc/my.cnf文件中[mysqld]部分增加max_connections=1000，重启mysql服务，问题解决。
+
+**补充1:mysql其他版本默认的最大连接数**
+
+Mysql5.5 mysql5.6  mysql5.7：默认的最大连接数都是151，上限为：100000
+
+![图片](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mysql-demo/20210627155249.webp)
+
+Mysql5.1根据其小版本的不同，默认的最大连接数和可修改的连接数上限也有所不同
+
+![å¾ç](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mysql-demo/20210627155310.webp)
+
+Mysql5.0版本：默认的最大连接数为100，上限为16384
+
+![å¾ç](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mysql-demo/20210627155322.webp)
+
+**补充2：修改mysql数据库默认的最大连接数**
+
+方法一：修改mysql的主配置文件/etc/my.cnf，[mysqld]部分添加“max_connections=1000（这个根据实际的需要来进行设置即可）”，重启mysql服务。
+
+方法二：mysql客户端登录，通过命令行修改全局变量来进行修改
+
+```
+mysql -uroot -p123456
+mysql> set global_max_connections = 200;
+mysql> show processlist;
+mysql> show status;
+```
+
+修改完成后进行查看，mysql的最大连接数
+
+```
+mysql> show variables like '%max_connections%';
++-----------------+-------+
+| Variable_name   | Value |
++-----------------+-------+
+| max_connections | 1000  |
++-----------------+-------+
+1 row in set (0.00 sec)
+```
+
+方法三：解开mysql源代码，进入里面的SQL目录修改mysqld.cc找到下面一行：
+
+```
+{"max_connections", OPT_MAX_CONNECTIONS,
+  "The number of simultaneous clients allowed.", (gptr*) &max_connections,
+  (gptr*) &max_connections, 0, GET_ULONG, REQUIRED_ARG, 100, 1, 16384, 0, 1,
+  0},
+```
+
+把它改为：
+
+```
+{"max_connections", OPT_MAX_CONNECTIONS,
+  "The number of simultaneous clients allowed.", (gptr*) &max_connections,
+  (gptr*) &max_connections, 0, GET_ULONG, REQUIRED_ARG, 1500, 1, 16384, 0, 1,
+  0},
+```
+
+保存退出，然后./configure ;make;make install可以获得同样的效果
+
+方法四：通过修改mysqld_safe来修改mysql的连接数
+
+编辑 mysqld_safe配置文件，找到如下内容：
+
+```
+then $NOHUP_NICENESS $ledir/$MYSQLD
+  $defaults --basedir=$MY_BASEDIR_VERSION
+  --datadir=$DATADIR $USER_OPTION
+  --pid-file=$pid_file
+  --skip-external-locking
+  -O max_connections=1500
+  >> $err_log 2>&1 else
+  eval "$NOHUP_NICENESS $ledir/$MYSQLD
+  $defaults --basedir=$MY_BASEDIR_VERSION
+  --datadir=$DATADIR $USER_OPTION
+  --pid-file=$pid_file
+  --skip-external-locking $args
+  -O max_connections=1500 >>
+  $err_log 2>&1"
+```
+
+保存退出并重启mysql服务。

@@ -2,307 +2,179 @@
 
 
 
-# Java 生成随机数
+# 登录接口
 
-## 1.Random
+## 1.安全风险
 
-Random 类诞生于 JDK 1.0，它产生的随机数是伪随机数，也就是有规则的随机数。Random 使用的随机算法为 linear congruential pseudorandom number generator (LGC) 线性同余法伪随机数。在随机数生成时，随机算法的起源数字称为种子数（seed），在种子数的基础上进行一定的变换，从而产生需要的随机数字。
+### 1.1.暴力破解！
 
-**Random 对象在种子数相同的情况下，相同次数生成的随机数是相同的**。比如两个种子数相同的 Random 对象，第一次生成的随机数字完全相同，第二次生成的随机数字也完全相同。**默认情况下 new Random() 使用的是当前纳秒时间作为种子数的**。
+只要网站是暴露在公网的，那么很大概率上会被人盯上，尝试爆破这种简单且有效的方式：
+**通过各种方式获得了网站的用户名之后，通过编写程序来遍历所有可能的密码，直至找到正确的密码为止**
 
-### 1.1.基础使用
+*伪代码如下：*
 
-使用 Random 生成一个从 0 到 10 的随机数（不包含 10），实现代码如下：
-
-```java
-// 生成 Random 对象
-Random random = new Random();
-for (int i = 0; i < 10; i++) {
-    // 生成 0-9 随机整数
-    int number = random.nextInt(10);
-    System.out.println("生成随机数：" + number);
-}
+```
+# 密码字典  
+password_dict = []  
+# 登录接口  
+login_url = ''  
+def attack(username):  
+ for password in password_dict:  
+     data = {'username': username, 'password': password}  
+       content = requests.post(login_url, data).content.decode('utf-8')  
+       if 'login success' in content:  
+           print('got it! password is : %s' % password)  
 ```
 
-以上程序的执行结果为：
-![image.png](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/project-design/20210626193743.png)
+那么这种情况，我们要怎么防范呢？
 
-### 1.2.优缺点分析
+#### 1.1.1.验证码
 
-Random 使用 LGC 算法生成伪随机数的**优点是执行效率比较高，生成的速度比较快**。
+有聪明的同学就想到了，我可以在它密码错误达到一定次数时，增加验证码校验！比如我们设置，当用户密码错误达到3次之后，则需要用户输入图片验证码才可以继续登录操作：
 
-它的**缺点是如果 Random 的随机种子一样的话，每次生成的随机数都是可预测的（都是一样的）**。如下代码所示，当我们给两个线程设置相同的种子数的时候，会发现每次产生的随机数也是相同的：
+*伪代码如下：*
 
-```java
- // 创建两个线程
-for (int i = 0; i < 2; i++) {
-    new Thread(() -> {
-        // 创建 Random 对象，设置相同的种子
-        Random random = new Random(1024);
-        // 生成 3 次随机数
-        for (int j = 0; j < 3; j++) {
-            // 生成随机数
-            int number = random.nextInt();
-            // 打印生成的随机数
-            System.out.println(Thread.currentThread().getName() + ":" +
-                               number);
-            // 休眠 200 ms
-            try {
-                Thread.sleep(200);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            System.out.println("---------------------");
-        }
-    }).start();
-}
+```
+fail_count = get_from_redis(fail_username)  
+if fail_count >= 3:  
+ if captcha is None:  
+  return error('需要验证码')  
+    check_captcha(captcha)  
+success = do_login(username, password)  
+if not success:  
+ set_redis(fail_username, fail_count + 1)  
 ```
 
-以上程序的执行结果为：
+> 伪代码未考虑并发，实际开发可以考虑加锁。
 
-![image.png](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/project-design/20210626193841.png)
+这样确实可以过滤掉一些非法的攻击，但是以目前的OCR技术来说的话，普通的图片验证码真的很难做到有效的防止机器人（*我们就在这个上面吃过大亏*）。
 
-### 1.3.线程安全问题
+当然，我们也可以花钱购买类似于三方公司提供的滑动验证等验证方案，但是也并不是100%的安全，一样可以被破解（*惨痛教训*）。
 
-当我们要使用一个类时，我们首先关心的第一个问题是：它是否为线程安全？对于 Random 来说，**Random 是线程安全的**。
+#### 1.1.2.登录限制
 
-> PS：线程安全指的是在多线程的场景下，程序的执行结果和预期的结果一致，就叫线程安全的，否则则为非线程安全的（也叫线程安全问题）。比如有两个线程，第一个线程执行 10 万次 ++ 操作，第二个线程执行 10 万次 -- 操作，那么最终的结果应该是没加也没减，如果程序最终的结果和预期不符，则为非线程安全的。
+那这时候又有同学说了，那我可以直接限制非正常用户的登录操作，当它密码错误达到一定次数时，直接拒绝用户的登录，隔一段时间再恢复。比如我们设置某个账号在登录时错误次数达到10次时，则5分钟内拒绝该账号的所有登录操作。
 
-我们来看 Random 的实现源码：
+*伪代码如下：*
 
-```java
-public Random() {
-    this(seedUniquifier() ^ System.nanoTime());
-}
-
-public int nextInt() {
-    return next(32);
-}
-
-protected int next(int bits) {
-    long oldseed, nextseed;
-    AtomicLong seed = this.seed;
-    do {
-        oldseed = seed.get();
-        nextseed = (oldseed * multiplier + addend) & mask;
-    } while (!seed.compareAndSet(oldseed, nextseed)); // CAS（Compare and Swap）生成随机数
-    return (int)(nextseed >>> (48 - bits));
-}
+```
+fail_count = get_from_redis(fail_username)  
+locked = get_from_redis(lock_username)  
+  
+if locked:  
+ return error('拒绝登录')  
+if fail_count >= 3:  
+ if captcha is None:  
+  return error('需要验证码')  
+    check_captcha(captcha)   
+success = do_login(username, password)  
+if not success:  
+ set_redis(fail_username, fail_count + 1)  
+    if fail_count + 1 >= 10:  
+     # 失败超过10次，设置锁定标记  
+     set_redis(lock_username, true, 300s)  
 ```
 
-> PS：本文所有源码来自于 JDK 1.8.0_211。
+umm，这样确实可以解决用户密码被爆破的问题。但是，这样会带来另一个风险：攻击者虽然不能获取到网站的用户信息，但是它可以让我们网站所有的用户都无法登录！
 
-从以上源码可以看出，Random 底层使用的是 CAS（Compare and Swap，比较并替换）来解决线程安全问题的，因此对于绝大数随机数生成的场景，使用 Random 不乏为一种很好的选择。
-​
+攻击者只需要无限循环遍历所有的用户名（*即使没有，随机也行*）进行登录，那么这些用户会永远处于锁定状态，导致正常的用户无法登录网站！
 
-> PS：Java 并发机制实现原子操作有两种：一种是锁，一种是 CAS。
-> ​
+#### 1.1.3.IP限制
 
-> CAS 是 Compare And Swap（比较并替换）的缩写，java.util.concurrent.atomic 中的很多类，如（AtomicInteger AtomicBoolean AtomicLong等）都使用了 CAS 机制来实现。
+那既然直接针对用户名不行的话，我们可以针对IP来处理，直接把攻击者的IP封了不就万事大吉了嘛。我们可以设定某个IP下调用登录接口错误次数达到一定时，则禁止该IP进行登录操作。
 
-## 2.ThreadLocalRandom
+*伪代码如下：*
 
-ThreadLocalRandom 是 JDK 1.7 新提供的类，它属于 JUC（java.util.concurrent）下的一员，为什么有了 Random 之后还会再创建一个 ThreadLocalRandom？
-
-原因很简单，通过上面 Random 的源码我们可以看出，Random 在生成随机数时使用的 CAS 来解决线程安全问题的，然而 CAS 在线程竞争比较激烈的场景中效率是非常低的**，原因是 CAS 对比时老有其他的线程在修改原来的值，所以导致 CAS 对比失败，所以它要一直循环来尝试进行 CAS 操作。所以**在多线程竞争比较激烈的场景可以使用 ThreadLocalRandom 来解决 Random 执行效率比较低的问题。
-
-当我们第一眼看到 ThreadLocalRandom 的时候，一定会联想到一次类 ThreadLocal，确实如此。**ThreadLocalRandom 的实现原理与 ThreadLocal 类似，它相当于给每个线程一个自己的本地种子，从而就可以避免因多个线程竞争一个种子，而带来的额外性能开销了**。
-
-![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/project-design/20210626193920.png)
-
-### 2.1.基础使用
-
-接下来我们使用 ThreadLocalRandom 来生成一个 0 到 10 的随机数（不包含 10），实现代码如下：
-
-```java
-// 得到 ThreadLocalRandom 对象
-ThreadLocalRandom random = ThreadLocalRandom.current();
-for (int i = 0; i < 10; i++) {
-    // 生成 0-9 随机整数
-    int number = random.nextInt(10);
-    // 打印结果
-    System.out.println("生成随机数：" + number);
-}
+```
+ip = request['IP']  
+fail_count = get_from_redis(fail_ip)  
+if fail_count > 10:  
+ return error('拒绝登录')  
+# 其它逻辑  
+# do something()  
+success = do_login(username, password)  
+if not success:  
+ set_redis(fail_ip, true, 300s)  
 ```
 
-以上程序的执行结果为：
-![image.png](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/project-design/20210626194002.png)
+这样也可以一定程度上解决问题，事实上有很多的限流操作都是针对IP进行的，比如niginx的限流模块就可以限制一个IP在单位时间内的访问次数。
 
-### 2.2.实现原理
+但是这里还是存在问题：
 
-ThreadLocalRandom 的实现原理和 ThreadLocal 类似，它是让每个线程持有自己的本地种子，该种子在生成随机数时候才会被初始化，实现源码如下：
+- 比如现在很多学校、公司都是使用同一个出口IP，如果直接按IP限制，可能会误杀其它正常的用户
+- 现在这么多VPN，攻击者完全可以在IP被封后切换VPN来攻击
 
-```java
-public int nextInt(int bound) {
-    // 参数效验
-    if (bound <= 0)
-        throw new IllegalArgumentException(BadBound);
-    // 根据当前线程中种子计算新种子
-    int r = mix32(nextSeed());
-    int m = bound - 1;
-    // 根据新种子和 bound 计算随机数
-    if ((bound & m) == 0) // power of two
-        r &= m;
-    else { // reject over-represented candidates
-        for (int u = r >>> 1;
-             u + m - (r = u % bound) < 0;
-             u = mix32(nextSeed()) >>> 1)
-            ;
-    }
-    return r;
-}
+#### 1.1.4.手机验证
 
-final long nextSeed() {
-    Thread t; long r; // read and update per-thread seed
-    // 获取当前线程中 threadLocalRandomSeed 变量，然后在种子的基础上累加 GAMMA 值作为新种子
-    // 再使用 UNSAFE.putLong 将新种子存放到当前线程的 threadLocalRandomSeed 变量中
-    UNSAFE.putLong(t = Thread.currentThread(), SEED,
-                   r = UNSAFE.getLong(t, SEED) + GAMMA); 
-    return r;
-}
+那难道就没有一个比较好的方式来防范吗？　当然有。　我们可以看到近些年来，几乎所有的应用都会让用户绑定手机，一个是国家的实名制政策要求，第二个是手机基本上和身份证一样，基本上可以代表一个人的身份标识了。所以很多安全操作都是基于手机验证来进行的，登录也可以。
+
+1. 当用户输入密码次数大于3次时，要求用户输入验证码（*最好使用滑动验证*）
+2. 当用户输入密码次数大于10次时，弹出手机验证，需要用户使用手机验证码和密码双重认证进行登录
+
+> 手机验证码防刷就是另一个问题了，这里不展开，以后再有时间再聊聊我们在验证码防刷方面做了哪些工作。
+
+*伪代码如下：*
+
+```
+fail_count = get_from_redis(fail_username)  
+  
+if fail_count > 3:  
+ if captcha is None:  
+  return error('需要验证码')  
+    check_captcha(captcha)   
+      
+if fail_count > 10:  
+ # 大于10次，使用验证码和密码登录  
+ if dynamic_code is None:  
+     return error('请输入手机验证码')  
+    if not validate_dynamic_code(username, dynamic_code):  
+     delete_dynamic_code(username)  
+     return error('手机验证码错误')  
+  
+ success = do_login(username, password, dynamic_code)  
+      
+ if not success:  
+     set_redis(fail_username, fail_count + 1)  
 ```
 
-### 2.3.优缺点分析
+我们结合了上面说的几种方式的同时，加上了手机验证码的验证模式，基本上可以阻止相当多的一部分恶意攻击者。但是没有系统是绝对安全的，我们只能够尽可能的增加攻击者的攻击成本。大家可以根据自己网站的实际情况来选择合适的策略。
 
-ThreadLocalRandom 结合了 Random 和 ThreadLocal 类，并被隔离在当前线程中。因此它通过避免竞争操作种子数，从而**在多线程运行的环境中实现了更好的性能**，而且也保证了它的**线程安全**。
+### 1.2.中间人攻击？
 
-另外，不同于 Random， ThreadLocalRandom 明确不支持设置随机种子。它重写了 Random 的
-`setSeed(long seed)` 方法并直接抛出了 `UnsupportedOperationException` 异常，因此**降低了多个线程出现随机数重复的可能性**。
+#### 1.2.1.什么是中间人攻击
 
-源码如下：
+**中间人攻击(man-in-the-middle attack, abbreviated to MITM)**，简单一点来说就是，A和B在通讯过程中，攻击者通过嗅探、拦截等方式获取或修改A和B的通讯内容。
 
-```java
-public void setSeed(long seed) {
-    // only allow call from super() constructor
-    if (initialized)
-        throw new UnsupportedOperationException();
-}
-```
+举个栗子：`小白`给`小黄`发快递，途中要经过快递点A，`小黑`就躲在快递点A，或者干脆自己开一个快递点B来冒充快递点A。然后偷偷的拆了`小白`给`小黄`的快递，看看里面有啥东西。甚至可以把`小白`的快递给留下来，自己再打包一个一毛一样的箱子发给`小黄`。
 
-只要程序中调用了 setSeed() 方法就会抛出 `UnsupportedOperationException` 异常，如下图所示：
+那在登录过程中，如果攻击者在嗅探到了从客户端发往服务端的登录请求，就可以很轻易的获取到用户的用户名和密码。
 
-![image.png](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/project-design/20210626194027.png)
+#### 1.2.2.HTTPS
 
-**ThreadLocalRandom 缺点分析**
+防范中间人攻击最简单也是最有效的一个操作，更换HTTPS，把网站中所有的HTTP请求修改为强制使用HTTPS。
 
-虽然 ThreadLocalRandom 不支持手动设置随机种子的方法，但并不代表 ThreadLocalRandom 就是完美的，当我们查看 ThreadLocalRandom 初始化随机种子的方法 initialSeed() 源码时发现，默认情况下它的随机种子也是以当前时间有关，源码如下：
+**为什么HTTPS可以防范中间人攻击？**
 
-```java
-private static long initialSeed() {
-    // 尝试获取 JVM 的启动参数
-    String sec = VM.getSavedProperty("java.util.secureRandomSeed");
-    // 如果启动参数设置的值为 true，则参数一个随机 8 位的种子
-    if (Boolean.parseBoolean(sec)) {
-        byte[] seedBytes = java.security.SecureRandom.getSeed(8);
-        long s = (long)(seedBytes[0]) & 0xffL;
-        for (int i = 1; i < 8; ++i)
-            s = (s << 8) | ((long)(seedBytes[i]) & 0xffL);
-        return s;
-    }
-    // 如果没有设置启动参数，则使用当前时间有关的随机种子算法
-    return (mix64(System.currentTimeMillis()) ^
-            mix64(System.nanoTime()));
-}
-```
+HTTPS实际上就是在HTTP和TCP协议中间加入了SSL/TLS协议，用于保障数据的安全传输。相比于HTTP，HTTPS主要有以下几个特点：
 
-从上述源码可以看出，当我们设置了启动参数“-Djava.util.secureRandomSeed=true”时，ThreadLocalRandom 会产生一个随机种子，一定程度上能缓解随机种子相同所带来随机数可预测的问题，然而**默认情况下如果不设置此参数，那么在多线程中就可以因为启动时间相同，而导致多个线程在每一步操作中都会生成相同的随机数**。
+- 内容加密
+- 数据完整性
+- 身份验证
 
-## 3.SecureRandom
+> 具体的HTTPS原理这里就不再扩展了，大家可以自行Google
 
-SecureRandom 继承自 Random，该类提供加密强随机数生成器。**SecureRandom 不同于 Random，它收集了一些随机事件，比如鼠标点击，键盘点击等，SecureRandom 使用这些随机事件作为种子。这意味着，种子是不可预测的**，而不像 Random 默认使用系统当前时间的毫秒数作为种子，从而避免了生成相同随机数的可能性。
+#### 1.2.3.加密传输
 
-### 3.1.基础使用
+在HTTPS之外，我们还可以手动对敏感数据进行加密传输：
 
-```java
-// 创建 SecureRandom 对象，并设置加密算法
-SecureRandom random = SecureRandom.getInstance("SHA1PRNG");
-for (int i = 0; i < 10; i++) {
-    // 生成 0-9 随机整数
-    int number = random.nextInt(10);
-    // 打印结果
-    System.out.println("生成随机数：" + number);
-}
-```
+- 用户名可以在客户端使用非对称加密，在服务端解密
+- 密码可以在客户端进行MD5之后传输，防止暴露密码明文
 
-以上程序的执行结果为：
+## 2.其它
 
-![image.png](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/project-design/20210626194057.png)
-SecureRandom 默认支持两种加密算法：
+除了上面我们聊的这些以外，其实还有很多其它的工作可以考虑，比如：
 
-1. SHA1PRNG 算法，提供者 sun.security.provider.SecureRandom；
-2. NativePRNG 算法，提供者 sun.security.provider.NativePRNG。
-
-当然除了上述的操作方式之外，你还可以选择使用 `new SecureRandom()` 来创建 SecureRandom 对象，实现代码如下：
-
-```java
-SecureRandom secureRandom = new SecureRandom();
-```
-
-通过 new 初始化 SecureRandom，默认会使用 NativePRNG 算法来生成随机数，但是也可以配置 JVM 启动参数“-Djava.security”参数来修改生成随机数的算法，或选择使用 `getInstance("算法名称")` 的方式来指定生成随机数的算法。
-
-## 4.Math
-
-Math 类诞生于 JDK 1.0，它里面包含了用于执行基本数学运算的属性和方法，如初等指数、对数、平方根和三角函数，当然它里面也包含了生成随机数的静态方法 `Math.random()` ，**此方法会产生一个 0 到 1 的 double 值**，如下代码所示。
-
-### 4.1.基础使用
-
-```java
-for (int i = 0; i < 10; i++) {
-    // 产生随机数
-    double number = Math.random();
-    System.out.println("生成随机数：" + number);
-}
-```
-
-以上程序的执行结果为：
-![image.png](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/project-design/20210626194212.png)
-
-### 4.2.扩展
-
-当然如果你想**用它来生成一个一定范围的 int 值**也是可以的，你可以这样写：
-
-```java
-for (int i = 0; i < 10; i++) {
-    // 生成一个从 0-99 的整数
-    int number = (int) (Math.random() * 100);
-    System.out.println("生成随机数：" + number);
-}
-```
-
-
-
-以上程序的执行结果为：
-![image.png](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/project-design/20210626194237.png)
-
-### 4.3.实现原理
-
-通过分析 `Math` 的源码我们可以得知：当第一次调用 `Math.random()` 方法时，自动创建了一个伪随机数生成器，**实际上用的是 **`new java.util.Random()`，当下一次继续调用 `Math.random()` 方法时，就会使用这个新的伪随机数生成器。
-
-源码如下：
-
-```java
-public static double random() {
-    return RandomNumberGeneratorHolder.randomNumberGenerator.nextDouble();
-}
-
-private static final class RandomNumberGeneratorHolder {
-    static final Random randomNumberGenerator = new Random();
-}
-```
-
-## 5.总结
-
-本文我们介绍了 4 种生成随机数的方法，其中 Math 是对 Random 的封装，所以二者比较类似。Random 生成的是伪随机数，是以当前纳秒时间作为种子数的，并且在多线程竞争比较激烈的情况下因为要进行 CAS 操作，所以存在一定的性能问题，但**对于绝大数应用场景来说，使用 Random 已经足够了。当在竞争比较激烈的场景下可以使用 ThreadLocalRandom 来替代 Random，但如果对安全性要求比较高的情况下，可以使用 SecureRandom 来生成随机数**，因为 SecureRandom 会收集一些随机事件来作为随机种子，所以 SecureRandom 可以看作是生成真正随机数的一个工具类。
-
-
-
-
-
-
-
-
-
-
-
-
-
+- **操作日志**，用户的每次登录和敏感操作都需要记录日志（包括IP、设备等）
+- **异常操作或登录提醒**，有了上面的操作日志，那我们就可以基于日志做风险提醒，比如用户在进行非常登录地登录、修改密码、登录异常时，可以短信提醒用户
+- **拒绝弱密码** 注册或修改密码时，不允许用户设置弱密码
+- **防止用户名被遍历** 有些网站在注册时，在输入完用户名之后，会提示用户名是否存在。这样会存在网站的所有用户名被泄露的风险（*遍历该接口即可*），需要在交互或逻辑上做限制

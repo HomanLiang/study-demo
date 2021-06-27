@@ -41,10 +41,11 @@
 1. 接口设计
    1. 接口设计介绍
    2. [接口设计 - GraphQL](https://github.com/HomanLiang/study-demo/blob/main/project-design/document/chapter3_01_02.md)
-   3. 接口设计 - 幂等性
+   3. [接口设计 - 幂等性](https://github.com/HomanLiang/study-demo/blob/main/project-design/document/chapter3_01_03.md)
    4. [接口设计 - 防刷](https://github.com/HomanLiang/study-demo/blob/main/project-design/document/chapter3_01_04.md)
    5. [接口设计 - 版本控制](https://github.com/HomanLiang/study-demo/blob/main/project-design/document/chapter3_01_05.md)
-   6. 接口设计 - 安全性
+   6. [接口设计 - 重放攻击](https://github.com/HomanLiang/study-demo/blob/main/project-design/document/chapter3_01_06.md)
+   7. [接口设计 - 限流](https://github.com/HomanLiang/study-demo/blob/main/project-design/document/chapter3_01_07.md)
 4. 电商
    1. [电商 - 订单号生成](https://github.com/HomanLiang/study-demo/blob/main/project-design/document/chapter3_02_01.md)
    3. 电商 - 支付
@@ -53,13 +54,17 @@
    5. [电商 - 积分兑换](https://github.com/HomanLiang/study-demo/blob/main/project-design/document/chapter3_02_05.md)
    6. [电商 - 淘宝商品和类目体系](https://github.com/HomanLiang/study-demo/blob/main/project-design/document/chapter3_02_06.md)
    7. [电商 - 促销后台](https://github.com/HomanLiang/study-demo/blob/main/project-design/document/chapter3_02_07.md)
+   8. [电商 - 订单超时自动取消](https://github.com/HomanLiang/study-demo/blob/main/project-design/document/chapter3_02_08.md)
 5. 异常监控
    1. [异常监控方式](https://github.com/HomanLiang/study-demo/blob/main/project-design/document/chapter3_03_01.md)
 4. 微信接口对接
    1. 微信扫码登录
 5. 钉钉开发
    1. [企业内部应用开发](https://github.com/HomanLiang/study-demo/blob/main/project-design/document/chapter3_05_01.md)
-6. 
+6. 用户权限
+   1. [登录接口](https://github.com/HomanLiang/study-demo/blob/main/project-design/document/chapter3_06_01.md)
+7. 延迟队列
+   1. 延迟队列](https://github.com/HomanLiang/study-demo/blob/main/project-design/document/chapter3_07_01.md)
 
 ## 分布式
 
@@ -90,8 +95,7 @@
 2. [高并发 - 秒杀设计](https://github.com/HomanLiang/study-demo/blob/main/project-design/document/chapter5_02.md)
 3. [高并发 - 案例1](https://github.com/HomanLiang/study-demo/blob/main/project-design/document/chapter5_03.md)
 4. [高并发 - 案例2（微信抢红包）](https://github.com/HomanLiang/study-demo/blob/main/project-design/document/chapter5_04.md)
-5. 高并发 - 下单
-6. 
+6. 高并发 - 下单
 
 
 
