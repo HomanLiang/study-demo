@@ -104,9 +104,10 @@ config rewrite
 
 ## 2.Docker构建SpringBoot应用
 ### 2.1.准备工作
-将SpringBoot项目通过maven打成jar包
+将 `SpringBoot` 项目通过 `maven` 打成 `jar` 包
 
-mvn clean package #使用maven打包项目
+`mvn clean package` #使用maven打包项目
+
 ### 2.2.使用Dockerfile构建镜像
 **step1 在存放jar所在目录下创建Dockerfile文件**
 
@@ -157,7 +158,7 @@ net.ipv4.ip_forward = 1
 **step5 调用你的springboot应用，验证其是否正确**
 
 ## 3.docker中save与load的使用及注意事项
-对于没有私有仓库来说，将本地镜像放到其它服务器上执行时，可以使用save和load方法，前者用来把镜像保存一个tar文件，后台从一个tar文件恢复成一个镜像，这个功能对于开发者来说还是很方便的！下面就带大家来实现上面的过程。
+对于没有私有仓库来说，将本地镜像放到其它服务器上执行时，可以使用 `save` 和 `load` 方法，前者用来把镜像保存一个 `tar` 文件，后台从一个 `tar` 文件恢复成一个镜像，这个功能对于开发者来说还是很方便的！下面就带大家来实现上面的过程。
 ### 3.1.docker images  查看一下本地镜像
 ```
 [root@Dimage ~]# docker images
@@ -171,11 +172,11 @@ postgres                                                      10.4              
 [root@Dimage Templates]# docker save sonarqube -o /root/Templates/sonarqube.tar
 [root@Dimage Templates]# docker save postgres -o /root/Templates/postgres.tar
 ```
-将上面的sonarqube、postgres两个镜像保存成一个tar文件，注意如果目录没有，需要提前建立一下，docker不会帮你建立目录的。
+将上面的 `sonarqube`、`postgres` 两个镜像保存成一个 `tar` 文件，注意如果目录没有，需要提前建立一下，`docker` 不会帮你建立目录的。
 
-使用xtfp、FileZilla等工具把文件下载，复制到对应的服务器上
+使用 `xtfp`、`FileZilla` 等工具把文件下载，复制到对应的服务器上
 
-在外测服务器上，去load你的tar文件，把这恢复到docker列表里
+在外测服务器上，去 `load` 你的 `tar` 文件，把这恢复到 `docker` 列表里
 ```
 [root@jenkins ~]# docker load < /home/sonarqube.tar
 f715ed19c28b: Loading layer [==================================================>]  105.5MB/105.5MB
@@ -208,14 +209,14 @@ fa8311b04439: Loading layer [==================================================>
 b607040b9b5b: Loading layer [==================================================>]  8.704kB/8.704kB
 Loaded image: postgres:10.4
 ```
-然后使用docker images就可以看到自己加载的新的镜像了
+然后使用 `docker images` 就可以看到自己加载的新的镜像了
 ```
 [root@jenkins ~]# docker ps
 CONTAINER ID        IMAGE                                                   COMMAND                  CREATED             STATUS              PORTS                    NAMES
 b4cf326fbf10        sonarqube:7.1                                           "./bin/run.sh"           4 seconds ago       Up 3 seconds        0.0.0.0:9000->9000/tcp   sonarqube
 a9ccfaf9a91e        postgres:10.4                                           "docker-entrypoint.s…"   16 minutes ago      Up 16 minutes       0.0.0.0:5432->5432/tcp   postgresql
 ```
-（注意：docker save postgres -o /root/Templates/sonarqube.tar，这里最好是用镜像名，不要使用镜像ID，不然load出来的镜像显示如下REPOSITORY、TAG均显示none,不便于后面进一步操作）
+（注意：`docker save postgres -o /root/Templates/sonarqube.tar`，这里最好是用镜像名，不要使用镜像ID，不然 `load` 出来的镜像显示如下 `REPOSITORY`、`TAG` 均显示 `none`,不便于后面进一步操作）
 ```
 [root@jenkins ~]# docker images
 REPOSITORY                                      TAG                 IMAGE ID            CREATED             SIZE
@@ -224,9 +225,9 @@ sonarqube                                       7.1                 7a39fc50869a
 ```
 
 ## 4.如何提交对 Docker 镜像的更改
-我将使用官方NGINX图像演示该过程，并将自定义来自Docker Hub的镜像。我假设您已经在您选择的平台上启动并运行Docker，现在准备开始。
+我将使用官方 `NGINX` 图像演示该过程，并将自定义来自 `Docker Hub` 的镜像。我假设您已经在您选择的平台上启动并运行 `Docker`，现在准备开始。
 ### 4.1.拉取官方镜像
-这个过程的第一步是从Docker Hub下载官方镜像。要拉取此镜像，执行以下命令：
+这个过程的第一步是从 `Docker Hub` 下载官方镜像。要拉取此镜像，执行以下命令：
 ```
 docker pull nginx
 ```
@@ -244,15 +245,15 @@ docker pull nginx
 docker run --name nginx-template -p8080:80-e TERM=xterm -d nginx
 ```
 上面的命令分解如下：
-- docker run 指示Docker 我们要运行一个新容器。
-- -name nginx-template 指示Docker命名新容器nginx-template
-- -p8080:80指示Docker将内部容器端口80暴露给网络端口8080。
-- -e TERM = xterm 定义我们的终端变量。
-- -d 在后台启动容器。
-- nginx 是要用于容器的图像的名称。
+- `docker run` 指示Docker 我们要运行一个新容器。
+- `-name nginx-template` 指示 `Docker` 命名新容器 `nginx-template`
+- `-p8080:80` 指示 `Docker` 将内部容器端口 `80` 暴露给网络端口 `8080`。
+- `-e TERM = xterm` 定义我们的终端变量。
+- `-d` 在后台启动容器。
+- `nginx` 是要用于容器的图像的名称。
 
 ### 4.3.访问修改容器
-我们的下一步是访问容器。当您执行上述命令时，Docker将返回容器的ID（图B）。此ID是您用于访问容器的ID。
+我们的下一步是访问容器。当您执行上述命令时，`Docker` 将返回容器的ID（图B）。此ID是您用于访问容器的ID。
 
 ![Image [2]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/docker-demo/20210413231258.png)
 
@@ -271,7 +272,7 @@ docker  exec  -it  b1d5  bash
 <center>图C：我们新部署的容器的bash提示符</center>
 
 ### 4.4.安装工具
-下一步是安装必要的工具。请记住，我们将安装build-essential，PHP，MySQL和nano。在尝试安装任何内容之前，首先需要使用命令更新apt：
+下一步是安装必要的工具。请记住，我们将安装 `build-essential`，`PHP`，`MySQL`和 `nano`。在尝试安装任何内容之前，首先需要使用命令更新apt：
 ```
 apt-get update
 ```
@@ -282,10 +283,10 @@ apt-get  install  build-essential
 apt-get  install  php  php-mysql
 apt-get  install  mysql-server
 ```
-完成上述命令后，使用exit命令退出NGINX bash提示符。
+完成上述命令后，使用 `exit` 命令退出 `NGINX bash` 提示符。
 
 ### 4.5.提交改变
-现在该基于我们的添加提交您的更改去创建新图像。为此，我们需要再次使用容器ID（在我们的示例中前四个字符，b1d5）。当我们提交这些更改时，我们会有效地创建一个新镜像，其中包含对原始镜像的所有添加。执行此操作的命令是：
+现在该基于我们的添加提交您的更改去创建新图像。为此，我们需要再次使用容器 `ID`（在我们的示例中前四个字符，`b1d5`）。当我们提交这些更改时，我们会有效地创建一个新镜像，其中包含对原始镜像的所有添加。执行此操作的命令是：
 ```
 docker commit b1d5 nginx-template
 ```

@@ -14,7 +14,7 @@
 - 无法在多个容器之间共享数据。
 - 当容器删除时，容器中产生的数据将丢失。
 
-为了解决这些问题，docker 引入了数据卷(volume) 机制。数据卷是存在于一个或多个容器中的特定文件或文件夹，这个文件或文件夹以独立于 docker 文件系统的形式存在于宿主机中。数据卷的最大特定是：**其生存周期独立于容器的生存周期**。
+为了解决这些问题，`docker` 引入了数据卷(`volume`) 机制。数据卷是存在于一个或多个容器中的特定文件或文件夹，这个文件或文件夹以独立于 `docker` 文件系统的形式存在于宿主机中。数据卷的最大特定是：**其生存周期独立于容器的生存周期**。
 
 ### 1.2.使用数据卷的最佳场景
 
@@ -25,15 +25,15 @@
 
 ### 1.3.数据卷原理
 
-下图描述了 docker 容器挂载数据的三种方式：
+下图描述了 `docker` 容器挂载数据的三种方式：
 
 ![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/docker-demo/20210412233259.png)
 
-数据卷是完全被 docker 管理的，就像上图中的黄色区域描述的一样，docker 在宿主机的文件系统中找了个文件管理数据卷相关的数据。因此你可能根本不需要知道数据卷文件在宿主机上的存储位置(事实上抱着刨根问底的精神我们还是很想搞清楚它背后的工作原理！)。
+数据卷是完全被 `docker` 管理的，就像上图中的黄色区域描述的一样，`docker` 在宿主机的文件系统中找了个文件管理数据卷相关的数据。因此你可能根本不需要知道数据卷文件在宿主机上的存储位置(事实上抱着刨根问底的精神我们还是很想搞清楚它背后的工作原理！)。
 
-docker 数据卷的本质是容器中的一个特殊目录。在容器创建的过程中，docker 会将宿主机上的指定目录(一个以数据卷 ID 为名称的目录)挂载到容器中指定的目录上。这里使用的挂载方式为绑定挂载(bind mount)，所以挂载完成后的宿主机目录和容器内的目标目录表现一致。
+`docker` 数据卷的本质是容器中的一个特殊目录。在容器创建的过程中，`docker` 会将宿主机上的指定目录(一个以数据卷 `ID` 为名称的目录)挂载到容器中指定的目录上。这里使用的挂载方式为绑定挂载(`bind mount`)，所以挂载完成后的宿主机目录和容器内的目标目录表现一致。
 
-比如我们执行下面的命令创建数据卷 hello，并挂载到容器 testcon 的 /world 目录：
+比如我们执行下面的命令创建数据卷 `hello`，并挂载到容器 `testcon` 的 `/world` 目录：
 
 ```
 $ docker volume create hello
@@ -47,7 +47,7 @@ $ docker run -id --name testcon --mount type=volume,source=hello,target=/world u
 mount("/var/lib/docker/volumes/hello/_data", "rootfs/world", "none", MS_BIND, NULL)
 ```
 
-在处理完所有的 mount 操作之后(真正需要 docker 容器挂载的除了数据卷目录还包括 rootfs，init-layer 里的内容，/proc 设备等)，docker 只需要通过 chdir 和 pivot_root 切换进程的根目录到 rootfs 中，这样容器内部进程就只能看见以 rootfs 为根的文件系统以及被 mount 到 rootfs 之下的各项目录了。例如我们启动的 testcon 中的文件系统为：
+在处理完所有的 `mount` 操作之后(真正需要 `docker` 容器挂载的除了数据卷目录还包括 `rootfs`，`init-layer` 里的内容，`/proc` 设备等)，`docker` 只需要通过 `chdir` 和 `pivot_root` 切换进程的根目录到 `rootfs` 中，这样容器内部进程就只能看见以 `rootfs` 为根的文件系统以及被 `mount` 到 `rootfs` 之下的各项目录了。例如我们启动的 `testcon` 中的文件系统为：
 
 ![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/docker-demo/20210412233243.png)
 
@@ -82,26 +82,26 @@ docker run -it -v /dataVolume:/dataVloumeContainer centos /bin/bash
 
 ![Image [4]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/docker-demo/20210412232655.png)
 
-上面的“RW”:true 标识具有读写权限
+上面的 `“RW”:true` 标识具有读写权限
 
 #### 1.5.3.容器和宿主机之间数据共享
-主要是在dataVolume 和dataVolumeContainer 两个挂载的目录下演示数据是否共享
+主要是在`dataVolume` 和 `dataVolumeContainer` 两个挂载的目录下演示数据是否共享
 
 ![Image [5]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/docker-demo/20210412232707.png)
 
-上图主要演示在centos docker容器和宿主机中往test.txt文件中写数据，看双方数据是否一致。
+上图主要演示在 `centos docker` 容器和宿主机中往 `test.txt` 文件中写数据，看双方数据是否一致。
 
-结果在centos docker容器中编辑的test.txt文件能同步到宿主机中的test.txt文件中。
+结果在 `centos docker` 容器中编辑的 `test.txt` 文件能同步到宿主机中的 `test.txt` 文件中。
 
-在宿主机中编辑的test.txt文件也能同步到centos docker 容器的test.txt中。
+在宿主机中编辑的 `test.txt` 文件也能同步到 `centos docker` 容器的 `test.txt` 中。
 #### 1.5.4.容器停止退出后，主机修改后数据是否同步
 演示步骤：
-- 退出centos docker容器(exit 命令，退出并停止容器)
-- 在宿主机的dataVolume上执行 echo "java world">>test02.txt
-- docker ps -a 查询刚才停止退出的容器id
-- docker start 容器id
-- docker attach 容器id
-- 查看dataVolumeContainer目录下是否有新建的test02.txt和之前的text.txt
+- 退出 `centos docker` 容器(`exit` 命令，退出并停止容器)
+- 在宿主机的 `dataVolume` 上执行 `echo "java world">>test02.txt`
+- `docker ps -a` 查询刚才停止退出的容器id
+- `docker start 容器id`
+- `docker attach 容器id`
+- 查看 `dataVolumeContainer` 目录下是否有新建的 `test02.txt` 和之前的 `text.txt`
 
 ![Image [6]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/docker-demo/20210412232723.png)
 
@@ -116,15 +116,17 @@ docker run -it -v /dataVolume:/dataVloumeContainer centos /bin/bash
 
 ### 1.6.容器内添加-直接命令添加(使用 volume driver 把数据存储到其它地方)
 
-除了默认的把数据卷中的数据存储在宿主机，docker 还允许我们通过指定 volume driver 的方式把数据卷中的数据存储在其它的地方，比如 Azrue Storge 或 AWS 的 S3。
-简单起见，我们接下来的 demo 演示如何通过 vieux/sshfs 驱动把数据卷的存储在其它的主机上。
-docker 默认是不安装 vieux/sshfs 插件的，我们可以通过下面的命令进行安装：
+除了默认的把数据卷中的数据存储在宿主机，`docker` 还允许我们通过指定 `volume driver` 的方式把数据卷中的数据存储在其它的地方，比如 `Azrue Storge` 或 `AWS` 的 `S3`。
+
+简单起见，我们接下来的 `demo` 演示如何通过 `vieux/sshfs` 驱动把数据卷的存储在其它的主机上。
+
+`docker` 默认是不安装 `vieux/sshfs` 插件的，我们可以通过下面的命令进行安装：
 
 ```
 $ docker plugin install --grant-all-permissions vieux/sshfs
 ```
 
-然后通过 vieux/sshfs 驱动创建数据卷，并指定远程主机的登录用户名、密码和数据存放目录：
+然后通过 `vieux/sshfs` 驱动创建数据卷，并指定远程主机的登录用户名、密码和数据存放目录：
 
 ```
 docker volume create --driver vieux/sshfs \
@@ -133,7 +135,8 @@ docker volume create --driver vieux/sshfs \
     mysshvolume
 ```
 
-注意，请确保你指定的远程主机上的挂载点目录是存在的(demo 中是 /home/nick/sshvolume 目录)，否则在启动容器时会报错。
+注意，请确保你指定的远程主机上的挂载点目录是存在的(`demo` 中是 `/home/nick/sshvolume` 目录)，否则在启动容器时会报错。
+
 最后在启动容器时指定挂载这个数据卷：
 
 ```
@@ -143,29 +146,30 @@ docker run -id \
     ubuntu /bin/bash
 ```
 
-这就搞定了，你在容器中 /world 目录下操作的文件都存储在远程主机的 /home/nick/sshvolume 目录中。进入容器 testcon 然后在 /world 目录中创建一个文件，然后打开远程主机的 /home/nick/sshvolume 目录进行查看，你新建的文件是不是已经出现在那里了！
+这就搞定了，你在容器中 `/world` 目录下操作的文件都存储在远程主机的 `/home/nick/sshvolume` 目录中。进入容器 `testcon` 然后在 `/world` 目录中创建一个文件，然后打开远程主机的 `/home/nick/sshvolume` 目录进行查看，你新建的文件是不是已经出现在那里了！
 
 ### 1.7.容器内添加-DockerFile添加
 
-Java EE Hello.java---->Hello.class
+`Java EE Hello.java---->Hello.class`
 
-Docker images---->DockerFile(dokcer编程)
+`Docker images---->DockerFile` (dokcer编程)
 
-基于 Dockerfile 创建镜像是常见的方式。 Dockerfile 是一个文本文件，利用给定的指令描述基于某个父镜像创建新镜像的过程 。
+基于 `Dockerfile` 创建镜像是常见的方式。 `Dockerfile` 是一个文本文件，利用给定的指令描述基于某个父镜像创建新镜像的过程 。
 
 **step1**
 
-根目录下新建mydocker文件夹并进入
+根目录下新建 `mydocker` 文件夹并进入
 
 **step2**
 
-可在Dockerfile中使用VOLUME指令来给镜像添加一个或多个数据卷
+可在 `Dockerfile` 中使用 `VOLUME` 指令来给镜像添加一个或多个数据卷
 
 ```
 VOLUME["/dataVolumeContainer","/dataVolumeContainer2","/dataVolumeContainer3"]
 ```
 
 说明：
+
 出于可移植和分享的考虑，用-v 主机目录:容器目录这种方法不能够直接在Dockerfile中实现。
 
 由于宿主机目录是依赖于特定宿主机的，并不能够保证在所有的宿主机上都存在这样的特定目录。
@@ -185,9 +189,9 @@ CMD /bin/bash
 ```
 **step4**
 
-build后生成镜像
+`build` 后生成镜像
 
-获得一个新镜像ng/centos
+获得一个新镜像 `ng/centos`
 ```
 docker build -f /mydocker/dockerfile -t ng/centos .
 ```
@@ -195,7 +199,7 @@ docker build -f /mydocker/dockerfile -t ng/centos .
 
 **step5**
 
-run容器
+`run` 容器
 
 ![Image [10]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/docker-demo/20210412232837.png)
 
@@ -203,7 +207,7 @@ run容器
 
 通过上述步骤，容器内的卷目录地址已经知道对应的主机目录地址哪??
 
-docker会默认生成一个，通过docker inspet 可以查看具体路径
+`docker` 会默认生成一个，通过 `docker inspet` 可以查看具体路径
 
 ![Image [11]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/docker-demo/20210412232848.png)
 
@@ -215,9 +219,9 @@ docker会默认生成一个，通过docker inspet 可以查看具体路径
 
 备注
 
-Docker挂载主机目录Docker访问出现 `cannot open directory .: Permission denied`
+`Docker` 挂载主机目录Docker访问出现 `cannot open directory .: Permission denied`
 
-解决办法：在挂载目录后多加一个`--privileged=true`参数即可
+解决办法：在挂载目录后多加一个 `--privileged=true` 参数即可
 
 ## 2.数据卷容器
 ### 2.1.是什么
@@ -229,26 +233,27 @@ Docker挂载主机目录Docker访问出现 `cannot open directory .: Permission 
 
 ![Image [13]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/docker-demo/20210412232916.png)
 
-以上一步新建的镜像ng/centos为模板并运行容器dc01/dc02/dc03
+以上一步新建的镜像 `ng/centos` 为模板并运行容器 `dc01/dc02/dc03`
 
 它们已经具有容器卷
-- /dataVolumeContainer1
-- /dataVolumeContainer2
+- `/dataVolumeContainer1`
+- `/dataVolumeContainer2`
 
 ### 2.3.容器间传递共享(--volumes-from)
 **step 1**
 
-先启动一个父容器dc01
+先启动一个父容器 `dc01`
 ```
 docker run -it --name dc01 ng/centos /bin/bash
 ```
 ![Image [14]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/docker-demo/20210412232931.png)
 
-在dataVolumeContainer2新增内容
+在 `dataVolumeContainer2` 新增内容
 
 **step 2**
 
-dc02/dc03继承自dc01 (主要使用--volumes-from)
+`dc02/dc03` 继承自 `dc01`(主要使用 `--volumes-from`)
+
 ```
 docker run -it --name dc02 --volumes-from dc01 ng/centos
 docker run -it --name dc03 --volumes-from dc01 ng/centos
@@ -257,27 +262,27 @@ docker run -it --name dc03 --volumes-from dc01 ng/centos
 
 ![Image [16]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/docker-demo/20210412232946.png)
 
-dc02 dc03容器继承与dc01容器，并在dc2容器的dataVolumeContainer2文件夹下，新增dc02_add.txt文件。
+`dc02` `dc03` 容器继承与 `dc01` 容器，并在 `dc2` 容器的 `dataVolumeContainer2` 文件夹下，新增 `dc02_add.txt` 文件。
 
-此时可以看到，dc01 dc03容器也有新增加的文件。
+此时可以看到，`dc01` `dc03` 容器也有新增加的文件。
 
-并在dc03容器的dataVolumeContainer2文件夹下，新增dc03_add.txt文件。此时可以看到，dc01 dc02容器也有新增加的文件。
+并在 `dc03` 容器的 `dataVolumeContainer2` 文件夹下，新增 `dc03_add.txt` 文件。此时可以看到，`dc01` `dc02` 容器也有新增加的文件。
 
 **step 3**
 
-删除dc01，dc02修改后dc03可否访问------->是可以访问的
+删除 `dc01`，`dc02` 修改后 `dc03` 可否访问------->是可以访问的
 
-删除dc01容器
+删除 `dc01` 容器
 ```
 docker container rm -f dc01
 ```
 **step 4**
 
-删除dc02后dc03可否访问---->是可以访问的
+删除 `dc02` 后 `dc03` 可否访问---->是可以访问的
 
 **step 5**
 
-新建dc04继承dc03后再删除dc03
+新建 `dc04` 继承 `dc03` 后再删除 `dc03`
 ```
 docker run -it --name dc04 --volumes-from dc03 ng/centos
 docker container rm -f dc03

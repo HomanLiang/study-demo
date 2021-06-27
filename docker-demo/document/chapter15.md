@@ -14,7 +14,7 @@ docker info|more
 
 ### 1.1.磁盘驱动模式为devicemapper
 
-Docker从1.13版本开始默认磁盘驱动模式：`overlay2`，可以修改为Devicemapper模式，修改方法：
+`Docker` 从 `1.13` 版本开始默认磁盘驱动模式：`overlay2`，可以修改为 `Devicemapper` 模式，修改方法：
 
 - `vim /etc/sysconfig/docker-storage`
 
@@ -24,15 +24,15 @@ Docker从1.13版本开始默认磁盘驱动模式：`overlay2`，可以修改为
 
   ![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/docker-demo/20210502223814.webp)
 
-  这里也要修改改成devicemapper
+  这里也要修改改成 `devicemapper`
 
-- 保存重启docker服务（这下引擎变了，数据也就都丢失了，镜像和容器都没了，所以用什么模式要规划好不要随便改磁盘模式）
+- 保存重启 `docker` 服务（这下引擎变了，数据也就都丢失了，镜像和容器都没了，所以用什么模式要规划好不要随便改磁盘模式）
 
   ![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/docker-demo/20210502223834.webp)
 
 #### 1.1.1.新建容器磁盘资源限制
 
-可以指定默认容器的大小（在启动容器的时候指定），可以在docker配置文件里通过dm.basesize参数指定，指定Docker容器rootfs容量大小为20G：
+可以指定默认容器的大小（在启动容器的时候指定），可以在 `docker` 配置文件里通过 `dm.basesize` 参数指定，指定 `Docker` 容器`rootfs` 容量大小为 `20G`：
 
 ```
 vim /etc/sysconfig/docker-storage
@@ -44,21 +44,21 @@ DOCKER_STORAGE_OPTIONS="--storage-driver devicemapper --storage-opt dm.basesize=
 
 ![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/docker-demo/20210502223912.png)
 
-重启docker服务。
+重启 `docker` 服务。
 
 启动一个容器后查看磁盘。
 
 ![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/docker-demo/20210502223917.png)
 
-**注意**：devicemapper模式下扩容不支持xfs，overlay2可以支持xfs
+**注意**：`devicemapper` 模式下扩容不支持 `xfs`，`overlay2` 可以支持 `xfs`
 
 #### 1.1.2.容器启动后给在线扩容
 
-基于现有容器在线扩容，宿主机文件系统类型支持：ext2、ext3、ext4、不支持XFS。
+基于现有容器在线扩容，宿主机文件系统类型支持：`ext2`、`ext3`、`ext4`、不支持 `XFS`。
 
 - 查看原容器的磁盘空间大小：
 
-- 查看mapper设备：
+- 查看 `mapper` 设备：
 
 - 查看卷信息表：
 
@@ -68,7 +68,7 @@ DOCKER_STORAGE_OPTIONS="--storage-driver devicemapper --storage-opt dm.basesize=
 
   我们来计算一下一个 15GB 的卷需要多少扇区，
 
-  $ echo $((15*1024*1024*1024/512)) 31457280
+  `$ echo $((15*1024*1024*1024/512)) 31457280`
 
   修改卷信息表--激活--并且验证（红色3个部分）
 
@@ -80,22 +80,23 @@ DOCKER_STORAGE_OPTIONS="--storage-driver devicemapper --storage-opt dm.basesize=
 
 #### 1.2.1.新容器生成时指定默认容器大小
 
-修改docker配置文件 `/etc/sysconfig/docker-storage` 中，OPTIONS参数后面添加如下代码，指定docker容器rootfs容量大小为10G
+修改 `docker` 配置文件 `/etc/sysconfig/docker-storage` 中，`OPTIONS` 参数后面添加如下代码，指定 `docker` 容器 `rootfs` 容量大小为 `10G`
+
  `OPTIONS=‘--storage-opt  over lay2.size=10G’`，修改完重启docker
 
 #### 1.2.2.给正在运行的容器指定大小
 
-1. 首先添加一块磁盘sdb 10G
+1. 首先添加一块磁盘 `sdb 10G`
 
    ![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/docker-demo/20210502224533.webp)
 
-2. 格式化硬盘为xfs格式
+2. 格式化硬盘为 `xfs` 格式
 
     ```undefined
     mkfs.xfs -f /dev/sdb
     ```
 
-3. 创建data目录，把sdb挂载，开启配额功能（默认xfs支持配额功能）
+3. 创建 `data` 目录，把 `sdb` 挂载，开启配额功能（默认 `xfs` 支持配额功能）
 
     ```kotlin
     mkfs.xfs -f /dev/sdb
@@ -116,7 +117,7 @@ DOCKER_STORAGE_OPTIONS="--storage-driver devicemapper --storage-opt dm.basesize=
     
     ![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/docker-demo/20210502224705.webp)
 
-5. 可以通过命令行xfs_quota设置来为用户和目录分配配额，也可以通过命令来查看配额信息
+5. 可以通过命令行 `xfs_quota` 设置来为用户和目录分配配额，也可以通过命令来查看配额信息
 
     ```kotlin
     例如给用户fp1限制磁盘配为10M
@@ -125,19 +126,19 @@ DOCKER_STORAGE_OPTIONS="--storage-driver devicemapper --storage-opt dm.basesize=
     
     ![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/docker-demo/20210502224733.webp)
     
-    测试：发现fp1在data目录下确实最多只能写10M
+    测试：发现 `fp1` 在 `data` 目录下确实最多只能写 `10M`
     
     ![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/docker-demo/20210502224752.webp)
 
-6. 将docker引擎默认数据存储目录/var/lib/docker重命名，冰将/data/docker目录软链接到/var/lib下即可
+6. 将 `docker` 引擎默认数据存储目录 `/var/lib/docker` 重命名，并将 `/data/docker` 目录软链接到 `/var/lib` 下即可
 
 ## 2.清理 Docker 占用的磁盘空间
 
-Docker 很占用空间，每当我们运行容器、拉取镜像、部署应用、构建自己的镜像时，我们的磁盘空间会被大量占用。
+`Docker` 很占用空间，每当我们运行容器、拉取镜像、部署应用、构建自己的镜像时，我们的磁盘空间会被大量占用。
 
-如果你也被这个问题所困扰，咱们就一起看一下 Docker 是如何使用磁盘空间的，以及如何回收。
+如果你也被这个问题所困扰，咱们就一起看一下 `Docker` 是如何使用磁盘空间的，以及如何回收。
 
-docker 占用的空间可以通过下面的命令查看：
+`docker` 占用的空间可以通过下面的命令查看：
 
 ```javascript
 $ docker system df
@@ -145,7 +146,7 @@ $ docker system df
 
 ![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/docker-demo/20210502231316.webp)
 
-`TYPE` 列出了docker 使用磁盘的 4 种类型：
+`TYPE` 列出了 `docker` 使用磁盘的 4 种类型：
 
 - **Images**：所有镜像占用的空间，包括拉取下来的镜像，和本地构建的。
 - **Containers**：运行的容器占用的空间，表示每个容器的读写层的空间。
@@ -187,14 +188,14 @@ Build cache usage: 0B
 
 每次创建一个容器时，都会有一些文件和目录被创建，例如：
 
-- `/var/lib/docker/containers/ID`目录，如果容器使用了默认的日志模式，他的所有日志都会以JSON形式保存到此目录下。
+- `/var/lib/docker/containers/ID`目录，如果容器使用了默认的日志模式，他的所有日志都会以 `JSON` 形式保存到此目录下。
 - `/var/lib/docker/overlay2` 目录下含有容器的读写层，如果容器使用自己的文件系统保存了数据，那么就会写到此目录下。
 
-现在我们从一个完全干净的系统开始，假设 docker 刚刚安装：
+现在我们从一个完全干净的系统开始，假设 `docker` 刚刚安装：
 
 ![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/docker-demo/20210502231330.webp)
 
-首先，我们启动一个 NGINX 容器：
+首先，我们启动一个 `NGINX` 容器：
 
 ![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/docker-demo/20210502231339.webp)
 
@@ -207,7 +208,7 @@ Build cache usage: 0B
 
 此时没有可回收空间，因为容器在运行，镜像正被使用。
 
-现在，我们在容器内创建一个 100MB 的空文件：
+现在，我们在容器内创建一个 `100MB` 的空文件：
 
 ![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/docker-demo/20210502231357.webp)
 
@@ -295,9 +296,9 @@ $ docker image rm $(docker image ls -q)
 
 例如容器中的应用有上传图片的功能，上传之后肯定不能保存在容器内部，因为容器内部的数据会随着容器的死掉而被删除，所以，这些图片要保存在容器之外，也就是数据卷。
 
-比如我们运行了一个 MongoDB 容器做测试，导入了很多测试数据，这些数据就不是在容器内部的，是在数据卷中，因为 MongoDB 的 Dockerfile 中使用了数据卷。
+比如我们运行了一个 `MongoDB` 容器做测试，导入了很多测试数据，这些数据就不是在容器内部的，是在数据卷中，因为 `MongoDB` 的 `Dockerfile` 中使用了数据卷。
 
-测试完成后，删除了这个 MongoDB 容器，但测试数据还在，没被删除。
+测试完成后，删除了这个 `MongoDB` 容器，但测试数据还在，没被删除。
 
 删除不再使用的数据卷：
 
@@ -315,9 +316,9 @@ $ docker volume prune
 
 ### 2.4.Build Cache 的磁盘占用
 
-Docker 18.09 引入了 **BuildKit**，提升了构建过程的性能、安全、存储管理等能力。
+`Docker 18.09` 引入了 **BuildKit**，提升了构建过程的性能、安全、存储管理等能力。
 
-删除 build cache 可以使用命令：
+删除 `build cache` 可以使用命令：
 
 ```javascript
 $ docker builder prune
@@ -346,8 +347,8 @@ $ docker system prune
   - 未被任何容器所使用的卷（volume）
   - 未被任何容器所关联的网络（network）
   - 所有悬空镜像（image）。
-- 该指令默认只会清除悬空镜像，未被使用的镜像不会被删除。添加-a 或 --all参数后，可以一并清除所有未使用的镜像和悬空镜像。
-- 可以添加-f 或 --force参数用以忽略相关告警确认信息。
+- 该指令默认只会清除悬空镜像，未被使用的镜像不会被删除。添加 `-a` 或 `--all` 参数后，可以一并清除所有未使用的镜像和悬空镜像。
+- 可以添加 `-f` 或 `--force` 参数用以忽略相关告警确认信息。
 
 ```ruby
 [root@dockercon ~]# docker system prune --help
@@ -482,11 +483,11 @@ docker exec -it b6bac438271d /bin/bash
 
 ##### X.1.1.4.查看cpu
 
-物理cpu：主板上实际插入的cpu数量，可以数不重复的 physical id 有几个（physical id）
+物理 `cpu`：主板上实际插入的 `cpu` 数量，可以数不重复的 `physical id` 有几个（`physical id`）
 
 cpu核数：单块CPU上面能处理数据的芯片组的数量
 
-逻辑cpu：一般情况下，逻辑cpu=物理CPU个数×每颗核数
+逻辑cpu：一般情况下，`逻辑cpu=物理CPU个数×每颗核数`
 
 ```
 1.物理cpu数：[root@server ~]# grep 'physical id' /proc/cpuinfo|sort|uniq|wc -l
@@ -500,7 +501,7 @@ cpu核数：单块CPU上面能处理数据的芯片组的数量
 
 注：上面这样子看的和在宿主机上通过这些命令看，你会发现docker容器和宿主机都是一样的，这是为什么呢？
 
-首先我们要知道，docker默认容器和宿主机时共享所有的cpu、内存、磁盘资源的，所以这样看都是一样的。为了不让个别容器因为受到攻击，大肆占用资源，造成其他容器也崩溃，我们需要对每个容器的资源多少进行限制。那么就有这两个问题：怎样看准确的呢？怎样对容器使用的这些资源进行限制呢？
+首先我们要知道，`docker` 默认容器和宿主机时共享所有的 `cpu`、内存、磁盘资源的，所以这样看都是一样的。为了不让个别容器因为受到攻击，大肆占用资源，造成其他容器也崩溃，我们需要对每个容器的资源多少进行限制。那么就有这两个问题：怎样看准确的呢？怎样对容器使用的这些资源进行限制呢？
 
 #### X.1.2.怎样准确查看每个容器的资源消耗情况呢？
 
@@ -535,7 +536,7 @@ docker run -itd --cpuset-cpus=0-0 -m 4MB docker.io/jdeathe/centos-ssh /bin/bash
 
 报错的意思是：守护进程的错误响应：请求的CPU不可用-请求的0-1，可用：0。
 
-说明咱们的vmware虚拟机创建时只给了1核，所以这里不能给两核！
+说明咱们的 `vmware` 虚拟机创建时只给了1核，所以这里不能给两核！
 
 ![在这里插入图片描述](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/docker-demo/20210502230000.png)
 
@@ -543,7 +544,7 @@ docker run -itd --cpuset-cpus=0-0 -m 4MB docker.io/jdeathe/centos-ssh /bin/bash
 
 ![在这里插入图片描述](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/docker-demo/20210502230002.png)
 
-内存、cpu限制成功！这个查看容器的cpu核数的方式不知道应该怎样查看！我后面加了cpu，然后试了下，top命令和通过看`cpuinfo文件`都不能查看出一个容器占用的cpu资源实际情况！
+内存、`cpu` 限制成功！这个查看容器的 `cpu` 核数的方式不知道应该怎样查看！我后面加了 `cpu`，然后试了下，`top` 命令和通过看`cpuinfo` 文件都不能查看出一个容器占用的 `cpu` 资源实际情况！
 
 ##### X.1.3.2.磁盘大小限制
 
@@ -563,7 +564,7 @@ docker run -itd --cpuset-cpus=0-0 -m 4MB docker.io/jdeathe/centos-ssh /bin/bash
 
 **X.1.3.2.2.修改docker配置文件**
 
-docker配置文件：/etc/sysconfig/docker（注意不是docker-storage文件）中，OPTIONS参数后面添加如下代码：
+`docker` 配置文件：`/etc/sysconfig/docker`（注意不是 `docker-storage` 文件）中，`OPTIONS` 参数后面添加如下代码：
 
 ```
 OPTIONS='--storage-opt overlay2.size=40G'
@@ -571,7 +572,7 @@ OPTIONS='--storage-opt overlay2.size=40G'
 
 ![在这里插入图片描述](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/docker-demo/20210502230008.png)
 
-重启docker，报错：
+重启 `docker`，报错：
 
 ```
 systemctl status docker.service -l
@@ -579,9 +580,9 @@ systemctl status docker.service -l
 
 ![在这里插入图片描述](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/docker-demo/20210502230015.png)
 
-注：project Quota(目录配额)
+注：`project Quota`(目录配额)
 
-解释：Overlay2 Docker磁盘驱动模式，如果要调整其大小，需要让Linux文件系统设置为xfs，并且支持目录级别的磁盘配额功能；
+解释：`Overlay2 Docker` 磁盘驱动模式，如果要调整其大小，需要让 `Linux` 文件系统设置为 `xfs` ，并且支持目录级别的磁盘配额功能；
 
 **X.1.3.2.3.接下来我们就做支持目录级别的磁盘配额功能**
 
@@ -593,7 +594,7 @@ systemctl status docker.service -l
 
   ![在这里插入图片描述](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/docker-demo/20210502230028.png)
 
-  注：/dev/sdb就是我添加的磁盘！
+  注：`/dev/sdb` 就是我添加的磁盘！
 
 - 格式化硬盘为xfs文件系统格式
 
@@ -641,7 +642,7 @@ ln -s /data/docker /var/lib/
 
 ![在这里插入图片描述](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/docker-demo/20210502230051.png)
 
-这个样子，不支持目录级别的磁盘配额功能的/var/lib/docker/目录，就变成支持目录级别的磁盘配额功能软链接到/data/docker/目录下的/var/lib/docker/目录
+这个样子，不支持目录级别的磁盘配额功能的 `/var/lib/docker/` 目录，就变成支持目录级别的磁盘配额功能软链接到 `/data/docker/` 目录下的 `/var/lib/docker/` 目录
 
 **X.1.3.2.5.docker load加载备份的镜像，并运行容器，查看磁盘大小**
 
