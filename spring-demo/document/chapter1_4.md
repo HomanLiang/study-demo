@@ -455,3 +455,212 @@ Spring Bean 中所说的作用域，在配置文件中即是“scope”。在面
 我是一个豆子
 ```
 
+## X.Bean常见问题
+
+### X.1.如何获取spring容器对象
+
+#### X.1.1.实现BeanFactoryAware接口
+
+```
+@Service
+public class PersonService implements BeanFactoryAware {
+    private BeanFactory beanFactory;
+
+    @Override
+    public void setBeanFactory(BeanFactory beanFactory) throws BeansException {
+        this.beanFactory = beanFactory;
+    }
+
+    public void add() {
+        Person person = (Person) beanFactory.getBean("person");
+    }
+}
+```
+
+实现`BeanFactoryAware`接口，然后重写`setBeanFactory`方法，就能从该方法中获取到spring容器对象。
+
+#### X.1.2.实现ApplicationContextAware接口
+
+```
+@Service
+public class PersonService2 implements ApplicationContextAware {
+    private ApplicationContext applicationContext;
+
+    @Override
+    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+        this.applicationContext = applicationContext;
+    }
+
+    public void add() {
+        Person person = (Person) applicationContext.getBean("person");
+    }
+
+}
+```
+
+实现`ApplicationContextAware`接口，然后重写`setApplicationContext`方法，也能从该方法中获取到spring容器对象。
+
+#### X.1.3.实现ApplicationListener接口
+
+```
+@Service
+public class PersonService3 implements ApplicationListener<ContextRefreshedEvent> {
+    private ApplicationContext applicationContext;
+
+    @Override
+    public void onApplicationEvent(ContextRefreshedEvent event) {
+        applicationContext = event.getApplicationContext();
+    }
+
+    public void add() {
+        Person person = (Person) applicationContext.getBean("person");
+    }
+
+}
+```
+
+实现 `ApplicationListener` 接口，需要注意的是该接口接收的泛型是 `ContextRefreshedEvent` 类，然后重写 `onApplicationEvent` 方法，也能从该方法中获取到 `spring` 容器对象。
+
+此外，不得不提一下Aware接口，它其实是一个空接口，里面不包含任何方法。
+
+它表示已感知的意思，通过这类接口可以获取指定对象，比如：
+
+- 通过BeanFactoryAware获取BeanFactory
+- 通过ApplicationContextAware获取ApplicationContext
+- 通过BeanNameAware获取BeanName等
+
+Aware接口是很常用的功能，目前包含如下功能：
+
+![å¨è¿éæå¥å¾çæè¿°](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/spring-demo/20210627102825.png)
+
+### X.2.如何初始化bean
+
+spring中支持3种初始化bean的方法：
+
+- xml中指定init-method方法
+- 使用@PostConstruct注解
+- 实现InitializingBean接口
+
+#### X.2.1.使用@PostConstruct注解
+
+```
+@Service
+public class AService {
+
+    @PostConstruct
+    public void init() {
+        System.out.println("===初始化===");
+    }
+}
+```
+
+在需要初始化的方法上增加`@PostConstruct`注解，这样就有初始化的能力。
+
+#### X.2.2.实现InitializingBean接口
+
+```
+@Service
+public class BService implements InitializingBean {
+
+    @Override
+    public void afterPropertiesSet() throws Exception {
+        System.out.println("===初始化===");
+    }
+}
+```
+
+实现 `InitializingBean` 接口，重写 `afterPropertiesSet` 方法，该方法中可以完成初始化功能。
+
+这里顺便抛出一个有趣的问题：`init-method`、`PostConstruct` 和 `InitializingBean` 的执行顺序是什么样的？
+
+决定他们调用顺序的关键代码在 `AbstractAutowireCapableBeanFactory` 类的 `initializeBean` 方法中。
+
+![å¨è¿éæå¥å¾çæè¿°](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/spring-demo/20210627103026.png)
+
+这段代码中会先调用 `BeanPostProcessor` 的 `postProcessBeforeInitialization` 方法，而 `PostConstruct` 是通过`InitDestroyAnnotationBeanPostProcessor` 实现的，它就是一个 `BeanPostProcessor`，所以 `PostConstruct` 先执行。
+
+而`invokeInitMethods`方法中的代码：
+
+![å¨è¿éæå¥å¾çæè¿°](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/spring-demo/20210627103110.png)
+
+决定了先调用`InitializingBean`，再调用`init-method`。
+
+所以得出结论，他们的调用顺序是：
+
+![å¨è¿éæå¥å¾çæè¿°](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/spring-demo/20210627103126.png)
+
+### X.3.别说FactoryBean没用
+
+说起`FactoryBean`就不得不提`BeanFactory`，因为面试官老喜欢问它们的区别。
+
+- BeanFactory：spring容器的顶级接口，管理bean的工厂。
+
+- FactoryBean：并非普通的工厂bean，它隐藏了实例化一些复杂Bean的细节，给上层应用带来了便利。
+  如果你看过spring源码，会发现它有70多个地方在用FactoryBean接口。
+
+![å¨è¿éæå¥å¾çæè¿°](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/spring-demo/20210627103249.png)
+
+上面这张图足以说明该接口的重要性，请勿忽略它好吗？
+
+特别提一句：mybatis的`SqlSessionFactory`对象就是通过`SqlSessionFactoryBean`类创建的。
+
+我们一起定义自己的FactoryBean：
+
+```
+@Component
+public class MyFactoryBean implements FactoryBean {
+
+    @Override
+    public Object getObject() throws Exception {
+        String data1 = buildData1();
+        String data2 = buildData2();
+        return buildData3(data1, data2);
+    }
+
+    private String buildData1() {
+        return "data1";
+    }
+
+    private String buildData2() {
+        return "data2";
+    }
+
+    private String buildData3(String data1, String data2) {
+        return data1 + data2;
+    }
+
+
+    @Override
+    public Class<?> getObjectType() {
+        return null;
+    }
+}
+```
+
+获取FactoryBean实例对象：
+
+```
+@Service
+public class MyFactoryBeanService implements BeanFactoryAware {
+    private BeanFactory beanFactory;
+
+    @Override
+    public void setBeanFactory(BeanFactory beanFactory) throws BeansException {
+        this.beanFactory = beanFactory;
+    }
+
+    public void test() {
+        Object myFactoryBean = beanFactory.getBean("myFactoryBean");
+        System.out.println(myFactoryBean);
+        Object myFactoryBean1 = beanFactory.getBean("&myFactoryBean");
+        System.out.println(myFactoryBean1);
+    }
+}
+```
+
+`getBean("myFactoryBean");`：获取的是MyFactoryBeanService类中getObject方法返回的对象
+
+`getBean("&myFactoryBean");`：获取的才是MyFactoryBean对象。
+
+
+

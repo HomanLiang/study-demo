@@ -1632,7 +1632,407 @@ protected void doBackOff() throws BackOffInterruptedException {
 
 `Spring Retry` 通过 `AOP` 机制来实现对业务代码的重试”入侵“，`RetryTemplate` 中包含了核心的重试逻辑，还提供了丰富的重试策略和退避策略。
 
+## 5.轻松自定义类型转换
 
+spring目前支持3中类型转换器：
 
+- Converter<S,T>：将 S 类型对象转为 T 类型对象
+- ConverterFactory<S, R>：将 S 类型对象转为 R 类型及子类对象
+- GenericConverter：它支持多个source和目标类型的转化，同时还提供了source和目标类型的上下文，这个上下文能让你实现基于属性上的注解或信息来进行类型转换。
+
+这3种类型转换器使用的场景不一样，我们以`Converter<S,T>`为例。假如：接口中接收参数的实体对象中，有个字段的类型是Date，但是实际传参的是字符串类型：2021-01-03 10:20:15，要如何处理呢？
+
+第一步，定义一个实体User：
+
+```
+@Data
+public class User {
+    private Long id;
+    private String name;
+    private Date registerDate;
+}
+```
+
+第二步，实现Converter接口：
+
+```
+public class DateConverter implements Converter<String, Date> {
+
+    private SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+    @Override
+    public Date convert(String source) {
+        if (source != null && !"".equals(source)) {
+            try {
+                simpleDateFormat.parse(source);
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+        }
+        return null;
+    }
+}
+```
+
+第三步，将新定义的类型转换器注入到spring容器中：
+
+```
+@Configuration
+public class WebConfig extends WebMvcConfigurerAdapter {
+
+    @Override
+    public void addFormatters(FormatterRegistry registry) {
+        registry.addConverter(new DateConverter());
+    }
+}
+```
+
+第四步，调用接口
+
+```
+@RequestMapping("/user")
+@RestController
+public class UserController {
+
+    @RequestMapping("/save")
+    public String save(@RequestBody User user) {
+        return "success";
+    }
+}
+```
+
+请求接口时User对象中registerDate字段会被自动转换成Date类型。
+
+## 6.Enable开关真香
+
+不知道你有没有用过`Enable`开头的注解，比如：EnableAsync、EnableCaching、EnableAspectJAutoProxy等，这类注解就像开关一样，只要在@Configuration定义的配置类上加上这类注解，就能开启相关的功能。
+
+让我们一起实现一个自己的开关：
+
+第一步，定义一个LogFilter：
+
+```
+public class LogFilter implements Filter {
+    @Override
+    public void init(FilterConfig filterConfig) throws ServletException {
+
+    }
+
+    @Override
+    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
+        System.out.println("记录请求日志");
+        chain.doFilter(request, response);
+        System.out.println("记录响应日志");
+    }
+
+    @Override
+    public void destroy() {
+        
+    }
+}
+```
+
+第二步，注册LogFilter：
+
+```
+@ConditionalOnWebApplication
+public class LogFilterWebConfig {
+
+    @Bean
+    public LogFilter timeFilter() {
+        return new LogFilter();
+    }
+}
+```
+
+注意，这里用了`@ConditionalOnWebApplication`注解，没有直接使用`@Configuration`注解。
+
+第三步，定义开关@EnableLog注解：
+
+```
+@Target(ElementType.TYPE)
+@Retention(RetentionPolicy.RUNTIME)
+@Documented
+@Import(LogFilterWebConfig.class)
+public @interface EnableLog {
+
+}
+```
+
+第四步，只需在springboot启动类加上@EnableLog注解即可开启LogFilter记录请求和响应日志的功能。
+
+## 7.RestTemplate拦截器
+
+我们使用`RestTemplate`调用远程接口时，有时需要在header中传递信息，比如：traceId，source等，便于在查询日志时能够串联一次完整的请求链路，快速定位问题。
+
+这种业务场景就能通过`ClientHttpRequestInterceptor`接口实现，具体做法如下：
+
+第一步，实现ClientHttpRequestInterceptor接口：
+
+```
+public class RestTemplateInterceptor implements ClientHttpRequestInterceptor {
+
+    @Override
+    public ClientHttpResponse intercept(HttpRequest request, byte[] body, ClientHttpRequestExecution execution) throws IOException {
+        request.getHeaders().set("traceId", MdcUtil.get());
+        return execution.execute(request, body);
+    }
+}
+```
+
+第二步，定义配置类：
+
+```
+@Configuration
+public class RestTemplateConfiguration {
+
+    @Bean
+    public RestTemplate restTemplate() {
+        RestTemplate restTemplate = new RestTemplate();
+        restTemplate.setInterceptors(Collections.singletonList(restTemplateInterceptor()));
+        return restTemplate;
+    }
+
+    @Bean
+    public RestTemplateInterceptor restTemplateInterceptor() {
+        return new RestTemplateInterceptor();
+    }
+}
+```
+
+其中MdcUtil其实是利用`MDC`工具在`ThreadLocal`中存储和获取traceId
+
+```
+public class MdcUtil {
+
+    private static final String TRACE_ID = "TRACE_ID";
+
+    public static String get() {
+        return MDC.get(TRACE_ID);
+    }
+
+    public static void add(String value) {
+        MDC.put(TRACE_ID, value);
+    }
+}
+```
+
+当然，这个例子中没有演示MdcUtil类的add方法具体调的地方，我们可以在filter中执行接口方法之前，生成traceId，调用MdcUtil类的add方法添加到MDC中，然后在同一个请求的其他地方就能通过MdcUtil类的get方法获取到该traceId。
+
+## 8.@ControllerAdvice与统一异常处理
+
+### 8.1.@ControllerAdvice
+
+Spring源码中有关`@ControllerAdvice`的注解如下：
+
+> Specialization of {@link Component @Component} for classes that declare {@link ExceptionHandler @ExceptionHandler}, {@link InitBinder @InitBinder}, or {@link ModelAttribute @ModelAttribute} methods to be shared across multiple {@code @Controller} classes.
+
+理解：
+
+`@ControllerAdvice`是一个特殊的`@Component`，用于标识一个类，这个类中被以下三种注解标识的方法：`@ExceptionHandler`，`@InitBinder`，`@ModelAttribute`，将作用于所有的`@Controller`类的接口上。
+
+那么，这个三个注解分别是什么意思，起到什么作用呢？
+
+### 8.2.@InitBinder
+
+> Annotation that identifies methods which initialize the {@link org.springframework.web.bind.WebDataBinder} which will be used for populating command and form object arguments of annotated handler methods. Such init-binder methods support all arguments that {@link RequestMapping} supports, except for command/form objects and corresponding validation result objects. Init-binder methods must not have a return value; they are usually declared as {@code void}.
+
+作用：注册属性编辑器，对HTTP请求参数进行处理，再绑定到对应的接口，比如格式化的时间转换等。应用于单个@Controller类的方法上时，仅对该类里的接口有效。与@ControllerAdvice组合使用可全局生效。
+
+示例：
+
+```
+@ControllerAdvice
+public class ActionAdvice {
+    
+    @InitBinder
+    public void handleException(WebDataBinder binder) {
+        binder.addCustomFormatter(new DateFormatter("yyyy-MM-dd HH:mm:ss"));
+    }
+}
+```
+
+### 8.3.@ExceptionHandler
+
+作用：统一异常处理，也可以指定要处理的异常类型
+
+示例：
+
+```
+@ControllerAdvice
+public class ActionAdvice {
+    
+    @ExceptionHandler(Exception.class)
+    @ResponseBody
+    @ResponseStatus(HttpStatus.OK)
+    public Map handleException(Exception ex) {
+        Map<String, Object> map = new HashMap<>();
+        map.put("code", 400);
+        map.put("msg", ex.toString());
+        return map;
+    }
+}
+```
+
+### 8.4.@ModelAttribute
+
+作用：绑定数据
+
+示例：
+
+```
+@ControllerAdvice
+public class ActionAdvice {
+    
+    @ModelAttribute
+    public void handleException(Model model) {
+        model.addAttribute("user", "zfh");
+    }
+}
+```
+
+在接口中获取前面绑定的参数：
+
+```
+@RestController
+public class BasicController {
+    
+    @GetMapping(value = "index")
+    public Map index(@ModelAttribute("user") String user) {
+        //...
+    }
+}
+```
+
+完整示例代码：
+
+```
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.format.datetime.DateFormatter;
+import org.springframework.http.HttpStatus;
+import org.springframework.ui.Model;
+import org.springframework.validation.Validator;
+import org.springframework.web.bind.WebDataBinder;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.HashMap;
+import java.util.Map;
+
+/**
+ * 统一异常处理
+ * @author zfh
+ * @version 1.0
+ * @since 2019/1/4 15:23
+ */
+@ControllerAdvice
+public class ControllerExceptionHandler {
+
+    private Logger logger = LoggerFactory.getLogger(ControllerExceptionHandler.class);
+
+    @InitBinder
+    public void initMyBinder(WebDataBinder binder) {
+        // 添加对日期的统一处理
+        //binder.addCustomFormatter(new DateFormatter("yyyy-MM-dd"));
+        binder.addCustomFormatter(new DateFormatter("yyyy-MM-dd HH:mm:ss"));
+
+        // 添加表单验证
+        //binder.addValidators();
+    }
+
+    @ModelAttribute
+    public void addMyAttribute(Model model) {
+        model.addAttribute("user", "zfh"); // 在@RequestMapping的接口中使用@ModelAttribute("name") Object name获取
+    }
+
+    @ExceptionHandler(value = Exception.class)
+    @ResponseStatus(HttpStatus.OK)
+    @ResponseBody // 如果使用了@RestControllerAdvice，这里就不需要@ResponseBody了
+    public Map handler(Exception ex) {
+        logger.error("统一异常处理", ex);
+        Map<String, Object> map = new HashMap<>();
+        map.put("code", 400);
+        map.put("msg", ex);
+        return map;
+    }
+}
+```
+
+测试接口：
+
+```
+@RestController
+public class TestAction {
+
+    @GetMapping(value = "testAdvice")
+    public JsonResult testAdvice(@ModelAttribute("user") String user, Date date) throws Exception {
+        System.out.println("user: " + user);
+        System.out.println("date: " + date);
+        throw new Exception("直接抛出异常");
+    }
+}
+```
+
+### 8.5.高阶应用--格式化时间转Date
+
+使用`@ControllerAdvice` + `@InitBinder`，可将http请求参数中的时间自动转换成Date类型。
+
+```
+    @InitBinder
+    public void initBinder(WebDataBinder binder) {
+        GenericConversionService genericConversionService = (GenericConversionService) binder.getConversionService();
+        if (genericConversionService != null) {
+            genericConversionService.addConverter(new DateConverter());
+        }
+    }
+```
+
+自定义的时间类型转换器：
+
+```
+import org.springframework.core.convert.converter.Converter;
+import org.springframework.util.StringUtils;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
+/**
+ * 日期转换类
+ * 将标准日期、标准日期时间、时间戳转换成Date类型
+ */
+public class DateConverter implements Converter<String, Date> {
+    private static final String dateFormat = "yyyy-MM-dd HH:mm:ss";
+    private static final String shortDateFormat = "yyyy-MM-dd";
+    private static final String timeStampFormat = "^\\d+$";
+
+    @Override
+    public Date convert(String value) {
+
+        if(StringUtils.isEmpty(value)) {
+            return null;
+        }
+
+        value = value.trim();
+
+        try {
+            if (value.contains("-")) {
+                SimpleDateFormat formatter;
+                if (value.contains(":")) {
+                    formatter = new SimpleDateFormat(dateFormat);
+                } else {
+                    formatter = new SimpleDateFormat(shortDateFormat);
+                }
+                return formatter.parse(value);
+            } else if (value.matches(timeStampFormat)) {
+                Long lDate = new Long(value);
+                return new Date(lDate);
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(String.format("parser %s to Date fail", value));
+        }
+        throw new RuntimeException(String.format("parser %s to Date fail", value));
+    }
+}
+```
 
 

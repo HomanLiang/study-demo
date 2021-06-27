@@ -960,3 +960,253 @@ Spring 为了解决单例的循环依赖问题，使用了三级缓存。其中�
 | 代理是由目标对象创建的, 并且切面应用在这些代理上 | 在执行应用程序之前 (在运行时) 前, 各方面直接在代码中进行织入 |
 | 比 AspectJ 慢多了                                | 更好的性能                                                   |
 | 易于学习和应用                                   | 相对于 Spring AOP 来说更复杂                                 |
+
+## 4.过滤器、拦截器和AOP的分析与对比
+
+### 4.1.Filter过滤器
+
+过滤器可以**拦截到方法的请求和响应**(ServletRequest request, ServletResponse response),并对**请求响应**做出过滤操作。
+
+> 过滤器**依赖于servlet容器**。在实现上，基于函数回调，它可以对几乎所有请求进行过滤，一个过滤器实例只能在**容器初始化时调用一次。**
+
+使用过滤器的目的是用来**做一些过滤操作**，获取我们想要获取的数据，比如：在过滤器中修改字符编码；在**过滤器中修改HttpServletRequest的一些参数**，包括：过滤低俗文字、危险字符等。话不多说，先上代码。
+
+![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/spring-demo/20210627122902.jpeg)
+
+再定义两个Controller，一个UserController，一个OrderController
+
+![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/spring-demo/20210627122916.jpeg)
+
+![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/spring-demo/20210627122921.png)
+
+虽然Filter过滤器和Controller请求都已经定义了，但现在过滤器是不起作用的。需要把Filter配置一下，有两个方案**第一个方案在Filter上面加上@Component**。
+
+```
+@Component
+public  class  TimeFilter  implements  Filter
+```
+
+**第二个方案配置化注册过滤器**
+
+![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/spring-demo/20210627122956.png)
+
+第二个方案的特点就是可以**细化到过滤哪些规则的URL**我们来**启动应用时，过滤器被初始化了，init函数被回调**。
+
+![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/spring-demo/20210627123013.png)
+
+**请求**http://localhost:9000/order/1
+
+![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/spring-demo/20210627123027.png)
+
+控制台日志输出
+
+![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/spring-demo/20210627123046.png)
+
+停止应用后，控制台输出
+
+![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/spring-demo/20210627123051.png)
+
+**Filter随web应用的启动而启动**，只初始化一次，随web应用的停止而销毁。
+
+> 1.启动服务器时加载过滤器的实例，并**调用init()方法**来初始化实例；
+>
+> 2.每一次请求时都**只调用方法doFilter()进行处理**；
+>
+> 3.停止服务器时**调用destroy()方法**，销毁实例。
+
+我们再来看看doFilter方法
+
+> **doFilter**(ServletRequest request, ServletResponse response, FilterChain chain)
+
+从参数我们看到，filter里面是能够获取到**请求的参数和响应的数据**；但此方法是无法知道是哪一个Controller类中的哪个方法被执行。还有一点需要注意的是，filter中是没法使用注入的bean的，也就是无法使用@Autowired
+
+![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/spring-demo/20210627123105.png)
+
+上面**代码注入的值为null。这是为什么呢**？
+
+> 其实Spring中，web应用启动的顺序是：**listener->filter->servlet**，先初始化listener，然后再来就filter的初始化，**再接着才到我们的dispathServlet的初始化**，因此，当我们需要在filter里注入一个注解的bean时，就会注入失败，**因为filter初始化时，注解的bean还没初始化，没法注入。**
+
+### 4.2.Interceptor拦截器
+
+依赖于web框架，在SpringMVC中就是依赖于SpringMVC框架。在实现上,**基于Java的反射机制，属于面向切面编程（AOP）的一种运用**，就是在一个方法前，调用一个方法，或者在方法后，调用一个方法。
+
+![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/spring-demo/20210627130051.jpeg)
+
+在WebMvcConfigurationSupport配置一下
+
+![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/spring-demo/20210627130103.png)
+
+执行结果
+
+![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/spring-demo/20210627130111.png)
+
+我们发现拦截器中可以获取到Controller对象
+
+```
+preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
+```
+
+object handler就是controller方法对象
+
+```
+HandlerMethod handlerMethod = (HandlerMethod)handler;
+
+handlerMethod.getBean().getClass().getName(); //获取类名
+
+handlerMethod.getMethod().getName(); //获取方法名
+```
+
+但我们发现获取不到方法的参数值，这个是为什么呢？在**DispatcherServlet类**中，方法 doDispatch(HttpServletRequest request, HttpServletResponse response)。
+
+![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/spring-demo/20210627130144.png)
+
+**applyPreHandle**这个方法执行，就是执行的拦截器的preHandler方法，但这个过程中，controller方法没有从request中获取请求参数，组装方法参数；**而是在ha.handle这个方法的时候，才会组装参数**。
+
+> 虽然没法得到方法的参数，但是可以获得IOC的bean哦。
+
+再说明一点的是**postHandler方法**。
+
+> postHandler方法的执行，当controller内部有异常，posthandler方法是不会执行的。
+
+**afterCompletion方法**，不管controller内部是否有异常，都会执行此方法；此方法还会有个Exception ex这个参数；**如果有异常，ex会有异常值；没有异常 此值为null**。
+
+> 注意点如果controller内部有异常，但异常被@ControllerAdvice 异常统一捕获的话，ex也会为null
+
+### 4.3.Aspect切片
+
+AOP操作可以对操作进行横向的拦截,最大的优势在于他可以**获取执行方法的参数**,对方法进行统一的处理。常见**使用日志,事务,请求参数安全验证**等。
+
+![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/spring-demo/20210627130222.jpeg)
+
+上面的代码中，我们是可以获取方法的参数的
+
+![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/spring-demo/20210627130234.png)
+
+虽然切面aop可以拿到方法参数，但拿不到response，request对象。
+
+### 4.4.对比
+
+**执行顺序**
+
+> filter -> interceptor -> ControllerAdvice -> aspect -> controller
+
+**返回顺序**
+
+> controller -> aspect -> controllerAdvice -> Interceptor -> Filter
+
+![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/spring-demo/20210627131045.jpeg)
+
+![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/spring-demo/20210627131054.jpeg)
+
+#### 4.4.1.过滤器（Filter）
+
+- 应用场景
+  - 自动登录
+  - 统一设置编码格式
+  - 访问权限控制
+  - 敏感字符过滤等
+
+#### 4.4.2.拦截器（Interceptor）
+
+- 应用场景
+  - 日志记录：记录请求信息的日志
+  - 权限检查：如登录检查
+  - 性能检测：检测方法的执行时间
+
+#### 4.4.3.面向切面编程（AOP）
+
+- 应用场景
+  - 事务控制
+  - 异常处理
+  - 打印日志等
+
+![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/spring-demo/20210627131243.png) 
+
+![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/spring-demo/20210627131226.png)
+
+## 5.ExceptionHandler的执行顺序
+
+在项目开发中经常会遇到统一异常处理的问题，在springMVC中有一种解决方式，使用ExceptionHandler。举个例子，
+
+```
+@ControllerAdvice
+public class GlobalExceptionHandler {
+
+    private static final Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
+
+    @ExceptionHandler({IllegalArgumentException.class})
+    @ResponseBody
+    public Result handleIllegalArgumentException(IllegalArgumentException e) {
+        logger.error(e.getLocalizedMessage(), e);
+        return Result.fail(e.getMessage());
+    }
+
+    @ExceptionHandler({RuntimeException.class})
+    @ResponseBody
+    public Result handleRuntimeException(RuntimeException e) {
+        logger.error(e.getLocalizedMessage(), e);
+        return Result.failure();
+    }
+}
+
+```
+
+在这段代码中，我们可以看到存在两个异常处理的函数分别处理IllegalArgumentException和RuntimeException，但是转念一想，就会想到一个问题，IllegalArgumentException是RuntimeException的子类，那么对IllegalArgumentException这个异常又会由谁来处理呢？起初在网上看到一些答案，可以通过Order设置，但是经过简单的测试，发现Order并不起任何作用。虽然心中已有猜测，但还是希望能够找到真正可以证明想法的证据，于是便尝试找到这一块的源码。
+
+### 5.1.源码解读
+
+**调用栈**
+
+排出掉缓存的情况，主动触发一个IllegalArgumentException异常，经过一步步调试，发现调用栈如下:
+
+![image-20190326180205336](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/spring-demo/20210627132107.webp)
+
+**核心代码**
+
+决定最终选择哪个ExceptionHandler的核心代码为ExceptionHandlerMethodResolver的getMappedMethod方法。代码如下:
+
+```
+private Method getMappedMethod(Class<? extends Throwable> exceptionType) {
+    List<Class<? extends Throwable>> matches = new ArrayList<Class<? extends Throwable>>();
+    for (Class<? extends Throwable> mappedException : this.mappedMethods.keySet()) {
+        if (mappedException.isAssignableFrom(exceptionType)) {
+            matches.add(mappedException);
+        }
+    }
+    if (!matches.isEmpty()) {
+        Collections.sort(matches, new ExceptionDepthComparator(exceptionType));
+        return this.mappedMethods.get(matches.get(0));
+    }
+    else {
+    	return null;
+    }
+}
+
+```
+
+这个首先找到可以匹配异常的所有ExceptionHandler，然后对其进行排序，取深度最小的那个(即匹配度最高的那个)。
+
+至于深度比较器的算法如下图，就是做了一个简单的递归，不停地判断父异常是否为目标异常来取得最终的深度。
+
+![image-20190327224336509](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/spring-demo/20210627132157.webp)
+
+### 5.2.结论
+
+源码不长，我们也可以很容易地就找到我们想要的答案——ExceptionHandler的处理顺序是由异常匹配度来决定的，且我们也无法通过其他途径指定顺序(其实也没有必要)。
+
+## 6.@RestControllerAdvice与@ControllerAdvice的区别
+
+简单地说，@RestControllerAdvice与@ControllerAdvice的区别就和@RestController与@Controller的区别类似，@RestControllerAdvice注解包含了@ControllerAdvice注解和@ResponseBody注解。
+
+**当自定义类加@ControllerAdvice注解时，方法需要返回json数据时，每个方法还需要添加@ResponseBody注解：**
+
+![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/spring-demo/20210627133914.png)
+
+**当自定义类加@RestControllerAdvice注解时，方法自动返回json数据，每个方法无需再添加@ResponseBody注解：**
+
+![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/spring-demo/20210627133924.png)
+
+
+
+
+
