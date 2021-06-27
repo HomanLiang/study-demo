@@ -59,11 +59,7 @@
    1. 微信扫码登录
 5. 钉钉开发
    1. [企业内部应用开发](https://github.com/HomanLiang/study-demo/blob/main/project-design/document/chapter3_05_01.md)
-6. Java基础
-   1. [Java 生成随机数](https://github.com/HomanLiang/study-demo/blob/main/project-design/document/chapter3_06_01.md)
-   2. [实用的jar包加密方案](https://github.com/HomanLiang/study-demo/blob/main/project-design/document/chapter3_06_02.md)
-   3. [统计代码执行耗时](https://github.com/HomanLiang/study-demo/blob/main/project-design/document/chapter3_06_03.md)
-   4. [Java Shutdown Hook 场景使用和源码分析](https://github.com/HomanLiang/study-demo/blob/main/project-design/document/chapter3_06_04.md)
+6. 
 
 ## 分布式
 

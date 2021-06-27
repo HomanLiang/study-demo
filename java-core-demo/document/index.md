@@ -62,3 +62,12 @@
 ## Servlet 容器
 
 1. [Tomcat](https://github.com/HomanLiang/study-demo/blob/main/java-core-demo/document/chapter6_01.md)
+
+## Java 基础应用
+
+Java基础
+
+1. [Java 生成随机数](https://github.com/HomanLiang/study-demo/blob/main/java-core-demo/document/chapter7_01.md)
+2. [实用的jar包加密方案](https://github.com/HomanLiang/study-demo/blob/main/java-core-demo/document/chapter7_02.md)
+3. [统计代码执行耗时](https://github.com/HomanLiang/study-demo/blob/main/java-core-demo/document/chapter7_03.md)
+4. [Java Shutdown Hook 场景使用和源码分析](https://github.com/HomanLiang/study-demo/blob/main/java-core-demo/document/chapter7_04.md)
