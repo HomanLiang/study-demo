@@ -15,4 +15,4 @@
 13. [Dubbo 序列化协议](https://github.com/HomanLiang/study-demo/blob/main/dubbo-demo/document/chapter13.md)
 14. [Dubbo 应用](https://github.com/HomanLiang/study-demo/blob/main/dubbo-demo/document/chapter14.md)
 15. [Dubbo 实际问题解决](https://github.com/HomanLiang/study-demo/blob/main/dubbo-demo/document/chapter15.md)
-16. [Dubbo 面试题](https://github.com/HomanLiang/study-demo/blob/main/dubbo-demo/document/chapter16.md)
+16. [Dubbo 面试题](https://github.com/HomanLiang/study-demo/blob/main/dubbo-demo/document/chapterXX.md)

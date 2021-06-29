@@ -75,12 +75,12 @@ registry.register(URL.valueOf("override://0.0.0.0/com.foo.BarService?category=co
 
 其中，最主要的两种形式是： 
 
-- `mock='force:return+null'`表示消费对该服务的方法调用都直接返回null值，不发起远程调用。用来屏蔽不重要服务不可用时对调用方的影响。
--  还可以改为`mock=fail:return+null`表示消费方对该服务的方法调用在失败后，再返回null。用来容忍不重要服务不稳定时对调用方的影响。
+- `mock='force:return+null'`表示消费对该服务的方法调用都直接返回 `null` 值，不发起远程调用。用来屏蔽不重要服务不可用时对调用方的影响。
+-  还可以改为`mock=fail:return+null`表示消费方对该服务的方法调用在失败后，再返回 `null`。用来容忍不重要服务不稳定时对调用方的影响。
 
 ### 2.1.具体代码 
 
-阅读过源码的知道Dubbo的远程调用是从一个代理Proxy开始的，首先将运行时参数存储在数组中，然后调用`InvocationHandler`接口来实现类的`invoke`方法。下面是一个动态生成的一个代理类例子。 
+阅读过源码的知道 `Dubbo` 的远程调用是从一个代理 `Proxy` 开始的，首先将运行时参数存储在数组中，然后调用 `InvocationHandler` 接口来实现类的 `invoke` 方法。下面是一个动态生成的一个代理类例子。 
 
 ```
 public class proxy0 implements ClassGenerator.DC, EchoService, DemoService {
@@ -111,7 +111,7 @@ public class proxy0 implements ClassGenerator.DC, EchoService, DemoService {
 }
 ```
 
-`InvokerInvocationHandler`中的`invoker`成员变量为`MockClusterInvoker`，它来处理服务降级的逻辑。
+`InvokerInvocationHandler` 中的 `invoker` 成员变量为 `MockClusterInvoker`，它来处理服务降级的逻辑。
 
 ```
 public class InvokerInvocationHandler implements InvocationHandler {
@@ -149,8 +149,8 @@ public class InvokerInvocationHandler implements InvocationHandler {
 }
 ```
 
-在`MockClusterInvoker`中，从`no mock(正常情况)`,`force:direct mock(屏蔽)`,`fail-mock(容错)`三种情况我们也可以看出,普通情况是直接调用,容错的情况是调用失败后,返回一个设置的值.而屏蔽就很暴力了,直接连调用都不调用,就直接返回一个之前设置的值.
-从下面的注释中可以看出，如果没有降级，会执行`this.invoker.invoke(invocation)`方法进行远程调动，默认类是`FailoverClusterInvoker`，它会执行集群模块的逻辑，主要是调用`Directory#list`方法获取所有该服务提供者的地址列表，然后将多个服务提供者聚合成一个`Invoker`， 并调用 Router 的 route 方法进行路由，过滤掉不符合路由规则的 Invoker。当 FailoverClusterInvoker 拿到 Directory 返回的 Invoker 列表后，它会通过 LoadBalance 从 Invoker 列表中选择一个 Invoker。最后 FailoverClusterInvoker 会将参数传给 LoadBalance 选择出的 Invoker 实例的 invoke 方法，进行真正的远程调用。
+在 `MockClusterInvoker` 中，从 `no mock(正常情况)`，`force:direct mock(屏蔽)`，`fail-mock(容错)` 三种情况我们也可以看出,普通情况是直接调用，容错的情况是调用失败后,返回一个设置的值。而屏蔽就很暴力了，直接连调用都不调用，就直接返回一个之前设置的值。
+从下面的注释中可以看出，如果没有降级，会执行 `this.invoker.invoke(invocation)` 方法进行远程调动，默认类是`FailoverClusterInvoker`，它会执行集群模块的逻辑，主要是调用 `Directory#list` 方法获取所有该服务提供者的地址列表，然后将多个服务提供者聚合成一个`Invoker`， 并调用 `Router` 的 `route` 方法进行路由，过滤掉不符合路由规则的 `Invoker`。当 `FailoverClusterInvoker` 拿到 `Directory` 返回的 `Invoker` 列表后，它会通过 `LoadBalance` 从 `Invoker` 列表中选择一个 `Invoker`。最后 `FailoverClusterInvoker` 会将参数传给 `LoadBalance` 选择出的 `Invoker` 实例的 `invoke` 方法，进行真正的远程调用。
 
 ```
 public class MockClusterInvoker<T> implements Invoker<T> {

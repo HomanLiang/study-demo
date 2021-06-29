@@ -2,20 +2,21 @@
 
 # Dubbo 负载均衡
 
-在分布式系统中，负载均衡是必不可少的一个模块，dubbo 中提供了五种负载均衡的实现，在阅读这块源码之前，建议先学习负载均衡的基础知识。把看源码当做一个印证自己心中所想的过程，这样会得到事半功倍的效果
+在分布式系统中，负载均衡是必不可少的一个模块，`dubbo` 中提供了五种负载均衡的实现，在阅读这块源码之前，建议先学习负载均衡的基础知识。把看源码当做一个印证自己心中所想的过程，这样会得到事半功倍的效果
 ## 1.类结构
 先来看一下这一块的类结构图
 
 ![Image [3]](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mybatis-demo/20210408004155.png)
 
-大部分算法都是在权重比的基础上进行负载均衡，RandomLoadBalance 是默认的算法
+大部分算法都是在权重比的基础上进行负载均衡，`RandomLoadBalance` 是默认的算法
 
 ![Image](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/dubbo-demo/20210410112153.png)
 
 ## 2.AbstractLoadBalance
-AbstractLoadBalance 对一些通用的操作做了处理，是一个典型的模板方法模式的实现
+`AbstractLoadBalance` 对一些通用的操作做了处理，是一个典型的模板方法模式的实现
 
-select 方法只做一些简单的范围校验，具体的实现有子类通过 doSelect 方法去实现
+`select` 方法只做一些简单的范围校验，具体的实现有子类通过 `doSelect` 方法去实现
+
 ```
     @Override
     public <T> Invoker<T> select(List<Invoker<T>> invokers, URL url, Invocation invocation) {
@@ -28,7 +29,8 @@ select 方法只做一些简单的范围校验，具体的实现有子类通过 
         return doSelect(invokers, url, invocation);
     }
 ```
-getWeight方法封装了获取一个调用者的权重值的方法，并加入了预热处理
+`getWeight` 方法封装了获取一个调用者的权重值的方法，并加入了预热处理
+
 ```
     int getWeight(Invoker<?> invoker, Invocation invocation) {
         int weight;
@@ -63,7 +65,8 @@ getWeight方法封装了获取一个调用者的权重值的方法，并加入�
         return Math.max(weight, 0);
     }
 ```
-calculateWarmupWeight 方法用来计算权重，保证随着预热时间的增加，权重逐渐达到设置的权重
+`calculateWarmupWeight` 方法用来计算权重，保证随着预热时间的增加，权重逐渐达到设置的权重
+
 ```
     static int calculateWarmupWeight(int uptime, int warmup, int weight) {
         // 运行时间/(预热时间/权重)
@@ -73,7 +76,7 @@ calculateWarmupWeight 方法用来计算权重，保证随着预热时间的增�
     }
 ```
 ## 3.RandomLoadBalance
-随机调用是负载均衡算法中最常用的算法之一，也是 dubbo 的默认负载均衡算法，实现起来也较为简单
+随机调用是负载均衡算法中最常用的算法之一，也是 `dubbo` 的默认负载均衡算法，实现起来也较为简单
 
 随机调用的缺点是在调用量比较少的情况下，有可能出现不均匀的情况
 
@@ -141,7 +144,7 @@ calculateWarmupWeight 方法用来计算权重，保证随着预热时间的增�
 
 dubbo的新版本采用的是平滑加权轮询算法，轮训的过程中节点之间穿插调用，可以避免了上面说的问题，因此这块源码看起来会稍有难度
 
-轮训算法 在dubbo 在升级的过程中，做过多次优化，有兴趣的可以去了解下该算法的优化过程，也是件很有意思的事情
+轮训算法 在 `dubbo` 在升级的过程中，做过多次优化，有兴趣的可以去了解下该算法的优化过程，也是件很有意思的事情
 ```
 public class RoundRobinLoadBalance extends AbstractLoadBalance {
     public static final String NAME = "roundrobin";
@@ -268,7 +271,8 @@ public class RoundRobinLoadBalance extends AbstractLoadBalance {
 ## 5.LeastActiveLoadBalance
 最少活跃数调用算法是指在调用时判断此时每个服务提供者此时正在处理的请求个数，选取最小的调用
 
-dubbo 在实现该算法时的具体逻辑如下
+`dubbo` 在实现该算法时的具体逻辑如下
+
 1. 选取所有活跃数最少的提供者
 1. 如果只有一个，直接返回
 1. 如果权重不同，加权随机选择一个
@@ -376,7 +380,8 @@ dubbo 在实现该算法时的具体逻辑如下
 ## 6.ShortestResponseLoadBalance
 最短时间调用调用算法是指预估出来每个处理完请求的提供者所需时间，然后又选择最少最短时间的提供者进行调用，整体处理逻辑和最少活跃数算法基本相似
 
-dubbo 在实现该算法时的具体逻辑如下
+`dubbo` 在实现该算法时的具体逻辑如下
+
 1. 选取所有预估处理时间最短的提供者
 1. 如果只有一个，直接返回
 1. 如果权重不同，加权随机选择一个
@@ -468,23 +473,23 @@ dubbo 在实现该算法时的具体逻辑如下
     }
 ```
 ## 7.ConsistentHashLoadBalance
-一致性hash算法是一种广泛应用与分布式缓存中的算法，该算法的优势在于新增和删除节点后，只有少量请求发生变动，大部分请求仍旧映射到原来的节点。
+一致性 `hash` 算法是一种广泛应用与分布式缓存中的算法，该算法的优势在于新增和删除节点后，只有少量请求发生变动，大部分请求仍旧映射到原来的节点。
 
-为了防止节点过少，造成节点分布不均匀，一般采用虚拟节点的方式，dubbo默认的是160个虚拟节点。
+为了防止节点过少，造成节点分布不均匀，一般采用虚拟节点的方式，`dubbo` 默认的是 `160` 个虚拟节点。
 
-这个是一致性 Hash 负载均衡算法，一致性 Hash 想必大家都很熟悉了，常见的一致性 Hash 算法是 Karger 提出的，就是将 hash值空间设为 [0, 2^32 - 1]，并且是个循环的圆环状。
+这个是一致性 `Hash` 负载均衡算法，一致性 `Hash` 想必大家都很熟悉了，常见的一致性 `Hash` 算法是 `Karger` 提出的，就是将 `hash` 值空间设为 `[0, 2^32 - 1]`，并且是个循环的圆环状。
 
-将服务器的 IP 等信息生成一个 hash 值，将这个值投射到圆环上作为一个节点，然后当 key 来查找的时候顺时针查找第一个大于等于这个 key 的 hash 值的节点。
+将服务器的 `IP` 等信息生成一个 `hash` 值，将这个值投射到圆环上作为一个节点，然后当 `key` 来查找的时候顺时针查找第一个大于等于这个 `key` 的 `hash` 值的节点。
 
 一般而言还会引入虚拟节点，使得数据更加的分散，避免数据倾斜压垮某个节点，来看下官网的一个图。
 
 ![图片](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/dubbo-demo/20210410123510.webp)
 
-整体的实现也不难，就是上面所说的那个逻辑，而圆环这是利用 treeMap 来实现的，通过 tailMap 来查找大于等于的第一个 invoker，如果没找到说明要拿第一个，直接赋值 treeMap 的 firstEntry。
+整体的实现也不难，就是上面所说的那个逻辑，而圆环这是利用 `treeMap` 来实现的，通过 `tailMap` 来查找大于等于的第一个 `invoker`，如果没找到说明要拿第一个，直接赋值 `treeMap` 的 `firstEntry`。
 
-然后 Dubbo 默认搞了 160 个虚拟节点，整体的 hash 是方法级别的，即一个 service 的每个方法有一个 ConsistentHashSelector，并且是根据参数值来进行 hash的，也就是说负载均衡逻辑只受参数值影响，具有相同参数值的请求将会被分配给同一个服务提供者。
+然后 `Dubbo` 默认搞了 `160` 个虚拟节点，整体的 `hash` 是方法级别的，即一个 `service` 的每个方法有一个 `ConsistentHashSelector`，并且是根据参数值来进行 `hash` 的，也就是说负载均衡逻辑只受参数值影响，具有相同参数值的请求将会被分配给同一个服务提供者。
 
-以下是dubbo中的实现，需要说明的是， 一致性hash算法中权重配置不起作用
+以下是 `dubbo` 中的实现，需要说明的是， 一致性 `hash` 算法中权重配置不起作用
 ```
     @Override
     protected <T> Invoker<T> doSelect(List<Invoker<T>> invokers, URL url, Invocation invocation) {
@@ -598,11 +603,11 @@ dubbo 在实现该算法时的具体逻辑如下
     }
 ```
 ## 8.总结
-dubbo的负载均衡算法总体来说并不复杂，代码写的也很优雅，简洁，看起来很舒服，而且有很多细节的处理值得称赞，例如预热处理，轮训算法的平滑处理等。
+`dubbo` 的负载均衡算法总体来说并不复杂，代码写的也很优雅，简洁，看起来很舒服，而且有很多细节的处理值得称赞，例如预热处理，轮训算法的平滑处理等。
 
 我们平时使用时，可以根据自己的业务场景，选择适合自己的算法，当然，一般情况下，默认的的随机算法就能满足我们的日常需求，而且随机算法的性能足够好。
 
-如果觉得dubbo提供的五种算法都不能满足自己的需求，还可以通过dubbo的SPI机制很方便的扩展自己的负载均衡算法。
+如果觉得 `dubbo` 提供的五种算法都不能满足自己的需求，还可以通过 `dubbo` 的 `SPI` 机制很方便的扩展自己的负载均衡算法。
 
 
 

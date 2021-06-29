@@ -6,9 +6,10 @@
 
 ## 1.SOA模式
 ### 1.1.是什么？
-SOA（Service-Oriented Architecture）即面向服务架构，它将应用程序的不同功能单元（这里就理解为服务）进行了拆分。在这种架构下项目不会直接和数据库进行交互，而是通过调用不同服务的接口来访问数据库。
+`SOA`（`Service-Oriented Architecture`）即面向服务架构，它将应用程序的不同功能单元（这里就理解为服务）进行了拆分。在这种架构下项目不会直接和数据库进行交互，而是通过调用不同服务的接口来访问数据库。
+
 ### 1.2.模式优点在哪？
-这样最直接的好处就是解决代码冗余，如果多个项目同时都要访问数据库同一张表。比如用户表的访问。我们可以直接调用用户服务里面的接口进行开发，而不需要每个项目都去写一遍用户表的增删改查。除了这个，SOA能带给我们的好处就是能够让开发者以更迅速、更可靠、更具重用性架构整个业务系统。较之以往MVC开发模式，以SOA架构的系统能够更加从容地面对业务的急剧变化。
+这样最直接的好处就是解决代码冗余，如果多个项目同时都要访问数据库同一张表。比如用户表的访问。我们可以直接调用用户服务里面的接口进行开发，而不需要每个项目都去写一遍用户表的增删改查。除了这个，`SOA` 能带给我们的好处就是能够让开发者以更迅速、更可靠、更具重用性架构整个业务系统。较之以往 `MVC` 开发模式，以 `SOA` 架构的系统能够更加从容地面对业务的急剧变化。
 ### 1.3.SOA示意图：
 ![Image](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mybatis-demo/20210408001924.png)
 
@@ -17,23 +18,23 @@ SOA（Service-Oriented Architecture）即面向服务架构，它将应用程序
 
 很多人会漏看上面线的示意图，下面解释一下：
 
-- 紫色虚线：在Dubbo启动时完成的功能
+- 紫色虚线：在 `Dubbo` 启动时完成的功能
 - 蓝青色的线：都是程序运行过程中执行的功能，虚线是异步操作，实线是同步操作
-- Provider：提供者，服务发布方。如果是采用SOA开发的模式，这个就是和数据库交互的接口，也就是service主要放在生产者这边
-- Consumer：消费者，调用服务方。面向前端的Controller主要是在这边，可以远程调用生产者中的方法，生产者发生变化时也会实时更新消费者的调用列表。具体的看下面介绍
-- Container：Dubbo容器，依赖于Spring容器。这里比较注意的就是Dubbo是依赖与Spring容器的。所以必须要和Spring配合着使用
-- Registry：注册中心.当Container启动时把所有可以提供的服务列表上Registry中进行注册。作用：告诉Consumer提供了什么服务和服务方在哪里.
-- Monitor：监听器
+- `Provider`：提供者，服务发布方。如果是采用 `SOA` 开发的模式，这个就是和数据库交互的接口，也就是 `service` 主要放在生产者这边
+- `Consumer`：消费者，调用服务方。面向前端的 `Controller` 主要是在这边，可以远程调用生产者中的方法，生产者发生变化时也会实时更新消费者的调用列表。具体的看下面介绍
+- `Container`：`Dubbo` 容器，依赖于 `Spring` 容器。这里比较注意的就是 `Dubbo` 是依赖与 `Spring` 容器的。所以必须要和 `Spring` 配合着使用
+- `Registry`：注册中心。当 `Container` 启动时把所有可以提供的服务列表上 `Registry` 中进行注册。作用：告诉 `Consumer` 提供了什么服务和服务方在哪里.
+- `Monitor`：监听器
 
 ## 3.Dubbo运行原理
-就着上面的架构图来看看Dubbo的运行原理：
-1. Start： 启动容器，相当于在启动Dubbo的Provider，并且会创建对应的目录结构，例如代码中的共用接口名为`com.learnDubbo.demo.DemoService`，就会创建 `/dubbo/com.learnDubbo.demo.DemoService`目录，然后在创建providers目录，再在providers目录下写入自己的 URL 地址。
+就着上面的架构图来看看 `Dubbo` 的运行原理：
+1. `Start`：启动容器，相当于在启动 `Dubbo` 的 `Provider`，并且会创建对应的目录结构，例如代码中的共用接口名为`com.learnDubbo.demo.DemoService`，就会创建 `/dubbo/com.learnDubbo.demo.DemoService`目录，然后在创建 `providers` 目录，再在 `providers` 目录下写入自己的 URL 地址。
 
-2. Register：启动后会去注册中心进行注册，注册所有可以提供的服务列表。即订阅 `/dubbo/com.learnDubbo.demo.DemoService` 目录下的所有提供者和消费者 URL 地址。
+2. `Register`：启动后会去注册中心进行注册，注册所有可以提供的服务列表。即订阅 `/dubbo/com.learnDubbo.demo.DemoService` 目录下的所有提供者和消费者 `URL` 地址。
 
-3. Subscribe：Consumer在启动时，不仅仅会注册自身到 …/consumers/目录下，同时还会订阅…/providers目录，实时获取其上Provider的URL字符串信息。当服务消费者启动时：会在 `/dubbo/com.learnDubbo.demo.DemoService`目录创建/consumers目录，并在/consumers目录写入自己的 URL 地址。
+3. `Subscribe`：`Consumer` 在启动时，不仅仅会注册自身到 `…/consumers/` 目录下，同时还会订阅 `…/providers` 目录，实时获取其上 `Provider` 的 `URL` 字符串信息。当服务消费者启动时：会在 `/dubbo/com.learnDubbo.demo.DemoService`目录创建 `/consumers` 目录，并在 `/consumers` 目录写入自己的 `URL` 地址。
 
-4. notify：当Provider有修改后，注册中心会把消息推送给Consummer。也就是注册中心会对Provider进行观察，这里就是使用设计模式中的观察者模式。以Zookeeper注册中心为例，Dubbo中有ZookeeperRegistry中的doSubscribe方法也就是进行生产者订阅和监听。下面分析一下源码，看看订阅过程
+4. `notify`：当 `Provider` 有修改后，注册中心会把消息推送给 `Consummer`。也就是注册中心会对 `Provider` 进行观察，这里就是使用设计模式中的观察者模式。以 `Zookeeper` 注册中心为例，`Dubbo` 中有 `ZookeeperRegistry` 中的 `doSubscribe` 方法也就是进行生产者订阅和监听。下面分析一下源码，看看订阅过程
 
     ```
         @Override
@@ -114,5 +115,5 @@ SOA（Service-Oriented Architecture）即面向服务架构，它将应用程序
         }
     ```
 
-5. invoke：根据获取到的Provider地址，真实调用Provider中功能。这里就是唯一一个同步的方法，因为消费者要得到生产者传来的数据才能进行下一步操作，但是Dubbo是一个RPC框架，RPC的核心就在于只能知道接口不能知道内部具体实现。所以在Consumer方使用了代理设计模式，创建一个Provider方类的一个代理对象，通过代理对象获取Provider中真实功能，起到保护Provider真实功能的作用。
-6. Monitor：Consumer和Provider每隔1分钟向Monitor发送统计信息,统计信息包含,访问次数,频率等
+5. `invoke`：根据获取到的 `Provider` 地址，真实调用 `Provider` 中功能。这里就是唯一一个同步的方法，因为消费者要得到生产者传来的数据才能进行下一步操作，但是 `Dubbo` 是一个 `RPC` 框架，`RPC` 的核心就在于只能知道接口不能知道内部具体实现。所以在`Consumer` 方使用了代理设计模式，创建一个 `Provider` 方类的一个代理对象，通过代理对象获取 `Provider` 中真实功能，起到保护 `Provider` 真实功能的作用。
+6. `Monitor`：`Consumer` 和 `Provider` 每隔1分钟向 `Monitor` 发送统计信息,统计信息包含,访问次数,频率等

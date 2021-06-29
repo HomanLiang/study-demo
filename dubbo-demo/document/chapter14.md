@@ -8,7 +8,7 @@
 
 我们检查依赖的服务是否启动，可利用下面三个属性，优先级从左到右逐渐降低。
 
-如果服务不是强依赖，或者说服务之间可能存在死循环依赖，我们应该将 check 置为 false。
+如果服务不是强依赖，或者说服务之间可能存在死循环依赖，我们应该将 `check` 置为 `false`。
 
 检查判断优先级：`dubbo.reference.check` > `dubbo.consumer.check` > `dubbo.registry.check`
 
@@ -29,19 +29,19 @@ dubbo.registry.subscribe=true
 
 **集群容错中主要有几个角色：**
 
-**Invoker**：Provider 的一个可调用 Service 的抽象，Invoker 封装了 Provider 地址以及 Service 接口信息。
+**Invoker**：`Provider` 的一个可调用 `Service` 的抽象，`Invoker` 封装了 `Provider` 地址以及 `Service` 接口信息。
 
-**Directory**：代表多个 Invoker ，可以把它看成是 List，但是与 List 不同的是，它的值可能是动态变化的，比如注册中心推送变更。
+**Directory**：代表多个 `Invoker` ，可以把它看成是 `List`，但是与 `List` 不同的是，它的值可能是动态变化的，比如注册中心推送变更。
 
-**Cluster**：将 Directory 中的多个 Invoker 伪装成一个 Invoker，对上层透明，伪装过程包含了容错逻辑，调用失败后，重试另一个。
+**Cluster**：将 `Directory` 中的多个 `Invoker` 伪装成一个 `Invoker`，对上层透明，伪装过程包含了容错逻辑，调用失败后，重试另一个。
 
-**Router**：负责从多个 Invoker 中按路由规则选出子集，比如读写分离，应用隔离等。
+**Router**：负责从多个 `Invoker` 中按路由规则选出子集，比如读写分离，应用隔离等。
 
-**LoadBalance**：负责从多个 Invoker 中选出具体的一个用于本次调用，选的过程包含了负载均衡算法，调用失败后，需要重选
+**LoadBalance**：负责从多个 `Invoker` 中选出具体的一个用于本次调用，选的过程包含了负载均衡算法，调用失败后，需要重选
 
 **dubbo 提供的集群容错模式：**
 
-- **Failover Cluster**：失败自动切换，当出现失败，重试其它服务器。通常用于读操作，但重试会带来更长延迟。可通过 retries="2" 来设置重试次数(不含第一次)。
+- **Failover Cluster**：失败自动切换，当出现失败，重试其它服务器。通常用于读操作，但重试会带来更长延迟。可通过 `retries="2"` 来设置重试次数(不含第一次)。
 
 - **Failfast Cluster**：快速失败，即只发起一次调用，失败立即报错。通常用于非幂等性的写操作。
 
@@ -49,13 +49,13 @@ dubbo.registry.subscribe=true
 
 - **Failback Cluster**：失败自动恢复，后台记录失败请求，定时重发。通常用于消息通知操作。
 
-- **Forking Cluster**：并行调用多个服务器，只要一个成功就返回。通常用于实时性要求较高的读操作，但需要浪费更多服务资源。可通过 forks="2" 来设置最大并行数。
+- **Forking Cluster**：并行调用多个服务器，只要一个成功就返回。通常用于实时性要求较高的读操作，但需要浪费更多服务资源。可通过 `forks="2"` 来设置最大并行数。
 
 - **Broadcast Cluster**：广播调用所有提供者，逐个调用，任意一台报错则报错。通常用于通知所有提供者更新缓存或日志等本地资源信息。
 
 ## 4.负载均衡
 
-在集群负载均衡时，Dubbo 提供了多种均衡策略，缺省为 random 随机调用。
+在集群负载均衡时，`Dubbo` 提供了多种均衡策略，缺省为 `random` 随机调用。
 
 **Random LoadBalance：**
 
@@ -109,13 +109,13 @@ private DubboServiceOne DubboServiceOne;
 
 在开发及测试环境下，经常需要绕过注册中心，只测试指定服务提供者，这时候可能需要点对点直连，点对点直连方式，将以服务接口为单位，忽略注册中心的提供者列表，A 接口配置点对点，不影响 B 接口从注册中心获取列表。
 
-在 JVM 启动参数中加入 -D 参数映射服务地址：
+在 `JVM` 启动参数中加入 `-D` 参数映射服务地址：
 
 ```
 java -D com.alibaba.xxx.XxxService=dubbo://localhost:20890
 ```
 
-在`<dubbo.reference>`标签或者`@DubboResource注解`中增加 url 属性。
+在 `<dubbo.reference>` 标签或者 `@DubboResource注解` 中增加 `url` 属性。
 
 ```xml
 <debbo.reference url="dubbo://localhost:20890" interfaceClass=""/>
@@ -127,19 +127,19 @@ private DubboServiceOne DubboServiceOne;
 
 ## 6.本地调用
 
-本地调用使用了 injvm 协议，是一个伪协议，它不开启端口，不发起远程调用，只在 JVM 内直接关联，但执行 Dubbo 的 Filter 链。
+本地调用使用了 `injvm` 协议，是一个伪协议，它不开启端口，不发起远程调用，只在 `JVM` 内直接关联，但执行 `Dubbo` 的 `Filter` 链。
 
-protocol、provider、consumer、service、reference 都可以设置。
+`protocol`、`provider`、`consumer`、`service`、`reference` 都可以设置。
 
 ## 7.本地存根
 
-远程服务后，客户端通常只剩下接口，而实现全在服务器端，但提供方有些时候想在客户端也执行部分逻辑，比如：做 ThreadLocal 缓存，提前验证参数，调用失败后伪造容错数据等等，此时就需要在 API 中带上 Stub，客户端生成 Proxy 实例，会把 Proxy 通过构造函数传给 Stub ，然后把 Stub 暴露给用户，Stub 可以决定要不要去调 Proxy。
+远程服务后，客户端通常只剩下接口，而实现全在服务器端，但提供方有些时候想在客户端也执行部分逻辑，比如：做 `ThreadLocal` 缓存，提前验证参数，调用失败后伪造容错数据等等，此时就需要在 `API` 中带上 `Stub`，客户端生成 `Proxy` 实例，会把 `Proxy` 通过构造函数传给 `Stub`，然后把 `Stub` 暴露给用户，`Stub` 可以决定要不要去调 `Proxy`。
 
-Sub 利用 `dubbo.service.sub` 属性设置。
+`Sub` 利用 `dubbo.service.sub` 属性设置。
 
 **例子：**
 
-假设服务提供者提供了一个接口，DubboServiceOne，然后服务消费者要做本地存根，只需要在自己的项目中，增加一个 DubboServiceOne 接口的实现类，然后在 `@DubboReference` 注解或者 `<dubbo:reference>` 标签增加 stub 属性即可。
+假设服务提供者提供了一个接口，`DubboServiceOne`，然后服务消费者要做本地存根，只需要在自己的项目中，增加一个 `DubboServiceOne` 接口的实现类，然后在 `@DubboReference` 注解或者 `<dubbo:reference>` 标签增加 stub 属性即可。
 
 **实现类：**
 
@@ -203,19 +203,19 @@ public class TestStubController {
 
 ## 8.本地伪装
 
-本地伪装通常用于服务降级，比如某验权服务，当服务提供方全部挂掉后，客户端不抛出异常，而是通过 mock 数据返回授权失败。
+本地伪装通常用于服务降级，比如某验权服务，当服务提供方全部挂掉后，客户端不抛出异常，而是通过 `mock` 数据返回授权失败。
 
-mock 是 sub 的一个子集，mock是发生了错误，也就是抛出 RpcException 异常时会触发；而使用 sub，那么就需要在程序捕获异常，然后进行处理。
+`mock` 是 `sub` 的一个子集，`mock` 是发生了错误，也就是抛出 `RpcException` 异常时会触发；而使用 `sub`，那么就需要在程序捕获异常，然后进行处理。
 
-mock 机制可利用`<dubbo.reference>`标签或者`@DubboReference`的mock属性设置。
+`mock` 机制可利用 `<dubbo.reference>` 标签或者 `@DubboReference` 的 `mock` 属性设置。
 
 详细可看我自己写的文章：https://blog.csdn.net/Howinfun/article/details/113439208
 
 ## 9.服务延迟暴露
 
-Dubbo 2.6.5 之后，所有服务都将在 Spring 初始化完成后进行暴露，如果你不需要延迟暴露服务，无需配置 delay。
+`Dubbo 2.6.5` 之后，所有服务都将在 `Spring` 初始化完成后进行暴露，如果你不需要延迟暴露服务，无需配置 `delay`。
 
-可使用 `dubbo.service.delay` 属性来设置延迟多少秒暴露服务。delay 的时间单位为毫秒。
+可使用 `dubbo.service.delay` 属性来设置延迟多少秒暴露服务。`delay` 的时间单位为毫秒。
 
 ## 10.并发控制
 

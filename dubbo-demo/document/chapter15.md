@@ -10,7 +10,7 @@
 
 #### 1.1.1.生产拥堵回顾
 
-近期在一次生产发布过程中，因为突发的流量，出现了拥堵。系统的部署图如下，客户端通过Http协议访问到Dubbo的消费者，消费者通过Dubbo协议访问服务提供者。这是单个机房，8个消费者3个提供者，共两个机房对外服务。
+近期在一次生产发布过程中，因为突发的流量，出现了拥堵。系统的部署图如下，客户端通过 `Http` 协议访问到 `Dubbo` 的消费者，消费者通过 `Dubbo` 协议访问服务提供者。这是单个机房，8个消费者3个提供者，共两个机房对外服务。
 
 ![图片](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/dubbo-demo/20210410210756.webp)
 
@@ -18,49 +18,49 @@
 
 在问题发生时，因为不清楚状态，先切到另外一个机房，结果也拥堵了，最后整体回退，折腾了一段时间没有问题了。当时有一些现象：
 
-1. 提供者的CPU内存等都不高，第一个机房的最高CPU 66%(8核虚拟机)，第二个机房的最高CPU 40%(16核虚拟机)。消费者的最高CPU只有30%多(两个消费者结点位于同一台虚拟机上)
-2. 在拥堵的时候，服务提供者的Dubbo业务线程池(下面会详细介绍这个线程池)并没满，最多到了300，最大值是500。但是把这个机房摘下后，也就是没有外部的流量了，线程池反而满了，而且好几分钟才把堆积的请求处理完。
-3. 通过监控工具统计的每秒进入Dubbo业务线程池的请求数，在拥堵时，时而是0，时而特别大，在日间正常的时候，这个值不存在为0的时候。
+1. 提供者的 `CPU` 内存等都不高，第一个机房的最高 `CPU` `66%`(8核虚拟机)，第二个机房的最高 `CPU 40%` (16核虚拟机)。消费者的最高 `CPU` 只有 `30%` 多(两个消费者结点位于同一台虚拟机上)
+2. 在拥堵的时候，服务提供者的 `Dubbo` 业务线程池(下面会详细介绍这个线程池)并没满，最多到了 `300`，最大值是 `500`。但是把这个机房摘下后，也就是没有外部的流量了，线程池反而满了，而且好几分钟才把堆积的请求处理完。
+3. 通过监控工具统计的每秒进入 `Dubbo` 业务线程池的请求数，在拥堵时，时而是 `0`，时而特别大，在日间正常的时候，这个值不存在为 `0` 的时候。
 
 #### 1.1.2.事故原因猜测
 
-当时其他指标没有检测到异常，也没有打Dump，我们通过分析这些现象以及我们的Dubbo配置，猜测是在网络上发生了拥堵，而影响拥堵的关键参数就是Dubbo协议的连接数，我们默认使用了单个连接，但是消费者数量较少，没能充分把网络资源利用起来。
+当时其他指标没有检测到异常，也没有打 `Dump`，我们通过分析这些现象以及我们的 `Dubbo` 配置，猜测是在网络上发生了拥堵，而影响拥堵的关键参数就是 `Dubbo` 协议的连接数，我们默认使用了单个连接，但是消费者数量较少，没能充分把网络资源利用起来。
 
-默认的情况下，每个Dubbo消费者与Dubbo提供者建立一个长连接，Dubbo官方对此的建议是：
+默认的情况下，每个 `Dubbo` 消费者与 `Dubbo` 提供者建立一个长连接，`Dubbo` 官方对此的建议是：
 
-- Dubbo 缺省协议采用单一长连接和 NIO 异步通讯，适合于小数据量大并发的服务调用，以及服务消费者机器数远大于服务提供者机器数的情况。
+- `Dubbo` 缺省协议采用单一长连接和 `NIO` 异步通讯，适合于小数据量大并发的服务调用，以及服务消费者机器数远大于服务提供者机器数的情况。
 
-- 反之，Dubbo 缺省协议不适合传送大数据量的服务，比如传文件，传视频等，除非请求量很低。
+- 反之，`Dubbo` 缺省协议不适合传送大数据量的服务，比如传文件，传视频等，除非请求量很低。
 
-以下也是Dubbo官方提供的一些常见问题回答：
+以下也是 `Dubbo` 官方提供的一些常见问题回答：
 
 - **为什么要消费者比提供者个数多?**
 
-  因 dubbo 协议采用单一长连接，假设网络为千兆网卡，根据测试经验数据每条连接最多只能压满 7MByte(不同的环境可能不一样，供参考)，理论上 1 个服务提供者需要 20 个服务消费者才能压满网卡。
+  因 `dubbo` 协议采用单一长连接，假设网络为千兆网卡，根据测试经验数据每条连接最多只能压满 `7MByte` (不同的环境可能不一样，供参考)，理论上 1 个服务提供者需要 20 个服务消费者才能压满网卡。
 
 - **为什么不能传大包?**
 
-  因 dubbo 协议采用单一长连接，如果每次请求的数据包大小为 500KByte，假设网络为千兆网卡，每条连接最大 7MByte(不同的环境可能不一样，供参考)，单个服务提供者的 TPS(每秒处理事务数)最大为：128MByte / 500KByte = 262。单个消费者调用单个服务提供者的 TPS(每秒处理事务数)最大为：7MByte / 500KByte = 14。如果能接受，可以考虑使用，否则网络将成为瓶颈。
+  因 `dubbo` 协议采用单一长连接，如果每次请求的数据包大小为 `500KByte`，假设网络为千兆网卡，每条连接最大 `7MByte`(不同的环境可能不一样，供参考)，单个服务提供者的 `TPS`(每秒处理事务数)最大为：`128MByte / 500KByte = 262`。单个消费者调用单个服务提供者的 TPS(每秒处理事务数)最大为：`7MByte / 500KByte = 14`。如果能接受，可以考虑使用，否则网络将成为瓶颈。
 
 - **为什么采用异步单一长连接?**
 
-  因为服务的现状大都是服务提供者少，通常只有几台机器，而服务的消费者多，可能整个网站都在访问该服务，比如 Morgan 的提供者只有 6 台提供者，却有上百台消费者，每天有 1.5 亿次调用，如果采用常规的 hessian 服务，服务提供者很容易就被压跨，通过单一连接，保证单一消费者不会压死提供者，长连接，减少连接握手验证等，并使用异步 IO，复用线程池，防止 C10K 问题。
+  因为服务的现状大都是服务提供者少，通常只有几台机器，而服务的消费者多，可能整个网站都在访问该服务，比如 `Morgan` 的提供者只有 `6` 台提供者，却有上百台消费者，每天有 `1.5` 亿次调用，如果采用常规的 `hessian` 服务，服务提供者很容易就被压跨，通过单一连接，保证单一消费者不会压死提供者，长连接，减少连接握手验证等，并使用异步 `IO`，复用线程池，防止 `C10K` 问题。
 
-因为我们的消费者数量和提供者数量都不多，所以很可能是连接数不够，导致网络传输出现了瓶颈。以下我们通过详细分析Dubbo协议和一些实验来验证我们的猜测。
+因为我们的消费者数量和提供者数量都不多，所以很可能是连接数不够，导致网络传输出现了瓶颈。以下我们通过详细分析`Dubbo` 协议和一些实验来验证我们的猜测。
 
 ### 1.2.Dubbo通信流程详解
 
-我们用的Dubbo版本比较老，是2.5.x的，它使用的netty版本是3.2.5，最新版的Dubbo在线程模型上有一些修改，我们以下的分析是以2.5.10为例。
+我们用的 `Dubbo` 版本比较老，是 `2.5.x` 的，它使用的 `netty` 版本是 `3.2.5`，最新版的 `Dubbo` 在线程模型上有一些修改，我们以下的分析是以 `2.5.10` 为例。
 
-以图和部分代码说明Dubbo协议的调用过程，代码只写了一些关键部分，使用的是netty3，dubbo线程池无队列，同步调用，以下代码包含了Dubbo和Netty的代码。
+以图和部分代码说明 `Dubbo` 协议的调用过程，代码只写了一些关键部分，使用的是 `netty3`，`dubbo` 线程池无队列，同步调用，以下代码包含了 `Dubbo` 和 `Netty` 的代码。
 
-整个Dubbo一次调用过程如下：
+整个 `Dubbo` 一次调用过程如下：
 
 ![图片](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/dubbo-demo/20210410211423.webp)
 
 #### 1.2.1.请求入队
 
-我们通过Dubbo调用一个rpc服务，调用线程其实是把这个请求封装后放入了一个队列里。这个队列是netty的一个队列，这个队列的定义如下，是一个Linked队列，不限长度。
+我们通过 `Dubbo` 调用一个 `rpc` 服务，调用线程其实是把这个请求封装后放入了一个队列里。这个队列是 `netty` 的一个队列，这个队列的定义如下，是一个 `Linked` 队列，不限长度。
 
 ```
 class NioWorker implements Runnable {
@@ -70,11 +70,11 @@ class NioWorker implements Runnable {
 }
 ```
 
-主线程经过一系列调用，最终通过NioClientSocketPipelineSink类里的方法把请求放入这个队列，放入队列的请求，包含了一个请求ID，这个ID很重要。
+主线程经过一系列调用，最终通过 `NioClientSocketPipelineSink` 类里的方法把请求放入这个队列，放入队列的请求，包含了一个请求 `ID`，这个 `ID` 很重要。
 
 #### 1.2.2.调用线程等待
 
-入队后，netty会返回给调用线程一个Future，然后调用线程等待在Future上。这个Future是Dubbo定义的，名字叫DefaultFuture，主调用线程调用DefaultFuture.get(timeout)，等待通知，所以我们看与Dubbo相关的ThreadDump，经常会看到线程停在这，这就是在等后台返回。
+入队后，`netty` 会返回给调用线程一个 `Future`，然后调用线程等待在 `Future` 上。这个 `Future` 是 `Dubbo` 定义的，名字叫`DefaultFuture`，主调用线程调用 `DefaultFuture.get(timeout)`，等待通知，所以我们看与 `Dubbo` 相关的 `ThreadDump`，经常会看到线程停在这，这就是在等后台返回。
 
 ```
 public class DubboInvoker<T> extends AbstractInvoker<T> {
@@ -88,7 +88,7 @@ public class DubboInvoker<T> extends AbstractInvoker<T> {
 }
 ```
 
-我们可以看一下这个DefaultFuture的实现，
+我们可以看一下这个 `DefaultFuture` 的实现，
 
 ```
 public class DefaultFuture implements ResponseFuture {
@@ -120,7 +120,7 @@ public class DefaultFuture implements ResponseFuture {
 
 #### 1.2.3.IO线程读取队列里的数据 
 
-这个工作是由netty的IO线程池完成的，也就是NioWorker，对应的类叫NioWorker。它会死循环的执行select，在select中，会一次性把队列中的写请求处理完，select的逻辑如下：
+这个工作是由 `netty` 的 `IO` 线程池完成的，也就是 `NioWorker`，对应的类叫 `NioWorker`。它会死循环的执行 `select`，在 `select` 中，会一次性把队列中的写请求处理完，`select` 的逻辑如下：
 
 ```
 public void run() {
@@ -149,7 +149,7 @@ private void processWriteTaskQueue() throws IOException {
 
 #### 1.2.4.IO线程把数据写到Socket缓冲区 
 
-这一步很重要，跟我们遇到的性能问题相关，还是NioWorker，也就是上一步的task.run()，它的实现如下：
+这一步很重要，跟我们遇到的性能问题相关，还是 `NioWorker`，也就是上一步的 `task.run()`，它的实现如下：
 
 ```
 void writeFromTaskLoop(final NioSocketChannel ch) {
@@ -204,9 +204,9 @@ private void write0(NioSocketChannel channel) {
     }
 ```
 
-正常情况下，队列中的写请求要通过processWriteTaskQueue处理掉，但是这些写请求也同时注册到了selector上，如果processWriteTaskQueue写成功，就会删掉selector上的写请求。如果Socket的写缓冲区满了，对于NIO，会立刻返回，对于BIO，会一直等待。Netty使用的是NIO，它尝试16次后，还是不能写成功，它就把writeSuspended设置为true，这样接下来的所有写请求都会被跳过。那什么时候会再写呢？这时候就得靠selector了，它如果发现socket可写，就把这些数据写进去。
+正常情况下，队列中的写请求要通过 `processWriteTaskQueue` 处理掉，但是这些写请求也同时注册到了 `selector`上，如果`processWriteTaskQueue` 写成功，就会删掉 `selector` 上的写请求。如果 `Socket` 的写缓冲区满了，对于 `NIO`，会立刻返回，对于`BIO`，会一直等待。`Netty` 使用的是 `NIO`，它尝试 `16` 次后，还是不能写成功，它就把 `writeSuspended` 设置为 `true`，这样接下来的所有写请求都会被跳过。那什么时候会再写呢？这时候就得靠 `selector` 了，它如果发现 `socket` 可写，就把这些数据写进去。
 
-下面是processSelectedKeys里写的过程，因为它是发现socket可写才会写，所以直接把writeSuspended设为false。
+下面是 `processSelectedKeys` 里写的过程，因为它是发现 `socket` 可写才会写，所以直接把 `writeSuspended` 设为 `false`。
 
 ```
 	void writeFromSelectorLoop(final SelectionKey k) {
@@ -218,11 +218,11 @@ private void write0(NioSocketChannel channel) {
 
 #### 1.2.5.数据从消费者的socket发送缓冲区传输到提供者的接收缓冲区 
 
-这个是操作系统和网卡实现的，应用层的write写成功了，并不代表对面能收到，当然tcp会通过重传能机制尽量保证对端收到。
+这个是操作系统和网卡实现的，应用层的 `write` 写成功了，并不代表对面能收到，当然 `tcp` 会通过重传能机制尽量保证对端收到。
 
 #### 1.2.6.服务端IO线程从缓冲区读取请求数据
 
-这个是服务端的NIO线程实现的，在processSelectedKeys中。
+这个是服务端的 `NIO` 线程实现的，在 `processSelectedKeys` 中。
 
 ```
 
@@ -274,7 +274,7 @@ public void run() {
 
 #### 1.2.7.IO线程把请求交给Dubbo线程池
 
-按配置不同，走的Handler不同，配置dispatch为all，走的handler如下。下面IO线程直接交给一个ExecutorService来处理这个请求，出现了熟悉的报错“Threadpool is exhausted"，业务线程池满时，如果没有队列，就会报这个错。
+按配置不同，走的 `Handler` 不同，配置 `dispatch` 为 `all`，走的 `handler` 如下。下面 `IO` 线程直接交给一个 `ExecutorService` 来处理这个请求，出现了熟悉的报错 `Threadpool is exhausted`，业务线程池满时，如果没有队列，就会报这个错。
 
 ```
 
@@ -346,7 +346,7 @@ public class HeaderExchangeHandler implements ChannelHandlerDelegate {
  }
 ```
 
-channel.send(response)最终调用了NioServerSocketPipelineSink里的方法把返回报文放入队列。
+`channel.send(response)` 最终调用了 `NioServerSocketPipelineSink` 里的方法把返回报文放入队列。
 
 #### 1.2.9.服务端IO线程从队列中取出数据
 
@@ -354,9 +354,9 @@ channel.send(response)最终调用了NioServerSocketPipelineSink里的方法把�
 
 #### 1.2.10.服务端IO线程把回复数据写入Socket发送缓冲区
 
-IO线程写数据的时候，写入到TCP缓冲区就算成功了。但是如果缓冲区满了，会写不进去。对于阻塞和非阻塞IO，返回结果不一样，阻塞IO会一直等，而非阻塞IO会立刻失败，让调用者选择策略。
+`IO` 线程写数据的时候，写入到 `TCP` 缓冲区就算成功了。但是如果缓冲区满了，会写不进去。对于阻塞和非阻塞 `IO`，返回结果不一样，阻塞 `IO` 会一直等，而非阻塞 `IO` 会立刻失败，让调用者选择策略。
 
-Netty的策略是尝试最多写16次，如果不成功，则暂时停掉IO线程的写操作，等待连接可写时再写，writeSpinCount默认是16，可以通过参数调整。
+`Netty` 的策略是尝试最多写 `16` 次，如果不成功，则暂时停掉 `IO` 线程的写操作，等待连接可写时再写，`writeSpinCount` 默认是 `16`，可以通过参数调整。
 
 ```
 
@@ -395,11 +395,11 @@ for (int i = writeSpinCount; i > 0; i --) {
 
 #### 1.2.13.IO线程把数据交给Dubbo业务线程池
 
-这一步与流程1.2.7是一样的，这个线程池名字为DubboClientHandler。
+这一步与流程1.2.7是一样的，这个线程池名字为 `DubboClientHandler`。
 
 #### 1.2.14.业务线程池根据消息ID通知主线程
 
-先通过HeaderExchangeHandler的received函数得知是Response，然后调用handleResponse，
+先通过 `HeaderExchangeHandler` 的 `received` 函数得知是 `Response`，然后调用 `handleResponse`，
 
 ```
 public class HeaderExchangeHandler implements ChannelHandlerDelegate {
@@ -417,7 +417,7 @@ public class HeaderExchangeHandler implements ChannelHandlerDelegate {
 }
 ```
 
-DefaultFuture根据ID获取Future，通知调用线程
+`DefaultFuture` 根据 `ID` 获取 `Future`，通知调用线程
 
 ```
 	public static void received(Channel channel, Response response) {
@@ -436,13 +436,13 @@ DefaultFuture根据ID获取Future，通知调用线程
 
 #### 1.3.1.协议参数
 
-我们在使用Dubbo时，需要在服务端配置协议，例如
+我们在使用 `Dubbo` 时，需要在服务端配置协议，例如
 
 ```
 <dubbo:protocol name="dubbo" port="20880" dispatcher="all" threadpool="fixed" threads="2000" />
 ```
 
-下面是协议中与性能相关的一些参数，在我们的使用场景中，线程池选用了fixed，大小是500，队列为0，其他都是默认值。
+下面是协议中与性能相关的一些参数，在我们的使用场景中，线程池选用了 `fixed`，大小是 `500`，队列为 `0`，其他都是默认值。
 
 | 属性          | 对应URL参数   | 类型   | 是否必填 | 缺省值                                                       | 作用     | 描述                                                         |
 | :------------ | :------------ | :----- | :------- | :----------------------------------------------------------- | :------- | :----------------------------------------------------------- |
@@ -486,11 +486,11 @@ DefaultFuture根据ID获取Future，通知调用线程
 
 ##### 连接数与Socket缓冲区对性能影响的实验
 
-通过简单的Dubbo服务，验证一下连接数与缓冲区大小对传输性能的影响。
+通过简单的 `Dubbo` 服务，验证一下连接数与缓冲区大小对传输性能的影响。
 
-我们可以通过修改系统参数，调节TCP缓冲区的大小。
+我们可以通过修改系统参数，调节 `TCP` 缓冲区的大小。
 
-在 /etc/sysctl.conf 修改如下内容， tcp_rmem是发送缓冲区，tcp_wmem是接收缓冲区，三个数值表示最小值，默认值和最大值，我们可以都设置成一样。
+在 `/etc/sysctl.conf` 修改如下内容，`tcp_rmem` 是发送缓冲区，`tcp_wmem` 是接收缓冲区，三个数值表示最小值，默认值和最大值，我们可以都设置成一样。
 
 ```
 net.ipv4.tcp_rmem = 4096 873800 16777216
@@ -499,7 +499,7 @@ net.ipv4.tcp_wmem = 4096 873800 16777216
 
 然后执行 `sysctl –p` 使之生效。
 
-服务端代码如下，接受一个报文，然后返回两倍的报文长度，随机sleep 0-300ms，所以均值应该是150ms。服务端每10s打印一次tps和响应时间，这里的tps是指完成函数调用的tps，而不涉及传输，响应时间也是这个函数的时间
+服务端代码如下，接受一个报文，然后返回两倍的报文长度，随机 `sleep 0-300ms`，所以均值应该是 `150ms`。服务端每 `10s` 打印一次`tps` 和响应时间，这里的 `tps` 是指完成函数调用的 `tps`，而不涉及传输，响应时间也是这个函数的时间
 
 ```
    //服务端实现
@@ -517,7 +517,7 @@ net.ipv4.tcp_wmem = 4096 873800 16777216
     }
 ```
 
-客户端起N个线程，每个线程不停的调用Dubbo服务，每10s打印一次qps和响应时间，这个qps和响应时间是包含了网络传输时间的。
+客户端起 `N` 个线程，每个线程不停的调用 `Dubbo` 服务，每 `10s` 打印一次 `qps` 和响应时间，这个 `qps` 和响应时间是包含了网络传输时间的。
 
 ```
         for(int i = 0; i < N; i ++) {
@@ -536,7 +536,7 @@ net.ipv4.tcp_wmem = 4096 873800 16777216
         }
 ```
 
-通过ss -it命令可以看当前tcp socket的详细信息，包含待对端回复ack的数据Send-Q，最大窗口cwnd，rtt(round trip time)等。
+通过 `ss -it` 命令可以看当前 `tcp socket` 的详细信息，包含待对端回复 `ack` 的数据 `Send-Q`，最大窗口 `cwnd`，`rtt(round trip time)`等。
 
 ```
 
@@ -550,7 +550,7 @@ ESTAB                            0                             27474            
      cubic wscale:7,7 rto:204 rtt:1.277/0.239 ato:40 mss:1448 pmtu:1500 rcvmss:1448 advmss:1448 cwnd:625 ssthresh:20 bytes_acked:96432644704 bytes_received:49286576300 segs_out:68505947 segs_in:36666870 data_segs_out:67058676 data_segs_in:35833689 send 5669.5Mbps pacing_rate 6801.4Mbps delivery_rate 627.4Mbps app_limited busy:1340536ms rwnd_limited:400372ms(29.9%) sndbuf_limited:433724ms(32.4%) unacked:70 retrans:0/5 rcv_rtt:1.308 rcv_space:336692 rcv_ssthresh:2095692 notsent:6638 minrtt:0.097
 ```
 
-通过netstat -nat也能查看当前tcp socket的一些信息，比如Recv-Q, Send-Q。
+通过 `netstat -nat` 也能查看当前 `tcp socket` 的一些信息，比如 `Recv-Q`, `Send-Q`。
 
 ```
 (base) niuxinli@ubuntu:~$ netstat -nat
@@ -562,7 +562,7 @@ tcp        0      0 192.168.1.7:36666       192.168.1.7:2181        ESTABLISHED
 tcp        0  65160 192.168.1.7:20880       192.168.1.5:60760       ESTABLISHED
 ```
 
-可以看以下Recv-Q和Send-Q的具体含义：
+可以看以下 `Recv-Q` 和 `Send-Q` 的具体含义：
 
 ```
 
@@ -572,7 +572,7 @@ tcp        0  65160 192.168.1.7:20880       192.168.1.5:60760       ESTABLISHED
        Established: The count of bytes not acknowledged by the remote host.
 ```
 
-Recv-Q是已经到了接受缓冲区，但是还没被应用代码读走的数据。Send-Q是已经到了发送缓冲区，但是对方还没有回复Ack的数据。这两种数据正常一般不会堆积，如果堆积了，可能就有问题了。
+`Recv-Q` 是已经到了接受缓冲区，但是还没被应用代码读走的数据。`Send-Q` 是已经到了发送缓冲区，但是对方还没有回复 `Ack` 的数据。这两种数据正常一般不会堆积，如果堆积了，可能就有问题了。
 
 #### 1.3.3.第一组实验：单连接，改变TCP缓冲区
 
@@ -612,4 +612,4 @@ Recv-Q是已经到了接受缓冲区，但是还没被应用代码读走的数�
 
 #### 1.3.5.结论
 
-要想充分利用网络带宽， 缓冲区不能太小，如果太小有可能一次传输的报文就大于了缓冲区，严重影响传输效率。但是太大了也没有用，还需要多个连接数才能够充分利用CPU资源，连接数起码要超过CPU核数。
+要想充分利用网络带宽， 缓冲区不能太小，如果太小有可能一次传输的报文就大于了缓冲区，严重影响传输效率。但是太大了也没有用，还需要多个连接数才能够充分利用 `CPU` 资源，连接数起码要超过 `CPU` 核数。
