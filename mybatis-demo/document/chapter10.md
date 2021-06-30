@@ -348,3 +348,69 @@ public class MybatisConfiguration {
 ------
 
 发现想把Mybatis拦截器的使用讲清楚还是比较难的，因为里面设计的到的东西太多了，用代码才是最好说话的，所以我在实例里面都尽可能的把注解写的很详细。希望能对大家有点帮助。
+
+## X.常见问题
+
+### X.1.分离代理对象的目标类 
+
+```
+@Intercepts({@Signature(type = StatementHandler.class, method = "prepare", args = {Connection.class}), 
+    @Signature(type = ResultSetHandler.class, method = "handleResultSets", args = {Statement.class})}) 
+@Log4j 
+public class PageHelper implements Interceptor {
+    public Object intercept(Invocation invocation) throws Throwable { 
+        if (localPage.get() == null) { 
+            return invocation.proceed(); 
+        } 
+        if (invocation.getTarget() instanceof StatementHandler) { 
+            StatementHandler statementHandler = (StatementHandler) invocation.getTarget(); 
+            MetaObject metaStatementHandler = SystemMetaObject.forObject(statementHandler); 
+            // 分离代理对象链(由于目标类可能被多个插件拦截，从而形成多次代理，通过下面的两次循环 
+            // 可以分离出最原始的的目标类) 
+            while (metaStatementHandler.hasGetter("h")) { 
+                Object object = metaStatementHandler.getValue("h"); 
+                metaStatementHandler = SystemMetaObject.forObject(object); 
+            } 
+            // 分离最后一个代理对象的目标类 
+            while (metaStatementHandler.hasGetter("target")) { 
+                Object object = metaStatementHandler.getValue("target"); 
+                metaStatementHandler = SystemMetaObject.forObject(object); 
+            } 
+            MappedStatement mappedStatement = (MappedStatement) metaStatementHandler.getValue("delegate.mappedStatement"); 
+            //分页信息if (localPage.get() != null) { 
+            Page page = localPage.get(); 
+            BoundSql boundSql = (BoundSql) metaStatementHandler.getValue("delegate.boundSql"); 
+            // 分页参数作为参数对象parameterObject的一个属性 
+            String sql = boundSql.getSql(); 
+            // 重写sql 
+            String pageSql = buildPageSql(sql, page); 
+            //重写分页sql 
+            metaStatementHandler.setValue("delegate.boundSql.sql", pageSql); 
+            Connection connection = (Connection) invocation.getArgs()[0]; 
+            // 重设分页参数里的总页数等 
+            setPageParameter(sql, connection, mappedStatement, boundSql, page); 
+            // 将执行权交给下一个插件 
+            return invocation.proceed(); 
+        } else if (invocation.getTarget() instanceof ResultSetHandler) { 
+            Object result = invocation.proceed(); 
+            Page page = localPage.get(); 
+            page.setResult((List) result); 
+            return result; 
+        } 
+    	return null; 
+    } 
+}
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
