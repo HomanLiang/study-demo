@@ -4,9 +4,9 @@
 
 # ElasticSearch 索引文档及操作
 
-ES 提供了多种操作数据的方式，其中较为常见的方式就是RESTful风格的API。
+`ES` 提供了多种操作数据的方式，其中较为常见的方式就是 `RESTful` 风格的 `API`。
 
-简单的体验：利用Postman发起HTTP请求（当然也可以在命令行中使用curl命令）。
+简单的体验：利用 `Postman` 发起 `HTTP` 请求（当然也可以在命令行中使用 `curl` 命令）。
 
 [官方文档](https://www.elastic.co/guide/en/elasticsearch/reference/7.4/rest-apis.html)
 
@@ -14,9 +14,9 @@ ES 提供了多种操作数据的方式，其中较为常见的方式就是RESTf
 
 ## 1.ES 中的索引
 
-ES 中的文档都会存储在某个**索引**（Index）中，索引是文档的容器，是一类文档的集合，相当于关系型数据库中的表的概念。
+`ES` 中的文档都会存储在某个**索引**（`Index`）中，索引是文档的容器，是一类文档的集合，相当于关系型数据库中的表的概念。
 
-ES 中可以创建很多不同的索引，表示不同的文档集合。
+`ES` 中可以创建很多不同的索引，表示不同的文档集合。
 
 每个索引都可以定义自己的 **Mappings** 和 **Settings**：
 
@@ -27,15 +27,15 @@ ES 中可以创建很多不同的索引，表示不同的文档集合。
 
 ***ES 与传统数据库类比***
 
-如果将 ES 中的基本概念类比到传统数据库中，它们的对应关系如下：
+如果将 `ES` 中的基本概念类比到传统数据库中，它们的对应关系如下：
 
-| ES      | 传统数据库 |
-| ------- | ---------- |
-| 索引    | 表         |
-| 文档    | 行         |
-| 字段    | 列         |
-| Mapping | 表定义     |
-| DSL     | SQL 语句   |
+| ES        | 传统数据库 |
+| --------- | ---------- |
+| 索引      | 表         |
+| 文档      | 行         |
+| 字段      | 列         |
+| `Mapping` | 表定义     |
+| `DSL`     | `SQL` 语句 |
 
 
 
@@ -55,9 +55,9 @@ PUT /twitter
 }
 ```
 
-number_of_shards：分片数，默认1
+`number_of_shards`：分片数，默认1
 
-number_of_replicas：备份数，默认1
+`number_of_replicas`：备份数，默认1
 
 或者
 
@@ -171,7 +171,7 @@ POST /_aliases
 
 #### 2.3.1.查询索引
 
-Request:
+`Request`:
 
 ```
 GET /<alias>
@@ -179,7 +179,7 @@ GET /<alias>
 
 查询所有索引
 
-Request:
+`Request`:
 
 ```
 GET /_all
@@ -201,7 +201,7 @@ GET /<index>/_alias/<alias>
 
 #### 2.3.3.查询索引设置
 
-Request:
+`Request`:
 
 ```
 GET /<index>/_settings
@@ -226,7 +226,7 @@ GET /<index>/_mapping
 
 #### 2.4.1.删除索引
 
-Request:
+`Request`:
 
 ```
 DELETE /<index>
@@ -234,7 +234,7 @@ DELETE /<index>
 
 #### 2.4.2.删除别名
 
-Request:
+`Request`:
 
 ```
 DELETE /<index>/_alias/<alias>
@@ -280,9 +280,9 @@ GET /_analyze
 
 ## 3.ES 中的文档
 
-在 ES 中，**文档**（Document）是可搜索数据的最小存储单位，相当于关系数据库中的一条记录。
+在 `ES` 中，**文档**（`Document`）是可搜索数据的最小存储单位，相当于关系数据库中的一条记录。
 
-文档以 **Json** 数据格式保存在 ES 中，Json 中保存着多个**键值对**，它可以保存不同类型的数据，比如：
+文档以 **Json** 数据格式保存在 `ES` 中，`Json` 中保存着多个**键值对**，它可以保存不同类型的数据，比如：
 
 - 字符串类型
 - 数字类型
@@ -292,15 +292,15 @@ GET /_analyze
 - 二进制类型
 - 范围类型
 
-> Python 语言中的**字典**类型，就是 Json 数据格式。
+> `Python` 语言中的**字典**类型，就是 `Json` 数据格式。
 
-文档中的数据类型可以指定，也可以由 ES 自动推断。
+文档中的数据类型可以指定，也可以由 `ES` 自动推断。
 
-每个文档中都有一个 **Unique ID**，用于唯一标识一个文档。Unique ID 可以由用户指定，也可以由 ES 自动生成。
+每个文档中都有一个 **Unique ID**，用于唯一标识一个文档。`Unique ID` 可以由用户指定，也可以由 `ES` 自动生成。
 
 > **Unique ID** 实际上是一个**字符串**。
 
-比如下面的 Json 就是一个文档：
+比如下面的 `Json` 就是一个文档：
 
 ```python
 {
@@ -312,7 +312,7 @@ GET /_analyze
 
 ### 3.1.文档元数据
 
-将上面那个 Json 数据存储到 ES 后，会像下面这样：
+将上面那个 `Json` 数据存储到 `ES` 后，会像下面这样：
 
 ```python
 {
@@ -331,9 +331,9 @@ GET /_analyze
 其中以下划线开头的字段就是元数据：
 
 - `_index`：文档所属的索引。
-- `_type`：文档的类型。ES 7.0 开始，一个索引只能有一种 `_type`。
-- `_id`：文档的唯一 ID。
-- `_source`：文档的原始 Json 数据。
+- `_type`：文档的类型。`ES 7.0` 开始，一个索引只能有一种 `_type`。
+- `_id`：文档的唯一 `ID`。
+- `_source`：文档的原始 `Json` 数据。
 - `_version`：文档更新的次数。
 
 你可以查看[这里](https://www.elastic.co/cn/blog/moving-from-types-to-typeless-apis-in-elasticsearch-7-0)，了解“**为什么单个Index下，不再支持多个Types？**”。
@@ -344,17 +344,17 @@ GET /_analyze
 
 ### 3.2.文档的删除与更新
 
-ES 中文档的**删除操作不会马上将其删除**，而是会将其标记到 **del** 文件中，在后期合适的时候（比如 Merge 阶段）会真正的删除。
+`ES` 中文档的**删除操作不会马上将其删除**，而是会将其标记到 **del** 文件中，在后期合适的时候（比如 `Merge` 阶段）会真正的删除。
 
-**ES 中的文档是不可变更的**，**更新操作**会将旧的文档标记为删除，同时增加一个新的字段，并且文档的 version 加 1。
+**ES 中的文档是不可变更的**，**更新操作**会将旧的文档标记为删除，同时增加一个新的字段，并且文档的 `version` 加 1。
 
 
 
 ### 3.3.文档中的字段数
 
-在 ES 中，一个文档默认最多可以有 **1000** 个字段，可以通过 [index.mapping.total_fields.limit](https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping.html#mapping-limit-settings) 进行设置。
+在 `ES` 中，一个文档默认最多可以有 **1000** 个字段，可以通过 [index.mapping.total_fields.limit](https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping.html#mapping-limit-settings) 进行设置。
 
-注意在设计 ES 中的数据结构时，不要使文档的字段数过多，这样会使得 mapping 很大，增加集群的负担。
+注意在设计 `ES` 中的数据结构时，不要使文档的字段数过多，这样会使得 `mapping` 很大，增加集群的负担。
 
 
 
@@ -364,7 +364,7 @@ ES 中文档的**删除操作不会马上将其删除**，而是会将其标记�
 
 ### 4.1.插入文档
 
-- Create document IDs automatically
+- `Create document IDs automatically`
 
     ```
     POST twitter/_doc/
@@ -1059,50 +1059,45 @@ GET /twitter/_count
 
 - `POST/PUT index_name/_doc/id` ：指定 ID
 
-  - 当 id 存在时，会覆盖之前的，并且 version 会加 1，文档数不增加。
-  - 当 id 不存在时，会插入新的文档，文档数加 1。
+  - 当 `id` 存在时，会覆盖之前的，并且 `version` 会加 1，文档数不增加。
+  - 当 `id` 不存在时，会插入新的文档，文档数加 1。
 
 `PUT index_name/_create`：
 
 - `PUT index_name/_create`：不指定 ID，**不允许**该操作。
-
-  `PUT index_name/_create/id`：指定 ID
-
-  - 当 id 存在时：**报错**，不会插入新文档。
-- 当 id 不存在时：会插入新的文档，文档数加 1。
+- `PUT index_name/_create/id`：指定 ID
+- 当 id 存在时：**报错**，不会插入新文档。
+  - 当 id 不存在时：会插入新的文档，文档数加 1。
 
 `PUT index_name/_doc`：
 
 - `PUT index_name/_doc`：不指定 ID，**不允许**该操作。
 - `PUT/POST index_name/_doc/id`：指定 ID
-- 当 id 存在时，会覆盖之前的，并且 version 会加 1，文档数不增加。
+  - 当 id 存在时，会覆盖之前的，并且 version 会加 1，文档数不增加。
   - 当 id 不存在时，会插入新的文档，文档数加 1。
 
-```
-PUT index_name/_doc/id?op_type=XXX
-```
+- `PUT index_name/_doc/id?op_type=XXX`
+  - `op_type=create`：
+    - 当 id 存在时，**报错**，不会插入新文档。
+    - 当 id 不存在时，会插入新的文档，文档数加 1。
 
-- `op_type=create`：
-- 当 id 存在时，**报错**，不会插入新文档。
-  - 当 id 不存在时，会插入新的文档，文档数加 1。
-
-- `op_type=index`：
-- 当 id 存在时，会覆盖之前的，并且 version 会加 1，文档数不增加。
-  - 当 id 不存在时，会插入新的文档，文档数加 1。
+  - `op_type=index`：
+    - 当 id 存在时，会覆盖之前的，并且 version 会加 1，文档数不增加。
+    - 当 id 不存在时，会插入新的文档，文档数加 1。
 
 ***按照是否指定 ID 来区分***
 
 **指定 ID**：
 
 - `POST/PUT index_name/_doc/id`：指定 ID，称为 Index 操作
-- 相当于 `PUT index_name/_doc/id?op_type=index`
+  - 相当于 `PUT index_name/_doc/id?op_type=index`
   - 当 id 存在时，会覆盖之前的，并且 version 会加 1，文档数不增加。
-- 当 id 不存在时，会插入新的文档，文档数加 1。
-  
+  - 当 id 不存在时，会插入新的文档，文档数加 1。
+
 - `PUT index_name/_doc/id?op_type=create`：指定 ID，称为Create操作
-- 相当于 `PUT index_name/_create/id`
+  - 相当于 `PUT index_name/_create/id`
   - 当 id 存在时，**报错**，不会插入新文档。
-- 当 id 不存在时，会插入新的文档，文档数加 1。
+  - 当 id 不存在时，会插入新的文档，文档数加 1。
 
 **不指定 ID**：
 
@@ -1121,15 +1116,15 @@ Update 操作用于更新文档的内容。
 - 当 id 不存在时，报错，不更新任何内容。
 - 当 id 存在时：
   - 如果更新的字段与**原来的相同**，则不做任何操作。
-  - 如果更新的字段与**原来的不同**，则更新原有内容，并且 version 会加 1。
+  - 如果更新的字段与**原来的不同**，则更新原有内容，并且 `version` 会加 1。
 
-实际上 ES 中的文档是不可变更的，更新操作会将旧的文档标记为删除，同时增加一个新的字段，并且文档的 version 加 1。
+实际上 `ES` 中的文档是不可变更的，更新操作会将旧的文档标记为删除，同时增加一个新的字段，并且文档的 `version` 加 1。
 
 
 
 ### 6.4.Delete 操作
 
-Delete 操作用于删除索引或文档。
+`Delete` 操作用于删除索引或文档。
 
 `DELETE /index_name/_doc/id`：删除某个文档。
 
@@ -1138,8 +1133,8 @@ Delete 操作用于删除索引或文档。
 
 `DELETE /index_name`：删除整个索引，**要谨慎使用**！
 
-- 当删除的 index_name 存在时，会删除整个索引内容。
-- 当删除的 index_name 不存在时，ES 会返回 `404` 错误。
+- 当删除的 `index_name` 存在时，会删除整个索引内容。
+- 当删除的 `index_name` 不存在时，`ES` 会返回 `404` 错误。
 
 
 
@@ -1166,15 +1161,15 @@ POST _bulk
 { "doc" : {"field2" : "value2"} }
 ```
 
-注意 Bulk 请求体的数据量不宜过大，建议在 5~15M。
+注意 `Bulk` 请求体的数据量不宜过大，建议在 `5~15M`。
 
 
 
 ### 6.6.Mget 批量读取
 
-**Mget** 一次读取多个文档的内容，设计思想类似 Bulk 操作。
+**Mget** 一次读取多个文档的内容，设计思想类似 `Bulk` 操作。
 
-Mget 操作的格式如下：
+`Mget` 操作的格式如下：
 
 ```shell
 GET _mget
@@ -1234,7 +1229,7 @@ POST _msearch
 {"query" : {"match_all" : {}},"size":2}
 ```
 
-上文中介绍了 3 种批量操作，分别是 Bulk，Mget，Msearch。注意在使用批量操作时，数据量不宜过大，避免出现**性能问题**。
+上文中介绍了 3 种批量操作，分别是 `Bulk`，`Mget`，`Msearch`。注意在使用批量操作时，数据量不宜过大，避免出现**性能问题**。
 
 
 
@@ -1464,14 +1459,14 @@ POST _reindex
 
 同一个资源在多并发处理的时候，会发生冲突的问题。
 
-传统数据库（比如 MySQL）会采用**锁**的方式，在更新数据的时候对数据进行加锁，来防止冲突。
+传统数据库（比如 `MySQL`）会采用**锁**的方式，在更新数据的时候对数据进行加锁，来防止冲突。
 
-而 ES 并没有采用锁，而是将并发问题交给了用户处理。
+而 `ES` 并没有采用锁，而是将并发问题交给了用户处理。
 
-在 ES 中可以采用两种方式：
+在 `ES` 中可以采用两种方式：
 
-- 内部版本控制（ES 自带的 version）：在 URI 中使用 `if_seq_no` 和 `if_primary_term`
-- 外部版本控制（由用户指定 version）：在 URI 中使用 `version` 和 `version_type=external`
+- 内部版本控制（`ES` 自带的 `version`）：在 `URI` 中使用 `if_seq_no` 和 `if_primary_term`
+- 外部版本控制（由用户指定 `version`）：在 `URI` 中使用 `version` 和 `version_type=external`
 
 示例，首先插入数据：
 

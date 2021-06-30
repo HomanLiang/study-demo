@@ -12,9 +12,9 @@
 
 ## 2.精确值与全文本
 
-ES 中有 **精确值**（Exact Values）与 **全文本**（Full Text）之分：
+`ES` 中有 **精确值**（`Exact Values`）与 **全文本**（`Full Text`）之分：
 
-- **精确值**：包括数字，日期，一个具体字符串（例如"Hello World"）。
+- **精确值**：包括数字，日期，一个具体字符串（例如 `Hello World`）。
   - 在 ES 中用 [keyword](https://www.elastic.co/guide/en/elasticsearch/reference/current/keyword.html) 数据类型表示。
   - 精确值不需要做分词处理。
 - **全文本**：非结构化的文本数据
@@ -29,15 +29,15 @@ ES 中有 **精确值**（Exact Values）与 **全文本**（Full Text）之分�
 
 ## 3.分词过程
 
-搜索引擎需要建立单词（Term / Token）与倒排索引项的对应关系，那么首先就需要将文档拆分为单词，这个过程叫做分词。
+搜索引擎需要建立单词（`Term / Token`）与倒排索引项的对应关系，那么首先就需要将文档拆分为单词，这个过程叫做分词。
 
-比如将 hello world 拆分为 hello 和 world，这就是分词过程。
+比如将 `hello world` 拆分为 `hello` 和 `world`，这就是分词过程。
 
 
 
 ## 4.分词器
 
-ES 使用分词器（Analyzer）对文档进行分词，ES 中内置了很多分词器供我们使用，我们也可以定制自己的分词器。
+`ES` 使用分词器（`Analyzer`）对文档进行分词，`ES` 中内置了很多分词器供我们使用，我们也可以定制自己的分词器。
 
 一个分词器有 3 个组成部分，分词过程会依次经过这些部分：
 
@@ -51,20 +51,20 @@ ES 使用分词器（Analyzer）对文档进行分词，ES 中内置了很多分
 
 ES 有下面这些[内置的分词器](https://www.elastic.co/guide/en/elasticsearch/reference/current/analysis-analyzers.html)：
 
-- Standard Analyzer：默认分词器，按词切分，转小写处理，也可以过滤停用词（默认关闭）。
-  - 在 ES 中的名称为 `standard`
+- `Standard Analyzer`：默认分词器，按词切分，转小写处理，也可以过滤停用词（默认关闭）。
+  - 在 `ES` 中的名称为 `standard`
 
-- Simple Analyzer：按照非字母切分，非字母会被去除，转小写处理。
-  - 在 ES 中的名称为 `simple`
-- Stop Analyzer：按照非字母切分，非字母会被去除，转小写处理，停用词过滤(the、a、is 等)。
-  - 在 ES 中的名称为 `stop`
-- Whitespace Analyzer：按照空格切分，不转小写。
-  - 在 ES 中的名称为 `whitespace`
-- Keyword Analyzer：不做任何的分词处理，直接将输入当作输出。
-  - 在 ES 中的名称为 keyword
-- Pattern Analyzer：通过正则表达式进行分词，默认为\W+非字符分隔，然后会进行转小写处理。
-  - 在 ES 中的名称为 `pattern`
-- Language Analyzers：提供了30多种常见语言的分词器，比如：
+- `Simple Analyzer`：按照非字母切分，非字母会被去除，转小写处理。
+  - 在 `ES` 中的名称为 `simple`
+- `Stop Analyzer`：按照非字母切分，非字母会被去除，转小写处理，停用词过滤(`the`、`a`、`is` 等)。
+  - 在 `ES` 中的名称为 `stop`
+- `Whitespace Analyzer`：按照空格切分，不转小写。
+  - 在 `ES` 中的名称为 `whitespace`
+- `Keyword Analyzer`：不做任何的分词处理，直接将输入当作输出。
+  - 在 `ES` 中的名称为 keyword
+- `Pattern Analyzer`：通过正则表达式进行分词，默认为 `\W+` 非字符分隔，然后会进行转小写处理。
+  - 在 `ES` 中的名称为 `pattern`
+- `Language Analyzers`：提供了 `30` 多种常见语言的分词器，比如：
   - `english`：英语分词器，会对英文单词进行归一化处理，去掉停用词等。
     - 归一化处理：比如 `running` 变为 `run`，`goods` 变为 `good` 等。
 
@@ -86,24 +86,24 @@ GET _analyze
 
 ## 7.自定义分词器
 
-当 ES 中的内置分词器不能满足需求时，我们可以[定制自己的分词器](https://www.elastic.co/guide/en/elasticsearch/reference/current/analysis-custom-analyzer.html)。
+当 `ES` 中的内置分词器不能满足需求时，我们可以[定制自己的分词器](https://www.elastic.co/guide/en/elasticsearch/reference/current/analysis-custom-analyzer.html)。
 
 在上文中已经介绍过一个分词器由 3 部分组成：
 
-- Character Filters：字符过滤，用于删去某些字符。
+- `Character Filters`：字符过滤，用于删去某些字符。
   - 该组件可以有 0 或多个。
-- Tokenizer：分词过程，按照某个规则将文档切分为单词，比如用空格来切分。
+- `Tokenizer`：分词过程，按照某个规则将文档切分为单词，比如用空格来切分。
   - 该组件有且只能有一个。
-- Token Filter：对切分好的单词进一步加工，比如大小写转换，删除停用词等。
+- `Token Filter`：对切分好的单词进一步加工，比如大小写转换，删除停用词等。
   - 该组件可以有 0 或多个。
 
 
 
 ### 7.1.内置分词器组件
 
-ES 对这 3 部分都有内置：
+`ES` 对这 3 部分都有内置：
 
-- 内置 Character Filters
+- 内置 `Character Filters`
   - [HTML Strip](https://www.elastic.co/guide/en/elasticsearch/reference/current/analysis-htmlstrip-charfilter.html)：去除 HTML 标签。
   - [Mapping](https://www.elastic.co/guide/en/elasticsearch/reference/current/analysis-mapping-charfilter.html)：字符串替换。
   - [Pattern Replace](https://www.elastic.co/guide/en/elasticsearch/reference/current/analysis-pattern-replace-charfilter.html)：正则匹配替换。
@@ -262,7 +262,7 @@ POST index_name/_analyze
 elasticsearch-plugin install analysis-icu
 ```
 
-**analysis-icu** 在 ES 中的名称为 `icu_analyzer`。
+**analysis-icu** 在 `ES` 中的名称为 `icu_analyzer`。
 
 还有一些其它的中文分词器：
 
@@ -290,7 +290,7 @@ elasticsearch-plugin install analysis-icu
 
 ### 9.1.IK分词器的安装
 
-**下载地址：**https://github.com/medcl/elasticsearch-analysis-ik/releases在这上面有elasticsearch所对应版本的IK分词器以编译的包，可以在上面找到对应版本进行下载使用
+**下载地址：**https://github.com/medcl/elasticsearch-analysis-ik/releases在这上面有 `elasticsearch` 所对应版本的IK分词器以编译的包，可以在上面找到对应版本进行下载使用
 
 1. 下载：
 
@@ -298,17 +298,15 @@ elasticsearch-plugin install analysis-icu
    wget https://github.com/medcl/elasticsearch-analysis-ik/releases/download/v7.5.1/elasticsearch-analysis-ik-7.5.1.zip
    ```
 
-   
-
-2. 在解压到elasticsearch/plugin/ik/文件夹中，ik文件夹需要自己建
+2. 在解压到 `elasticsearch/plugin/ik/` 文件夹中，`ik` 文件夹需要自己建
 
    ```
    unzip elasticsearch-analysis-ik-7.5.1.zip -d $ES_HOME/plugins/ik/
    ```
 
-   把$ES_HOME替换成你elasticsearch所在目录即可
+   把 `$ES_HOME` 替换成你 `elasticsearch` 所在目录即可
 
-3. 重启elasticsearch后就可以用了
+3. 重启 `elasticsearch` 后就可以用了
 
 
 
@@ -342,9 +340,9 @@ PUT my_index
 }
 ```
 
-IK分词器示例：
+`IK` 分词器示例：
 
-1. ik_smart:会做最粗粒度的拆分
+1. `ik_smart`:会做最粗粒度的拆分
 
    ```
    POST _analyze
@@ -356,7 +354,7 @@ IK分词器示例：
 
    ![image-20210221190812724](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/elastic-search-demo/20210312211148.png)
 
-2. ik_max_word:会将文本做最细粒度的拆分
+2. `ik_max_word`:会将文本做最细粒度的拆分
 
    ```
    POST _analyze
@@ -372,7 +370,7 @@ IK分词器示例：
 
 ### 9.3.扩展词典
 
-在`$ES_HOME/plugins/ik/elasticsearch-analysis-ik-7.5.1/config/IKAnalyzer.cfg.xml` 配置文件下
+在 `$ES_HOME/plugins/ik/elasticsearch-analysis-ik-7.5.1/config/IKAnalyzer.cfg.xml`  配置文件下
 
 ```
 <?xml version="1.0" encoding="UTF-8"?>
@@ -390,61 +388,61 @@ IK分词器示例：
 </properties>
 ```
 
-其中custom.dic为自定义的扩展字典， 内容可以根据自己需要，自定义分词的文字。
+其中 `custom.dic` 为自定义的扩展字典， 内容可以根据自己需要，自定义分词的文字。
 
-保存后重启elasticsearch即可看到自己想要的分词效果。
+保存后重启 `elasticsearch` 即可看到自己想要的分词效果。
 
 
 
 ## 10.ES 实现实时从Mysql数据库中读取热词,停用词
 
-IK分词器虽然自带词库
+`IK` 分词器虽然自带词库
 
 ![image-20210306213327744](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/elastic-search-demo/image-20210306213327744.png)
 
-但是在实际开发应用中对于词库的灵活度的要求是远远不够的,IK分词器虽然配置文件中能添加扩展词库,但是需要重启ES
+但是在实际开发应用中对于词库的灵活度的要求是远远不够的，`IK` 分词器虽然配置文件中能添加扩展词库，但是需要重启 `ES`
 
-其实IK本身是支持热更新词库的,但是需要我感觉不是很好
+其实 `IK` 本身是支持热更新词库的,但是需要我感觉不是很好
 
 词库热更新方案:
 
-1. IK 原生的热更新方案,部署一个WEB服务器,提供一个Http接口,通过Modified和tag两个Http响应头,来完成词库的热更新
+1. `IK` 原生的热更新方案,部署一个 `WEB` 服务器,提供一个 `Http` 接口，通过 `Modified` 和 `tag` 两个 `Http` 响应头，来完成词库的热更新
 
-2. 通过修改IK源码支持Mysql定时更新数据
+2. 通过修改 `IK` 源码支持 `Mysql` 定时更新数据
 
-注意:推荐使用第二种方案,也是比较常用的方式,虽然第一种是官方提供的,但是官方也不建议使用
+注意:推荐使用第二种方案，也是比较常用的方式，虽然第一种是官方提供的，但是官方也不建议使用
 
  
 
 ### 10.1.方案一:IK原生方案
 
-1. 外挂词库,就是在IK配置文件中添加扩展词库文件多个之间使用分号分割
+1. 外挂词库，就是在 `IK` 配置文件中添加扩展词库文件多个之间使用分号分割
 
-   优点:编辑指定词库文件,部署比较方便
+   优点：编辑指定词库文件，部署比较方便
 
-   缺点:每次编辑更新后都需要重启ES
+   缺点：每次编辑更新后都需要重启 `ES`
 
-2. 远程词库,就是在IK配置文件中配置一个Http请求,可以是.dic文件,也可以是接口,同样多个之间使用分号分割
+2. 远程词库，就是在 `IK` 配置文件中配置一个 `Http` 请求，可以是 `.dic` 文件,也可以是接口，同样多个之间使用分号分割
 
-   优点:指定静态文件,或者接口设置词库实现热更新词库,不用重启ES,是IK原生自带的
+   优点：指定静态文件，或者接口设置词库实现热更新词库，不用重启 `ES`，是 `IK` 原生自带的
 
-   缺点:需要通过Modified和tag两个Http响应头,来提供词库的热更新,有时候会不生效
+   缺点：需要通过 `Modified` 和 `tag` 两个 `Http` 响应头，来提供词库的热更新，有时候会不生效
 
-具体使用就不说了,在这里具体说第二种方案
+具体使用就不说了，在这里具体说第二种方案
 
 
 
 ### 10.2.方案二:通过定时读取Mysql完成词库的热更新
 
-首先要下载IK分词器的源码
+首先要下载 `IK` 分词器的源码
 
 网址:https://github.com/medcl/elasticsearch-analysis-ik
 
-下载的时候一定要选对版本,保持和ES的版本一致,否则会启动的时候报错,版本不一致
+下载的时候一定要选对版本，保持和 `ES` 的版本一致，否则会启动的时候报错,版本不一致
 
-接着把源码导入IDEA中,并在POM.xml中添加Mysql的依赖,根据自己的Mysql版本需要添加
+接着把源码导入 `IDEA` 中，并在 `POM.xml` 中添加 `Mysql` 的依赖，根据自己的 `Mysql` 版本需要添加
 
-我的Mysql是5.6.1所以添加5的驱动包
+我的 `Mysql` 是 `5.6.1` 所以添加 `5` 的驱动包
 
 ```
 <!-- https://mvnrepository.com/artifact/mysql/mysql-connector-java -->
@@ -455,11 +453,11 @@ IK分词器虽然自带词库
         </dependency>
 ```
 
-然后再config目录下创建一个新的.properties配置文件
+然后再 `config` 目录下创建一个新的 `.properties` 配置文件
 
 ![image-20210306213653363](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/elastic-search-demo/image-20210306213653363.png)
 
- 在里面配置Mysql的一些配置,以及我们需要的配置
+ 在里面配置 `Mysql` 的一些配置,以及我们需要的配置
 
 ```
 jdbc.url=jdbc:mysql://192.168.43.154:3306/es?characterEncoding=UTF-8&serverTimezone=GMT&nullCatalogMeansCurrent=true
@@ -473,7 +471,7 @@ jdbc.reload.stopword.sql=select stopword as word from hot_stopwords
 jdbc.reload.interval=5000
 ```
 
-创建一个新的线程，用于调用Dictionary得reLoadMainDict()方法重新加载词库
+创建一个新的线程，用于调用 `Dictionary` 得 `reLoadMainDict()` 方法重新加载词库
 
 ![image-20210306213729281](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/elastic-search-demo/image-20210306213729281.png)
 
@@ -499,9 +497,9 @@ public class HotDicReloadThread implements Runnable{
 }
 ```
 
-修改org.wltea.analyzer.dic文件夹下的Dictionary
+修改 `org.wltea.analyzer.dic` 文件夹下的 `Dictionary`
 
-在Dictionary类中加载mysql驱动类
+在 `Dictionary` 类中加载 `mysql` 驱动类
 
 ```java
 private static Properties prop = new Properties();
@@ -515,7 +513,7 @@ private static Properties prop = new Properties();
     }
 ```
 
-接着,创建重Mysql中加载词典的方法
+接着,创建重 `Mysql` 中加载词典的方法
 
 ```java
 	/**
@@ -576,7 +574,7 @@ private static Properties prop = new Properties();
     }
 ```
 
-接着,创建加载停用词词典方法
+接着，创建加载停用词词典方法
 
 ```java
 	/**
@@ -633,7 +631,7 @@ private static Properties prop = new Properties();
     }
 ```
 
-接下来,分别在loadMainDict()方法和loadStopWordDict()方法结尾处调用
+接下来,分别在 `loadMainDict()` 方法和 `loadStopWordDict()` 方法结尾处调用
 
 ```java
 	/**
@@ -706,7 +704,7 @@ private static Properties prop = new Properties();
     }
 ```
 
-最后在initial()方法中启动更新线程
+最后在 `initial()` 方法中启动更新线程
 
 ```java
 	/**
@@ -748,7 +746,7 @@ private static Properties prop = new Properties();
     }
 ```
 
-然后,修改src/main/assemblies/plugin.xml文件中,加入Mysql
+然后，修改 `src/main/assemblies/plugin.xml` 文件中，加入`Mysql`
 
 ```
 		<dependencySet>
@@ -763,7 +761,7 @@ private static Properties prop = new Properties();
 
 源码至此修改完成，在自己的数据库中创建两张新的表
 
-建表SQL
+建表 `SQL`
 
 ```
 CREATE TABLE hot_words (
@@ -781,15 +779,15 @@ CREATE TABLE hot_stopwords (
 
 接下来对源码进行打包:
 
-打包之前检查自己的POM.xml中的elasticsearch.version的版本,记得和自己的ES的版本对应,否则到时候会报错
+打包之前检查自己的 `POM.xml` 中的 `elasticsearch.version` 的版本，记得和自己的 `ES` 的版本对应，否则到时候会报错
 
 ![image-20210306214035983](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/elastic-search-demo/image-20210306214035983.png)
 
-检查完毕后,点击IDEA右侧的package进行项目打包,如果版本不对,修改版本并点击IDEA右侧的刷新同步,进行版本的更换,然后打包
+检查完毕后,点击 `IDEA` 右侧的 `package` 进行项目打包,如果版本不对,修改版本并点击 `IDEA` 右侧的刷新同步,进行版本的更换,然后打包
 
 ![image-20210306214056152](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/elastic-search-demo/image-20210306214056152.png)
 
- 打包完成后在左侧项目中会出现target目录,会看到一个zip,我的是因为解压了,所以有文件夹
+ 打包完成后在左侧项目中会出现 `target` 目录,会看到一个 `zip` ,我的是因为解压了,所以有文件夹
 
 ![image-20210306214118479](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/elastic-search-demo/image-20210306214118479.png)
 
@@ -801,17 +799,17 @@ CREATE TABLE hot_stopwords (
 
 ![image-20210306214158884](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/elastic-search-demo/image-20210306214158884.png)
 
-先把原来ES下的plugins下的IK文件夹中的东西删除,可以先备份,然后把自己打包解压后里面的东西全部拷贝到ES下的plugins下的IK文件夹中
+先把原来 `ES` 下的 `plugins` 下的 `IK` 文件夹中的东西删除,可以先备份,然后把自己打包解压后里面的东西全部拷贝到 `ES` 下的 `plugins` 下的 `IK` 文件夹中
 
 ![image-20210306214221905](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/elastic-search-demo/image-20210306214221905.png)
 
-接下来进入bin目录下启动就可以了
+接下来进入 `bin` 目录下启动就可以了
 
 当然按照惯例,我的启动时不会那么简单的,很高兴,我的报错了,所有的坑都踩了一遍,之前的版本不对就踩了两次
 
 第一次是源码下载的版本不对
 
-第二次的ES依赖版本不对
+第二次的 `ES` 依赖版本不对
 
 好了说报错:报错只贴主要内容
 
@@ -821,9 +819,9 @@ CREATE TABLE hot_stopwords (
 Caused by: java.security.AccessControlException: access denied ("java.lang.RuntimePermission" "setContextClassLoader")
 ```
 
-这个是JRE的类的创建设值权限不对
+这个是 `JRE` 的类的创建设值权限不对
 
-在jre/lib/security文件夹中有一个java.policy文件,在其grant{}中加入授权即可
+在 `jre/lib/security` 文件夹中有一个 `java.policy` 文件,在其 `grant{}` 中加入授权即可
 
 ```
 permission java.lang.RuntimePermission "createClassLoader"; 
@@ -840,7 +838,7 @@ Caused by: java.security.AccessControlException: access denied ("java.net.Socket
 
 这个是通信链接等权限不对
 
-也是,在jre/lib/security文件夹中有一个java.policy文件,在其grant{}中加入授权即可
+也是,在 `jre/lib/security` 文件夹中有一个 `java.policy` 文件,在其 `grant{}` 中加入授权即可
 
 ```
 permission java.net.SocketPermission "192.168.43.154:3306","accept";
@@ -851,7 +849,7 @@ permission java.net.SocketPermission "192.168.43.154:3306","connect";
 
 到此之后启动无异常
 
-最后就是测试了,启动我的head插件和kibana,这两个没有或者不会的可以看我之前写的,也可以百度
+最后就是测试了,启动我的 `head` 插件和 `kibana`,这两个没有或者不会的可以看我之前写的,也可以百度
 
 执行分词
 
@@ -859,7 +857,7 @@ permission java.net.SocketPermission "192.168.43.154:3306","connect";
 
 但是我想要 天青色
 
-在Mysql中添加记录
+在 `Mysql` 中添加记录
 
 ```
 insert into hot_words(word) value("天青色");
@@ -871,7 +869,7 @@ insert into hot_words(word) value("天青色");
 
 也比如我想要这就是一个词 天青色等烟雨
 
-在Mysql中添加记录
+在 `Mysql` 中添加记录
 
 ```
 insert into hot_words(word) value("天青色等烟雨");
@@ -881,7 +879,7 @@ insert into hot_words(word) value("天青色等烟雨");
 
 ![image-20210306214429920](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/elastic-search-demo/image-20210306214429920.png)
 
-到此实现了ES定时从mysql中读取热词,停用词这个一般用的比较少,有兴趣自己测测,在使用的时候,通过业务系统往数据库热词表和停用词表添加记录就可以了
+到此实现了 `ES` 定时从 `mysql` 中读取热词,停用词这个一般用的比较少,有兴趣自己测测,在使用的时候,通过业务系统往数据库热词表和停用词表添加记录就可以了
 
 
 
