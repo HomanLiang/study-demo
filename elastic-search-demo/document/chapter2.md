@@ -12,7 +12,7 @@ ES 是基于 Java 语言开发的，因此，要安装 ES，首先需要有 Java
 
 从 ES 7.0 开始，ES 内置了 Java 环境，所以如果安装的是 7.0 及以上版本的 ES，就不需要额外安装 Java 环境了。
 
-我们可以到 [ES 的下载页面](https://www.elastic.co/downloads/elasticsearch)去下载 ES 安装包，你可以根据你的系统，选择不同的安装包进行安装。
+我们可以到 [ES 的下载页面](https://www.elastic.co/downloads/elasticsearch) 去下载 ES 安装包，你可以根据你的系统，选择不同的安装包进行安装。
 
 ![image-20210227123553772](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/elastic-search-demo/image-20210227123553772.png)
 
@@ -38,17 +38,16 @@ ES 是基于 Java 语言开发的，因此，要安装 ES，首先需要有 Java
 
 - **config** 目录是一些配置文件。
 
-  - `elasticsearch.yml` 文件用于配置 ES 服务。
+  - `elasticsearch.yml` 文件用于配置 `ES` 服务。
 
-  - `jvm.options` 文件用于配置 JVM 参数。
-
-    - 其中 Xmx 和 Xms 建议设置的大小一样，且不超过机器内存的一半。
-    - Xmx 和 Xms 默认为 1g。
+  - `jvm.options` 文件用于配置 `JVM` 参数。
+- 其中 `Xmx` 和 `Xms` 建议设置的大小一样，且不超过机器内存的一半。
+    - `Xmx` 和 `Xms` 默认为 `1g`。
     - [这里](https://www.elastic.co/cn/blog/a-heap-of-trouble)有一些介绍，你可以参考一下。
 
 ### 1.2.启动 ES
 
-**bin** 目录中有一个 `elasticsearch` 命令，用于运行 ES 实例。我们可以通过 `--help` 参数查看其帮助：
+**bin** 目录中有一个 `elasticsearch` 命令，用于运行 `ES` 实例。我们可以通过 `--help` 参数查看其帮助：
 
 ```shell
 > bin\elasticsearch --help
@@ -78,9 +77,9 @@ bin\elasticsearch
 bin/elasticsearch
 ```
 
-如果启动成功，ES Server 将在本机的 9200 端口监听服务。
+如果启动成功，`ES Server` 将在本机的 `9200` 端口监听服务。
 
-我们可以使用 **curl** 命令访问本机 9200 端口，查看 ES 是否启动成功。如果输出像下面这样，则说明启动成功：
+我们可以使用 **curl** 命令访问本机 `9200` 端口，查看 `ES` 是否启动成功。如果输出像下面这样，则说明启动成功：
 
 ```shell
 > curl http://localhost:9200/ 
@@ -234,20 +233,21 @@ ip        heap.percent ram.percent cpu  node.role  master name
 
 ## 2.head插件
 
-head插件可以用来快速查看elasticsearch中的数据概况以及非全量的数据，也支持控件化查询和rest请求，但是体验都不是很好。
+`head` 插件可以用来快速查看 `elasticsearch` 中的数据概况以及非全量的数据，也支持控件化查询和 `rest` 请求，但是体验都不是很好。
+
  一般就用它来看各个索引的数据量以及分片的状态。
 
 ### 2.1.elasticsearch-head插件的作用
 
-ealsticsearch是一个分布式、RESTful 风格的搜索和数据分析引擎，所有的数据都是后台服务存储着，类似于Mysql服务器，因此如果我们需要直观的查看数据，就需要使用可视化工具了。elasticsearch-head是Web前端，用于浏览和与Elastic Search集群进行交互，可用于集群管理、数据可视化、增删改查工具Elasticsearch语句可视化等。
+`ealsticsearch` 是一个分布式、`RESTful` 风格的搜索和数据分析引擎，所有的数据都是后台服务存储着，类似于 `Mysql` 服务器，因此如果我们需要直观的查看数据，就需要使用可视化工具了。`elasticsearch-head` 是 `Web` 前端，用于浏览和与 `Elastic Search` 集群进行交互，可用于集群管理、数据可视化、增删改查工具 `Elasticsearch` 语句可视化等。
 
 ### 2.2.elasticsearch-head插件的安装
 
-- 下载elasticsearch-head插件，地址：https://github.com/mobz/elasticsearch-head
+- 下载 `elasticsearch-head` 插件，地址：https://github.com/mobz/elasticsearch-head
 
-- 进入elasticsearch-head源码目录中，执行 `npm install`
+- 进入 `elasticsearch-head` 源码目录中，执行 `npm install`
 
-  在运行npm install时，可能会存在Head插件phantomjs权限问题
+  在运行 `npm install` 时，可能会存在 `Head` 插件 `phantomjs` 权限问题
 
   ```
   npm WARN deprecated phantomjs-prebuilt@2.1.16: this package is now deprecated
@@ -284,7 +284,7 @@ ealsticsearch是一个分布式、RESTful 风格的搜索和数据分析引擎�
   npm ERR!     C:\Users\ysxx\AppData\Roaming\npm-cache\_logs\2020-12-28T01_28_03_195Z-debug.log
   ```
 
-  解决方案：在npm install命令后加 -g 参数
+  解决方案：在 `npm install` 命令后加 `-g` 参数
 
   ```
   npm install -g
@@ -333,23 +333,23 @@ ealsticsearch是一个分布式、RESTful 风格的搜索和数据分析引擎�
 
 - 基本查询
 
-  选择一个索引，然后再选择不同的查询条件，勾选“显示查询语句”，点击搜索，可以看到具体的查询json和查询结果，点击“显示原始JSON”，可以看到未经格式化的查询json
+  选择一个索引，然后再选择不同的查询条件，勾选“显示查询语句”，点击搜索，可以看到具体的查询 `json` 和查询结果，点击“显示原始JSON”，可以看到未经格式化的查询 `json`
 
   ![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/elastic-search-demo/20210503232239.png)
 
 - 复合查询
 
-  可以使用json进行复杂的查询，也可发送put请求新增及跟新索引，使用delete请求删除索引等等。
+  可以使用 `json` 进行复杂的查询，也可发送 `put` 请求新增及跟新索引，使用 `delete` 请求删除索引等等。
 
   ![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/elastic-search-demo/20210503232309.png)
 
-  使用json进行复杂的查询，也可发送put请求新增及跟新索引，使用delete请求删除索引等等。
+  使用 `json` 进行复杂的查询，也可发送 `put` 请求新增及跟新索引，使用 `delete` 请求删除索引等等。
 
 ### 2.4.总结
 
-elasticsearch-head插件是较早支持Elasticsearch的可视化客户端工具之一，目前功能还是能够使用，界面美感有些不足，在elasticsearch-head插件的GitHub上发布版本的时间（2018年4月）来看，应该属于功能基本停更的状态，这也是其使用上的不足之处吧。
+`elasticsearch-head` 插件是较早支持 `Elasticsearch` 的可视化客户端工具之一，目前功能还是能够使用，界面美感有些不足，在 `elasticsearch-head` 插件的 `GitHub` 上发布版本的时间（2018年4月）来看，应该属于功能基本停更的状态，这也是其使用上的不足之处吧。
 
-elasticsearch-head插件可以对数据进行增删改查操作，故生产环境尽量不要使用，如果要使用，最少要限制IP地址。
+`elasticsearch-head` 插件可以对数据进行增删改查操作，故生产环境尽量不要使用，如果要使用，最少要限制 `IP` 地址。
 
 
 
