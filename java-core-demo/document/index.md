@@ -24,6 +24,7 @@
 4. [Java 本地化](https://github.com/HomanLiang/study-demo/blob/main/java-core-demo/document/chapter2_4.md)
 5. [JDK8 入门指南](https://github.com/HomanLiang/study-demo/blob/main/java-core-demo/document/chapter2_5.md)
 6. [字符编码](https://github.com/HomanLiang/study-demo/blob/main/java-core-demo/document/chapter2_6.md)
+7. 
 
 ## Java 容器
 
@@ -64,8 +65,6 @@
 1. [Tomcat](https://github.com/HomanLiang/study-demo/blob/main/java-core-demo/document/chapter6_01.md)
 
 ## Java 基础应用
-
-Java基础
 
 1. [Java 生成随机数](https://github.com/HomanLiang/study-demo/blob/main/java-core-demo/document/chapter7_01.md)
 2. [实用的jar包加密方案](https://github.com/HomanLiang/study-demo/blob/main/java-core-demo/document/chapter7_02.md)
