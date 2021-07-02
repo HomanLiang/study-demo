@@ -6,7 +6,7 @@
 
 ## 1.URI 查询格式
 
-URI 查询的一般格式如下：
+`URI` 查询的一般格式如下：
 
 ```shell
 GET /index_name/_search?q=key:val&df=title&sort=year:desc&from=0&size=10
@@ -17,14 +17,14 @@ GET /index_name/_search?q=key:val&df=title&sort=year:desc&from=0&size=10
 
 其中的参数代表的含义如下：
 
-- q：用于指定查询语句，它可以是一个键值对，也可以只有一个 val。
-  - key 表示在哪个字段中查询。
-  - val 表示查询的内容。
-- df：查询中未定义字段前缀时使用的默认字段。如果不指定，默认会对所有字段进行查询。
-- sort：指定排序规则。
-- from：与 size 一起用于分页。
-- profile：用于查看查询执行的详细过程，可参考[这里](https://www.elastic.co/guide/en/elasticsearch/reference/7.0/search-profile.html)。
-- 更多的 URI 参数可参考[这里](https://www.elastic.co/guide/en/elasticsearch/reference/7.0/search-uri-request.html)。
+- `q`：用于指定查询语句，它可以是一个键值对，也可以只有一个 `val`。
+  - `key` 表示在哪个字段中查询。
+  - `val` 表示查询的内容。
+- `df`：查询中未定义字段前缀时使用的默认字段。如果不指定，默认会对所有字段进行查询。
+- `sort`：指定排序规则。
+- `from`：与 `size` 一起用于分页。
+- `profile`：用于查看查询执行的详细过程，可参考[这里](https://www.elastic.co/guide/en/elasticsearch/reference/7.0/search-profile.html)。
+- 更多的 `URI` 参数可参考[这里](https://www.elastic.co/guide/en/elasticsearch/reference/7.0/search-uri-request.html)。
 
 
 

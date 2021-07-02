@@ -8,25 +8,25 @@
 
 ## 1.ES聚合分析是什么
 
-ES 中的[聚合分析](https://www.elastic.co/guide/en/elasticsearch/reference/7.10/search-aggregations.html)（Aggregations）是对数据的统计分析功能，它的优点是**实时性较高**，相比于 Hadoop 速度更快。
+`ES` 中的[聚合分析](https://www.elastic.co/guide/en/elasticsearch/reference/7.10/search-aggregations.html)（`Aggregations`）是对数据的统计分析功能，它的优点是**实时性较高**，相比于 `Hadoop` 速度更快。
 
 
 
 ## 2.聚合的分类
 
-ES 中的聚合分析主要有以下 3 大类，每一类都提供了多种统计方法：
+`ES` 中的聚合分析主要有以下 3 大类，每一类都提供了多种统计方法：
 
-- Metrics：对文档字段进行统计分析（数学运算），多数Metrics的输出是单个值，部分Metrics的输出是多个值。
+- `Metrics`：对文档字段进行统计分析（数学运算），多数 `Metrics` 的输出是单个值，部分 `Metrics` 的输出是多个值。
   - [Sum](https://www.elastic.co/guide/en/elasticsearch/reference/7.10/search-aggregations-metrics-sum-aggregation.html)：求和
   - [Max](https://www.elastic.co/guide/en/elasticsearch/reference/7.10/search-aggregations-metrics-max-aggregation.html)：求最大值
   - [Min](https://www.elastic.co/guide/en/elasticsearch/reference/7.10/search-aggregations-metrics-min-aggregation.html)：求最小值
   - [Avg](https://www.elastic.co/guide/en/elasticsearch/reference/7.10/search-aggregations-metrics-avg-aggregation.html)：求平均值
   - 等
-- Bucket：一些满足特定条件的文档集合（对文档进行分组）。
+- `Bucket`：一些满足特定条件的文档集合（对文档进行分组）。
   - [Terms](https://www.elastic.co/guide/en/elasticsearch/reference/7.10/search-aggregations-bucket-terms-aggregation.html)
   - [Range](https://www.elastic.co/guide/en/elasticsearch/reference/7.10/search-aggregations-bucket-range-aggregation.html)
   - 等
-- Pipeline：对其它的聚合结果进行再聚合。
+- `Pipeline`：对其它的聚合结果进行再聚合。
   - [Avg bucket](https://www.elastic.co/guide/en/elasticsearch/reference/7.10/search-aggregations-pipeline-avg-bucket-aggregation.html)：求平均值
   - [Max bucket](https://www.elastic.co/guide/en/elasticsearch/reference/7.10/search-aggregations-pipeline-max-bucket-aggregation.html)：求最大值
   - [Min bucket](https://www.elastic.co/guide/en/elasticsearch/reference/7.10/search-aggregations-pipeline-min-bucket-aggregation.html)：求最小值
@@ -69,27 +69,24 @@ POST index_name/_search
 
 ## 3.Metrics 聚合
 
-Metrics 聚合可以分为单值分析和多值分析：
+`Metrics` 聚合可以分为单值分析和多值分析：
 
 - 单值分析：分析结果是单个值
 
-  - max
+  - `max`
 
-  - min
+  - `min`
 
-  - avg
+  - `avg`
 
-  - sum
+  - `sum`
 
-  - cardinality
-
-    ：类似 distinct count
-
-    - 注意 cardinality 对 keyword 类型数据和 text 类型数据的区别
-    - keyword 类型不会进行分词处理，而 text 类型会进行分词处理
+  - `cardinality`：类似 `distinct count`
+- 注意 `cardinality` 对 `keyword` 类型数据和 `text` 类型数据的区别
+    - `keyword` 类型不会进行分词处理，而 text 类型会进行分词处理
 
   - 等
-
+  
 - 多值分析：分析结果是多个值
 
   - [stats](https://www.elastic.co/guide/en/elasticsearch/reference/7.10/search-aggregations-metrics-stats-aggregation.html)
@@ -97,7 +94,7 @@ Metrics 聚合可以分为单值分析和多值分析：
   - [string stats](https://www.elastic.co/guide/en/elasticsearch/reference/7.10/search-aggregations-metrics-string-stats-aggregation.html)
   - [percentiles](https://www.elastic.co/guide/en/elasticsearch/reference/7.10/search-aggregations-metrics-percentile-aggregation.html)
   - [percentile ranks](https://www.elastic.co/guide/en/elasticsearch/reference/7.10/search-aggregations-metrics-percentile-rank-aggregation.html)
-  - [top hits](https://www.elastic.co/guide/en/elasticsearch/reference/7.10/search-aggregations-metrics-top-hits-aggregation.html)：根据一定的规则排序，选 top N
+  - [top hits](https://www.elastic.co/guide/en/elasticsearch/reference/7.10/search-aggregations-metrics-top-hits-aggregation.html)：根据一定的规则排序，选 `top N`
   - 等
 
 ### 3.1.示例
@@ -268,14 +265,14 @@ POST employees/_search
 
 ## 4.Bucket 聚合
 
-Bucket 聚合按照一定的规则，将文档分配到不同的**桶**中，达到分类的目的。
+`Bucket` 聚合按照一定的规则，将文档分配到不同的**桶**中，达到分类的目的。
 
-Bucket 聚合**支持嵌套**，也就是在桶里再次分桶。
+`Bucket` 聚合**支持嵌套**，也就是在桶里再次分桶。
 
-Bucket 聚合算法：
+`Bucket` 聚合算法：
 
-- Terms：根据关键字（字符串）分桶。text类型的字段需要打开 `fielddata` 配置。
-  - 注意 keyword 类型不会做分词处理，text 类型会做分词处理。
+- `Terms`：根据关键字（字符串）分桶。`text` 类型的字段需要打开 `fielddata` 配置。
+  - 注意 `keyword` 类型不会做分词处理，`text`  类型会做分词处理。
   - 另外 **size 参数**可以控制**桶的数量**。
 - [Range](https://www.elastic.co/guide/en/elasticsearch/reference/7.10/search-aggregations-bucket-range-aggregation.html)：按照范围进行分桶，主要针对**数字类型的数据**。
 - [Date range](https://www.elastic.co/guide/en/elasticsearch/reference/7.10/search-aggregations-bucket-daterange-aggregation.html)
@@ -324,7 +321,7 @@ POST employees/_search
 }
 ```
 
-对 Text 字段进行 terms 聚合查询会出错，示例：
+对 `Text` 字段进行 `terms` 聚合查询会出错，示例：
 
 ```shell
 # 对 Text 字段进行 terms 聚合查询
@@ -521,7 +518,7 @@ POST employees/_search
 
 ## 5.Pipeline 聚合
 
-Pipeline 聚合用于对其它聚合的结果进行再聚合。
+`Pipeline` 聚合用于对其它聚合的结果进行再聚合。
 
 根据 **Pipeline 聚合**与**原聚合**的位置区别，分为两类：
 
@@ -637,7 +634,7 @@ POST employees/_search
 
 ## 6.聚合的作用范围
 
-ES 聚合的默认作用范围是 Query 的查询结果，如果没有写 Query，那默认就是在索引的所有数据上做聚合。
+`ES` 聚合的默认作用范围是 `Query` 的查询结果，如果没有写 `Query`，那默认就是在索引的所有数据上做聚合。
 
 比如：
 
@@ -658,17 +655,17 @@ POST employees/_search
 }
 ```
 
-ES 支持通过以下方式来改变聚合的作用范围：
+`ES` 支持通过以下方式来改变聚合的作用范围：
 
-- Query：ES 聚合的默认作用范围。
+- `Query`：`ES` 聚合的默认作用范围。
   - **一般设置 size 为 0**。
-  - 如果没有写 Query，那默认就是在索引的所有数据上做聚合。
-- Filter：写在某个聚合的内部，只控制某个聚合的作用范围。
+  - 如果没有写 `Query`，那默认就是在索引的所有数据上做聚合。
+- `Filter`：写在某个聚合的内部，只控制某个聚合的作用范围。
   - **一般设置 size 为 0**。
-- Post Filter：对聚合没有影响，只是对聚合的结果进行再过滤。
+- `Post Filter`：对聚合没有影响，只是对聚合的结果进行再过滤。
   - **不再设置 size 为 0**。
   - **使用场景**：获取聚合信息，并获取符合条件的文档。
-- Global：会覆盖掉 Query 的影响。
+- `Global`：会覆盖掉 `Query` 的影响。
 
 
 
@@ -931,10 +928,10 @@ POST index_name/_search
 提高 **terms** 聚合的精准度有两种方式：
 
 - 将主分片数设置为 1。
-  - 因为 terms 的不准确是由于分片导致的，如果将主分片数设置为 1，就不存在不准确的问题。
+  - 因为 `terms` 的不准确是由于分片导致的，如果将主分片数设置为 1，就不存在不准确的问题。
   - 这种方式在数据量不是很大的时候，可以是使用。
-- 将shard_size的值尽量调大（意味着从分片上额外获取更多的数据，从而提升准确度）。
-  - **shard_size** 值变大后，会使得计算量变大，进而使得 ES 的**整体性能变低，精准度变高**。
+- 将 `shard_size` 的值尽量调大（意味着从分片上额外获取更多的数据，从而提升准确度）。
+  - **shard_size** 值变大后，会使得计算量变大，进而使得 `ES` 的**整体性能变低，精准度变高**。
   - 所以需要权衡 **shard_size** 值与精准度的平衡。
   - **shard_size** 值的默认值是 【[**size**](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-bucket-terms-aggregation.html#search-aggregations-bucket-terms-aggregation-size) * **1.5 + 10**】。
 

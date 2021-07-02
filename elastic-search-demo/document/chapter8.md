@@ -10,7 +10,7 @@
 
 默认情况下，查询按照算分排序，返回前 10 条记录。
 
-ES 也支持分页，分页使用 [from-size](https://www.elastic.co/guide/en/elasticsearch/reference/7.0/search-request-from-size.html)：
+`ES` 也支持分页，分页使用 [from-size](https://www.elastic.co/guide/en/elasticsearch/reference/7.0/search-request-from-size.html)：
 
 - **from**：从第几个文档开始返回，默认为 0。
 - **size**：返回的文档数，默认为 10。
@@ -30,17 +30,17 @@ POST /index_name/_search
 
 ### 1.1.深度分页问题
 
-ES 是一个分布式系统，数据保存在多个分片中，那么查询时就需要查询多个分片。
+`ES` 是一个分布式系统，数据保存在多个分片中，那么查询时就需要查询多个分片。
 
-比如一个查询 `from = 990; size = 10`，那么 ES 需要在每个分片上都获取 1000 个文档：
+比如一个查询 `from = 990; size = 10`，那么 `ES` 需要在每个分片上都获取 `1000` 个文档：
 
 ![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/elastic-search-demo/20210315103542.png)
 
 然后通过 **Coordinating** 节点汇总结果，最后再通过排序获取前 1000 个文档。
 
-这种方式，当页数很深的时候，就会占用很多内存，从而给 ES 集群带来很大的开销，这就是**深度分页问题**。
+这种方式，当页数很深的时候，就会占用很多内存，从而给 `ES` 集群带来很大的开销，这就是**深度分页问题**。
 
-因此，ES 为了避免此类问题带来的巨大开销，有个默认的限制 [index.max_result_window](https://www.elastic.co/guide/en/elasticsearch/reference/7.10/index-modules.html)，`from + size` 必须小于等于 10000，否则就会**报错**。
+因此，`ES` 为了避免此类问题带来的巨大开销，有个默认的限制 [index.max_result_window](https://www.elastic.co/guide/en/elasticsearch/reference/7.10/index-modules.html)，`from + size` 必须小于等于 10000，否则就会**报错**。
 
 比如：
 
@@ -73,7 +73,7 @@ POST index_name/_search
 [Search After](https://www.elastic.co/guide/en/elasticsearch/reference/7.10/paginate-search-results.html#search-after) 通过实时获取下一页的文档信息来实现，使用方法：
 
 - 第一步搜索需要指定 **sort**，并且保证值是唯一的（通过 `sort by id` 来保证）。
-- 随后的搜索，都使用上一次搜索的最后一个文档的 sort 值进行搜索。
+- 随后的搜索，都使用上一次搜索的最后一个文档的 `sort` 值进行搜索。
 
 **Search After** 的方式不支持指定页数，只能一页一页的往下翻。
 
@@ -181,18 +181,18 @@ POST /_search/scroll
 分页方式共 4 种：
 
 - 普通查询（不使用分页）：需要实时获取顶部的部分文档。
-- From-Size（普通分页）：适用于非深度分页。
-  - from/size方案的优点是简单，缺点是在深度分页的场景下系统开销比较大，占用较多内存。
-- Search After：需要深度分页时使用。
-  - search after基于ES内部排序好的游标，可以实时高效的进行分页查询，但是它只能做下一页这样的查询场景，不能随机的指定页数查询。
-- Scroll：需要全部文档，比如导出全部数据。
-  - scroll方案也很高效，但是它基于快照，不能用在实时性高的业务场景，建议用在类似报表导出，或者ES内部的reindex等场景。
+- `From-Size`（普通分页）：适用于非深度分页。
+  - `from/size` 方案的优点是简单，缺点是在深度分页的场景下系统开销比较大，占用较多内存。
+- `Search After`：需要深度分页时使用。
+  - `search after` 基于 `ES` 内部排序好的游标，可以实时高效的进行分页查询，但是它只能做下一页这样的查询场景，不能随机的指定页数查询。
+- `Scroll`：需要全部文档，比如导出全部数据。
+  - `scroll` 方案也很高效，但是它基于快照，不能用在实时性高的业务场景，建议用在类似报表导出，或者 `ES` 内部的 `reindex` 等场景。
 
 
 
 ## 2.排序
 
-ES 默认使用算分进行排序，我们可以使用 [sort-processor](https://www.elastic.co/guide/en/elasticsearch/reference/current/sort-processor.html)（不需要再计算算分）来指定排序规则；可以对某个字段进行排序，最好只对**数字型**和**日期型**字段排序。
+`ES` 默认使用算分进行排序，我们可以使用 [sort-processor](https://www.elastic.co/guide/en/elasticsearch/reference/current/sort-processor.html)（不需要再计算算分）来指定排序规则；可以对某个字段进行排序，最好只对**数字型**和**日期型**字段排序。
 
 示例：
 
@@ -218,7 +218,7 @@ POST /index_name/_search
 }
 ```
 
-对 **text** 类型的数据进行排序会发生错误，可以通过打开 fielddata 参数（一般**不建议这么做**），来对 **text** 类型进行排序：
+对 **text** 类型的数据进行排序会发生错误，可以通过打开 `fielddata` 参数（一般**不建议这么做**），来对 **text** 类型进行排序：
 
 ```shell
 # 打开 text的 fielddata
@@ -292,7 +292,7 @@ POST /index_name/_search
 
 ## 6.全文本查询
 
-[全文本](https://www.elastic.co/guide/en/elasticsearch/reference/current/full-text-queries.html)（Full text）查询会对搜索字符串进行**分词处理**。
+[全文本](https://www.elastic.co/guide/en/elasticsearch/reference/current/full-text-queries.html)（`Full text`）查询会对搜索字符串进行**分词处理**。
 
 全文本查询有以下 9 种：
 
@@ -426,7 +426,7 @@ POST index_name/_search
   - `OR` 用 `|` 替代
   - `NOT` 用 `-` 替代
 
-- Term 之间默认的关系是  `OR`，可以指定 `default_operator` 来修改。
+- `Term` 之间默认的关系是  `OR`，可以指定 `default_operator` 来修改。
 
 示例：
 
@@ -470,7 +470,7 @@ GET index_name/_search
 
 一个字符串在多个字段中查询的情况，如何匹配最终的结果。（还有一个 **dis-max** 查询也是针对这种情况的）
 
-一个字符串在多个字段中查询的情况，Multi-match 有 6 种处理方式，如下：
+一个字符串在多个字段中查询的情况，`Multi-match` 有 6 种处理方式，如下：
 
 - **best_fields**：最终得分为**分数最高**的那个字段，默认的处理方式。
 - **most_fields**：算分相加。不支持 **AND** 操作。
@@ -923,7 +923,7 @@ POST index_name/_search
 - **weight**：为文档设置一个权重。
 - **random_score**：随机算分排序。
 - **field_value_factor**：使用该数值来修改算分。
-- **decay functions**: gauss, linear, exp：以某个字段为标准，距离某个值越近，得分越高。
+- **decay functions**: `gauss`,`linear`,` exp`：以某个字段为标准，距离某个值越近，得分越高。
 
 
 
@@ -1044,14 +1044,14 @@ POST /blogs/_search
 
 #### 8.5.2.Boost Mode 和 Max Boost 参数
 
-Boost Mode：
+`Boost Mode`：
 
-- Multiply：算分与函数值的乘积。
-- Sum：算分与函数值的和。
-- Min / Max：算分与函数值的最小/最大值。
-- Replace：使用函数值替代算分。
+- `Multiply`：算分与函数值的乘积。
+- `Sum`：算分与函数值的和。
+- `Min / Max`：算分与函数值的最小/最大值。
+- `Replace`：使用函数值替代算分。
 
-Max Boost 可以将算分控制在一个最大值。
+`Max Boost` 可以将算分控制在一个最大值。
 
 示例：
 

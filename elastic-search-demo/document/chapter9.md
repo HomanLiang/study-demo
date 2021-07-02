@@ -4,7 +4,7 @@
 
 # ElasticSearch 搜索模板与建议
 
-[Search APIs](https://www.elastic.co/guide/en/elasticsearch/reference/current/search.html) 用于**搜索**和**聚合**存储在 ES 中的数据。
+[Search APIs](https://www.elastic.co/guide/en/elasticsearch/reference/current/search.html) 用于**搜索**和**聚合**存储在 `ES` 中的数据。
 
 
 
@@ -47,11 +47,11 @@ POST template_name/_search/template
 
 ## 2.搜索建议 Suggesters
 
-[搜索建议](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-suggesters.html)帮助用户在输入搜索的过程中，进行自动补全或者纠错，这种功能在 ES 中通过 **Suggesters** 来完成。
+[搜索建议](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-suggesters.html)帮助用户在输入搜索的过程中，进行自动补全或者纠错，这种功能在 `ES` 中通过 **Suggesters** 来完成。
 
-**Suggesters** 会将输入的文本分解为 token，然后在索引的字典里查找相似的 Term 并返回。
+**Suggesters** 会将输入的文本分解为 `token`，然后在索引的字典里查找相似的 `Term` 并返回。
 
-ES 提供了 4 种类别的 **Suggesters**：
+`ES` 提供了 4 种类别的 **Suggesters**：
 
 - **Term suggester**
 - **Phrase Suggester**
@@ -114,7 +114,7 @@ POST /articles/_search
 一些参数：
 
 - **sort**：排序方法，默认按照评分排序，也可以按照 **frequency** 排序。
-- **prefix_length**：默认情况下，首字母不一致就不会给出建议词。如果将其设置为 0，就会为 hock 建议 rock。
+- **prefix_length**：默认情况下，首字母不一致就不会给出建议词。如果将其设置为 0，就会为 `hock` 建议 `rock`。
 
 示例：
 
@@ -179,9 +179,9 @@ POST /articles/_search
 
 `Completion Suggester` 用于自动补全，用户每输入一个字符，就需要即时发送一个查询请求到后端查找匹配项。
 
-自动补全功能对性能要求比较高， ES 采用了不同的数据结构，而非通过倒排索引来完成。
+自动补全功能对性能要求比较高，`ES` 采用了不同的数据结构，而非通过倒排索引来完成。
 
-自动补全功能将分词数据编码成 FST，与索引放在一起。FST 会被加载到内存中，以加快速度。FSF 的缺点是只能用于**前缀查找**。
+自动补全功能将分词数据编码成 `FST`，与索引放在一起。`FST` 会被加载到内存中，以加快速度。`FSF` 的缺点是只能用于**前缀查找**。
 
 示例：
 
@@ -248,13 +248,13 @@ POST articles/_search?pretty
 
 可以定义两种类型的上下文：
 
-- Category：任意字符串
-- Geo：地理位置信息
+- `Category`：任意字符串
+- `Geo`：地理位置信息
 
-实现 Context Suggester 的步骤：
+实现 `Context Suggester` 的步骤：
 
-1. 定义一个 Mapping
-2. 索引数据，并且为每个文档加入 Context 信息
+1. 定义一个 `Mapping`
+2. 索引数据，并且为每个文档加入 `Context` 信息
 3. 查询
 
 示例：
@@ -322,6 +322,6 @@ POST comments/_search
 
 比较：
 
-- 精准度： Completion > Phrase > Term
-- 召回率：Term > Phrase > Completion
-- 性能：Completion > Phrase > Term
+- 精准度： `Completion > Phrase > Term`
+- 召回率：`Term > Phrase > Completion`
+- 性能：`Completion > Phrase > Term`

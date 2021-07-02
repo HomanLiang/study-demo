@@ -4,16 +4,16 @@
 
 # ElasticSearch 查询
 
-ES 中的查询 API 有两种：
+`ES` 中的查询 `API` 有两种：
 
-- **URI Search**：HTTP GET 请求的方式。
-- **Request Body Search**：基于 Json 数据格式的 **DSL**（Query Domain Specific Language）。
+- **URI Search**：`HTTP GET` 请求的方式。
+- **Request Body Search**：基于 `Json` 数据格式的 **DSL**（`Query Domain Specific Language`）。
 
 
 
 ## 1.指定查询范围
 
-通过 URI 可以指定在哪些索引中进行查询，有下面几种格式：
+通过 `URI` 可以指定在哪些索引中进行查询，有下面几种格式：
 
 - `/_search`：在所有的索引中进行搜索。
 
@@ -27,7 +27,7 @@ ES 中的查询 API 有两种：
 
 ## 2.URI 查询
 
-URI 查询使用 HTTP GET 请求的方式，使用 `q` 指定查询的内容，格式如下：
+`URI` 查询使用 `HTTP GET` 请求的方式，使用 `q` 指定查询的内容，格式如下：
 
 ```shell
 curl -XGET http://localhost:9200/index_name/_search?q=key:val
@@ -45,7 +45,7 @@ GET /index_name/_search?q=key:val
 
 ## 3.Request Body 查询
 
-Request Body 查询可以使用 GET 或 POST 方式，格式如下：
+`Request Body` 查询可以使用 `GET` 或 `POST` 方式，格式如下：
 
 ```
 curl -XGET/POST http://localhost:9200/index_name/_search -H 'Content-Type: application/json' -d'
@@ -87,7 +87,7 @@ POST index_name/_search
 - **查全率**：尽可能返回较多的相关文档。
 - **结果排名**：查询结果排名是否准确。
 
-在 ES 中可以通过调整查询的参数来改善搜素的查准率和查全率。
+在 `ES` 中可以通过调整查询的参数来改善搜素的查准率和查全率。
 
 
 
