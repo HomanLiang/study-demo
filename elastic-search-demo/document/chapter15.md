@@ -4,9 +4,9 @@
 
 # ElasticSearch 集群安全
 
-在安装完 ES 后，ES 默认是没有任何安全防护的。
+在安装完 `ES` 后，`ES` 默认是没有任何安全防护的。
 
-ES 的[安全管理](https://www.elastic.co/guide/en/elasticsearch/reference/current/secure-cluster.html)主要包括以下内容：
+`ES` 的[安全管理](https://www.elastic.co/guide/en/elasticsearch/reference/current/secure-cluster.html)主要包括以下内容：
 
 - [身份认证](https://www.elastic.co/guide/en/elasticsearch/reference/current/setting-up-authentication.html)：鉴定访问用户是否合法。
 - [用户鉴权](https://www.elastic.co/guide/en/elasticsearch/reference/current/authorization.html)：设置用户有哪些访问权限。
@@ -15,11 +15,11 @@ ES 的[安全管理](https://www.elastic.co/guide/en/elasticsearch/reference/cur
 
 这里有一些免费的安全方案：
 
-- 设置 Nginx 方向代理。
+- 设置 `Nginx` 方向代理。
 - 安装免费的安全插件，比如：
-  - [Search Guard](https://search-guard.com/)：一个安全和报警的 ES 插件，分收费版和免费版。
+  - [Search Guard](https://search-guard.com/)：一个安全和报警的 `ES` 插件，分收费版和免费版。
   - [Readonly REST](https://github.com/sscarduzio/elasticsearch-readonlyrest-plugin)
-- X-Pack 的 Basic 版：可参考[这里](https://www.elastic.co/what-is/elastic-stack-security)。
+- `X-Pack` 的 `Basic` 版：可参考[这里](https://www.elastic.co/what-is/elastic-stack-security)。
 
 
 
@@ -27,10 +27,10 @@ ES 的[安全管理](https://www.elastic.co/guide/en/elasticsearch/reference/cur
 
 ES 中提供的认证叫做 [Realms](https://www.elastic.co/guide/en/elasticsearch/reference/current/realms.html)，有以下几种方式，可分为两类：
 
-- 内部的：不需要与 ES 外部方通信。
-  - [file](https://www.elastic.co/guide/en/elasticsearch/reference/current/file-realm.html)（免费）：用户名和密码保存在 ES 索引中。
-  - [native](https://www.elastic.co/guide/en/elasticsearch/reference/current/native-realm.html)（免费）：用户名和密码保存在 ES 索引中。
-- 外部的：需要与 ES 外部组件通信。
+- 内部的：不需要与 `ES` 外部方通信。
+  - [file](https://www.elastic.co/guide/en/elasticsearch/reference/current/file-realm.html)（免费）：用户名和密码保存在 `ES` 索引中。
+  - [native](https://www.elastic.co/guide/en/elasticsearch/reference/current/native-realm.html)（免费）：用户名和密码保存在 `ES` 索引中。
+- 外部的：需要与 `ES` 外部组件通信。
   - [ldap](https://www.elastic.co/guide/en/elasticsearch/reference/current/ldap-realm.html)（收费）
   - [active_directory](https://www.elastic.co/guide/en/elasticsearch/reference/current/active-directory-realm.html)（收费）
   - [pki](https://www.elastic.co/guide/en/elasticsearch/reference/current/pki-realm.html)（收费）
@@ -43,11 +43,11 @@ ES 中提供的认证叫做 [Realms](https://www.elastic.co/guide/en/elasticsear
 
 用户鉴权通过定义一个角色，并分配一组权限；然后将角色分配给用户，使得用户拥有这些权限。
 
-ES 中的[权限](https://www.elastic.co/guide/en/elasticsearch/reference/current/security-privileges.html)有不同的级别，包括集群级别（30 多种）和索引级别（不到 20 种）。
+`ES` 中的[权限](https://www.elastic.co/guide/en/elasticsearch/reference/current/security-privileges.html)有不同的级别，包括集群级别（30 多种）和索引级别（不到 20 种）。
 
-ES 中提供了很多[内置角色](https://www.elastic.co/guide/en/elasticsearch/reference/current/built-in-roles.html)（不到 30 种）可供使用。
+`ES` 中提供了很多[内置角色](https://www.elastic.co/guide/en/elasticsearch/reference/current/built-in-roles.html)（不到 30 种）可供使用。
 
-ES 中提供了很多关于用户与角色的 API：
+`ES` 中提供了很多关于用户与角色的 API：
 
 - 关于用户：
   - [Change passwords](https://www.elastic.co/guide/en/elasticsearch/reference/current/security-api-change-password.html)：修改密码。
@@ -65,15 +65,15 @@ ES 中提供了很多关于用户与角色的 API：
 
 ## 3.启动 ES 安全功能
 
-下面演示如何使用 ES 的安全功能。
+下面演示如何使用 `ES` 的安全功能。
 
-启动 ES 并通过 [xpack.security.enabled](https://www.elastic.co/guide/en/kibana/current/security-settings-kb.html) 参数打开安全功能：
+启动 `ES` 并通过 [xpack.security.enabled](https://www.elastic.co/guide/en/kibana/current/security-settings-kb.html) 参数打开安全功能：
 
 ```shell
 bin\elasticsearch -E node.name=node0 -E cluster.name=mycluster -E path.data=node0_data -E http.port=9200 -E xpack.security.enabled=true
 ```
 
-使用 [elasticsearch-setup-passwords](https://www.elastic.co/guide/en/elasticsearch/reference/current/setup-passwords.html) 命令启用 ES内置用户及初始 6 位密码（需要手动输入，比如是 `111111`）：
+使用 [elasticsearch-setup-passwords](https://www.elastic.co/guide/en/elasticsearch/reference/current/setup-passwords.html) 命令启用 `ES` 内置用户及初始 6 位密码（需要手动输入，比如是 `111111`）：
 
 ```shell
 bin\elasticsearch-setup-passwords interactive
@@ -89,7 +89,7 @@ bin\elasticsearch-setup-passwords interactive
 - **beats_system**
 - **remote_monitoring_user**
 
-启用 ES 的安全功能后，访问 ES 就需要输入用户名和密码：
+启用 `ES` 的安全功能后，访问 `ES` 就需要输入用户名和密码：
 
 ![image-20210306170435857](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/elastic-search-demo/image-20210306170435857.png)
 
@@ -112,9 +112,9 @@ elasticsearch.username: "kibana_system"  # 用户名
 elasticsearch.password: "111111"         # 密码
 ```
 
-然后使用 `bin\kibana` 命令启动 Kibana。
+然后使用 `bin\kibana` 命令启动 `Kibana`。
 
-访问 Kibana 也需要用户和密码（这里使用的是超级用户）：
+访问 `Kibana` 也需要用户和密码（这里使用的是超级用户）：
 
 ![image-20210306170459839](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/elastic-search-demo/image-20210306170459839.png)
 
@@ -140,7 +140,7 @@ elasticsearch.password: "111111"         # 密码
 
 - 角色名称
 - 角色对哪些索引有权限及索引的权限级别
-- 添加一个 Kibana 权限
+- 添加一个 `Kibana` 权限
 - 最后创建角色
 
 ![image-20210306170703567](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/elastic-search-demo/image-20210306170703567.png)
@@ -159,7 +159,7 @@ elasticsearch.password: "111111"         # 密码
 
 ### 5.3.使用用户
 
-使用新创建的用户登录 Kibana：
+使用新创建的用户登录 `Kibana`：
 
 ![image-20210306170817282](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/elastic-search-demo/image-20210306170817282.png)
 
@@ -173,24 +173,24 @@ elasticsearch.password: "111111"         # 密码
 
 传输加密分为**集群内**加密和**集群间**加密：
 
-- 集群内加密指的是 ES 集群内部各节点之间的数据传输时的加密。
-  - 通过 TLS 协议完成。
-- 集群间加密指的是外部客户访问 ES 时，数据传输的加密。
-  - 通过 HTTPS 协议完成。
+- 集群内加密指的是 `ES` 集群内部各节点之间的数据传输时的加密。
+  - 通过 `TLS` 协议完成。
+- 集群间加密指的是外部客户访问 `ES` 时，数据传输的加密。
+  - 通过 `HTTPS` 协议完成。
 
 更多的内容可参考[这里](https://www.elastic.co/guide/en/elasticsearch/reference/current/configuring-tls.html)。
 
 ### 6.1.集群内部传输加密
 
-在 ES 中可以使用 TLS 协议对数据进行加密，需要进行以下步骤：
+在 `ES` 中可以使用 `TLS` 协议对数据进行加密，需要进行以下步骤：
 
-- 创建 CA
-- 为 ES 节点创建证书和私钥
+- 创建 `CA`
+- 为 `ES` 节点创建证书和私钥
 - 配置证书
 
 **6.1.1.创建 CA 证书**
 
-使用如下命令创建 CA：
+使用如下命令创建 `CA`：
 
 ```shell
 bin\elasticsearch-certutil ca
@@ -204,7 +204,7 @@ elastic-stack-ca.p12
 
 **6.1.2.生成证书和私钥**
 
-使用如下命令为 ES 中的节点生成证书和私钥
+使用如下命令为 `ES` 中的节点生成证书和私钥
 
 ```shell
 bin\elasticsearch-certutil cert --ca elastic-stack-ca.p12

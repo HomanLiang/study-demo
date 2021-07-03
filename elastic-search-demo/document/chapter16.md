@@ -8,8 +8,8 @@
 
 ES 有以下不同类型的节点：
 
-- **Master(eligible)节点**：只有 Master eligible 节点可以成为 Master 节点。
-  - Master 节点用于维护索引信息和集群状态。
+- **Master(eligible)节点**：只有 `Master eligible` 节点可以成为 `Master` 节点。
+  - `Master` 节点用于维护索引信息和集群状态。
 - **Data** 节点：负责数据存储。
 - **Ingest** 节点：数据预处理。
 - **Coordinating** 节点：处理用户请求。
@@ -21,7 +21,7 @@ ES 有以下不同类型的节点：
 
 ### 1.1.节点配置参数
 
-在默认情况下，一个节点会同时扮演 Master eligible Node，Data Node 和 Ingest Node。
+在默认情况下，一个节点会同时扮演 `Master eligible Node`，`Data Node` 和 `Ingest Node`。
 
 各类型的节点配置参数如下：
 
@@ -33,7 +33,7 @@ ES 有以下不同类型的节点：
 | Coordinating    | 无          | -                          |
 | ML              | node.ml     | true（需要 enable x-pack） |
 
-默认情况下，每个节点都是一个 Coordinating 节点，可以将 `node.master`，`node.data` 和 `node.ingest` 同时设置为 `false`，让一个节点**只负责** Coordinating 节点的角色。
+默认情况下，每个节点都是一个 `Coordinating` 节点，可以将 `node.master`，`node.data` 和 `node.ingest` 同时设置为 `false`，让一个节点**只负责** `Coordinating` 节点的角色。
 
 ### 1.2.配置单一角色
 
@@ -41,29 +41,29 @@ ES 有以下不同类型的节点：
 
 单一职责节点配置：
 
-- Master节点：从高可用和避免脑裂的角度考虑，生产环境可配置 3 个 Master节点。
-  - node.master：`true`
-  - node.ingest：`false`
-  - node.data：`false`
-- Data节点
-  - node.master：`false`
-  - node.ingest：`false`
-  - node.data：`true`
-- Ingest节点
-  - node.master：`false`
-  - node.ingest：`true`
-  - node.data：`false`
-- Coordinating节点
-  - node.master：`false`
-  - node.ingest：`false`
-  - node.data：`false`
+- `Master` 节点：从高可用和避免脑裂的角度考虑，生产环境可配置 3 个 `Master` 节点。
+  - `node.master`：`true`
+  - `node.ingest`：`false`
+  - `node.data`：`false`
+- `Data` 节点
+  - `node.master`：`false`
+  - `node.ingest`：`false`
+  - `node.data`：`true`
+- `Ingest` 节点
+  - `node.master`：`false`
+  - `node.ingest`：`true`
+  - `node.data`：`false`
+- `Coordinating` 节点
+  - `node.master`：`false`
+  - `node.ingest`：`false`
+  - `node.data`：`false`
 
 ### 1.3.水平扩展架构
 
 集群的水平扩展：
 
-- 当需要更多的磁盘容量和读写能力时，可以增加 Data Node；
-- 当系统有大量的复杂查询和聚合分析时，可以增加 Coordinating Node。
+- 当需要更多的磁盘容量和读写能力时，可以增加 `Data Node`；
+- 当系统有大量的复杂查询和聚合分析时，可以增加 `Coordinating Node`。
 
 ![image-20210306172946095](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/elastic-search-demo/image-20210306172946095.png)
 
@@ -86,7 +86,7 @@ ES 中的文档存储在索引中，索引的最小存储单位是分片，不�
 关于[主副分片数的设置](https://www.elastic.co/guide/en/elasticsearch/reference/7.10/index-modules.html)：
 
 - 主分片数：主分片数在索引创建时确定，之后不能修改。
-  - 在 ES 7.0 以后，一个索引**默认**有一个主分片。
+  - 在 `ES 7.0` 以后，一个索引**默认**有一个主分片。
   - 一个索引的主分片数不能超过 **1024**。
 - 副本分片数：副本分片数在索引创建之后可以动态修改。
   - 副本分片数默认为 1。
@@ -114,8 +114,8 @@ ES 中的文档存储在索引中，索引的最小存储单位是分片，不�
 对于**分片的设计建议**：
 
 - 从分片的存储量考虑：
-  - 对于日志类应用，单个分片不要大于 50G；
-  - 对于搜索类应用，单个分片不要大于 20G；
+  - 对于日志类应用，单个分片不要大于 `50G`；
+  - 对于搜索类应用，单个分片不要大于 `20G`；
 - 从分片数量考虑：
   - **一个 ES 集群的分片**（包括主分片和副本分片）**总数不超过 10 W**。
 
@@ -156,13 +156,13 @@ ES 中的文档存储在索引中，索引的最小存储单位是分片，不�
 
 ### 3.2.硬件配置
 
-对系统整体性能要求高的，建议使用 SSD，内存与硬盘的比例可为 1：10。
+对系统整体性能要求高的，建议使用 `SSD`，内存与硬盘的比例可为 `1：10`。
 
-对系统整体性能要求一般的，可使用机械硬盘，内存与硬盘的比例可为 1：50。
+对系统整体性能要求一般的，可使用机械硬盘，内存与硬盘的比例可为 `1：50`。
 
-JVM 配置为机器内存的一半，建议 JVM 内存配置不超过 32 G。
+`JVM` 配置为机器内存的一半，建议 `JVM` 内存配置不超过 `32 G`。
 
-单个节点的数据建议控制在 2TB 以内，最大不超过 5 TB。
+单个节点的数据建议控制在 `2TB` 以内，最大不超过 `5 TB`。
 
 ### 3.3.常见应用场景
 
@@ -203,30 +203,30 @@ POST /%3Clogs-%7Bnow%2Fw%7D%3E/_search
 
 ## 4.ES 开发模式与生产模式
 
-从 ES 5 开始，ES 支持开发模式与生产模式，ES 可通过配置自动选择不同的模式去运行：
+从 `ES 5` 开始，`ES` 支持开发模式与生产模式，`ES` 可通过配置自动选择不同的模式去运行：
 
 - 开发模式配置：
-  - http.host：localhost
-  - transport.bind_host：localhost
+  - `http.host：localhost`
+  - `transport.bind_host：localhost`
 - 生产模式配置：
-  - http.host：真实 IP 地址
-  - transport.bind_host：真实 IP 地址
+  - `http.host：真实 IP 地址`
+  - `transport.bind_host：真实 IP 地址`
 
 ### 4.1.Booststrap 检测
 
-在生产模式启动 ES 集群时，会进行 [Booststrap 检测](https://www.elastic.co/guide/en/elasticsearch/reference/current/bootstrap-checks.html)（只有检测通过才能启动成功），它包括：
+在生产模式启动 `ES` 集群时，会进行 [Booststrap 检测](https://www.elastic.co/guide/en/elasticsearch/reference/current/bootstrap-checks.html)（只有检测通过才能启动成功），它包括：
 
-- JVM 检测
-- Linux 检测：只在 Linux 环境进行
+- `JVM` 检测
+- `Linux` 检测：只在 `Linux` 环境进行
 
 ### 4.2.JVM 配置
 
 JVM 通过 `config` 目录下的 [jvm.options](https://www.elastic.co/guide/en/elasticsearch/reference/current/jvm-options.html) 文件进行配置，需要注意以下几点：
 
-- 将 Xms 和 Xmx 设置成一样；
-- Xmx 不要超过物理内存的 50%，最大内存建议不超过 32G；
-- JVM 有 Server 和 Client 两种模式，在 ES 的生产模式必须使用 Server 模式；
-- 需要关闭 JVM Swapping
+- 将 `Xms` 和 `Xmx` 设置成一样；
+- `Xmx` 不要超过物理内存的 `50%`，最大内存建议不超过 `32G`；
+- `JVM` 有 `Server` 和 `Client` 两种模式，在 `ES` 的生产模式必须使用 `Server` 模式；
+- 需要关闭 `JVM Swapping`
 
 ### 4.3.更多的 ES 配置
 
@@ -242,7 +242,7 @@ JVM 通过 `config` 目录下的 [jvm.options](https://www.elastic.co/guide/en/e
 
 集群状态为 **Green** 只能代表分片正常分配，不能代表没有其它问题。
 
-ES 提供了很多监控相关的 API：
+`ES` 提供了很多监控相关的 `API`：
 
 - [_cluster/health](https://www.elastic.co/guide/en/elasticsearch/reference/current/cluster-health.html)：集群健康状态。
 - [_cluster/state](https://www.elastic.co/guide/en/elasticsearch/reference/current/cluster-state.html)：集群状态。
@@ -342,22 +342,23 @@ GET _cluster/allocation/explain
 实战：
 
 GET _cat/shards?h=index,shard,prirep,state,unassigned.reason
+
 官网：https://www.elastic.co/guide/en/elasticsearch/reference/7.2/cat-shards.html
 
 未分配状态及原因解读：
 
-- INDEX_CREATED：Unassigned as a result of an API creation of an index.
-- CLUSTER_RECOVERED：Unassigned as a result of a full cluster recovery.
-- INDEX_REOPENED：Unassigned as a result of opening a closed index.
-- DANGLING_INDEX_IMPORTED：Unassigned as a result of importing a dangling index.
-- NEW_INDEX_RESTORED：Unassigned as a result of restoring into a new index.
-- EXISTING_INDEX_RESTORED：Unassigned as a result of restoring into a closed index.
-- REPLICA_ADDED：Unassigned as a result of explicit addition of a replica.
-- ALLOCATION_FAILED：Unassigned as a result of a failed allocation of the shard.
-- NODE_LEFT：Unassigned as a result of the node hosting it leaving the cluster.
-- REROUTE_CANCELLED：Unassigned as a result of explicit cancel reroute command.
-- REINITIALIZED：When a shard moves from started back to initializing, for example, with shadow replicas.
-- REALLOCATED_REPLICA：A better replica location is identified and causes the existing replica allocation to be cancelled.
+- `INDEX_CREATED`：Unassigned as a result of an API creation of an index.
+- `CLUSTER_RECOVERED`：Unassigned as a result of a full cluster recovery.
+- `INDEX_REOPENED`：Unassigned as a result of opening a closed index.
+- `DANGLING_INDEX_IMPORTED`：Unassigned as a result of importing a dangling index.
+- `NEW_INDEX_RESTORED`：Unassigned as a result of restoring into a new index.
+- `EXISTING_INDEX_RESTORED`：Unassigned as a result of restoring into a closed index.
+- `REPLICA_ADDED：Unassigned as a result of explicit addition of a replica.
+- `ALLOCATION_FAILED`：Unassigned as a result of a failed allocation of the shard.
+- `NODE_LEFT`：Unassigned as a result of the node hosting it leaving the cluster.
+- `REROUTE_CANCELLED`：Unassigned as a result of explicit cancel reroute command.
+- `REINITIALIZED`：When a shard moves from started back to initializing, for example, with shadow replicas.
+- `REALLOCATED_REPLICA`：A better replica location is identified and causes the existing replica allocation to be cancelled.
 
 
 
@@ -400,7 +401,7 @@ PUT /_cluster/settings
 
 ### 6.4.强制刷新
 
-适用场景：刷新索引是确保当前仅存储在事务日志中的所有数据也永久存储在Lucene索引中。
+适用场景：刷新索引是确保当前仅存储在事务日志中的所有数据也永久存储在 `Lucene` 索引中。
 
 ```
 POST /_flush
@@ -452,7 +453,7 @@ PUT /_cluster/settings
 
 适用场景：
 
-为了避免集群过载，Elasticsearch限制了分配给恢复的速度。你可以仔细更改该设置，以使其恢复更快。
+为了避免集群过载，`Elasticsearch` 限制了分配给恢复的速度。你可以仔细更改该设置，以使其恢复更快。
 
 如果此值调的太高，则正在进行的恢复可能会消耗过多的带宽和其他资源，这可能会使集群不稳定。
 
@@ -469,9 +470,9 @@ PUT /_cluster/settings
 
 ### 6.8.清除节点上的缓存
 
-适用场景：如果节点达到较高的JVM值，则可以在节点级别上调用该API 以使 Elasticsearch 清理缓存。
+适用场景：如果节点达到较高的 `JVM` 值，则可以在节点级别上调用该 `API` 以使 `Elasticsearch` 清理缓存。
 
-这会降低性能，但可以使你摆脱OOM（内存不足）的困扰。
+这会降低性能，但可以使你摆脱 `OOM`（内存不足）的困扰。
 
 ```
 POST /_cache/clear
@@ -481,7 +482,7 @@ POST /_cache/clear
 
 ### 6.9.调整断路器
 
-适用场景：为了避免在Elasticsearch中进入OOM，可以调整断路器上的设置。这将限制搜索内存，并丢弃所有估计消耗比所需级别更多的内存的搜索。
+适用场景：为了避免在 `Elasticsearch` 中进入 `OOM`，可以调整断路器上的设置。这将限制搜索内存，并丢弃所有估计消耗比所需级别更多的内存的搜索。
 
 注意：这是一个非常精密的设置，你需要仔细校准。
 
@@ -513,11 +514,11 @@ POST _reindex
 }
 **方案二：借助第三方工具迁移索引或者集群**
 
-- elasticdump
+- `elasticdump`
 
-- elasticsearch-migration
+- `elasticsearch-migration`
 
-工具本质：scroll + bulk 实现。
+工具本质：`scroll + bulk` 实现。
 
 
 
@@ -548,7 +549,7 @@ POST /_snapshot/my_backup/snapshot_hamlet_index/_restore
 
 运维工作包罗万象，文章内容只是抛砖引玉，开了个头。
 
-牛逼的集群运维需要结合可视化工具（如：kibana，cerebro，elastic-hd，Prometheus + grafana，结合业务自研工具如 阿里云Eyou等）能极大提高效率。
+牛逼的集群运维需要结合可视化工具（如：`kibana`，`cerebro`，`elastic-hd`，`Prometheus + grafana`，结合业务自研工具如 阿里云 `Eyou` 等）能极大提高效率。
 
 
 

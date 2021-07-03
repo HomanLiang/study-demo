@@ -12,11 +12,11 @@ ES 中的 [Mapping](https://www.elastic.co/guide/en/elasticsearch/reference/7.10
 - 定义索引中的字段的类型，比如字符串，数字等。
 - 定义索引中的字段是否建立倒排索引。
 
-一个 Mapping 是针对一个索引中的 Type 定义的：
+一个 `Mapping` 是针对一个索引中的 `Type` 定义的：
 
-- ES 中的文档都存储在索引的 Type 中
-- 在 **ES 7.0** 之前，一个索引可以有多个 Type，所以一个索引可拥有多个 Mapping
-- 在 **ES 7.0** 之后，一个索引只能有一个 Type，所以一个索引只对应一个 Mapping
+- `ES` 中的文档都存储在索引的 `Type` 中
+- 在 **ES 7.0** 之前，一个索引可以有多个 `Type`，所以一个索引可拥有多个 `Mapping`
+- 在 **ES 7.0** 之后，一个索引只能有一个 `Type`，所以一个索引只对应一个 `Mapping`
 
 通过下面语法可以获取一个索引的 Mapping 信息：
 
@@ -32,74 +32,68 @@ GET index_name/_mapping
 
 - [analyzer](https://www.elastic.co/guide/en/elasticsearch/reference/7.10/analyzer.html)：指定分词器，只有 **text** 类型的数据支持。
 
-- enabled：如果设置成`false`，表示数据仅做存储，不支持搜索和聚合分析（数据保存在 _source 中）。
+- `enabled`：如果设置成 `false`，表示数据仅做存储，不支持搜索和聚合分析（数据保存在 `_source` 中）。
   - 默认值为 `true`。
 
-- index：字段是否建立倒排索引。
+- `index`：字段是否建立倒排索引。
   - 如果设置成 `false`，表示不建立倒排索引（节省空间），同时数据也**无法被搜索**，但依然**支持聚合分析**，数据也会出现在 **_source** 中。
   - 默认值为 `true`。
 
-- norms：字段是否支持算分。
-
-  - 如果字段只用来过滤和聚合分析，而不需要被搜索（计算算分），那么可以设置为 `false`，可节省空间。
+- `norms`：字段是否支持算分。
+- 如果字段只用来过滤和聚合分析，而不需要被搜索（计算算分），那么可以设置为 `false`，可节省空间。
   - 默认值为 `true`。
-
-- doc_values：如果确定不需要对字段进行排序或聚合，也不需要从脚本访问字段值，则可以将其设置为`false`，以节省磁盘空间。
-
-  - 默认值为 `true`。
-
-- fielddata：如果要对text类型的数据进行排序和聚合分析，则将其设置为`true`。
-
-  - 默认为 `false`。
-
-- store：默认值为`false`，数据存储在_source中。
-
-  - 默认情况下，字段值被编入索引以使其可搜索，但**它们不会被存储**。这意味着可以查询字段，但无法检索原始字段值。
+  
+- `doc_values`：如果确定不需要对字段进行排序或聚合，也不需要从脚本访问字段值，则可以将其设置为`false`，以节省磁盘空间。
+- 默认值为 `true`。
+  
+- `fielddata`：如果要对 `text` 类型的数据进行排序和聚合分析，则将其设置为 `true`。
+- 默认为 `false`。
+  
+- `store`：默认值为 `false`，数据存储在 `_source` 中。
+- 默认情况下，字段值被编入索引以使其可搜索，但**它们不会被存储**。这意味着可以查询字段，但无法检索原始字段值。
   - 在某些情况下，存储字段是有意义的。例如，有一个带有标题、日期和非常大的内容字段的文档，只想检索标题和日期，而不必从一个大的源字段中提取这些字段。
-
+  
 - [boost](https://www.elastic.co/guide/en/elasticsearch/reference/7.10/mapping-boost.html)：可增强字段的算分。
 
-- coerce：是否开启数据类型的自动转换，比如字符串转数字。
-
-  - 默认是开启的。
-
+- `coerce`：是否开启数据类型的自动转换，比如字符串转数字。
+- 默认是开启的。
+  
 - [dynamic](https://www.elastic.co/guide/en/elasticsearch/reference/7.10/dynamic.html)：控制 **mapping** 的自动更新，取值有 `true`，`false`，`strict`。
 
 - [eager_global_ordinals](https://www.elastic.co/guide/en/elasticsearch/reference/7.10/eager-global-ordinals.html)
 
-- fields：多字段特性。
+- `fields`：多字段特性。
+- 让**一个字段**拥有**多个子字段类型**，使得一个字段能够被多个不同的索引方式进行索引。
+  
+- `copy_to`
 
-  - 让**一个字段**拥有**多个子字段类型**，使得一个字段能够被多个不同的索引方式进行索引。
+- `format`
 
-- copy_to
+- `ignore_above`
 
-- format
+- `ignore_malformed`
 
-- ignore_above
+- `index_options`
 
-- ignore_malformed
+- `index_phrases`
 
-- index_options
+- `index_prefixes`
 
-- index_phrases
+- `meta`
 
-- index_prefixes
-
-- meta
-
-- normalizer
+- `normalizer`
 
 - [null_value](https://www.elastic.co/guide/en/elasticsearch/reference/7.10/null-value.html)：定义 `null` 的值。
 
-- position_increment_gap
+- `position_increment_gap`
 
-- properties
+- `properties`
 
-- search_analyzer
+- `search_analyzer`
 
-- similarity
+- `similarity`
 
-- term_vector
+- `term_vector`
 
 
 
@@ -153,7 +147,7 @@ PUT index_name
 
 ## 3.ES 字段的数据类型
 
-ES 中字段的[数据类型](https://www.elastic.co/guide/en/elasticsearch/reference/7.10/mapping-types.html)有以下这些：
+`ES` 中字段的[数据类型](https://www.elastic.co/guide/en/elasticsearch/reference/7.10/mapping-types.html)有以下这些：
 
 - 简单类型
   - [Numeric](https://www.elastic.co/guide/en/elasticsearch/reference/7.10/number.html)
@@ -177,31 +171,31 @@ ES 中字段的[数据类型](https://www.elastic.co/guide/en/elasticsearch/refe
 
 字符串数据可以定义成 **text** 或 **keyword** 类型，**text** 类型数据会做**分词处理**，而 **keyword** 类型数据不会做分词处理。
 
-- text类型
+- `text` 类型
 
   - 支持分词，全文检索,支持模糊、精确查询,不支持聚合,排序操作;
-  - test类型的最大支持的字符长度无限制,适合大字段存储；
+  - `text` 类型的最大支持的字符长度无限制,适合大字段存储；
 
   使用场景：
 
   - 存储全文搜索数据, 例如: 邮箱内容、地址、代码块、博客文章内容等。
-  - 默认结合standard analyzer(标准解析器)对文本进行分词、倒排索引。
+  - 默认结合 `standard analyzer` (标准解析器)对文本进行分词、倒排索引。
   - 默认结合标准分析器进行词命中、词频相关度打分。
 
-- keyword
+- `keyword`
 
   - 不进行分词，直接索引,支持模糊、支持精确匹配，支持聚合、排序操作。
-  - keyword类型的最大支持的长度为——32766个UTF-8类型的字符,可以通过设置ignore_above指定自持字符长度，超过给定长度后的数据将不被索引，无法通过term精确匹配检索返回结果。
+  - `keyword` 类型的最大支持的长度为——`32766` 个 `UTF-8` 类型的字符,可以通过设置 `ignore_above` 指定自持字符长度，超过给定长度后的数据将不被索引，无法通过 `term` 精确匹配检索返回结果。
 
   使用场景： 
 
-  - 存储邮箱号码、url、name、title，手机号码、主机名、状态码、邮政编码、标签、年龄、性别等数据。
-  -  用于筛选数据(例如: select * from x where status='open')、排序、聚合(统计)。
+  - 存储邮箱号码、`url`、`name`、`title`，手机号码、主机名、状态码、邮政编码、标签、年龄、性别等数据。
+  -  用于筛选数据(例如: `select * from x where status='open'`)、排序、聚合(统计)。
   -  直接将完整的文本保存到倒排索引中。
 
 ### 3.2.数组类型
 
-对于数组类型 **Arrays**，ES 并没有提供专门的数组类型，但是**任何字段**都可以包含多个**相同类型**的数据，比如：
+对于数组类型 **Arrays**，`ES` 并没有提供专门的数组类型，但是**任何字段**都可以包含多个**相同类型**的数据，比如：
 
 ```shell
 ["one", "two"] # 一个字符串数组
@@ -210,7 +204,7 @@ ES 中字段的[数据类型](https://www.elastic.co/guide/en/elasticsearch/refe
 [{ "name": "Mary", "age": 12 }, { "name": "John", "age": 10 }] # 一个对象数组
 ```
 
-当在 Mapping 中查看这些数组的类型时，其实**还是数组中的元素的类型，而不是一个数组类型**。
+当在 `Mapping` 中查看这些数组的类型时，其实**还是数组中的元素的类型，而不是一个数组类型**。
 
 
 
@@ -239,7 +233,7 @@ POST my_movies/_doc/1
 }
 ```
 
-将数据插入 ES 之后，执行下面的查询：
+将数据插入 `ES` 之后，执行下面的查询：
 
 ```shell
 # 查询电影信息
@@ -258,11 +252,11 @@ POST my_movies/_search
 
 按照上面的查询语句，我们想查询的是 `first_name=Keanu` 且 `last_name=Hopper` 的数据，所以我们刚才插入的 **id** 为 1 的文档应该不符合这个查询条件。
 
-但是在 ES 中执行上面的查询语句，却能查出 **id** 为 1 的文档。这是为什么呢？
+但是在 `ES` 中执行上面的查询语句，却能查出 **id** 为 1 的文档。这是为什么呢？
 
-这是因为，ES 对于这种 **actors** 字段这样的结构的数据，ES 并没有考虑**对象的边界**。
+这是因为，`ES` 对于这种 **actors** 字段这样的结构的数据，ES 并没有考虑**对象的边界**。
 
-实际上，在 ES 内部，**id** 为 1 的那个文档是这样存储的：
+实际上，在 `ES` 内部，**id** 为 1 的那个文档是这样存储的：
 
 ```shell
 "title":"Speed"
@@ -272,7 +266,7 @@ POST my_movies/_search
 
 所以这种存储方式，并不是我们想象的那样。
 
-如果我们查看 ES 默认为上面（id 为 1）结构的数据生成的 mappings，如下：
+如果我们查看 `ES` 默认为上面（`id` 为 1）结构的数据生成的 `mappings`，如下：
 
 ```shell
 {
@@ -375,7 +369,7 @@ POST my_movies/_search
 
 #### 3.3.3.搜索 Nested 类型
 
-这是因为，查询 Nested 类型的数据，要像下面这样查询：
+这是因为，查询 `Nested` 类型的数据，要像下面这样查询：
 
 ```shell
 POST my_movies/_search
@@ -406,7 +400,7 @@ POST my_movies/_search
 
 #### 3.3.4.聚合 Nested 类型
 
-对 Nested 类型的数据进行聚合，示例：
+对 `Nested` 类型的数据进行聚合，示例：
 
 ```shell
 # Nested Aggregation
@@ -454,13 +448,13 @@ POST my_movies/_search
 
 **Nested** 类型的对象与**其父/子级文档**的关系，使得每次文档有更新的时候需要重建**整个文档**（包括根对象和嵌套对象）的索引。
 
-**Join** 数据类型（类似关系型数据库中的 Join 操作）为同一索引中的文档定义父/子关系。
+**Join** 数据类型（类似关系型数据库中的 `Join` 操作）为同一索引中的文档定义父/子关系。
 
-Join 数据类型可以维护一个父/子关系，从而分离两个对象，它的优点是：
+`Join` 数据类型可以维护一个父/子关系，从而分离两个对象，它的优点是：
 
 - 父文档和子文档是两个完全独立的文档，这使得更新父文档不会影响到子文档，更新子文档也不会影响到父文档。
 
-**Nested** 类型与 **Join**（Parent/Child） 类型的**优缺点对比**：
+**Nested** 类型与 **Join**（`Parent/Child`） 类型的**优缺点对比**：
 
 ![在这里插入图片描述](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/elastic-search-demo/20210315112116.png)
 
@@ -468,7 +462,7 @@ Join 数据类型可以维护一个父/子关系，从而分离两个对象，�
 
 #### 3.4.1.定义 Join 类型
 
-定义 Join 类型的语法如下：
+定义 ` Join` 类型的语法如下：
 
 ```shell
 DELETE my_blogs
@@ -669,8 +663,8 @@ PUT my_blogs/_doc/comment3?routing=blog2
 
 ES 中的[动态 Mapping](https://www.elastic.co/guide/en/elasticsearch/reference/7.1/dynamic-mapping.html) 指的是：
 
-- 在写入新文档的时候，如果索引不存在，ES 会自动创建索引。
-- **动态 Mapping** 使得我们可以不定义 Mapping，ES 会自动根据文档信息，推断出字段的类型。
+- 在写入新文档的时候，如果索引不存在，`ES` 会自动创建索引。
+- **动态 Mapping** 使得我们可以不定义 `Mapping`，`ES` 会自动根据文档信息，推断出字段的类型。
 - 但有时候也会**推断错误**，不符合我们的预期，比如地理位置信息等。
 
 ES 类型的[自动识别规则](https://www.elastic.co/guide/en/elasticsearch/reference/7.1/dynamic-field-mapping.html)如下：
@@ -700,7 +694,7 @@ PUT index_name/_mapping
 }
 ```
 
-通过下面语法可以获取一个索引的 Mapping：
+通过下面语法可以获取一个索引的 `Mapping`：
 
 ```shell
 GET index_name/_mapping
@@ -710,7 +704,7 @@ GET index_name/_mapping
 
 ## 6.自定义 Mapping
 
-自定义 Mapping 的语法如下：
+自定义 `Mapping` 的语法如下：
 
 ```shell
 PUT index_name
@@ -721,10 +715,10 @@ PUT index_name
 }
 ```
 
-自定义 Mapping 的小技巧：
+自定义 `Mapping` 的小技巧：
 
 1. 创建一个临时索引，写入一些测试数据
-2. 获取该索引的 Mapping 值，修改后，使用它创建新的索引
+2. 获取该索引的 `Mapping` 值，修改后，使用它创建新的索引
 3. 删除临时索引
 
 **Mappings** 有很多参数可以设置，可以参考[这里](https://www.elastic.co/guide/en/elasticsearch/reference/7.10/mapping-params.html)。
@@ -785,7 +779,7 @@ PUT /blog
 
 ### 6.2.一个对象数组的 mappings
 
-如果我们要在 ES 中插入如下结构的数据：
+如果我们要在 `ES` 中插入如下结构的数据：
 
 ```shell
 POST my_movies/_doc/1
@@ -942,20 +936,20 @@ GET my-index/_search?q=status_code:NULL
 
 ## 10.索引模板
 
-[索引模板](https://www.elastic.co/guide/en/elasticsearch/reference/7.1/indices-templates.html)（Index Template）设置一个规则，自动生成索引的 Mappings 和 Settings。
+[索引模板](https://www.elastic.co/guide/en/elasticsearch/reference/7.1/indices-templates.html)（`Index Template`）设置一个规则，自动生成索引的 `Mappings` 和 `Settings`。
 
 **索引模板有以下特性**：
 
 - 模板只在索引创建时起作用，修改模板不会影响已创建的索引。
 - 可以设置多个索引模板，这些设置会被 **merge** 在一起。
-- 可以设置 order 的数值，控制 **merge** 的过程。
+- 可以设置 `order` 的数值，控制 **merge** 的过程。
 
 多个模板时的 **merge** 规则，当一个索引被创建时：
 
-- 使用 ES 默认的 mappings 和 settings。
-- 使用 order 值低的模板。
-- 使用 order 值高的模板，它会覆盖 order 值低的模板。
-- 使用用户自带的，指定的 mappings 和 settings，这个级别的最高，会覆盖之前所有的。
+- 使用 `ES` 默认的 `mappings` 和 `settings`。
+- 使用 `order` 值低的模板。
+- 使用 `order` 值高的模板，它会覆盖 `order` 值低的模板。
+- 使用用户自带的，指定的 `mappings` 和 `settings`，这个级别的最高，会覆盖之前所有的。
 
 > 对于相同字段的不同只会进行**覆盖**，对于不同的字段会进行**叠加**依次使用。
 

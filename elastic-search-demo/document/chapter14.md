@@ -6,20 +6,20 @@
 
 ## 1.ES 的分布式架构
 
-ES 是一个分布式的集群，具有**高可用性**和**可扩展性**：
+`ES` 是一个分布式的集群，具有**高可用性**和**可扩展性**：
 
 - 高可用性指的是：当某些节点意外宕机或者数据丢失的时候，不影响整个集群的使用。
 - 可扩展性指的是：当业务数据量增加的时候，可以增加节点的数量，从而增强整个集群的能力。
 
 **ES 集群**
 
-ES 集群中可以有一个或多个节点，ES 通过**集群名字**来区分不同的集群，集群名可以通过 `cluster.name` 进行设置，默认为 "elasticsearch"。
+`ES` 集群中可以有一个或多个节点，ES 通过**集群名字**来区分不同的集群，集群名可以通过 `cluster.name` 进行设置，默认为 `elasticsearch`。
 
 
 
 ## 2.ES 的节点类型
 
-ES 的一个节点就是一个 Java 进程，所以一台机器可以运行一个或多个节点，生产环境建议一台机器只运行一个节点。
+`ES` 的一个节点就是一个 `Java` 进程，所以一台机器可以运行一个或多个节点，生产环境建议一台机器只运行一个节点。
 
 每个节点启动之后，都会分配一个 `UID`，并保存在 `data` 目录下。
 
@@ -27,7 +27,7 @@ ES 的一个节点就是一个 Java 进程，所以一台机器可以运行一�
 
 ### 2.1.Master 节点
 
-Master 节点的职责：
+`Master` 节点的职责：
 
 - 处理客户端的请求。
 - 决定分片被分配到哪个节点。
@@ -37,28 +37,28 @@ Master 节点的职责：
 集群的状态包括：
 
 - 所有的节点信息
-- 所有的索引及其 Mapping 和 Setting 信息
+- 所有的索引及其 `Mapping` 和 `Setting` 信息
 - 分片的路由信息
 
 所有的节点有保存了集群的状态信息，但只有主节点能够修改集群状态。
 
 ### 2.2.Master-eligible 节点
 
-在 ES 集群中，只有 **Master-eligible 节点** 可以被选举为 Master 节点。
+在 `ES` 集群中，只有 **Master-eligible 节点** 可以被选举为 `Master` 节点。
 
-每个节点启动后默认就是 Master-eligible 节点，可以通过设置 `node.master` 为 `false` 来禁止成为 Master-eligible 节点。
+每个节点启动后默认就是 `Master-eligible` 节点，可以通过设置 `node.master` 为 `false` 来禁止成为 `Master-eligible` 节点。
 
-默认情况下，集群中的**第一个节点**启动后，会将自己选举为 Master 节点。
+默认情况下，集群中的**第一个节点**启动后，会将自己选举为 `Master` 节点。
 
-集群中的每个节点都保存了集群的状态，但只有 Master 节点能够修改集群的状态信息。
+集群中的每个节点都保存了集群的状态，但只有 `Master` 节点能够修改集群的状态信息。
 
 ### 2.3.Data 与 Coordinating 节点
 
-用于保存 ES 数据的节点，就是 Data 节点，它对数据扩展起到了至关重要的作用。
+用于保存 `ES` 数据的节点，就是 `Data` 节点，它对数据扩展起到了至关重要的作用。
 
-Coordinating 节点叫做协调节点，它负责接收 Client 的请求，将请求分发到合适的节点，并最终汇总结果返回给 Client。
+`Coordinating` 节点叫做协调节点，它负责接收 `Client` 的请求，将请求分发到合适的节点，并最终汇总结果返回给 `Client`。
 
-在 ES 中，所有的节点都是 Coordinating 节点。
+在 `ES` 中，所有的节点都是 `Coordinating` 节点。
 
 ### 2.4.Ingest 节点
 
@@ -95,7 +95,7 @@ Coordinating 节点叫做协调节点，它负责接收 Client 的请求，将�
 - `yellow`：所有的主分片都正常，某些副本分片不正常。
 - `red`：部分主分片不正常。
 
-我们也可以通过 Kibana 中的**索引管理**，来查看每个索引的健康状态：
+我们也可以通过 `Kibana` 中的**索引管理**，来查看每个索引的健康状态：
 
 ![image-20210306162909556](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/elastic-search-demo/image-20210306162909556.png)
 
@@ -113,23 +113,23 @@ Coordinating 节点叫做协调节点，它负责接收 Client 的请求，将�
 
 ***如何避免脑裂问题***
 
-要限定一个选举条件，设置 Quorum（仲裁）：
+要限定一个选举条件，设置 `Quorum`（仲裁）：
 
 - `Quorum = （master 节点总数 / 2）+ 1`
 
-只有当 Master eligible 节点数大于 Quorum 时，才能进行选举。
+只有当 `Master eligible` 节点数大于 `Quorum` 时，才能进行选举。
 
-在 ES 7.0 之前，为了避免脑裂问题，需要手动设置 `discovery.zen.minimum_master_nodes` 为 Quorum。
+在 `ES 7.0` 之前，为了避免脑裂问题，需要手动设置 `discovery.zen.minimum_master_nodes` 为 `Quorum`。
 
-在 ES 7.0 之后，ES 会自己处理脑裂问题，不需要用户处理。
+在 `ES 7.0` 之后，`ES` 会自己处理脑裂问题，不需要用户处理。
 
 
 
 ## 5.ES 中的分片
 
-ES 中的**分片**（Shard）用于存储数据，是存储的**最小单元**。
+`ES` 中的**分片**（`Shard`）用于存储数据，是存储的**最小单元**。
 
-分片有两种：**主分片**（Primary Shard）和**副本分片**（Replica Shard），副本分片是主分片的拷贝。
+分片有两种：**主分片**（`Primary Shard`）和 **副本分片**（`Replica Shard`），副本分片是主分片的拷贝。
 
 主分片用于数据水平扩展的问题，主分片数在索引创建时指定，**之后不允许修改**。
 
@@ -149,7 +149,7 @@ PUT /index_name
 
 其中 `number_of_shards` 表示主分片数，`number_of_replicas` 表示每个主分片的副本分片数。
 
-如果一个集群有 3 个数据节点，某个索引有 3 个主分片，1 一个副本分片，那么它的节点分布会像下面这样：
+如果一个集群有 `3` 个数据节点，某个索引有 `3` 个主分片，`1` 一个副本分片，那么它的节点分布会像下面这样：
 
 ![image-20210306163025798](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/elastic-search-demo/image-20210306163025798.png)
 
@@ -171,7 +171,7 @@ PUT /index_name
 
 ![image-20210306163109548](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/elastic-search-demo/image-20210306163109548.png)
 
-根据这样的配置（3 个主分片，1 个副本分片），如果只有一个节点，则会导致副本分片无法分配（ES 会将主副分片分配在不同的节点上），集群状态为 **yellow**。
+根据这样的配置（3 个主分片，1 个副本分片），如果只有一个节点，则会导致副本分片无法分配（`ES` 会将主副分片分配在不同的节点上），集群状态为 **yellow**。
 
 **如果此时增加一个数据节点**，那么副本分片就得以分配，集群具备了故障转移能力，集群状态转为 **green**。
 
@@ -197,55 +197,55 @@ PUT /index_name
 
 ## 6.分片的内部原理
 
-ES 中的一个分片对应了 Lucene 中的一个 Index。
+`ES` 中的一个分片对应了 `Lucene` 中的一个 `Index`。
 
 ### 6.1.Lucene Index
 
-在 Lucene 中，单个倒排索引文件称为 **Segment**。
+在 `Lucene` 中，单个倒排索引文件称为 **Segment**。
 
-Segment 是不可变的，当有新的文档写入时，会生成新的 Segment（放在**文件系统缓存**中）。
+`Segment` 是不可变的，当有新的文档写入时，会生成新的 `Segment`（放在**文件系统缓存**中）。
 
-多个 Segment 汇总在一起称为 Lucene 中的 Index，也就是 ES 中的分片。
+多个 `Segment` 汇总在一起称为 `Lucene` 中的 `Index`，也就是 `ES` 中的分片。
 
 ![image-20210306163229806](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/elastic-search-demo/image-20210306163229806.png)
 
 ### 6.2.Refresh 刷新
 
-ES 的文档在写入时，会先放在 `Index Buffer`（内存） 中，当 Index Buffer 的空间被占用到**一定程度/时间周期**后，会 **Refresh**到 Segment 中，Index Buffer 则会被清空。
+`ES` 的文档在写入时，会先放在 `Index Buffer`（内存） 中，当 `Index Buffer` 的空间被占用到**一定程度/时间周期**后，会 **Refresh**到 `Segment` 中，`Index Buffer` 则会被清空。
 
 ![image-20210306163244912](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/elastic-search-demo/image-20210306163244912.png)
 
-Refresh 的刷新频率可以通过 [index.refresh_interval](https://www.elastic.co/guide/en/elasticsearch/reference/current/index-modules.html#index-refresh-interval-setting) 参数进行设置，默认为 1 秒。
+`Refresh` 的刷新频率可以通过 [index.refresh_interval](https://www.elastic.co/guide/en/elasticsearch/reference/current/index-modules.html#index-refresh-interval-setting) 参数进行设置，默认为 1 秒。
 
-或者当 Index Buffer 被占用到 JVM 的 **10%**（默认值），也会触发 Refresh。
+或者当 `Index Buffer` 被占用到 `JVM` 的 **10%**（默认值），也会触发 `Refresh`。
 
-当文档被 Refresh 到 Segment 后，就可以被 ES 检索到了。
+当文档被 `Refresh` 到 `Segment` 后，就可以被 `ES` 检索到了。
 
 ### 6.3.Transaction log
 
-写入文档时，会先放在 `Index Buffer` 中，而 Index Buffer 是在内存中，为了防止内存意外（比如断电）丢失，在写入 Index Buffer 的同时，也会写到 [Transaction log](https://www.elastic.co/guide/en/elasticsearch/reference/current/index-modules-translog.html)（磁盘）中。
+写入文档时，会先放在 `Index Buffer` 中，而 `Index Buffer` 是在内存中，为了防止内存意外（比如断电）丢失，在写入 `Index Buffer` 的同时，也会写到 [Transaction log](https://www.elastic.co/guide/en/elasticsearch/reference/current/index-modules-translog.html)（磁盘）中。
 
 ![image-20210306163300658](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/elastic-search-demo/image-20210306163300658.png)
 
-一个 **Transaction log** 默认是 512M。
+一个 **Transaction log** 默认是 `512M`。
 
 ### 6.4.Flush 操作
 
-ES 的 Flush 会触发以下操作：
+`ES` 的 `Flush` 会触发以下操作：
 
 - 调用 **Refresh**
-- 调用 **fsync**，将文件系统缓存中的 Segment 写入磁盘。
-- 清空 Transaction log。
+- 调用 **fsync**，将文件系统缓存中的 `Segment` 写入磁盘。
+- 清空 `Transaction log`。
 
-Flush 操作默认 30 分钟调用一次，或者当 Transaction log 满（默认 512 M）时也会触发 Flush。
+`Flush` 操作默认 `30` 分钟调用一次，或者当 `Transaction log`  满（默认 `512 M`）时也会触发 `Flush`。
 
 ### 6.5.Merge 合并
 
-当越来越多的 Segment 被写入到磁盘后，磁盘上的 Segment 会变得很多，ES 会定期 **Merge** 这些 Segment。
+当越来越多的 `Segment` 被写入到磁盘后，磁盘上的 `Segment` 会变得很多，`ES` 会定期 **Merge** 这些 `Segment`。
 
-**文档的删除操作并不会马上被真正的删除**，而是会写入 **del** 文件中，Merge 操作也会删除该文件。
+**文档的删除操作并不会马上被真正的删除**，而是会写入 **del** 文件中，`Merge` 操作也会删除该文件。
 
-Merge 操作可以由 ES 自动触发，也可以[手动强制 Merge](https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-forcemerge.html)，语法如下：
+`Merge` 操作可以由 `ES` 自动触发，也可以[手动强制 Merge](https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-forcemerge.html)，语法如下：
 
 ```shell
 POST index_name/_forcemerge
@@ -260,8 +260,8 @@ POST index_name/_forcemerge
 文档到分片的路由算法：
 
 - `shard_index = hash(_routing) % number_of_primary_shards`
-- Hash 算法可以保证文档均匀的分散到分片上。
-- 默认的 `_routing` 值为文档 id。
+- `Hash` 算法可以保证文档均匀的分散到分片上。
+- 默认的 `_routing` 值为文档 `id`。
 - `_routing` 的值也可以自行指定。
 
 正是因为文档的路由算法是基于主分片数来计算的，所以主分片数一旦确定以后，就不能修改。
@@ -278,7 +278,7 @@ POST index_name/_doc/doc_id/routing=xxx
 文档的 **Write** 操作（插入，更新，删除）的流程：
 
 1. 客户将文档的 **Write** 请求发送到 **Coordinating** 节点（Coordinating 节点负责处理客户请求，而不是 Master 节点）。
-2. Coordinating 节点通过 Hash 算法找到该文档的**主分片**。
+2. `Coordinating` 节点通过 Hash 算法找到该文档的**主分片**。
 3. 在主分片上进行 **Write** 操作，主分片 **Write** 成功后，将该 **Write** 请求发送到所有的**副本分片**。
 4. 所有副本分片进行相应的 **Write** 操作，成功后，将结果返回给主分片。
 5. 主分片将所以的执行结果反馈给 **Coordinating** 节点。
@@ -292,14 +292,14 @@ POST index_name/_doc/doc_id/routing=xxx
 
 ### 8.1.Query Then Fetch 过程
 
-ES 的搜索过程分两个阶段：
+`ES` 的搜索过程分两个阶段：
 
-- Query阶段：
-  - 用户将查询请求发送到 Coordinating 节点，Coordinating 节点会随机选择 N（主分片数） 个分片，发送查询请求。
-  - 收到查询请求的分片执行查询，并进行排序。然后每个分片都会返回 `From + Size` 个排好序的文档 ID 和排序值（score），给 Coordinating 节点。
-- Fetch阶段：
-  - Coordinating 节点会将从所有分片得到的文档重新排序，重新得到 `From + Size` 个文档的 ID。
-  - Coordinating 节点以 `Multi Get` 的方式，到相应的分片获取具体的文档信息，并返回给用户。
+- `Query` 阶段：
+  - 用户将查询请求发送到 `Coordinating` 节点，`Coordinating` 节点会随机选择 `N`（主分片数） 个分片，发送查询请求。
+  - 收到查询请求的分片执行查询，并进行排序。然后每个分片都会返回 `From + Size` 个排好序的文档 `ID` 和排序值（`score`），给 `Coordinating` 节点。
+- `Fetch` 阶段：
+  - `Coordinating` 节点会将从所有分片得到的文档重新排序，重新得到 `From + Size` 个文档的 ID。
+  - `Coordinating` 节点以 `Multi Get` 的方式，到相应的分片获取具体的文档信息，并返回给用户。
 
 这两个阶段合称为 **Query Then Fetch**。
 
