@@ -17,6 +17,7 @@
 3. [一个技术总监的忠告：精通那么多技术，你为何还是受不到重用？](https://github.com/HomanLiang/study-demo/blob/main/team-manage/document/chapter3_03.md)
 4. [如何快速降低一个员工的积极性？](https://github.com/HomanLiang/study-demo/blob/main/team-manage/document/chapter3_04.md)
 5. [快速成长从写一份走心的周报开始](https://github.com/HomanLiang/study-demo/blob/main/team-manage/document/chapter3_05.md)
+6. [职场新人如何快速融入团队](https://github.com/HomanLiang/study-demo/blob/main/team-manage/document/chapter3_06.md)
 
 ## 写作技能
 
