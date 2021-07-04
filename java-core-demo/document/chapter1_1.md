@@ -36,11 +36,11 @@ Java 语言提供了 **8** 种基本类型，大致分为 **4** 类
   - 基本类型：变量名指向具体的数值。
   - 引用类型：变量名指向存数据对象的内存地址。
 - 从内存方面来说
-  - 基本类型：变量在声明之后，Java 就会立刻分配给他内存空间。
-  - 引用类型：它以特殊的方式（类似 C 指针）向对象实体（具体的值），这类变量声明时不会分配内存，只是存储了一个内存地址。
+  - 基本类型：变量在声明之后，`Java` 就会立刻分配给他内存空间。
+  - 引用类型：它以特殊的方式（类似 `C` 指针）向对象实体（具体的值），这类变量声明时不会分配内存，只是存储了一个内存地址。
 - 从使用方面来说
   - 基本类型：使用时需要赋具体值,判断时使用 `==` 号。
-  - 引用类型：使用时可以赋 null，判断时使用 `equals` 方法。
+  - 引用类型：使用时可以赋 `null`，判断时使用 `equals` 方法。
 
 > 👉 扩展阅读：[Java 基本数据类型和引用类型](https://juejin.im/post/59cd71835188255d3448faf6)
 >
@@ -48,32 +48,32 @@ Java 语言提供了 **8** 种基本类型，大致分为 **4** 类
 
 ## 2. 数据转换
 
-Java 中，数据类型转换有两种方式：
+`Java` 中，数据类型转换有两种方式：
 
 - 自动转换
 - 强制转换
 
 ### 2.1. 自动转换
 
-一般情况下，定义了某数据类型的变量，就不能再随意转换。但是 JAVA 允许用户对基本类型做**有限度**的类型转换。
+一般情况下，定义了某数据类型的变量，就不能再随意转换。但是 `JAVA` 允许用户对基本类型做**有限度**的类型转换。
 
-如果符合以下条件，则 JAVA 将会自动做类型转换：
+如果符合以下条件，则 `JAVA` 将会自动做类型转换：
 
 - **由小数据转换为大数据**
 
   显而易见的是，“小”数据类型的数值表示范围小于“大”数据类型的数值表示范围，即精度小于“大”数据类型。
 
-  所以，如果“大”数据向“小”数据转换，会丢失数据精度。比如：long 转为 int，则超出 int 表示范围的数据将会丢失，导致结果的不确定性。
+  所以，如果“大”数据向“小”数据转换，会丢失数据精度。比如：`long` 转为 `int`，则超出 `int` 表示范围的数据将会丢失，导致结果的不确定性。
 
   反之，“小”数据向“大”数据转换，则不会存在数据丢失情况。由于这个原因，这种类型转换也称为**扩大转换**。
 
-  这些类型由“小”到“大”分别为：(byte，short，char) < int < long < float < double。
+  这些类型由“小”到“大”分别为：`(byte，short，char) < int < long < float < double`。
 
   这里我们所说的“大”与“小”，并不是指占用字节的多少，而是指表示值的范围的大小。
 
 - **转换前后的数据类型要兼容**
 
-  由于 boolean 类型只能存放 true 或 false，这与整数或字符是不兼容的，因此不可以做类型转换。
+  由于 `boolean` 类型只能存放 `true` 或 `false`，这与整数或字符是不兼容的，因此不可以做类型转换。
 
 - **整型类型和浮点型进行计算后，结果会转为浮点类型**
 
@@ -91,7 +91,7 @@ Java 中，数据类型转换有两种方式：
     x/y = 1.9607843
     ```
 
-	可见 long 虽然精度大于 float 类型，但是结果为浮点数类型。
+	可见 `long` 虽然精度大于 `float` 类型，但是结果为浮点数类型。
 
 ### 2.2. 强制转换
 
@@ -113,7 +113,7 @@ System.out.println("x = " + x);
 
 ### 3.1. 包装类、装箱、拆箱
 
-Java 中为每一种基本数据类型提供了相应的包装类，如下：
+`Java` 中为每一种基本数据类型提供了相应的包装类，如下：
 
 ```java
 Byte <-> byte
@@ -138,11 +138,11 @@ Boolean <-> boolean
 
 ### 3.2. 自动装箱、自动拆箱
 
-基本数据（Primitive）型的自动装箱（boxing）拆箱（unboxing）自 JDK 5 开始提供的功能。
+基本数据（`Primitive`）型的自动装箱（`boxing`）拆箱（`unboxing`）自 `JDK 5` 开始提供的功能。
 
-自动装箱与拆箱的机制可以让我们在 Java 的变量赋值或者是方法调用等情况下使用原始类型或者对象类型更加简单直接。 因为自动装箱会隐式地创建对象，如果在一个循环体中，会创建无用的中间对象，这样会增加 GC 压力，拉低程序的性能。所以在写循环时一定要注意代码，避免引入不必要的自动装箱操作。
+自动装箱与拆箱的机制可以让我们在 `Java` 的变量赋值或者是方法调用等情况下使用原始类型或者对象类型更加简单直接。 因为自动装箱会隐式地创建对象，如果在一个循环体中，会创建无用的中间对象，这样会增加 `GC` 压力，拉低程序的性能。所以在写循环时一定要注意代码，避免引入不必要的自动装箱操作。
 
-JDK 5 之前的形式：
+`JDK 5` 之前的形式：
 
 ```java
 Integer i1 = new Integer(10); // 非自动装箱
@@ -154,7 +154,7 @@ JDK 5 之后：
 Integer i2 = 10; // 自动装箱
 ```
 
-Java 对于自动装箱和拆箱的设计，依赖于一种叫做享元模式的设计模式（有兴趣的朋友可以去了解一下源码，这里不对设计模式展开详述）。
+`Java` 对于自动装箱和拆箱的设计，依赖于一种叫做享元模式的设计模式（有兴趣的朋友可以去了解一下源码，这里不对设计模式展开详述）。
 
 > 👉 扩展阅读：[深入剖析 Java 中的装箱和拆箱](https://www.cnblogs.com/dolphin0520/p/3780005.html)
 >
@@ -164,7 +164,7 @@ Java 对于自动装箱和拆箱的设计，依赖于一种叫做享元模式的
 
 #### 装箱、拆箱应用场景
 
-- 一种最普通的场景是：调用一个**含类型为 `Object` 参数的方法**，该 `Object` 可支持任意类型（因为 `Object` 是所有类的父类），以便通用。当你需要将一个值类型（如 int）传入时，需要使用 `Integer` 装箱。
+- 一种最普通的场景是：调用一个**含类型为 `Object` 参数的方法**，该 `Object` 可支持任意类型（因为 `Object` 是所有类的父类），以便通用。当你需要将一个值类型（如 `int`）传入时，需要使用 `Integer` 装箱。
 - 另一种用法是：一个**非泛型的容器**，同样是为了保证通用，而将元素类型定义为 `Object`。于是，要将值类型数据加入容器时，需要装箱。
 - 当 `==` 运算符的两个操作，一个操作数是包装类，另一个操作数是表达式（即包含算术运算）则比较的是数值（即会触发自动拆箱的过程）。
 
@@ -199,8 +199,8 @@ System.out.println("i1 == i4 is [" + (i1 == i4) + "]"); // 自动拆箱
 
 原因在于：
 
-- i1、i2 都是包装类，使用 `==` 时，Java 将它们当做两个对象，而非两个 int 值来比较，所以两个对象自然是不相等的。正确的比较操作应该使用 `equals` 方法。
-- i1 是包装类，i4 是基础数据类型，使用 `==` 时，Java 会将两个 i1 这个包装类对象自动拆箱为一个 `int` 值，再代入到 `==` 运算表达式中计算；最终，相当于两个 `int` 进行比较，由于值相同，所以结果相等。
+- `i1`、`i2` 都是包装类，使用 `==` 时，`Java` 将它们当做两个对象，而非两个 `int` 值来比较，所以两个对象自然是不相等的。正确的比较操作应该使用 `equals` 方法。
+- `i1` 是包装类，`i4` 是基础数据类型，使用 `==` 时，Java 会将两个 `i1` 这个包装类对象自动拆箱为一个 `int` 值，再代入到 `==` 运算表达式中计算；最终，相当于两个 `int` 进行比较，由于值相同，所以结果相等。
 
 【示例】包装类判等问题
 
@@ -227,7 +227,7 @@ int j = 128;
 log.info("\nInteger i = 128;\nint j = 128;\ni == j ? {}", i == j); //true
 ```
 
-通过运行结果可以看到，虽然看起来永远是在对 127 和 127、128 和 128 判等，但 == 却并非总是返回 true。
+通过运行结果可以看到，虽然看起来永远是在对 `127` 和 `127`、`128` 和 `128` 判等，但 `==` 却并非总是返回 `true`。
 
 #### 装箱、拆箱应用注意点
 
@@ -236,7 +236,7 @@ log.info("\nInteger i = 128;\nint j = 128;\ni == j ? {}", i == j); //true
 
 ## 4. 判等问题
 
-Java 中，通常使用 `equals` 或 `==` 进行判等操作。`equals` 是方法而 `==` 是操作符。此外，二者使用也是有区别的：
+`Java` 中，通常使用 `equals` 或 `==` 进行判等操作。`equals` 是方法而 `==` 是操作符。此外，二者使用也是有区别的：
 
 - 对**基本类型**，比如 `int`、`long`，进行判等，**只能使用 `==`，比较的是字面值**。因为基本类型的值就是其数值。
 - 对**引用类型**，比如 `Integer`、`Long` 和 `String`，进行判等，**需要使用 `equals` 进行内容判等**。因为引用类型的直接值是指针，使用 `==` 的话，比较的是指针，也就是两个对象在内存中的地址，即比较它们是不是同一个对象，而不是比较对象的内容。
@@ -270,7 +270,7 @@ int j = 128;
 log.info("\nInteger i = 128;\nint j = 128;\ni == j ? {}", i == j); //true
 ```
 
-第一个案例中，编译器会把 Integer a = 127 转换为 Integer.valueOf(127)。查看源码可以发现，这个转换在内部其实做了缓存，使得两个 Integer 指向同一个对象，所以 == 返回 true。
+第一个案例中，编译器会把 `Integer a = 127` 转换为 `Integer.valueOf(127)`。查看源码可以发现，这个转换在内部其实做了缓存，使得两个 `Integer` 指向同一个对象，所以 `==` 返回 `true`。
 
 ```java
 public static Integer valueOf(int i) {
@@ -280,7 +280,7 @@ public static Integer valueOf(int i) {
 }
 ```
 
-第二个案例中，之所以同样的代码 128 就返回 false 的原因是，默认情况下会缓存[-128,127]的数值，而 128 处于这个区间之外。设置 JVM 参数加上 -XX:AutoBoxCacheMax=1000 再试试，是不是就返回 true 了呢？
+第二个案例中，之所以同样的代码 `128` 就返回 `false` 的原因是，默认情况下会缓存 `[-128,127]` 的数值，而 `128` 处于这个区间之外。设置 `JVM` 参数加上 `-XX:AutoBoxCacheMax=1000` 再试试，是不是就返回 `true` 了呢？
 
 ```java
 private static class IntegerCache {
@@ -318,9 +318,9 @@ private static class IntegerCache {
 }
 ```
 
-第三和第四个案例中，New 出来的 Integer 始终是不走缓存的新对象。比较两个新对象，或者比较一个新对象和一个来自缓存的对象，结果肯定不是相同的对象，因此返回 false。
+第三和第四个案例中，`New` 出来的 `Integer` 始终是不走缓存的新对象。比较两个新对象，或者比较一个新对象和一个来自缓存的对象，结果肯定不是相同的对象，因此返回 `false`。
 
-第五个案例中，我们把装箱的 Integer 和基本类型 int 比较，前者会先拆箱再比较，比较的肯定是数值而不是引用，因此返回 true。
+第五个案例中，我们把装箱的 `Integer` 和基本类型 `int` 比较，前者会先拆箱再比较，比较的肯定是数值而不是引用，因此返回 true。
 
 > 【总结】综上，我们可以得出结论：**包装类需要使用 `equals` 进行内容判等，而不能使用 `==`**。
 
@@ -344,19 +344,19 @@ String h = new String("4");
 log.info("\nString g = new String(\"4\");\nString h = new String(\"4\");\ng == h ? {}", g.equals(h)); //true
 ```
 
-在 JVM 中，当代码中出现双引号形式创建字符串对象时，JVM 会先对这个字符串进行检查，如果字符串常量池中存在相同内容的字符串对象的引用，则将这个引用返回；否则，创建新的字符串对象，然后将这个引用放入字符串常量池，并返回该引用。这种机制，就是字符串驻留或池化。
+在 `JVM` 中，当代码中出现双引号形式创建字符串对象时，`JVM` 会先对这个字符串进行检查，如果字符串常量池中存在相同内容的字符串对象的引用，则将这个引用返回；否则，创建新的字符串对象，然后将这个引用放入字符串常量池，并返回该引用。这种机制，就是字符串驻留或池化。
 
-第一个案例返回 true，因为 Java 的字符串驻留机制，直接使用双引号声明出来的两个 String 对象指向常量池中的相同字符串。
+第一个案例返回 `true`，因为 `Java` 的字符串驻留机制，直接使用双引号声明出来的两个 `String` 对象指向常量池中的相同字符串。
 
-第二个案例，new 出来的两个 String 是不同对象，引用当然不同，所以得到 false 的结果。
+第二个案例，`new` 出来的两个 `String` 是不同对象，引用当然不同，所以得到 `false` 的结果。
 
-第三个案例，使用 String 提供的 intern 方法也会走常量池机制，所以同样能得到 true。
+第三个案例，使用 `String` 提供的 `intern` 方法也会走常量池机制，所以同样能得到 `true`。
 
-第四个案例，通过 equals 对值内容判等，是正确的处理方式，当然会得到 true。
+第四个案例，通过 `equals` 对值内容判等，是正确的处理方式，当然会得到 `true`。
 
-虽然使用 new 声明的字符串调用 intern 方法，也可以让字符串进行驻留，但在业务代码中滥用 intern，可能会产生性能问题。
+虽然使用 `new` 声明的字符串调用 `intern` 方法，也可以让字符串进行驻留，但在业务代码中滥用 `intern`，可能会产生性能问题。
 
-【示例】String#intern 性能测试
+【示例】`String#intern` 性能测试
 
 ```
 //-XX:+PrintStringTableStatistics
@@ -370,19 +370,19 @@ System.out.println("size:" + list.size());
 System.out.println("time:" + (System.currentTimeMillis() - begin));
 ```
 
-上面的示例执行时间会比较长。原因在于：字符串常量池是一个固定容量的 Map。如果容量太小（Number of buckets=60013）、字符串太多（1000 万个字符串），那么每一个桶中的字符串数量会非常多，所以搜索起来就很慢。输出结果中的 Average bucket size=167，代表了 Map 中桶的平均长度是 167。
+上面的示例执行时间会比较长。原因在于：字符串常量池是一个固定容量的 `Map`。如果容量太小（`Number of buckets=60013`）、字符串太多（`1000` 万个字符串），那么每一个桶中的字符串数量会非常多，所以搜索起来就很慢。输出结果中的 `Average bucket size=167`，代表了 `Map` 中桶的平均长度是 `167`。
 
-解决方法是：设置 JVM 参数 -XX:StringTableSize=10000000，指定更多的桶。
+解决方法是：设置 `JVM` 参数 `-XX:StringTableSize=10000000`，指定更多的桶。
 
-为了方便观察，可以在启动程序时设置 JVM 参数 -XX:+PrintStringTableStatistic，程序退出时可以打印出字符串常量表的统计信息。
+为了方便观察，可以在启动程序时设置 `JVM` 参数 `-XX:+PrintStringTableStatistic`，程序退出时可以打印出字符串常量表的统计信息。
 
-执行结果比不设置 -XX:StringTableSize 要快很多。
+执行结果比不设置 `-XX:StringTableSize` 要快很多。
 
 > 【总结】**没事别轻易用 intern，如果要用一定要注意控制驻留的字符串的数量，并留意常量表的各项指标**。
 
 ### 4.3. 实现 equals
 
-如果看过 Object 类源码，你可能就知道，equals 的实现其实是比较对象引用
+如果看过 `Object` 类源码，你可能就知道，`equals` 的实现其实是比较对象引用
 
 ```java
 public boolean equals(Object obj) {
@@ -390,18 +390,18 @@ public boolean equals(Object obj) {
 }
 ```
 
-之所以 Integer 或 String 能通过 equals 实现内容判等，是因为它们都覆写了这个方法。
+之所以 `Integer` 或 `String` 能通过 `equals` 实现内容判等，是因为它们都覆写了这个方法。
 
-对于自定义类型，如果不覆写 equals 的话，默认就是使用 Object 基类的按引用的比较方式。
+对于自定义类型，如果不覆写 `equals` 的话，默认就是使用 `Object` 基类的按引用的比较方式。
 
-实现一个更好的 equals 应该注意的点：
+实现一个更好的 `equals` 应该注意的点：
 
-- 考虑到性能，可以先进行指针判等，如果对象是同一个那么直接返回 true；
-- 需要对另一方进行判空，空对象和自身进行比较，结果一定是 fasle；
-- 需要判断两个对象的类型，如果类型都不同，那么直接返回 false；
+- 考虑到性能，可以先进行指针判等，如果对象是同一个那么直接返回 `true`；
+- 需要对另一方进行判空，空对象和自身进行比较，结果一定是 `fasle`；
+- 需要判断两个对象的类型，如果类型都不同，那么直接返回 `false`；
 - 确保类型相同的情况下再进行类型强制转换，然后逐一判断所有字段。
 
-【示例】自定义 equals 示例
+【示例】自定义 `equals` 示例
 
 自定义类：
 
@@ -413,7 +413,7 @@ class Point {
 }
 ```
 
-自定义 equals：
+自定义 `equals`：
 
 ```java
 @Override
@@ -436,11 +436,11 @@ points.add(p1);
 log.info("points.contains(p2) ? {}", points.contains(p2));
 ```
 
-按照改进后的 equals 方法，这 2 个对象可以认为是同一个，Set 中已经存在了 p1 就应该包含 p2，但结果却是 false。
+按照改进后的 `equals` 方法，这 `2` 个对象可以认为是同一个，`Set` 中已经存在了 `p1` 就应该包含 `p2`，但结果却是 `false`。
 
-出现这个 Bug 的原因是，散列表需要使用 hashCode 来定位元素放到哪个桶。如果自定义对象没有实现自定义的 hashCode 方法，就会使用 Object 超类的默认实现，得到的两个 hashCode 是不同的，导致无法满足需求。
+出现这个 `Bug` 的原因是，散列表需要使用 `hashCode` 来定位元素放到哪个桶。如果自定义对象没有实现自定义的 `hashCode` 方法，就会使用 `Object` 超类的默认实现，得到的两个 `hashCode` 是不同的，导致无法满足需求。
 
-要自定义 hashCode，我们可以直接使用 Objects.hash 方法来实现。
+要自定义 `hashCode`，我们可以直接使用 `Objects.hash` 方法来实现。
 
 ```java
 @Override
@@ -451,7 +451,7 @@ public int hashCode() {
 
 ### 4.5. compareTo 和 equals 的逻辑一致性
 
-【示例】自定义 compareTo 出错示例
+【示例】自定义 `compareTo` 出错示例
 
 ```java
 @Data
@@ -488,12 +488,12 @@ log.info("index1 = " + index1);
 log.info("index2 = " + index2);
 ```
 
-binarySearch 方法内部调用了元素的 compareTo 方法进行比较；
+`binarySearch` 方法内部调用了元素的 `compareTo` 方法进行比较；
 
-- indexOf 的结果没问题，列表中搜索不到 id 为 2、name 是 li 的学生；
-- binarySearch 返回了索引 1，代表搜索到的结果是 id 为 2，name 是 wang 的学生。
+- `indexOf` 的结果没问题，列表中搜索不到 `id` 为 `2`、`name` 是 `li` 的学生；
+- `binarySearch` 返回了索引 `1`，代表搜索到的结果是 `id` 为 `2`，`name` 是 `wang` 的学生。
 
-修复方式很简单，确保 compareTo 的比较逻辑和 equals 的实现一致即可。
+修复方式很简单，确保 `compareTo` 的比较逻辑和 `equals` 的实现一致即可。
 
 ```java
 @Data
@@ -515,7 +515,7 @@ static class StudentRight implements Comparable<StudentRight> {
 
 ### 4.6. 小心 Lombok 生成代码的“坑”
 
-Lombok 的 @Data 注解会帮我们实现 equals 和 hashcode 方法，但是有继承关系时， Lombok 自动生成的方法可能就不是我们期望的了。
+`Lombok` 的 `@Data` 注解会帮我们实现 `equals` 和 `hashcode` 方法，但是有继承关系时，`Lombok` 自动生成的方法可能就不是我们期望的了。
 
 `@EqualsAndHashCode` 默认实现没有使用父类属性。为解决这个问题，我们可以手动设置 `callSuper` 开关为 true，来覆盖这种默认行为。
 
@@ -537,13 +537,13 @@ System.out.println(amount1 - amount2); // 1.0499999999999998
 
 上面的几个示例，输出结果和我们预期的很不一样。为什么会是这样呢？
 
-出现这种问题的主要原因是，计算机是以二进制存储数值的，浮点数也不例外。Java 采用了 IEEE 754 标准实现浮点数的表达和运算，你可以通过这里查看数值转化为二进制的结果。
+出现这种问题的主要原因是，计算机是以二进制存储数值的，浮点数也不例外。`Java` 采用了 `IEEE 754` 标准实现浮点数的表达和运算，你可以通过这里查看数值转化为二进制的结果。
 
-比如，0.1 的二进制表示为 0.0 0011 0011 0011… （0011 无限循环)，再转换为十进制就是 0.1000000000000000055511151231257827021181583404541015625。对于计算机而言，0.1 无法精确表达，这是浮点数计算造成精度损失的根源。
+比如，`0.1` 的二进制表示为 `0.0 0011 0011 0011…` （`0011` 无限循环)，再转换为十进制就是 `0.1000000000000000055511151231257827021181583404541015625`。对于计算机而言，`0.1` 无法精确表达，这是浮点数计算造成精度损失的根源。
 
 **浮点数无法精确表达和运算的场景，一定要使用 BigDecimal 类型**。
 
-使用 BigDecimal 时，有个细节要格外注意。让我们来看一段代码：
+使用 `BigDecimal` 时，有个细节要格外注意。让我们来看一段代码：
 
 ```java
 System.out.println(new BigDecimal(0.1).add(new BigDecimal(0.2)));
@@ -606,11 +606,11 @@ private static void right() {
 }
 ```
 
-BigDecimal 的 equals 方法的注释中说明了原因，equals 比较的是 BigDecimal 的 value 和 scale，1.0 的 scale 是 1，1 的 scale 是 0，所以结果一定是 false。
+`BigDecimal` 的 `equals` 方法的注释中说明了原因，`equals` 比较的是 `BigDecimal` 的 `value` 和 `scale`，`1.0` 的 `scale` 是 `1`，`1` 的 `scale` 是 `0`，所以结果一定是 `false`。
 
 **如果我们希望只比较 BigDecimal 的 value，可以使用 compareTo 方法**。
 
-BigDecimal 的 equals 和 hashCode 方法会同时考虑 value 和 scale，如果结合 HashSet 或 HashMap 使用的话就可能会出现麻烦。比如，我们把值为 1.0 的 BigDecimal 加入 HashSet，然后判断其是否存在值为 1 的 BigDecimal，得到的结果是 false。
+`BigDecimal` 的 `equals` 和 `hashCode` 方法会同时考虑 `value` 和 `scale`，如果结合 `HashSet` 或 `HashMap` 使用的话就可能会出现麻烦。比如，我们把值为 `1.0` 的 `BigDecimal` 加入 `HashSet`，然后判断其是否存在值为 `1` 的 `BigDecimal`，得到的结果是 `false`。
 
 ```java
 Set<BigDecimal> hashSet1 = new HashSet<>();
@@ -620,9 +620,9 @@ System.out.println(hashSet1.contains(new BigDecimal("1")));//返回false
 
 解决办法有两个：
 
-第一个方法是，使用 TreeSet 替换 HashSet。TreeSet 不使用 hashCode 方法，也不使用 equals 比较元素，而是使用 compareTo 方法，所以不会有问题。
+第一个方法是，使用 `TreeSet` 替换 `HashSet`。`TreeSet` 不使用 `hashCode` 方法，也不使用 `equals` 比较元素，而是使用 `compareTo` 方法，所以不会有问题。
 
-第二个方法是，把 BigDecimal 存入 HashSet 或 HashMap 前，先使用 stripTrailingZeros 方法去掉尾部的零，比较的时候也去掉尾部的 0，确保 value 相同的 BigDecimal，scale 也是一致的。
+第二个方法是，把 `BigDecimal` 存入 `HashSet` 或 `HashMap` 前，先使用 `stripTrailingZeros` 方法去掉尾部的零，比较的时候也去掉尾部的 `0`，确保 `value` 相同的 `BigDecimal`，`scale` 也是一致的。
 
 ```java
 Set<BigDecimal> hashSet2 = new HashSet<>();
@@ -636,7 +636,7 @@ System.out.println(treeSet.contains(new BigDecimal("1")));//返回true
 
 ### 5.4. 数值溢出
 
-数值计算还有一个要小心的点是溢出，不管是 int 还是 long，所有的基本数值类型都有超出表达范围的可能性。
+数值计算还有一个要小心的点是溢出，不管是 `int` 还是 `long`，所有的基本数值类型都有超出表达范围的可能性。
 
 ```java
 long l = Long.MAX_VALUE;
@@ -646,7 +646,7 @@ System.out.println(l + 1 == Long.MIN_VALUE); // true
 
 **显然这是发生了溢出，而且是默默的溢出，并没有任何异常**。这类问题非常容易被忽略，改进方式有下面 2 种。
 
-方法一是，考虑使用 Math 类的 addExact、subtractExact 等 xxExact 方法进行数值运算，这些方法可以在数值溢出时主动抛出异常。
+方法一是，考虑使用 `Math` 类的 `addExact`、`subtractExact` 等 `xxExact` 方法进行数值运算，这些方法可以在数值溢出时主动抛出异常。
 
 ```java
 try {
@@ -657,7 +657,7 @@ try {
 }
 ```
 
-方法二是，使用大数类 BigInteger。BigDecimal 是处理浮点数的专家，而 BigInteger 则是对大数进行科学计算的专家。
+方法二是，使用大数类 `BigInteger`。`BigDecimal` 是处理浮点数的专家，而 `BigInteger` 则是对大数进行科学计算的专家。
 
 ```java
 BigInteger i = new BigInteger(String.valueOf(Long.MAX_VALUE));
@@ -672,7 +672,7 @@ try {
 
 ## 6.double转string
 
-- double转string方式一：Double.toString(d)
+- `double` 转 `string` 方式一：`Double.toString(d)`
 
   ```
   public class DoubleConvertToString {
@@ -699,9 +699,9 @@ try {
   //no!
   ```
 
-  toString()方式使用时存在此坑，尽量不要使用；
+  `toString()` 方式使用时存在此坑，尽量不要使用；
 
-- double转string方式二：BigDecimal(d);
+- `double` 转 `string` 方式二：`BigDecimal(d);`
 
   ```
   public static void doubleToString2(double d){
@@ -714,7 +714,7 @@ try {
   //20160.0033299999995506368577480316162109375
   ```
 
-- double转string方式三：NumberFormat.format(d);
+- `double` 转 `string` 方式三：`NumberFormat.format(d);`
 
   ```
   public static void doubleToString3(double d){
@@ -726,7 +726,7 @@ try {
   //此方法的输出格式和输入的格式一样
   ```
 
-- double转string方法四：DecimalFormat().format(d);
+- `double` 转 `string` 方法四：`DecimalFormat().format(d);`
 
   ```
   public static void doubleToString4(double d){
@@ -752,15 +752,15 @@ try {
 
 ### X.1.说说基本类型和包装类型的区别
 
-Java 的每个基本类型都对应了一个包装类型，比如说 int 的包装类型为 Integer，double 的包装类型为 Double。基本类型和包装类型的区别主要有以下 4 点。
+`Java` 的每个基本类型都对应了一个包装类型，比如说 `int` 的包装类型为 `Integer`，`double` 的包装类型为 `Double`。基本类型和包装类型的区别主要有以下 `4` 点。
 
 #### X.1.1.包装类型可以为 null，而基本类型不可以
 
-别小看这一点区别，它使得包装类型可以应用于 POJO 中，而基本类型则不行。
+别小看这一点区别，它使得包装类型可以应用于 `POJO` 中，而基本类型则不行。
 
-POJO 是什么呢？这里稍微说明一下。
+`POJO` 是什么呢？这里稍微说明一下。
 
-POJO 的英文全称是 `Plain Ordinary Java Object`，翻译一下就是，简单无规则的 Java 对象，只有属性字段以及 setter 和 getter 方法，示例如下。
+`POJO` 的英文全称是 `Plain Ordinary Java Object`，翻译一下就是，简单无规则的 `Java` 对象，只有属性字段以及 `setter` 和 `getter` 方法，示例如下。
 
 ```
 class Writer {
@@ -785,11 +785,11 @@ class Writer {
 }
 ```
 
-和 POJO 类似的，还有数据传输对象 DTO（Data Transfer Object，泛指用于展示层与服务层之间的数据传输对象）、视图对象 VO（View Object，把某个页面的数据封装起来）、持久化对象 PO（Persistant Object，可以看成是与数据库中的表映射的 Java 对象）。
+和 `POJO` 类似的，还有数据传输对象 `DTO`（`Data Transfer Object`，泛指用于展示层与服务层之间的数据传输对象）、视图对象 `VO`（`View Object`，把某个页面的数据封装起来）、持久化对象 `PO`（`Persistant Object`，可以看成是与数据库中的表映射的 `Java` 对象）。
 
-那为什么 POJO 的属性必须要用包装类型呢？
+那为什么 `POJO` 的属性必须要用包装类型呢？
 
-《阿里巴巴 Java 开发手册》上有详细的说明，我们来大声朗读一下（预备，起）。
+《阿里巴巴 `Java` 开发手册》上有详细的说明，我们来大声朗读一下（预备，起）。
 
 > 数据库的查询结果可能是 null，如果使用基本类型的话，因为要自动拆箱（将包装类型转为基本类型，比如说把 Integer 对象转换成 int 值），就会抛出 `NullPointerException` 的异常。
 
@@ -802,7 +802,7 @@ List<int> list = new ArrayList<>(); // 提示 Syntax error, insert "Dimensions" 
 List<Integer> list = new ArrayList<>();
 ```
 
-为什么呢？因为泛型在编译时会进行类型擦除，最后只保留原始类型，而原始类型只能是 Object 类及其子类——基本类型是个特例。
+为什么呢？因为泛型在编译时会进行类型擦除，最后只保留原始类型，而原始类型只能是 `Object` 类及其子类——基本类型是个特例。
 
 #### X.1.3.基本类型比包装类型更高效
 
@@ -810,7 +810,7 @@ List<Integer> list = new ArrayList<>();
 
 ![图片](https://mmbiz.qpic.cn/mmbiz_png/z40lCFUAHpmDKLIZbsNufzxCDu3rjNseViaiaz7DwD79KYfZUSmtLeT5oMiasUEzgGzicswibdMmznR7mqmceicKF2WQ/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
 
-很显然，相比较于基本类型而言，包装类型需要占用更多的内存空间。假如没有基本类型的话，对于数值这类经常使用到的数据来说，每次都要通过 new 一个包装类型就显得非常笨重。
+很显然，相比较于基本类型而言，包装类型需要占用更多的内存空间。假如没有基本类型的话，对于数值这类经常使用到的数据来说，每次都要通过 `new` 一个包装类型就显得非常笨重。
 
 #### X.1.4.两个包装类型的值可以相同，但却不相等
 
@@ -824,9 +824,9 @@ System.out.println(chenmo == wanger); // false
 System.out.println(chenmo.equals(wanger )); // true
 ```
 
-两个包装类型在使用“==”进行判断的时候，判断的是其指向的地址是否相等。chenmo 和 wanger 两个变量使用了 new 关键字，导致它们在“==”的时候输出了 false。
+两个包装类型在使用 `==` 进行判断的时候，判断的是其指向的地址是否相等。`chenmo` 和 `wanger` 两个变量使用了 `new` 关键字，导致它们在 `==` 的时候输出了 `false`。
 
-而 `chenmo.equals(wanger)` 的输出结果为 true，是因为 equals 方法内部比较的是两个 int 值是否相等。源码如下。
+而 `chenmo.equals(wanger)` 的输出结果为 `true`，是因为 `equals` 方法内部比较的是两个 `int` 值是否相等。源码如下。
 
 ```
 private final int value;
@@ -842,15 +842,15 @@ public boolean equals(Object obj) {
 }
 ```
 
-瞧，虽然 chenmo 和 wanger 的值都是 10，但他们并不相等。换句话说就是：**将“==”操作符应用于包装类型比较的时候，其结果很可能会和预期的不符**。
+瞧，虽然 `chenmo` 和 `wanger` 的值都是 `10`，但他们并不相等。换句话说就是：**将“==”操作符应用于包装类型比较的时候，其结果很可能会和预期的不符**。
 
 
 
 ### X.2.BigDecimal一定不会丢失精度吗？
 
-我们基本已经形成了常识，需要用到金钱的地方要用BigDecimal而不是其他，而我们也都知道浮点型变量在进行计算的时候会出现丢失精度的问题。
+我们基本已经形成了常识，需要用到金钱的地方要用 `BigDecimal` 而不是其他，而我们也都知道浮点型变量在进行计算的时候会出现丢失精度的问题。
 
-那么，你知道其实BigDecimal也会丢失精度吗？而使用BigDecimal的背后又有什么值得去探究的地方吗？今天，告诉你，知其然，也知其所以然。
+那么，你知道其实 `BigDecimal` 也会丢失精度吗？而使用 `BigDecimal` 的背后又有什么值得去探究的地方吗？今天，告诉你，知其然，也知其所以然。
 
 如下一段代码：
 
@@ -867,17 +867,17 @@ System.out.println(123.3 / 100);
 401.49999999999994
 1.2329999999999999
 
-可以看到在Java中进行浮点数运算的时候，会出现丢失精度的问题。那么我们如果在进行商品价格计算的时候，就会出现问题。
+可以看到在 `Java` 中进行浮点数运算的时候，会出现丢失精度的问题。那么我们如果在进行商品价格计算的时候，就会出现问题。
 
-很有可能造成我们手中有0.06元，却无法购买一个0.05元和一个0.01元的商品。
+很有可能造成我们手中有 `0.06` 元，却无法购买一个 `0.05` 元和一个 `0.01` 元的商品。
 
-因为如上所示，他们两个的总和为0.060000000000000005。
+因为如上所示，他们两个的总和为 `0.060000000000000005`。
 
-这无疑是一个很严重的问题，尤其是当电商网站的并发量上去的时候，出现的问题将是巨大的。可能会导致无法下单，或者对账出现问题。所以接下来我们就可以使用Java中的BigDecimal类来解决这类问题。
+这无疑是一个很严重的问题，尤其是当电商网站的并发量上去的时候，出现的问题将是巨大的。可能会导致无法下单，或者对账出现问题。所以接下来我们就可以使用 `Java` 中的 `BigDecimal` 类来解决这类问题。
 
 **普及一下：**
 
-Java中float的精度为6-7位有效数字。double的精度为15-16位。
+`Java` 中 `float` 的精度为 `6-7` 位有效数字。`double` 的精度为 `15-16` 位。
 
 **X.2.1.API**
 
@@ -906,11 +906,11 @@ longValue()           将BigDecimal对象中的值以长整数返回。
 intValue()            将BigDecimal对象中的值以整数返回。
 ```
 
-由于一般的数值类型，例如double不能准确的表示16位以上的数字。
+由于一般的数值类型，例如 `double` 不能准确的表示 `16` 位以上的数字。
 
 **X.2.2.BigDecimal精度也丢失**
 
-我们在使用BigDecimal时，使用它的BigDecimal(String)构造器创建对象才有意义。其他的如BigDecimal b = new BigDecimal(1)这种，还是会发生精度丢失的问题。如下代码：
+我们在使用 `BigDecimal` 时，使用它的 `BigDecimal(String)` 构造器创建对象才有意义。其他的如 `BigDecimal b = new BigDecimal(1)` 这种，还是会发生精度丢失的问题。如下代码：
 
 ```
 BigDecimal a = new BigDecimal(1.01);
@@ -925,19 +925,19 @@ System.out.println(c.add(d));
 2.0300000000000000266453525910037569701671600341796875
 2.03
 
-可见论丢失精度BigDecimal显的更为过分。但是使用Bigdecimal的BigDecimal(String)构造器的变量在进行运算的时候却没有出现这种问题。
+可见论丢失精度 `BigDecimal` 显的更为过分。但是使用 `Bigdecimal` 的 `BigDecimal(String)` 构造器的变量在进行运算的时候却没有出现这种问题。
 
 究其原因计算机组成原理里面都有，它们的编码决定了这样的结果。
 
-long可以准确存储19位数字，而double只能准备存储16位数字。
+`long` 可以准确存储19位数字，而 `double` 只能准备存储16位数字。
 
-double由于有exp位，可以存16位以上的数字，但是需要以低位的不精确作为代价。如果需要高于19位数字的精确存储，则必须用BigInteger来保存，当然会牺牲一些性能。
+`double` 由于有 `exp` 位，可以存 `16` 位以上的数字，但是需要以低位的不精确作为代价。如果需要高于 `19` 位数字的精确存储，则必须用 `BigInteger` 来保存，当然会牺牲一些性能。
 
-所以我们一般使用BigDecimal来解决商业运算上丢失精度的问题的时候，声明BigDecimal对象的时候一定要使用它构造参数为String的类型的构造器。
+所以我们一般使用 `BigDecimal` 来解决商业运算上丢失精度的问题的时候，声明 `BigDecimal` 对象的时候一定要使用它构造参数为 `String` 的类型的构造器。
 
-同时这个原则Effective Java和MySQL 必知必会中也都有提及。float和double只能用来做科学计算和工程计算。商业运算中我们要使用BigDecimal。
+同时这个原则 `Effective Java` 和 `MySQL` 必知必会中也都有提及。`float` 和 `double` 只能用来做科学计算和工程计算。商业运算中我们要使用 `BigDecimal`。
 
-而且我们从源码的注释中官方也给出了说明，如下是BigDecimal类的double类型参数的构造器上的一部分注释说明：
+而且我们从源码的注释中官方也给出了说明，如下是 `BigDecimal` 类的 `double` 类型参数的构造器上的一部分注释说明：
 
 ```
 * The results of this constructor can be somewhat unpredictable.  
@@ -967,13 +967,13 @@ public BigDecimal(double val) {
 
 第一段也说的很清楚它只能计算的无限接近这个数，但是无法精确到这个数。
 
-第二段则说，如果要想准确计算这个值，那么需要把double类型的参数转化为String类型的。并且使用BigDecimal(String)这个构造方法进行构造。去获取结果。
+第二段则说，如果要想准确计算这个值，那么需要把 `double` 类型的参数转化为 `String` 类型的。并且使用 `BigDecimal(String)` 这个构造方法进行构造。去获取结果。
 
 **X.2.3.正确运用BigDecimal**
 
-另外，BigDecimal所创建的是对象，我们不能使用传统的+、-、*、/等算术运算符直接对其对象进行数学运算，而必须调用其相对应的方法。方法中的参数也必须是BigDecimal的对象，由刚才我们所罗列的API也可看出。
+另外，`BigDecimal` 所创建的是对象，我们不能使用传统的 `+、-、*、/` 等算术运算符直接对其对象进行数学运算，而必须调用其相对应的方法。方法中的参数也必须是 `BigDecimal` 的对象，由刚才我们所罗列的 `API` 也可看出。
 
-在一般开发过程中，我们数据库中存储的数据都是float和double类型的。在进行拿来拿去运算的时候还需要不断的转化，这样十分的不方便。这里我写了一个工具类：
+在一般开发过程中，我们数据库中存储的数据都是 `float` 和 `double` 类型的。在进行拿来拿去运算的时候还需要不断的转化，这样十分的不方便。这里我写了一个工具类：
 
 ```
 /**  
@@ -1013,7 +1013,7 @@ publicclass BigDecimalUtil {
 }  
 ```
 
-该工具类提供了double类型的基本的加减乘除运算。直接调用即可。
+该工具类提供了 `double` 类型的基本的加减乘除运算。直接调用即可。
 
 
 

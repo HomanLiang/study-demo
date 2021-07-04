@@ -17,9 +17,9 @@ public final class String
 
 `String` 类的数据存储于 `char[]` 数组，这个数组被 `final` 关键字修饰，表示 **`String` 对象不可被更改**。
 
-为什么 Java 要这样设计？
+为什么 `Java` 要这样设计？
 
-- **保证 String 对象安全性**。避免 String 被篡改。
+- **保证 String 对象安全性**。避免 `String` 被篡改。
 
 - **保证 hash 值不会频繁变更**。
 
@@ -28,11 +28,11 @@ public final class String
 通常有两种创建字符串对象的方式：
 
 - 一种是通过字符串常量的方式创建，如 `String str="abc";` 
-- 另一种是字符串变量通过 new 形式的创建，如 `String str = new String("abc")`。
+- 另一种是字符串变量通过 `new` 形式的创建，如 `String str = new String("abc")`。
 
-使用第一种方式创建字符串对象时，JVM 首先会检查该对象是否在字符串常量池中，如果在，就返回该对象引用，否则新的字符串将在常量池中被创建。这种方式可以减少同一个值的字符串对象的重复创建，节约内存。
+使用第一种方式创建字符串对象时，`JVM` 首先会检查该对象是否在字符串常量池中，如果在，就返回该对象引用，否则新的字符串将在常量池中被创建。这种方式可以减少同一个值的字符串对象的重复创建，节约内存。
 
-`String str = new String("abc")` 这种方式，首先在编译类文件时，`"abc"` 常量字符串将会放入到常量结构中，在类加载时，`"abc"` 将会在常量池中创建；其次，在调用 new 时，JVM 命令将会调用 `String` 的构造函数，同时引用常量池中的 `"abc"` 字符串，在堆内存中创建一个 `String` 对象；最后，str 将引用 `String` 对象。
+`String str = new String("abc")` 这种方式，首先在编译类文件时，`"abc"` 常量字符串将会放入到常量结构中，在类加载时，`"abc"` 将会在常量池中创建；其次，在调用 `new` 时，`JVM` 命令将会调用 `String` 的构造函数，同时引用常量池中的 `"abc"` 字符串，在堆内存中创建一个 `String` 对象；最后，`str` 将引用 `String` 对象。
 
 ## 2. String 的性能考量
 
@@ -77,7 +77,7 @@ public static void main(String[] args) {
 
 **`String` 的 `split()` 方法使用正则表达式实现其强大的分割功能**。而正则表达式的性能是非常不稳定的，使用不恰当会引起回溯问题，很可能导致 CPU 居高不下。
 
-所以，应该慎重使用 `split()` 方法，**可以考虑用 `String.indexOf()` 方法代替 `split()` 方法完成字符串的分割**。如果实在无法满足需求，你就在使用 Split() 方法时，对回溯问题加以重视就可以了。
+所以，应该慎重使用 `split()` 方法，**可以考虑用 `String.indexOf()` 方法代替 `split()` 方法完成字符串的分割**。如果实在无法满足需求，你就在使用 `Split()` 方法时，对回溯问题加以重视就可以了。
 
 ### 2.3. String.intern
 
@@ -101,7 +101,7 @@ sharedLocation.setCity(messageInfo.getCity().intern());		sharedLocation.setCount
 sharedLocation.setRegion(messageInfo.getCountryCode().intern());
 ```
 
-> 使用 `intern` 方法需要注意：一定要结合实际场景。因为常量池的实现是类似于一个 HashTable 的实现方式，HashTable 存储的数据越大，遍历的时间复杂度就会增加。如果数据过大，会增加整个字符串常量池的负担。
+> 使用 `intern` 方法需要注意：一定要结合实际场景。因为常量池的实现是类似于一个 `HashTable` 的实现方式，`HashTable` 存储的数据越大，遍历的时间复杂度就会增加。如果数据过大，会增加整个字符串常量池的负担。
 
 ## 3. String、StringBuffer、StringBuilder 有什么区别
 
@@ -109,9 +109,9 @@ sharedLocation.setRegion(messageInfo.getCountryCode().intern());
 
 `StringBuffer` 是为解决上面提到拼接产生太多中间对象的问题而提供的一个类，我们可以用 `append` 或者 `add` 方法，把字符串添加到已有序列的末尾或者指定位置。`StringBuffer` 是一个**线程安全的**可修改字符序列。`StringBuffer` 的线程安全是通过在各种修改数据的方法上用 `synchronized` 关键字修饰实现的。
 
-`StringBuilder` 是 Java 1.5 中新增的，在能力上和 StringBuffer 没有本质区别，但是它去掉了线程安全的部分，有效减小了开销，是绝大部分情况下进行字符串拼接的首选。
+`StringBuilder` 是 `Java 1.5` 中新增的，在能力上和 `StringBuffer` 没有本质区别，但是它去掉了线程安全的部分，有效减小了开销，是绝大部分情况下进行字符串拼接的首选。
 
-`StringBuffer` 和 `StringBuilder` 底层都是利用可修改的（char，JDK 9 以后是 byte）数组，二者都继承了 `AbstractStringBuilder`，里面包含了基本操作，区别仅在于最终的方法是否加了 `synchronized`。构建时初始字符串长度加 16（这意味着，如果没有构建对象时输入最初的字符串，那么初始值就是 16）。我们如果确定拼接会发生非常多次，而且大概是可预计的，那么就可以指定合适的大小，避免很多次扩容的开销。扩容会产生多重开销，因为要抛弃原有数组，创建新的（可以简单认为是倍数）数组，还要进行 `arraycopy`。
+`StringBuffer` 和 `StringBuilder` 底层都是利用可修改的（`char`，`JDK 9` 以后是 `byte`）数组，二者都继承了 `AbstractStringBuilder`，里面包含了基本操作，区别仅在于最终的方法是否加了 `synchronized`。构建时初始字符串长度加 `16`（这意味着，如果没有构建对象时输入最初的字符串，那么初始值就是 `16`）。我们如果确定拼接会发生非常多次，而且大概是可预计的，那么就可以指定合适的大小，避免很多次扩容的开销。扩容会产生多重开销，因为要抛弃原有数组，创建新的（可以简单认为是倍数）数组，还要进行 `arraycopy`。
 
 **除非有线程安全的需要，不然一般都使用 `StringBuilder`**。
 
@@ -121,13 +121,13 @@ sharedLocation.setRegion(messageInfo.getCountryCode().intern());
 
 字符串的分配，和其他的对象分配一样，耗费高昂的时间与空间代价。
 
-JVM为了提高性能和减少内存开销，在实例化字符串常量的时候进行了一些优化：
+`JVM` 为了提高性能和减少内存开销，在实例化字符串常量的时候进行了一些优化：
 
-- 为了减少在JVM中创建的字符串的数量，字符串类维护了一个字符串池，每当代码创建字符串常量时，JVM会首先检查字符串常量池；
+- 为了减少在 `JVM` 中创建的字符串的数量，字符串类维护了一个字符串池，每当代码创建字符串常量时，`JVM` 会首先检查字符串常量池；
 
 - 如果字符串已经存在池中，就返回池中的实例引用；
 
-- 如果字符串不在池中，就会实例化一个字符串并放到池中。Java能够进行这样的优化是因为字符串是不可变的，可以不用担心数据冲突进行共享；
+- 如果字符串不在池中，就会实例化一个字符串并放到池中。`Java` 能够进行这样的优化是因为字符串是不可变的，可以不用担心数据冲突进行共享；
 
 实现的基础：
 
@@ -145,32 +145,32 @@ System.out.printl（"str1 == str2" : str1 == str2 ) //true
 
 **字符串常量池在哪里？**
 
-在分析字符串常量池的位置时，首先得了解JVM内存模型，JVM内存区域分为线程共享区和线程独占区；线程共享区包括堆和方法区；线程独占区包括Java虚拟机栈、本地方法栈和陈程序计数器。
+在分析字符串常量池的位置时，首先得了解 `JVM` 内存模型，`JVM` 内存区域分为线程共享区和线程独占区；线程共享区包括堆和方法区；线程独占区包括 `Java` 虚拟机栈、本地方法栈和陈程序计数器。
 
 ![image-20210320195636031](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/java-core-demo/20210320195636.png)
 
 程序计数器
 
-- 是一块比较小的内存区域，是唯一一个不会发生OutOfMemoryError的区域，可以这样理解方法进栈后，每一行代码都有一个标识，程序按着标识往下执行。
+- 是一块比较小的内存区域，是唯一一个不会发生 `OutOfMemoryError` 的区域，可以这样理解方法进栈后，每一行代码都有一个标识，程序按着标识往下执行。
 
-Java虚拟机栈：
+`Java` 虚拟机栈：
 
 - 每个方法执行，都会创建一个栈帧，方法调用进栈，方法结束出栈；
 - 栈帧里面存放着局部变量表，操作数栈，动态链接以及方法出口等；
 - 局部变量表里面存放着基本数据类型，引用类型等；
 - 栈帧伴随着方法的开始而开始，结束而结束；
 - 局部变量表所需的内存空间在编译期间就完成了分配，在运行期间是不会改变的；
-- 栈很容易出现StackOverFlowError，栈内存溢出错误，常见于递归调用；
+- 栈很容易出现 `StackOverFlowError`，栈内存溢出错误，常见于递归调用；
 
-本地方法栈和Java虚拟机栈
+本地方法栈和 `Java` 虚拟机栈
 
-- 其实是差不多的，但是也是有区别的Java虚拟机栈为Java方法服务，本地方法栈为native方法服务
+- 其实是差不多的，但是也是有区别的 `Java` 虚拟机栈为 `Java` 方法服务，本地方法栈为 `native` 方法服务
 
 堆
 
 - 功能单一，就是存储对象的实例，堆其实又分新生代和老年代；
-- 新生代又分Eden、Survivor01和Survivor02三个区域，垃圾收集器主要管理的区域，Eden区回收效率很高。
-- 并不是所有的对象实例都会分配到堆上去，Java虚拟机栈也会分配。堆很容易出现OutOfMemoryError错误，内存溢出
+- 新生代又分 `Eden`、`Survivor01` 和 `Survivor02` 三个区域，垃圾收集器主要管理的区域，`Eden` 区回收效率很高。
+- 并不是所有的对象实例都会分配到堆上去，`Java` 虚拟机栈也会分配。堆很容易出现 `OutOfMemoryError` 错误，内存溢出
 
 方法区
 
@@ -181,7 +181,7 @@ Java虚拟机栈：
 
 **如何操作字符串常量池？**
 
-JVM实例化字符串常量池时
+`JVM` 实例化字符串常量池时
 
 ```
 String str1 = "hello";
@@ -189,9 +189,9 @@ String str2 = "hello";
 System.out.println("str1 == str2" : str1 == str2 ) //true
 ```
 
-String.intern()
+`String.intern()`
 
-通过new操作符创建的字符串对象不指向字符串池中的任何对象，但是可以通过使用字符串的intern()方法来指向其中的某一个。java.lang.String.intern()返回一个保留池字符串，就是一个在全局字符串池中有了一个入口。如果以前没有在全局字符串池中，那么它就会被添加到里面。
+通过 `new` 操作符创建的字符串对象不指向字符串池中的任何对象，但是可以通过使用字符串的 `intern()` 方法来指向其中的某一个。`java.lang.String.intern()` 返回一个保留池字符串，就是一个在全局字符串池中有了一个入口。如果以前没有在全局字符串池中，那么它就会被添加到里面。
 
 ```
 String s1 = "Hello";
@@ -208,9 +208,9 @@ System.out.println("s1 == s3? " + (s1 == s3)); // true
 
 ### X.1.String s = new String("xyz");产生了几个对象？
 
-面试官Q1：请问 `String s = new String("xyz");` 产生了几个对象？
+面试官 `Q1`：请问 `String s = new String("xyz");` 产生了几个对象？
 
-对于这个Java面试题，老套路先上代码：
+对于这个 `Java` 面试题，老套路先上代码：
 
 ```
 public class StringTest {
@@ -235,21 +235,21 @@ s1和s3 引用地址是否相同：false
 s1和s3 值是否相同：true
 ```
 
-上面程序中的"=="是判断两个对象引用的地址是否相同，也就是判断是否为同一个对象，s1与s2 返回为true，s1与s3返回则是false。说明s1与s2 引用的同一个对象的地址，s3则与其它两个引用不是同一个对象地址。
+上面程序中的 `==` 是判断两个对象引用的地址是否相同，也就是判断是否为同一个对象，`s1` 与 `s2` 返回为 `true`，`s1` 与 `s3` 返回则是`false`。说明  `s1` 与 `s2` 引用的同一个对象的地址，`s3` 则与其它两个引用不是同一个对象地址。
 
-Java为了避免产生大量的String对象，设计了一个字符串常量池。工作原理是这样的，创建一个字符串时，JVM首先为检查字符串常量池中是否有值相等的字符串，如果有，则不再创建，直接返回该字符串的引用地址，若没有，则创建，然后放到字符串常量池中，并返回新创建的字符串的引用地址。所以上面s1与s2引用地址相同。
+`Java` 为了避免产生大量的 `String` 对象，设计了一个字符串常量池。工作原理是这样的，创建一个字符串时，`JVM` 首先为检查字符串常量池中是否有值相等的字符串，如果有，则不再创建，直接返回该字符串的引用地址，若没有，则创建，然后放到字符串常量池中，并返回新创建的字符串的引用地址。所以上面 `s1` 与 `s2` 引用地址相同。
 
-那为什么s3与s1、s2引用的不是同一个字符串地址呢？ String s3=new String("Hello"); JVM首先是在字符串常量池中找"Hello" 字符串，如果没有创建字符串常量，然后放到常量池中，若已存在，则不需要创建；当遇到 new 时，还会在内存（不是字符串常量池中，而是在堆里面）上创建一个新的String对象，存储"Hello"，并将内存上的String对象引用地址返回，所以s3与s1、s2引用的不是同一个字符串地址。 内存结构图如下：
+那为什么 `s3` 与 `s1`、`s2` 引用的不是同一个字符串地址呢？` String s3=new String("Hello"); ` `JVM` 首先是在字符串常量池中找 `Hello` 字符串，如果没有创建字符串常量，然后放到常量池中，若已存在，则不需要创建；当遇到 `new` 时，还会在内存（不是字符串常量池中，而是在堆里面）上创建一个新的 `String` 对象，存储 `Hello`，并将内存上的 `String` 对象引用地址返回，所以 `s3` 与 `s1`、`s2` 引用的不是同一个字符串地址。 内存结构图如下：
 
 ![image-20210320190410685](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/java-core-demo/20210320190410.png)
 
-从内存图可见，s1与s2指向的都是常量池中的字符串常量，所以它们比较的是同一块内存地址，而s3指向的是堆里面的一块地址，说的具体点应该是堆里面的Eden区域，s1跟s3，s2跟s3比较都是不相等的，都不是同一块地址。
+从内存图可见，`s1` 与 `s2` 指向的都是常量池中的字符串常量，所以它们比较的是同一块内存地址，而 `s3` 指向的是堆里面的一块地址，说的具体点应该是堆里面的 `Eden` 区域，`s1` 跟 `s3`，`s2` 跟 `s3` 比较都是不相等的，都不是同一块地址。
 
-了解了String类的工作原理，回归问题本身：
+了解了 `String` 类的工作原理，回归问题本身：
 
-在String的工作原理中，已经提到了，new一个String对象，是需要先在字符串常量中查找相同值或创建一个字符串常量，然后再在内存中创建一个String对象，所以 `String str = new String("xyz");` 会创建两个对象。
+在 `String` 的工作原理中，已经提到了，`new` 一个 `String` 对象，是需要先在字符串常量中查找相同值或创建一个字符串常量，然后再在内存中创建一个 `String` 对象，所以 `String str = new String("xyz");` 会创建两个对象。
 
-下面两道Java面试题可以放在留言区回复哟：
+下面两道 `Java` 面试题可以放在留言区回复哟：
 
 ```
 String str1 = new String("A"+"B") ; 会创建多少个对象?
@@ -268,15 +268,15 @@ String str2 = new String("ABC") + "ABC" ; 会创建多少个对象?
 
 **继承关系**
 
-从源码上看看类StringBuffer和StringBuilder的继承结构：
+从源码上看看类 `StringBuffer` 和 `StringBuilder` 的继承结构：
 
 ![image-20210320191203863](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/java-core-demo/20210320191203.png)
 
-从结构图上可以直到，StringBuffer和StringBuiler都继承自AbstractStringBuilder类
+从结构图上可以直到，`StringBuffer` 和 `StringBuiler` 都继承自 `AbstractStringBuilder` 类
 
 **如何实现扩容**
 
-StringBuffer和StringBuiler的扩容的机制在抽象类AbstractStringBuilder中实现，当发现长度不够的时候(默认长度是16)，会自动进行扩容工作，扩展为原数组长度的2倍加2，创建一个新的数组，并将数组的数据复制到新数组。
+`StringBuffer` 和 `StringBuiler` 的扩容的机制在抽象类 `AbstractStringBuilder` 中实现，当发现长度不够的时候(默认长度是 `16`)，会自动进行扩容工作，扩展为原数组长度的 `2` 倍加 `2`，创建一个新的数组，并将数组的数据复制到新数组。
 
 ```java
 public void ensureCapacity(int minimumCapacity) {
@@ -325,7 +325,7 @@ private int hugeCapacity(int minCapacity) {
 
 **线程安全性**
 
-我们先来看看StringBuffer的相关方法：
+我们先来看看 `StringBuffer` 的相关方法：
 
 ```java
 @Override
@@ -364,11 +364,9 @@ public synchronized String toString() {
 }
 ```
 
-从上面的源码中我们看到几乎都是所有方法都加了synchronized,几乎都是调用的父类的方法.，用synchronized关键字修饰意味着什么？加锁，资源同步串行化处理，所以是线程安全的。
+从上面的源码中我们看到几乎都是所有方法都加了 `synchronized`,几乎都是调用的父类的方法.，用 `synchronized` 关键字修饰意味着什么？加锁，资源同步串行化处理，所以是线程安全的。
 
- 
-
-我们再来看看StringBuilder的相关源码：
+我们再来看看 `StringBuilder` 的相关源码：
 
 ```java
 @Override
@@ -396,14 +394,14 @@ public StringBuilder delete(int start, int end) {
 }
 ```
 
-StringBuilder的源码里面，基本上所有方法都没有用synchronized关键字修饰，当多线程访问时，就会出现线程安全性问题。
+`StringBuilder` 的源码里面，基本上所有方法都没有用 `synchronized` 关键字修饰，当多线程访问时，就会出现线程安全性问题。
 
-为了证明StringBuffer线程安全，StringBuilder线程不安全，我们通过一段代码进行验证：
+为了证明 `StringBuffer` 线程安全，`StringBuilder` 线程不安全，我们通过一段代码进行验证：
 
 **测试思想**
 
-- 分别用1000个线程写StringBuffer和StringBuilder，
-- 使用CountDownLatch保证在各自1000个线程执行完之后才打印StringBuffer和StringBuilder长度，
+- 分别用 `1000` 个线程写 `StringBuffer` 和 `StringBuilder`，
+- 使用 `CountDownLatch` 保证在各自 `1000` 个线程执行完之后才打印 `StringBuffer` 和 `StringBuilder` 长度，
 - 观察结果。
 
 **测试代码**
@@ -461,15 +459,15 @@ public class TestStringBuilderAndStringBuffer {
 
 **测试结果**
 
-- StringBuffer不论运行多少次都是1000长度。
-- StringBuilder绝大多数情况长度都会小于1000。
-- StringBuffer线程安全，StringBuilder线程不安全得到证明。
+- `StringBuffer` 不论运行多少次都是1000长度。
+- `StringBuilder` 绝大多数情况长度都会小于1000。
+- `StringBuffer` 线程安全，`StringBuilder` 线程不安全得到证明。
 
 **总结一下**
 
-- StringBuffer和StringBuilder都继承自抽象类AbstractStringBuilder。
-- 存储数据的字符数组也没有被final修饰，说明值可以改变，且构造出来的字符串还有空余位置拼接字符串，但是拼接下去肯定也有不够用的时候，这时候它们内部都提供了一个自动扩容机制，当发现长度不够的时候(默认长度是16)，会自动进行扩容工作，扩展为原数组长度的2倍加2，创建一个新的数组，并将数组的数据复制到新数组，所以对于拼接字符串效率要比String要高。自动扩容机制是在抽象类中实现的。
-- 线程安全性：StringBuffer效率低，线程安全，因为StringBuffer中很多方法都被 synchronized 修饰了，多线程访问时，线程安全，但是效率低下，因为它有加锁和释放锁的过程。StringBuilder效率高，但是线程是不安全的。
+- `StringBuffer` 和 `StringBuilder` 都继承自抽象类 `AbstractStringBuilder`。
+- 存储数据的字符数组也没有被 `final` 修饰，说明值可以改变，且构造出来的字符串还有空余位置拼接字符串，但是拼接下去肯定也有不够用的时候，这时候它们内部都提供了一个自动扩容机制，当发现长度不够的时候(默认长度是 `16`)，会自动进行扩容工作，扩展为原数组长度的 `2` 倍加 `2`，创建一个新的数组，并将数组的数据复制到新数组，所以对于拼接字符串效率要比 `String` 要高。自动扩容机制是在抽象类中实现的。
+- 线程安全性：`StringBuffer` 效率低，线程安全，因为 `StringBuffer` 中很多方法都被 `synchronized` 修饰了，多线程访问时，线程安全，但是效率低下，因为它有加锁和释放锁的过程。`StringBuilder` 效率高，但是线程是不安全的。
 
 
 
@@ -479,14 +477,14 @@ public class TestStringBuilderAndStringBuffer {
 
 **应聘者：**
 
-- equals()方法用来比较的是两个对象的内容是否相等，由于所有的类都是继承自java.lang.Object类的，所以适用于所有对象，如果没有对该方法进行覆盖的话，调用的仍然是Object类中的方法，而Object中的equals方法返回的却是==的判断；
-- "==" 比较的是变量(栈)内存中存放的对象的(堆)内存地址，用来判断两个对象的地址是否相同，即是否是指相同一个对象。
+- `equals()` 方法用来比较的是两个对象的内容是否相等，由于所有的类都是继承自 `java.lang.Object` 类的，所以适用于所有对象，如果没有对该方法进行覆盖的话，调用的仍然是 `Object` 类中的方法，而 `Object` 中的 `equals` 方法返回的却是 `==` 的判断；
+- `==` 比较的是变量(栈)内存中存放的对象的(堆)内存地址，用来判断两个对象的地址是否相同，即是否是指相同一个对象。
 
-**1、equals()作用**
+**X.3.1.equals()作用**
 
-equals() 的作用是用来判断两个对象是否相等。 
+`equals()` 的作用是用来判断两个对象是否相等。 
 
-equals() 定义在JDK的Object.java中。通过判断两个对象的地址是否相等(即，是否是同一个对象)来区分它们是否相等。源码如下：
+`equals()` 定义在 `JDK` 的 `Object.java` 中。通过判断两个对象的地址是否相等(即，是否是同一个对象)来区分它们是否相等。源码如下：
 
 ```
 public boolean equals(Object obj) {
@@ -494,16 +492,16 @@ public boolean equals(Object obj) {
 }
 ```
 
-既然Object.java中定义了equals()方法，这就意味着所有的Java类都实现了equals()方法，所有的类都可以通过equals()去比较两个对象是否相等。但是，我们已经说过，使用默认的“equals()”方法，等价于“==”方法。因此，我们通常会重写equals()方法：若两个对象的内容相等，则equals()方法返回true；否则，返回fasle。
+既然 `Object.java` 中定义了 `equals()` 方法，这就意味着所有的 `Java` 类都实现了 `equals()` 方法，所有的类都可以通过 `equals()` 去比较两个对象是否相等。但是，我们已经说过，使用默认的 `equals()` 方法，等价于 `==` 方法。因此，我们通常会重写 `equals()` 方法：若两个对象的内容相等，则 `equals()` 方法返回 `true`；否则，返回 `fasle`。
 
-下面根据"类是否覆盖equals()方法"，将它分为2类。
+下面根据"类是否覆盖 `equals()` 方法"，将它分为 `2` 类。
 
-- 若某个类没有覆盖equals()方法，当它的通过equals()比较两个对象时，实际上是比较两个对象是不是同一个对象。这时，等价于通过“==”去比较这两个对象。
-- 我们可以覆盖类的equals()方法，来让equals()通过其它方式比较两个对象是否相等。通常的做法是：若两个对象的内容相等，则equals()方法返回true；否则，返回fasle。
+- 若某个类没有覆盖 `equals()` 方法，当它的通过 `equals()` 比较两个对象时，实际上是比较两个对象是不是同一个对象。这时，等价于通过 `==` 去比较这两个对象。
+- 我们可以覆盖类的 `equals()` 方法，来让 `equals()` 通过其它方式比较两个对象是否相等。通常的做法是：若两个对象的内容相等，则 `equals()` 方法返回 `true`；否则，返回 `fasle`。
 
 下面，举例对上面的2种情况进行说明：
 
-**1.1、没有覆盖equals()方法的情况**
+**X.3.1.1.没有覆盖equals()方法的情况**
 
 ```
 public class EqualsTest {
@@ -540,11 +538,11 @@ public class EqualsTest {
 比较结果：false
 ```
 
-结果分析：我们通过 user1.equals(user2) 来“比较user1和user2是否相等时”。实际上，调用的Object.java的equals()方法，即调用的 (user1==user2) 。它是比较“p1和p2是否是同一个对象”。而由 user1 和 user2 的定义可知，它们虽然内容相同；但它们是两个不同的对象，因此，返回结果是false。
+结果分析：我们通过 `user1.equals(user2)` 来“比较 `user1` 和 `user2` 是否相等时”。实际上，调用的 `Object.java` 的 `equals()` 方法，即调用的 (`user1==user2`) 。它是比较“`p1` 和 `p2` 是否是同一个对象”。而由 `user1` 和 `user2` 的定义可知，它们虽然内容相同；但它们是两个不同的对象，因此，返回结果是 `false`。
 
-**1.2、覆盖equals()方法的情况**
+**X.3.1.2.覆盖equals()方法的情况**
 
-修改上面的EqualsTest，覆盖equals()方法：
+修改上面的 `EqualsTest`，覆盖 `equals()` 方法：
 
 ```
 public class EqualsTest {
@@ -600,11 +598,11 @@ public class EqualsTest {
 比较结果：true
 ```
 
-结果分析：我们在EqualsTest.java 中重写了User的equals()函数：当两个User对象的 name 和 age 都相等，则返回true。因此，运行结果返回true。
+结果分析：我们在 `EqualsTest.java` 中重写了 `User` 的 `equals()` 函数：当两个 `User` 对象的 `name` 和 `age` 都相等，则返回 `true`。因此，运行结果返回 `true`。
 
-**2、== 的作用**
+**X.3.2.== 的作用**
 
-“==”：它的作用是判断两个对象的地址是不是相等。即判断引用对象是不是指向的堆中的同一个对象，我们知道，凡是new出来的对象都在堆中。而对象的引用都存放在栈中，具体来讲就是放在栈帧中，我们来看下面一段代码：
+`==`：它的作用是判断两个对象的地址是不是相等。即判断引用对象是不是指向的堆中的同一个对象，我们知道，凡是 `new` 出来的对象都在堆中。而对象的引用都存放在栈中，具体来讲就是放在栈帧中，我们来看下面一段代码：
 
 ```
 public static void main(String[] args) {
@@ -626,7 +624,7 @@ user1==user2：false
 
 ![image-20210320194000052](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/java-core-demo/20210320194000.png)
 
-指向的是堆中两块不同的区域，所以用 "==" 比较时返回的是false。
+指向的是堆中两块不同的区域，所以用 `==` 比较时返回的是 `false`。
 
 
 
@@ -655,17 +653,17 @@ s = ABC
 s = 123
 ```
 
-对于上述代码，我们简单的分析一下：首先创建一个String对象str，然后让str的值为“ABC”，然后又让str的值为“123”。从打印结果可以看出，str的值确实改变了。
+对于上述代码，我们简单的分析一下：首先创建一个 `String` 对象 `str`，然后让 `str` 的值为 `ABC`，然后又让 `str` 的值为 `123`。从打印结果可以看出，`str` 的值确实改变了。
 
-**那还说String对象是不可变的呢？** 
+**那还说 String 对象是不可变的呢？** 
 
-这里存在一个误区：str只是一个String对象的引用，并不是对象本身。对象在内存中是一块内存区，放在堆中，成员变量越多，这块内存区占的空间越大。引用只是一个4字节的数据，里面存放了它所指向的对象的地址，通过这个地址可以访问对象，而这个引用存放在Java虚拟机栈栈帧的局部变量表中。也就是说，str只是一个引用，它指向了一个具体的对象，当str=“123”; 这句代码执行过之后，又创建了一个新的对象“123”， 而引用str重新指向了这个新的对象，原来的对象“ABC”还在内存中存在，并没有改变。
+这里存在一个误区：`str` 只是一个 `String` 对象的引用，并不是对象本身。对象在内存中是一块内存区，放在堆中，成员变量越多，这块内存区占的空间越大。引用只是一个 `4` 字节的数据，里面存放了它所指向的对象的地址，通过这个地址可以访问对象，而这个引用存放在 `Java` 虚拟机栈栈帧的局部变量表中。也就是说，`str` 只是一个引用，它指向了一个具体的对象，当 `str=“123”; `这句代码执行过之后，又创建了一个新的对象 `123`， 而引用 `str` 重新指向了这个新的对象，原来的对象 `ABC` 还在内存中存在，并没有改变。
 
 我们用一张内存结构图来看看整个变化过程：
 
 ![image-20210320200345715](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/java-core-demo/20210320200345.png)
 
-其实上面的"ABC","123"是字符串常量，按照JVM规范应该是存放在方法区的常量池里面。但是Java1.7之后HotSpot虚拟机并没有区分方法区和堆，所以，这里统一就当做是放在堆里面的吧。
+其实上面的 `ABC`，`123` 是字符串常量，按照 `JVM` 规范应该是存放在方法区的常量池里面。但是 `Java1.7` 之后 `HotSpot` 虚拟机并没有区分方法区和堆，所以，这里统一就当做是放在堆里面的吧。
 
 **String源码构成**
 
@@ -679,11 +677,11 @@ public final class String
     private int hash; // Default to 0
 ```
 
-通过源码我们可以知道String底层是由char数组构成，我们创建一个字符串对象的时候，其实是将字符串保存在char数组中，因为数组是引用对象，为了防止数组可变，JDK加了final修饰，但是加了final修饰的数组只是代表了引用不可变，不代表数组内容不可变，因此JDK为了真正防止不可变，又加了private修饰符。
+通过源码我们可以知道 `String` 底层是由 `char` 数组构成，我们创建一个字符串对象的时候，其实是将字符串保存在 `char` 数组中，因为数组是引用对象，为了防止数组可变，`JDK` 加了 `final` 修饰，但是加了 `final` 修饰的数组只是代表了引用不可变，不代表数组内容不可变，因此 `JDK` 为了真正防止不可变，又加了 `private` 修饰符。
 
 **String对象是真的不可变吗？**
 
-从上文可知String的成员变量是private final 的，也就是初始化之后不可改变。那么在这几个成员中，value比较特殊，因为他是一个引用变量，而不是真正的对象。value是final修饰的，也就是说final不能再指向其他数组对象，那么我能改变value指向的数组吗？我们来看下面的代码：
+从上文可知 `String` 的成员变量是 `private final` 的，也就是初始化之后不可改变。那么在这几个成员中，`value` 比较特殊，因为他是一个引用变量，而不是真正的对象。`value` 是 `final` 修饰的，也就是说 `final` 不能再指向其他数组对象，那么我能改变 `value` 指向的数组吗？我们来看下面的代码：
 
 ```java
 final int[] value={1,2,3}
@@ -691,20 +689,20 @@ int[] another={4,5,6};
 value=another;    //编译器报错，final不可变
 ```
 
-value用final修饰，编译器不允许我把value指向堆区另一个地址。但如果我直接对数组元素动手，分分钟搞定
+`value` 用 `final` 修饰，编译器不允许我把 `value` 指向堆区另一个地址。但如果我直接对数组元素动手，分分钟搞定
 
 ```java
 final int[] value={1,2,3};
 value[2]=100;  //这时候数组里已经是{1,2,100}
 ```
 
-所以String是不可变，关键是因为设计源代码的工程师，在后面所有String的方法里很小心的没有去动Array里的元素，没有暴露内部成员字段。`private final char value[]` 这一句里，private的私有访问权限的作用都比final大。而且设计师还很小心地把整个String设成final禁止继承，避免被其他人继承后破坏。**所以String是不可变的关键都在底层的实现，而不是一个final。**
+所以 `String` 是不可变，关键是因为设计源代码的工程师，在后面所有 `String` 的方法里很小心的没有去动 `Array` 里的元素，没有暴露内部成员字段。`private final char value[]` 这一句里，`private` 的私有访问权限的作用都比 `final` 大。而且设计师还很小心地把整个`String` 设成 `final` 禁止继承，避免被其他人继承后破坏。**所以String是不可变的关键都在底层的实现，而不是一个final。**
 
 **不可变有什么好处？**
 
 **1、多线程下安全性**
 
-最简单地原因，就是为了安全。因为String是不可变的，因此多线程操作下，它是安全的，我们来看下面一段代码：
+最简单地原因，就是为了安全。因为 `String` 是不可变的，因此多线程操作下，它是安全的，我们来看下面一段代码：
 
 ```java
 public String get(String str){
@@ -713,22 +711,22 @@ public String get(String str){
 }
 ```
 
-试想一下，如果String是可变的，那么get方法内部改变了str的值，方法外部str也会随之改变。
+试想一下，如果 `String` 是可变的，那么 `get` 方法内部改变了 `str` 的值，方法外部 `str` 也会随之改变。
 
 **2、类加载中体现的安全性**
 
-类加载器要用到字符串，不可变提供了安全性，以便正确的类被加载，例如你想加载java.sql.Connection类，而这个值被改成了xxx.Connection，那么会对你的数据库造成不可知的破坏。
+类加载器要用到字符串，不可变提供了安全性，以便正确的类被加载，例如你想加载 `java.sql.Connection` 类，而这个值被改成了`xxx.Connection`，那么会对你的数据库造成不可知的破坏。
 
 **3、使用常量池可以节省空间**
 
-像下面这样字符串one和two都用字面量"something"赋值。它们其实都指向同一个内存地址
+像下面这样字符串 `one` 和 `two` 都用字面量 `something` 赋值。它们其实都指向同一个内存地址
 
 ```java
 String one = "someString";
 String two = "someString";
 ```
 
-这样在大量使用字符串的情况下，可以节省内存空间，提高效率。但之所以能实现这个特性，String的不可变性是最基本的一个必要条件。要是内存里字符串内容能改来改去，这么做就完全没有意义了。
+这样在大量使用字符串的情况下，可以节省内存空间，提高效率。但之所以能实现这个特性，`String` 的不可变性是最基本的一个必要条件。要是内存里字符串内容能改来改去，这么做就完全没有意义了。
 
 
 
@@ -874,7 +872,7 @@ Constant pool:
 SourceFile: "StringTest.java"
 ```
 
-首先看到使用了一个指针指向一个常量池中的对象内容为“abc”，而另一个指针指向“def”，此时通过new申请了一个StringBuilder，然后调用这个StringBuilder的初始化方法；然后分别做了两次append操作，然后最后做一个toString()操作；可见String的+在编译后会被编译为StringBuilder来运行，我们知道这里做了一个new StringBuilder的操作，并且做了一个toString的操作，如果你对JVM有所了解，凡是new出来的对象绝对不会放在常量池中，toString会发生一次内容拷贝，但是也不会在常量池中，所以在这里常量池String+常量池String放在了堆中。
+首先看到使用了一个指针指向一个常量池中的对象内容为 `abc`，而另一个指针指向 `def`，此时通过 `new` 申请了一个 `StringBuilder`，然后调用这个 `StringBuilder` 的初始化方法；然后分别做了两次 `append` 操作，然后最后做一个 `toString()` 操作；可见 `String` 的`+` 在编译后会被编译为 `StringBuilder` 来运行，我们知道这里做了一个 `new StringBuilder` 的操作，并且做了一个 `toString` 的操作，如果你对 `JVM` 有所了解，凡是 `new` 出来的对象绝对不会放在常量池中，`toString` 会发生一次内容拷贝，但是也不会在常量池中，所以在这里常量池 `String ` `+` 常量池 `String` 放在了堆中。
 
 **我们再来看看另外一种情况，用同样的方式来看看结果是什么：**
 
@@ -963,13 +961,13 @@ Constant pool:
 SourceFile: "StringTest.java"
 ```
 
-这一次编译完后的代码比前面少了很多，而且，仔细看，你会发现14行处，编译的过程中直接变成了"abcdef"，这是为什么呢？因为当发生“abc” + “def”在同一行发生时，JVM在编译时就认为这个加号是没有用处的，编译的时候就直接变成
+这一次编译完后的代码比前面少了很多，而且，仔细看，你会发现14行处，编译的过程中直接变成了 `abcdef`，这是为什么呢？因为当发生 `“abc” + “def”` 在同一行发生时，`JVM` 在编译时就认为这个加号是没有用处的，编译的时候就直接变成
 
 ```
 String d = "abcdef";
 ```
 
-同理如果出现：String a =“a” + 1，编译时候就会变成：String a = “a1″;
+同理如果出现：`String a =“a” + 1`，编译时候就会变成：`String a = "a1"`;
 
 再补充一个例子：
 
@@ -979,13 +977,13 @@ final String b = "ab";
 String c = a + b;
 ```
 
-在编译时候，c部分会被编译为：String c = “aab”;但是如果a或b有任意一个不是final的，都会new一个新的对象出来；其次再补充下，如果a和b，是某个方法返回回来的，不论方法中是final类型的还是常量什么的，都不会被在编译时将数据编译到常量池，因为编译器并不会跟踪到方法体里面去看你做了什么，其次**只要是变量就是可变的，即使你认为你看到的代码是不可变的**，但是运行时是可以被切入的。
+在编译时候，`c` 部分会被编译为：`String c = “aab”;` 但是如果 `a` 或 `b` 有任意一个不是 `final` 的，都会 `new` 一个新的对象出来；其次再补充下，如果 `a` 和 `b`，是某个方法返回回来的，不论方法中是 `final` 类型的还是常量什么的，都不会被在编译时将数据编译到常量池，因为编译器并不会跟踪到方法体里面去看你做了什么，其次**只要是变量就是可变的，即使你认为你看到的代码是不可变的**，但是运行时是可以被切入的。
 
 **那么效率问题从何说起？**
 
 那说了这么多，也没看到有说效率方面的问题呀？
 
-其实上面两个例子，连接字符串行表达式很简单，那么"+"和StringBuilder基本是一样的，但如果结构比较复杂，如使用循环来连接字符串，那么产生的Java Byte Code就会有很大的区别。我们再来看看下面一段代码：
+其实上面两个例子，连接字符串行表达式很简单，那么 `+` 和 `StringBuilder` 基本是一样的，但如果结构比较复杂，如使用循环来连接字符串，那么产生的 `Java Byte Code` 就会有很大的区别。我们再来看看下面一段代码：
 
 ```java
 import java.util.*;
@@ -1054,7 +1052,7 @@ public class StringTest {
 }
 ```
 
-我们可以看到，虽然编译器将"+"转换成了StringBuilder，但创建StringBuilder对象的位置却在for语句内部。这就意味着每执行一次循环，就会创建一个StringBuilder对象（对于本例来说，是创建了10个StringBuilder对象），虽然Java有垃圾回收器，但这个回收器的工作时间是不定的。如果不断产生这样的垃圾，那么仍然会占用大量的资源。解决这个问题的方法就是在程序中直接使用StringBuilder来连接字符串，代码如下：
+我们可以看到，虽然编译器将 `+` 转换成了 `StringBuilder`，但创建 `StringBuilder` 对象的位置却在 `for` 语句内部。这就意味着每执行一次循环，就会创建一个 `StringBuilder` 对象（对于本例来说，是创建了 `10` 个 `StringBuilder` 对象），虽然 `Java` 有垃圾回收器，但这个回收器的工作时间是不定的。如果不断产生这样的垃圾，那么仍然会占用大量的资源。解决这个问题的方法就是在程序中直接使用 `StringBuilder` 来连接字符串，代码如下：
 
 ```java
 import java.util.Random;
@@ -1125,15 +1123,15 @@ public class StringTest {
 }
 ```
 
-从上面的反编译结果可以看出，创建StringBuilder的代码被放在了for语句外。虽然这样处理在源程序中看起来复杂，但却换来了更高的效率，同时消耗的资源也更少了。
+从上面的反编译结果可以看出，创建 `StringBuilder` 的代码被放在了 `for` 语句外。虽然这样处理在源程序中看起来复杂，但却换来了更高的效率，同时消耗的资源也更少了。
 
-所以，从上述几个例子中我们得出的结论是：String采用连接运算符(+)效率低下，都是上述循环、大批量数据情况造成的，每做一次"+"就产生个StringBuilder对象，然后append后就扔掉。下次循环再到达时重新产生个StringBuilder对象，然后append字符串，如此循环直至结束。如果我们直接采用StringBuilder对象进行append的话，我们可以节省创建和销毁对象的时间。如果只是简单的字面量拼接或者很少的字符串拼接，性能都是差不多的。
+所以，从上述几个例子中我们得出的结论是：`String` 采用连接运算符( `+` )效率低下，都是上述循环、大批量数据情况造成的，每做一次 `+` 就产生个 `StringBuilder` 对象，然后 `append` 后就扔掉。下次循环再到达时重新产生个 `StringBuilder` 对象，然后 `append` 字符串，如此循环直至结束。如果我们直接采用 `StringBuilder` 对象进行 `append` 的话，我们可以节省创建和销毁对象的时间。如果只是简单的字面量拼接或者很少的字符串拼接，性能都是差不多的。
 
 
 
 ### X.6.你真的了解String的常见API吗？
 
-String是我们开发中使用频率最高的类，它有哪些方法，大家一定不会陌生，例如：
+`String` 是我们开发中使用频率最高的类，它有哪些方法，大家一定不会陌生，例如：
 
 - `length();`//计算字符串的长度
 - `charAt();`//截取一个字符
@@ -1152,7 +1150,7 @@ String是我们开发中使用频率最高的类，它有哪些方法，大家�
 - `toLowerCase();`//转换为小写
 - `toUpperCase();`// 转换为大写
 
-但是像replace()，substring()，toLowerCase()这三个方法需要注意一下，我们看下下面一段代码：
+但是像 `replace()`，`substring()`，`toLowerCase()` 这三个方法需要注意一下，我们看下下面一段代码：
 
 ```
 import java.util.*;
@@ -1173,7 +1171,7 @@ ss = 123456
 ss = 123456
 ```
 
-如果你不了解replace方法的源码，可能会认为最后的打印结果为 "ss = 023456"，但是实际上方法内部创建了一个新的String对象，并将这个新的String对象返回。对ss是没有做任何操作的，我们也知道String是不可变的嘛。源码如下：
+如果你不了解 `replace` 方法的源码，可能会认为最后的打印结果为 `ss = 023456`，但是实际上方法内部创建了一个新的 `String` 对象，并将这个新的 `String` 对象返回。对 `ss` 是没有做任何操作的，我们也知道 `String` 是不可变的嘛。源码如下：
 
 ```
 public String replace(char oldChar, char newChar) {
@@ -1210,9 +1208,9 @@ public String replace(char oldChar, char newChar) {
 }
 ```
 
-方法内部最后重新创建新的String对象，并且返回这个新的对象，原来的对象是不会被改变的。substring()，toLowerCase()方法也是如此。
+方法内部最后重新创建新的 `String` 对象，并且返回这个新的对象，原来的对象是不会被改变的。`substring()`，`toLowerCase()` 方法也是如此。
 
-还有诸如contact()方法，源码如下：
+还有诸如 `contact()` 方法，源码如下：
 
 ```
 public String concat(String str) {
@@ -1227,17 +1225,17 @@ public String concat(String str) {
 }
 ```
 
-从上可知参数str不能为null，否则就会包空指针异常。用contact()拼接字符串速度也很快，因为直接Arrays.copyOf，直接内存复制。
+从上可知参数 `str` 不能为 `null`，否则就会包空指针异常。用 `contact()` 拼接字符串速度也很快，因为直接 `Arrays.copyOf`，直接内存复制。
 
 
 
 ### X.7.Java中的substring真的会引起内存泄露么？
 
-在Java中开发，String是我们开发程序可以说必须要使用的类型，String有一个substring方法用来截取字符串，我们想必也常常使用。但是你知道么，关于Java 6中的substring是否会引起内存泄露，在国外的论坛和社区有着一些讨论，以至于Java官方已经将其标记成bug，并且为此Java 7 还重新进行了实现。读到这里可能你的问题就来了，substring怎么会引起内存泄露呢？那么我们就带着问题，走进小黑屋，看看substring有没有内存泄露，又是怎么导致所谓的内存泄露。
+在 `Java` 中开发，`String` 是我们开发程序可以说必须要使用的类型，`String` 有一个 `substring` 方法用来截取字符串，我们想必也常常使用。但是你知道么，关于 `Java 6` 中的 `substring` 是否会引起内存泄露，在国外的论坛和社区有着一些讨论，以至于 `Java` 官方已经将其标记成 `bug`，并且为此 `Java 7` 还重新进行了实现。读到这里可能你的问题就来了，`substring` 怎么会引起内存泄露呢？那么我们就带着问题，走进小黑屋，看看 `substring` 有没有内存泄露，又是怎么导致所谓的内存泄露。
 
 **基本介绍**
 
-substring方法提供两种重载，第一种为只接受开始截取位置一个参数的方法
+`substring` 方法提供两种重载，第一种为只接受开始截取位置一个参数的方法
 
 ```
 public String substring(int beginIndex)
@@ -1249,13 +1247,13 @@ public String substring(int beginIndex)
 public String substring(int beginIndex, int endIndex)
 ```
 
-使用这个方法，"smiles".substring(1, 5) 返回结果 "mile"，"unhappy".substring(2) 返回结果 "happy" 另一种重载就是接受一个开始截取位置和一个结束截取位置的参数的方法
+使用这个方法，`"smiles".substring(1, 5)` 返回结果 `mile`，`"unhappy".substring(2)` 返回结果 `happy` 另一种重载就是接受一个开始截取位置和一个结束截取位置的参数的方法
 
-通过这个介绍我们基本了解了substring的作用，这样便于我们理解下面的内容。
+通过这个介绍我们基本了解了 `substring` 的作用，这样便于我们理解下面的内容。
 
 **准备工作**
 
-因为这个问题出现的情况在Java 6，如果你的Java版本号不是Java 6 需要调整一下。
+因为这个问题出现的情况在 `Java 6`，如果你的Java版本号不是 `Java 6` 需要调整一下。
 
 **终端调整（适用于Mac系统）**
 
@@ -1274,13 +1272,13 @@ Java HotSpot(TM) 64-Bit Server VM (build 25.25-b02, mixed mode)
 export JAVA_HOME=$(/usr/libexec/java_home -v 1.6)
 ```
 
-Ubuntu使用alternatives --config java，Fedora上面使用alternatives --config java。
+`Ubuntu` 使用 `alternatives --config java`，`Fedora` 上面使用 `alternatives --config java`。
 
-如果你使用Eclipse，可以选择工程，右击，选择Properties（属性）— Java Compiler（Java编译器）进行特殊指定。
+如果你使用 `Eclipse`，可以选择工程，右击，选择 `Properties（属性）— Java Compiler（Java编译器）`进行特殊指定。
 
 **问题重现**
 
-这里贴一下java官方bug里用到的重现问题的代码。
+这里贴一下 `java` 官方 `bug` 里用到的重现问题的代码。
 
 ```
 public class TestGC {
@@ -1300,19 +1298,19 @@ public class TestGC {
 }
 ```
 
-执行上面的方法，并不会导致OOM异常，因为我们持有的时1000000个ab字符串对象，而TestGC对象（包括其中的largeString）会在java的垃圾回收中释放掉。所以这里不会存在内存溢出。
+执行上面的方法，并不会导致 `OOM` 异常，因为我们持有的时 `1000000` 个 `ab` 字符串对象，而 `TestGC` 对象（包括其中的 `largeString`）会在 `java` 的垃圾回收中释放掉。所以这里不会存在内存溢出。
 
 那么究竟是什么导致的内存泄露呢？要研究这个问题，我们需要看一下方法的实现，即可。
 
 **深入Java 6实现**
 
-在String类中存在这样三个属性
+在 `String` 类中存在这样三个属性
 
-- value 字符数组，存储字符串实际的内容
-- offset 该字符串在字符数组value中的起始位置
-- count 字符串包含的字符的长度
+- `value` 字符数组，存储字符串实际的内容
+- `offset` 该字符串在字符数组 `value` 中的起始位置
+- `count` 字符串包含的字符的长度
 
-Java6中substring的实现
+`Java6` 中 `substring` 的实现
 
 ```
 public String substring(int beginIndex, int endIndex) {
@@ -1343,19 +1341,19 @@ String(int offset, int count, char value[]) {
 
 当我们读完上述的代码，我们应该会豁然开朗，原来是这个样子啊！
 
-当我们调用字符串a的substring得到字符串b，其实这个操作，无非就是调整了一下b的offset和count，用到的内容还是a之前的value字符数组，并没有重新创建新的专属于b的内容字符数组。
+当我们调用字符串 `a` 的 `substring` 得到字符串 `b`，其实这个操作，无非就是调整了一下 `b` 的 `offset` 和 `count`，用到的内容还是 `a` 之前的 `value` 字符数组，并没有重新创建新的专属于 `b` 的内容字符数组。
 
-举个和上面重现代码相关的例子，比如我们有一个1G的字符串a，我们使用substring(0,2)得到了一个只有两个字符的字符串b，如果b的生命周期要长于a或者手动设置a为null，当垃圾回收进行后，a被回收掉，b没有回收掉，那么这1G的内存占用依旧存在，因为b持有这1G大小的字符数组的引用。
+举个和上面重现代码相关的例子，比如我们有一个 `1G` 的字符串 `a`，我们使用 `substring(0,2)` 得到了一个只有两个字符的字符串 `b`，如果 `b` 的生命周期要长于 `a` 或者手动设置 `a` 为 `null`，当垃圾回收进行后，`a` 被回收掉，`b` 没有回收掉，那么这 `1G` 的内存占用依旧存在，因为 `b` 持有这 `1G` 大小的字符数组的引用。
 
 看到这里，大家应该可以明白上面的代码为什么出现内存溢出了。
 
 **共享内容字符数组**
 
-其实substring中生成的字符串与原字符串共享内容数组是一个很棒的设计，这样避免了每次进行substring重新进行字符数组复制。正如其文档说明的,共享内容字符数组为了就是速度。但是对于本例中的问题，共享内容字符数组显得有点蹩脚。
+其实 `substring` 中生成的字符串与原字符串共享内容数组是一个很棒的设计，这样避免了每次进行 `substring` 重新进行字符数组复制。正如其文档说明的,共享内容字符数组为了就是速度。但是对于本例中的问题，共享内容字符数组显得有点蹩脚。
 
 **如何解决**
 
-对于之前比较不常见的1G字符串只截取2个字符的情况可以使用下面的代码，这样的话，就不会持有1G字符串的内容数组引用了。
+对于之前比较不常见的 `1G` 字符串只截取 `2` 个字符的情况可以使用下面的代码，这样的话，就不会持有 `1G` 字符串的内容数组引用了。
 
 ```
 String littleString = new String(largeString.substring(0,2));
@@ -1387,7 +1385,7 @@ public String(String original) {
 
 **Java7 实现**
 
-在Java 7 中substring的实现抛弃了之前的内容字符数组共享的机制，对于子字符串（自身除外）采用了数组复制实现单个字符串持有自己的应该拥有的内容。
+在 `Java 7` 中 `substring` 的实现抛弃了之前的内容字符数组共享的机制，对于子字符串（自身除外）采用了数组复制实现单个字符串持有自己的应该拥有的内容。
 
 ```
 public String substring(int beginIndex, int endIndex) {
@@ -1406,7 +1404,7 @@ public String substring(int beginIndex, int endIndex) {
 }
 ```
 
-substring方法中调用的构造方法，进行内容字符数组复制
+`substring` 方法中调用的构造方法，进行内容字符数组复制
 
 ```
 public String(char value[], int offset, int count) {
@@ -1426,27 +1424,27 @@ public String(char value[], int offset, int count) {
 
 **真的是内存泄露么?**
 
-我们知道了substring某些情况下可能引起内存问题，但是这个叫做内存泄露么？
+我们知道了 `substring` 某些情况下可能引起内存问题，但是这个叫做内存泄露么？
 
-其实个人认为这个不应该算为内存泄露，使用substring生成的字符串b固然会持有原有字符串a的内容数组引用，但是当a和b都被回收之后，该字符数组的内容也是可以被垃圾回收掉的。
+其实个人认为这个不应该算为内存泄露，使用 `substring` 生成的字符串 `b` 固然会持有原有字符串 `a` 的内容数组引用，但是当 `a` 和 `b` 都被回收之后，该字符数组的内容也是可以被垃圾回收掉的。
 
 **哪个版本实现的好?**
 
-关于Java7对substring做的修改，收到了褒贬不一的反馈。
+关于 `Java7` 对 `substring` 做的修改，收到了褒贬不一的反馈。
 
-个人更加倾向于Java 6的实现，当进行substring时，使用共享内容字符数组，速度会更快，不用重新申请内存。虽然有可能出现本文中的内存性能问题，但也是有方法可以解决的。
+个人更加倾向于 `Java 6` 的实现，当进行 `substring` 时，使用共享内容字符数组，速度会更快，不用重新申请内存。虽然有可能出现本文中的内存性能问题，但也是有方法可以解决的。
 
-Java 7的实现不需要程序员特殊操作避免了本文中问题，但是进行每次substring的操作性能总会比java 6 的实现要差一些。这种实现显得有点“糟糕”。
+`Java 7` 的实现不需要程序员特殊操作避免了本文中问题，但是进行每次 `substring` 的操作性能总会比 `java 6` 的实现要差一些。这种实现显得有点“糟糕”。
 
 **问题的价值**
 
-虽然这个问题出现在Java 6并且Java 7中已经修复，但并不代表我们就不需要了解，况且Java 7的重新实现被喷的很厉害。
+虽然这个问题出现在 `Java 6` 并且 `Java 7` 中已经修复，但并不代表我们就不需要了解，况且 `Java 7` 的重新实现被喷的很厉害。
 
 其实这个问题的价值，还是比较宝贵的，尤其是内容字符数组共享这个优化的实现。希望可以为大家以后的设计实现提供帮助和一些想法。
 
 **受影响的方法**
 
-trim和subSequence都存在调用substring的操作。Java 6和Java 7 substring实现的更改也间接影响到了这些方法
+`trim` 和 `subSequence` 都存在调用 `substring` 的操作。`Java 6` 和 `Java 7` `substring` 实现的更改也间接影响到了这些方法
 
 
 
@@ -1485,11 +1483,11 @@ false
 false
 ```
 
-是不是感觉莫名其妙，新定义的str2好像和str1没有半毛钱的关系，怎么会影响到有关str1的输出结果呢？其实这都是intern()方法搞的鬼！看完这篇文章，你就会明白。o(∩_∩)o 
+是不是感觉莫名其妙，新定义的 `str2` 好像和 `str1` 没有半毛钱的关系，怎么会影响到有关 `str1` 的输出结果呢？其实这都是 `intern()` 方法搞的鬼！看完这篇文章，你就会明白。o(∩_∩)o  
 
 #### X.8.1.为什么要介绍intern()方法
 
-intern()方法设计的初衷，就是重用String对象，以节省内存消耗。这么说可能有点抽象，那么就用例子来证明。
+`intern()` 方法设计的初衷，就是重用 `String` 对象，以节省内存消耗。这么说可能有点抽象，那么就用例子来证明。
 
 ```
 static final int MAX = 100000;
@@ -1518,9 +1516,9 @@ public static void main(String[] args) throws Exception {
 ```
 
 
-这个例子也比较简单，就是为了证明使用intern()比不使用intern()消耗的内存更少。
+这个例子也比较简单，就是为了证明使用 `intern()` 比不使用 `intern()` 消耗的内存更少。
 
-先定义一个长度为10的Integer数组，并随机为其赋值，在通过for循环为长度为10万的String对象依次赋值，这些值都来自于Integer数组。两种情况分别运行，可通过 `Window ---> Preferences --> Java --> Installed JREs` 设置JVM启动参数为 `-agentlib:hprof=heap=dump,format=b` ，将程序运行完后的hprof置于工程目录下。再通过MAT插件查看该hprof文件。
+先定义一个长度为 `10` 的 `Integer` 数组，并随机为其赋值，在通过 `for` 循环为长度为 `10` 万的 `String` 对象依次赋值，这些值都来自于 `Integer` 数组。两种情况分别运行，可通过 `Window ---> Preferences --> Java --> Installed JREs` 设置JVM启动参数为 `-agentlib:hprof=heap=dump,format=b` ，将程序运行完后的 `hprof` 置于工程目录下。再通过 `MAT` 插件查看该 `hprof` 文件。
 
 两次实验结果如下：
 
@@ -1528,13 +1526,13 @@ public static void main(String[] args) throws Exception {
 
 ![20160823152041988](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/java-core-demo/20210320215005.jpg)
 
-从运行结果来看，不使用 `intern()` 的情况下，程序生成了101762个String对象，而使用了 `intern()` 方法时，程序仅生成了1772个String对象。自然也证明了 `intern()` 节省内存的结论。
+从运行结果来看，不使用 `intern()` 的情况下，程序生成了 `101762` 个 `String` 对象，而使用了 `intern()` 方法时，程序仅生成了 `1772` 个 `String` 对象。自然也证明了 `intern()` 节省内存的结论。
 
-细心的同学会发现使用了 `intern()` 方法后程序运行时间有所增加。这是因为程序中每次都是用了new String后又进行 `intern()` 操作的耗时时间，但是不使用 `intern()` 占用内存空间导致GC的时间是要远远大于这点时间的。 
+细心的同学会发现使用了 `intern()` 方法后程序运行时间有所增加。这是因为程序中每次都是用了 `new String` 后又进行 `intern()` 操作的耗时时间，但是不使用 `intern()` 占用内存空间导致 `GC` 的时间是要远远大于这点时间的。 
 
 #### X.8.2.深入认识intern()方法
 
-JDK1.7后，常量池被放入到堆空间中，这导致 `intern()` 函数的功能不同，具体怎么个不同法，且看看下面代码，这个例子是网上流传较广的一个例子，分析图也是直接粘贴过来的，这里我会用自己的理解去解释这个例子：
+`JDK1.7` 后，常量池被放入到堆空间中，这导致 `intern()` 函数的功能不同，具体怎么个不同法，且看看下面代码，这个例子是网上流传较广的一个例子，分析图也是直接粘贴过来的，这里我会用自己的理解去解释这个例子：
 
 ```
 String s = new String("1");
@@ -1577,21 +1575,21 @@ JDK1.7以及以上：false false
 ```
 
 
-下面依据上面代码对intern()方法进行分析：
+下面依据上面代码对 `intern()` 方法进行分析：
 
 **X.8.2.1 JDK1.6**
 
 ![image-20210320215551906](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/java-core-demo/20210320215552.png)
 
-在JDK1.6中所有的输出结果都是 false，因为JDK1.6以及以前版本中，常量池是放在 Perm 区（属于方法区）中的，熟悉JVM的话应该知道这是和堆区完全分开的。
+在 `JDK1.6` 中所有的输出结果都是 `false`，因为 `JDK1.6` 以及以前版本中，常量池是放在 `Perm` 区（属于方法区）中的，熟悉 `JVM` 的话应该知道这是和堆区完全分开的。
 
-使用引号声明的字符串都是会直接在字符串常量池中生成的，而 new 出来的 String 对象是放在堆空间中的。所以两者的内存地址肯定是不相同的，即使调用了intern()方法也是不影响的。如果不清楚String类的“==”和equals()的区别可以查看我的这篇博文Java面试——从Java堆、栈角度比较equals和==的区别。
+使用引号声明的字符串都是会直接在字符串常量池中生成的，而 `new` 出来的 `String` 对象是放在堆空间中的。所以两者的内存地址肯定是不相同的，即使调用了 `intern()` 方法也是不影响的。
 
-intern()方法在JDK1.6中的作用是：比如`String s = new String("SEU_Calvin")`，再调用`s.intern()`，此时返回值还是字符串"SEU_Calvin"，表面上看起来好像这个方法没什么用处。但实际上，在JDK1.6中它做了个小动作：检查字符串池里是否存在"SEU_Calvin"这么一个字符串，如果存在，就返回池里的字符串；如果不存在，该方法会把"SEU_Calvin"添加到字符串池中，然后再返回它的引用。然而在JDK1.7中却不是这样的，后面会讨论。
+`intern()` 方法在 `JDK1.6` 中的作用是：比如 `String s = new String("SEU_Calvin")`，再调用 `s.intern()`，此时返回值还是字符串 `SEU_Calvin`，表面上看起来好像这个方法没什么用处。但实际上，在 `JDK1.6` 中它做了个小动作：检查字符串池里是否存在 `SEU_Calvin` 这么一个字符串，如果存在，就返回池里的字符串；如果不存在，该方法会把 `SEU_Calvin` 添加到字符串池中，然后再返回它的引用。然而在 `JDK1.7` 中却不是这样的，后面会讨论。
 
 **X.8.2.2 JDK1.7**
 
-针对JDK1.7以及以上的版本，我们将上面两段代码分开讨论。先看第一段代码的情况：
+针对 `JDK1.7` 以及以上的版本，我们将上面两段代码分开讨论。先看第一段代码的情况：
 
 ![image-20210320215624841](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/java-core-demo/20210320215624.png)
 
@@ -1691,7 +1689,7 @@ System.out.println(str1 == "SEUCalvin");
 
 #### X.9.1.前言
 
-> 最近在突然想到了String字符串拼接问题，于是做了一个demo测试了一下，到底String类型的字符串在拼接的时候，哪种情况下会走会走StringBulider进行字符串拼接，而哪种情况编译器会对代码进行优化？话不多说，先看demo
+> 最近在突然想到了 `String` 字符串拼接问题，于是做了一个 `demo` 测试了一下，到底 `String` 类型的字符串在拼接的时候，哪种情况下会走会走 `StringBulider` 进行字符串拼接，而哪种情况编译器会对代码进行优化？话不多说，先看demo
 
 #### X.9.2.问题
 
@@ -1699,30 +1697,30 @@ System.out.println(str1 == "SEUCalvin");
 
 ![14534869-dd266493a5f1e16a](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/java-core-demo/20210320221314.webp)
 
-可以发现，str == str2的结果为false，那么我们在看看下一个例子。
+可以发现，`str == str2` 的结果为 `false`，那么我们在看看下一个例子。
 
 **案例2**
 
 ![14534869-a762dfb13e0457a2](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/java-core-demo/20210320221325.webp)
 
-这时候，两个字符串对比的结果为true。
+这时候，两个字符串对比的结果为 `true`。
 
 #### X.9.3.探究问题
 
-这时候，疑问就来了，为什么结果会不一致呢？利用在cmd窗口输入`javap -c TestDemo.class`命令，对字节码文件进行反编译，发现了问题所在？
+这时候，疑问就来了，为什么结果会不一致呢？利用在 `cmd` 窗口输入`javap -c TestDemo.class`命令，对字节码文件进行反编译，发现了问题所在？
 
 ![14534869-bf48d260d37c2d58](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/java-core-demo/20210320221416.webp)
 
-可以看到在案例1中，java代码底层走了StringBuilder，进行字符串拼接，然后调用了StringBuilder的toString方法。
+可以看到在案例1中，`java` 代码底层走了 `StringBuilder`，进行字符串拼接，然后调用了 `StringBuilder` 的 `toString` 方法。
 
 ![14534869-2468eb0566d532be](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/java-core-demo/20210320221425.webp)
 
-而案例2中，对class文件进行反编译，发现代码出现了一点变化，并没有走StringBuilder进行字符串拼接。
+而案例2中，对 `class` 文件进行反编译，发现代码出现了一点变化，并没有走 `StringBuilder` 进行字符串拼接。
 
 #### X.9.4.总结
 
-1. **案例1中**，通过变量和字符串拼接，java是需要先到内存找变量对应的值，才能进行完成字符串拼接的工作，这种方式java编译器没法优化，只能走`StringBuilder`进行拼接字符串，然后调用toString方法，当然返回的结果和常量池中的`111`这个字符串的内存地址是**不一样**的，因此结果为false。
-2. **案例2中**，直接在表达式里写值，java不用根据变量去内存里找对应的值，可以在编译的时候直接对这个表达式进行优化，优化后的表达式从 `"111" + ""` 直接变成了 `"111"` ，两个String类型的变量都指向了常量池的111字符串，因此结果为true;
+1. **案例1中**，通过变量和字符串拼接，`java` 是需要先到内存找变量对应的值，才能进行完成字符串拼接的工作，这种方式 `java` 编译器没法优化，只能走`StringBuilder`进行拼接字符串，然后调用 `toString` 方法，当然返回的结果和常量池中的`111`这个字符串的内存地址是**不一样**的，因此结果为 `false`。
+2. **案例2中**，直接在表达式里写值，`java` 不用根据变量去内存里找对应的值，可以在编译的时候直接对这个表达式进行优化，优化后的表达式从 `"111" + ""` 直接变成了 `"111"` ，两个 `String` 类型的变量都指向了常量池的 `111` 字符串，因此结果为 `true`;
 
 
 
@@ -1730,21 +1728,21 @@ System.out.println(str1 == "SEUCalvin");
 
 **String的长度限制**
 
-想要搞清楚这个问题，首先我们需要翻阅一下String的源码，看下其中是否有关于长度的限制或者定义。
+想要搞清楚这个问题，首先我们需要翻阅一下 `String` 的源码，看下其中是否有关于长度的限制或者定义。
 
-String类中有很多重载的构造函数，其中有几个是支持用户传入length来执行长度的：
+`String` 类中有很多重载的构造函数，其中有几个是支持用户传入length来执行长度的：
 
 ```
 public String(byte bytes[], int offset, int length) 
 ```
 
-可以看到，这里面的参数length是使用int类型定义的，那么也就是说，String定义的时候，最大支持的长度就是int的最大范围值。
+可以看到，这里面的参数 `length` 是使用 `int` 类型定义的，那么也就是说，`String` 定义的时候，最大支持的长度就是 `int` 的最大范围值。
 
-根据Integer类的定义，`java.lang.Integer#MAX_VALUE`的最大值是2^31 - 1;
+根据 `Integer` 类的定义，`java.lang.Integer#MAX_VALUE`的最大值是 `2^31 - 1`;
 
-那么，我们是不是就可以认为String能支持的最大长度就是这个值了呢？
+那么，我们是不是就可以认为 `String` 能支持的最大长度就是这个值了呢？
 
-其实并不是，这个值只是在运行期，我们构造String的时候可以支持的一个最大长度，而实际上，在运行期，定义字符串的时候也是有长度限制的。
+其实并不是，这个值只是在运行期，我们构造 `String` 的时候可以支持的一个最大长度，而实际上，在运行期，定义字符串的时候也是有长度限制的。
 
 如以下代码：
 
@@ -1758,17 +1756,17 @@ String s = "11111...1111";//其中有10万个字符"1"
 错误: 常量字符串过长
 ```
 
-那么，明明String的构造函数指定的长度是可以支持2147483647(2^31 - 1)的，为什么像以上形式定义的时候无法编译呢？
+那么，明明 `String` 的构造函数指定的长度是可以支持 `2147483647(2^31 - 1)` 的，为什么像以上形式定义的时候无法编译呢？
 
-其实，形如`String s = "xxx";`定义String的时候，xxx被我们称之为字面量，这种字面量在编译之后会以常量的形式进入到Class常量池。
+其实，形如`String s = "xxx";`定义 `String` 的时候，`xxx` 被我们称之为字面量，这种字面量在编译之后会以常量的形式进入到 `Class`常量池。
 
 那么问题就来了，因为要进入常量池，就要遵守常量池的有关规定。
 
 **常量池限制**
 
-我们知道，javac是将Java文件编译成class文件的一个命令，那么在Class文件生成过程中，就需要遵守一定的格式。
+我们知道，`javac` 是将 `Java` 文件编译成 `class` 文件的一个命令，那么在 `Class` 文件生成过程中，就需要遵守一定的格式。
 
-根据《Java虚拟机规范》中第4.4章节常量池的定义，CONSTANT_String_info 用于表示 java.lang.String 类型的常量对象，格式如下：
+根据《Java虚拟机规范》中第4.4章节常量池的定义，`CONSTANT_String_info` 用于表示 `java.lang.String` 类型的常量对象，格式如下：
 
 ```
 CONSTANT_String_info {
@@ -1777,9 +1775,9 @@ CONSTANT_String_info {
 }
 ```
 
-其中，string_index 项的值必须是对常量池的有效索引， 常量池在该索引处的项必须是 CONSTANT_Utf8_info 结构，表示一组 Unicode 码点序列，这组 Unicode 码点序列最终会被初始化为一个 String 对象。
+其中，`string_index` 项的值必须是对常量池的有效索引， 常量池在该索引处的项必须是 `CONSTANT_Utf8_info` 结构，表示一组 `Unicode` 码点序列，这组 `Unicode` 码点序列最终会被初始化为一个 `String` 对象。
 
-CONSTANT_Utf8_info 结构用于表示字符串常量的值：
+`CONSTANT_Utf8_info` 结构用于表示字符串常量的值：
 
 ```
 CONSTANT_Utf8_info {
@@ -1789,13 +1787,13 @@ CONSTANT_Utf8_info {
 }
 ```
 
-其中，length则指明了 bytes[]数组的长度，其类型为u2，
+其中，`length` 则指明了 `bytes[]` 数组的长度，其类型为 `u2`，
 
-通过翻阅《规范》，我们可以获悉。u2表示两个字节的无符号数，那么1个字节有8位，2个字节就有16位。
+通过翻阅《规范》，我们可以获悉。`u2` 表示两个字节的无符号数，那么 `1` 个字节有 `8` 位，`2` 个字节就有 `16` 位。
 
-16位无符号数可表示的最大值位 `2^16 - 1 = 65535`。
+`16` 位无符号数可表示的最大值位 `2^16 - 1 = 65535`。
 
-也就是说，Class文件中常量池的格式规定了，其字符串常量的长度不能超过65535。
+也就是说，`Class` 文件中常量池的格式规定了，其字符串常量的长度不能超过 `65535`。
 
 那么，我们尝试使用以下方式定义字符串：
 
@@ -1803,9 +1801,9 @@ CONSTANT_Utf8_info {
 String s = "11111...1111";//其中有65535万个字符"1"
 ```
 
-尝试使用javac编译，同样会得到"错误: 常量字符串过长"，那么原因是什么呢？
+尝试使用 `javac` 编译，同样会得到"错误: 常量字符串过长"，那么原因是什么呢？
 
-其实，这个原因在javac的代码中是可以找到的，在Gen类中有如下代码：
+其实，这个原因在 `javac` 的代码中是可以找到的，在 `Gen` 类中有如下代码：
 
 ```
 private void checkStringConstant(DiagnosticPosition var1, Object var2) {
@@ -1817,11 +1815,11 @@ private void checkStringConstant(DiagnosticPosition var1, Object var2) {
 }
 ```
 
-代码中可以看出，当参数类型为String，并且长度大于等于65535的时候，就会导致编译失败。
+代码中可以看出，当参数类型为 `String`，并且长度大于等于 `65535` 的时候，就会导致编译失败。
 
-这个地方大家可以尝试着debug一下javac的编译过程（视频中有对java的编译过程进行debug的方法），也可以发现这个地方会报错。
+这个地方大家可以尝试着 `debug` 一下 `javac` 的编译过程（视频中有对 `java` 的编译过程进行 `debug` 的方法），也可以发现这个地方会报错。
 
-如果我们尝试以65534个字符定义字符串，则会发现可以正常编译。
+如果我们尝试以 `65534` 个字符定义字符串，则会发现可以正常编译。
 
 其实，关于这个值，在《Java虚拟机规范》也有过说明：
 
@@ -1829,11 +1827,11 @@ private void checkStringConstant(DiagnosticPosition var1, Object var2) {
 
 **运行期限制**
 
-上面提到的这种String长度的限制是编译期的限制，也就是使用String s= “”;这种字面值方式定义的时候才会有的限制。
+上面提到的这种 `String` 长度的限制是编译期的限制，也就是使用 `String s= “”;` 这种字面值方式定义的时候才会有的限制。
 
-那么。String在运行期有没有限制呢，答案是有的，就是我们前文提到的那个Integer.MAX_VALUE ，这个值约等于4G，在运行期，如果String的长度超过这个范围，就可能会抛出异常。(在jdk 1.9之前）
+那么。`String` 在运行期有没有限制呢，答案是有的，就是我们前文提到的那个 `Integer.MAX_VALUE`，这个值约等于 `4G`，在运行期，如果 `String` 的长度超过这个范围，就可能会抛出异常。(在 `jdk 1.9` 之前）
 
-int 是一个 32 位变量类型，取正数部分来算的话，他们最长可以有
+`int` 是一个 `32` 位变量类型，取正数部分来算的话，他们最长可以有
 
 ```
 2^31-1 =2147483647 个 16-bit Unicodecharacter
@@ -1849,9 +1847,9 @@ int 是一个 32 位变量类型，取正数部分来算的话，他们最长可
 4095.9999980926513671875 / 1024 = 3.99999999813735485076904296875 (GB)
 ```
 
-有近 4G 的容量。
+有近 `4G` 的容量。
 
-很多人会有疑惑，编译的时候最大长度都要求小于65535了，运行期怎么会出现大于65535的情况呢。这其实很常见，如以下代码：
+很多人会有疑惑，编译的时候最大长度都要求小于 `65535` 了，运行期怎么会出现大于 `65535` 的情况呢。这其实很常见，如以下代码：
 
 ```
 String s = "";
@@ -1860,17 +1858,17 @@ for (int i = 0; i <100000 ; i++) {
 }
 ```
 
-得到的字符串长度就有10万，另外我之前在实际应用中遇到过这个问题。
+得到的字符串长度就有 `10` 万，另外我之前在实际应用中遇到过这个问题。
 
-之前一次系统对接，需要传输高清图片，约定的传输方式是对方将图片转成BASE6编码，我们接收到之后再转成图片。
+之前一次系统对接，需要传输高清图片，约定的传输方式是对方将图片转成 `BASE6` 编码，我们接收到之后再转成图片。
 
-在将BASE64编码后的内容赋值给字符串的时候就抛了异常。
+在将 `BASE64` 编码后的内容赋值给字符串的时候就抛了异常。
 
 **总结**
 
-字符串有长度限制，在编译期，要求字符串常量池中的常量不能超过65535，并且在javac执行过程中控制了最大值为65534。
+字符串有长度限制，在编译期，要求字符串常量池中的常量不能超过 `65535`，并且在 `javac` 执行过程中控制了最大值为 `65534`。
 
-在运行期，长度不能超过Int的范围，否则会抛异常。
+在运行期，长度不能超过 `Int` 的范围，否则会抛异常。
 
 
 
@@ -1878,29 +1876,29 @@ for (int i = 0; i <100000 ; i++) {
 
 #### X.11.1.Java对象的结构
 
-首先，我们来下Java对象在虚拟机中的结构，这里，以HotSpot虚拟机为例。
+首先，我们来下 `Java` 对象在虚拟机中的结构，这里，以 `HotSpot` 虚拟机为例。
 
 ![20201021013353498](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/java-core-demo/20210320224934.png)
 
 从上面的这张图里面可以看出，对象在内存中的结构主要包含以下几个部分：
 
-- Mark Word(标记字段)：对象的Mark Word部分占4个字节，其内容是一系列的标记位，比如轻量级锁的标记位，偏向锁标记位等等。
-- Klass Pointer（Class对象指针）：Class对象指针的大小也是4个字节，其指向的位置是对象对应的Class对象（其对应的元数据对象）的内存地址
-- 对象实际数据：这里面包括了对象的所有成员变量，其大小由各个成员变量的大小决定，比如：byte和boolean是1个字节，short和char是2个字节，int和float是4个字节，long和double是8个字节，reference是4个字节
-- 对齐：最后一部分是对齐填充的字节，按8个字节填充。
+- `Mark Word`(标记字段)：对象的 `Mark Word` 部分占4个字节，其内容是一系列的标记位，比如轻量级锁的标记位，偏向锁标记位等等。
+- `Klass Pointer`（`Class` 对象指针）：`Class` 对象指针的大小也是4个字节，其指向的位置是对象对应的 `Class` 对象（其对应的元数据对象）的内存地址
+- 对象实际数据：这里面包括了对象的所有成员变量，其大小由各个成员变量的大小决定，比如：`byte` 和 `boolean` 是1个字节，`short` 和 `char` 是 `2` 个字节，`int` 和 `float` 是 `4` 个字节，`long` 和 `double` 是 `8` 个字节，`reference` 是 `4` 个字节
+- 对齐：最后一部分是对齐填充的字节，按 `8` 个字节填充。
 
 换种说法就是：
 
-- 对象头（object header）：8 个字节（保存对象的 class 信息、ID、在虚拟机中的状态）
-- Java 原始类型数据：如 int, float, char 等类型的数据
-- 引用（reference）：4 个字节
-- 填充符（padding）
+- 对象头（`object header`）：`8` 个字节（保存对象的 `class` 信息、`ID`、在虚拟机中的状态）
+- `Java` 原始类型数据：如 `int`, `float`, `char` 等类型的数据
+- 引用（`reference`）：4 个字节
+- 填充符（`padding`）
 
 #### X.11.2.Java中的String类型
 
 **空String占用的空间**
 
-这里，我们以Java8为例进行说明。首先，我们来看看String类中的成员变量。
+这里，我们以 `Java8` 为例进行说明。首先，我们来看看 `String` 类中的成员变量。
 
 ```java
 /** The value is used for character storage. */
@@ -1913,7 +1911,7 @@ private int hash; // Default to 0
 private static final long serialVersionUID = -6849794470754667710L;
 ```
 
-在 Java 里数组也是对象，因此数组也有对象头。所以，一个数组所占的空间为对象头所占的空间加上数组长度加上数组的引用，即 8 + 4 + 4= 16 字节 。
+在 `Java` 里数组也是对象，因此数组也有对象头。所以，一个数组所占的空间为对象头所占的空间加上数组长度加上数组的引用，即 `8 + 4 + 4= 16` 字节 。
 
 所以，我们可以得出一个空String对象所占用的内存空间，如下所示。
 
@@ -1925,23 +1923,23 @@ private static final long serialVersionUID = -6849794470754667710L;
 
 **非空String占用的空间**
 
-如果String字符串的长度大于0的话，我们也可以得出String占用内存的计算公式，如下所示。
+如果 `String` 字符串的长度大于 `0` 的话，我们也可以得出 `String` 占用内存的计算公式，如下所示。
 
 ```java
 40 + 2 * n
 ```
 
-其中，n为字符串的长度。
+其中，`n` 为字符串的长度。
 
-这里，可能有小伙伴会问，为什么是 `40 + 2 * n` 呢？这是因为40是空字符串占用的内存空间，这个我们上面已经说过了，String类实际上是把数据存储到char[]这个成员变量数组中的，而char[]数组中的一个char类型的数据占用2个字节的空间，所以，只是String中的数据就会占用 2 * n（n为字符串的长度）个字节的空间，再加上空字符串所占用的40个字节空间，最终得出一个字符串所占用的存储空间为： `40 + 2 * n` （n为字符串长度）。
+这里，可能有小伙伴会问，为什么是 `40 + 2 * n` 呢？这是因为 `40` 是空字符串占用的内存空间，这个我们上面已经说过了，`String` 类实际上是把数据存储到 `char[]` 这个成员变量数组中的，而 `char[]` 数组中的一个 `char` 类型的数据占用 `2` 个字节的空间，所以，只是`String` 中的数据就会占用 `2 * n`（n为字符串的长度）个字节的空间，再加上空字符串所占用的 `40` 个字节空间，最终得出一个字符串所占用的存储空间为： `40 + 2 * n` （n为字符串长度）。
 
-注：`40 + 2 * n` 这个公式我们可以看成是计算String对象占用多大内存空间的通用公式。
+注：`40 + 2 * n` 这个公式我们可以看成是计算 `String` 对象占用多大内存空间的通用公式。
 
-因此在代码中大量使用String对象时，应考虑内存的实际占用情况。
+因此在代码中大量使用 `String` 对象时，应考虑内存的实际占用情况。
 
 #### X.11.3.验证结论
 
-接下来，我们就一起来验证下我们上面的结论。首先，创建一个UUIDUtils类用来生成32位的UUID，如下所示。
+接下来，我们就一起来验证下我们上面的结论。首先，创建一个 `UUIDUtils` 类用来生成 `32` 位的 `UUID`，如下所示。
 
 ```java
 package io.mykit.binghe.string.test;
@@ -1961,7 +1959,7 @@ public class UUIDUtils {
 }
 ```
 
-接下来，创建一个TestString类，在main()方法中创建一个长度为4000000的数组，然后在数组中放满UUID字符串，如下所示。
+接下来，创建一个 `TestString` 类，在 `main()` 方法中创建一个长度为 `4000000` 的数组，然后在数组中放满 `UUID` 字符串，如下所示。
 
 ```java
 package io.mykit.binghe.string.test;
@@ -1988,13 +1986,13 @@ public class TestString{
 }
 ```
 
-这里，4000000个字符串，每个字符串的长度为32，所以保存字符串数据所占用的内存空间为：(40 + 32 * 2) * 4000000 = 416000000字节，约等于416MB。
+这里，`4000000` 个字符串，每个字符串的长度为 `32` ，所以保存字符串数据所占用的内存空间为：`(40 + 32 * 2) * 4000000 = 416000000` 字节，约等于 `416MB`。
 
 我们使用Jprofiler内存分析工具进行分析：
 
 ![20201021013440615](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/java-core-demo/20210320224944.png)
 
-可以看到，使用Jprofiler内存分析工具的结果为：321MB + 96632KB，约等于417MB。之所以使用Jprofiler内存分析工具得出的结果比我们计算的大些，是因为在程序实际运行的过程中，程序内部也会生成一些字符串，这些字符串也会占用内存空间！！
+可以看到，使用 `Jprofiler` 内存分析工具的结果为：`321MB + 96632KB`，约等于 `417MB`。之所以使用 `Jprofiler` 内存分析工具得出的结果比我们计算的大些，是因为在程序实际运行的过程中，程序内部也会生成一些字符串，这些字符串也会占用内存空间！！
 
 
 
