@@ -6,7 +6,7 @@
 
 ## 1.为什么要用ELK
 
-ELK实际上是三个工具，Elastricsearch + LogStash + Kibana，通过ELK，用来收集日志还有进行日志分析，最后通过可视化UI进行展示。一开始业务量比较小的时候，通过简单的SLF4J+Logger在服务器打印日志，通过grep进行简单查询，但是随着业务量增加，数据量也会不断增加，所以使用ELK可以进行大数量的日志收集和分析
+`ELK` 实际上是三个工具，`Elastricsearch + LogStash + Kibana`，通过 `ELK`，用来收集日志还有进行日志分析，最后通过可视化UI进行展示。一开始业务量比较小的时候，通过简单的 `SLF4J+Logger` 在服务器打印日志，通过 `grep` 进行简单查询，但是随着业务量增加，数据量也会不断增加，所以使用 `ELK` 可以进行大数量的日志收集和分析
 
 ## 2.简单画了一下架构图
 
@@ -27,7 +27,7 @@ Java HotSpot(TM) 64-Bit Server VM (build 25.161-b12, mixed mode)
 
 ## 3.ElasticSearch
 
-> Elasticsearch 是一个分布式的 RESTful 风格的搜索和数据分析引擎，能够解决不断涌现出的各种用例。作为 Elastic Stack 的核心，它集中存储您的数据，帮助您发现意料之中以及意料之外的情况。
+> `Elasticsearch` 是一个分布式的 `RESTful` 风格的搜索和数据分析引擎，能够解决不断涌现出的各种用例。作为 `Elastic Stack` 的核心，它集中存储您的数据，帮助您发现意料之中以及意料之外的情况。
 
 Mac安装和运行
 

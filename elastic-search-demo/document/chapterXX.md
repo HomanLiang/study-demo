@@ -8,13 +8,13 @@
 
 ## 1.REST API在 Elasticsearch 方面有哪些优势？
 
-REST API是使用超文本传输协议的系统之间的通信，该协议以 XML 和 JSON格式传输数据请求。
+`REST API` 是使用超文本传输协议的系统之间的通信，该协议以 `XML` 和 `JSON` 格式传输数据请求。
 
-REST 协议是无状态的，并且与带有服务器和存储数据的用户界面分开，从而增强了用户界面与任何类型平台的可移植性。它还提高了可伸缩性，允许独立实现组件，因此应用程序变得更加灵活。
+`REST` 协议是无状态的，并且与带有服务器和存储数据的用户界面分开，从而增强了用户界面与任何类型平台的可移植性。它还提高了可伸缩性，允许独立实现组件，因此应用程序变得更加灵活。
 
-REST API与平台和语言无关，只是用于数据交换的语言是XML或JSON。
+`REST API` 与平台和语言无关，只是用于数据交换的语言是 `XML` 或 `JSON`。
 
-借助：REST API 查看集群信息或者排查问题都非常方便。
+借助：`REST API` 查看集群信息或者排查问题都非常方便。
 
 
 
@@ -30,7 +30,7 @@ REST API与平台和语言无关，只是用于数据交换的语言是XML或JSO
 
 而倒排索引，是通过分词策略，形成了词和文章的映射关系表，这种词典+映射表即为倒排索引。
 
-有了倒排索引，就能实现o（1）时间复杂度的效率检索文章了，极大的提高了检索效率。
+有了倒排索引，就能实现 `o（1）` 时间复杂度的效率检索文章了，极大的提高了检索效率。
 
 ![image-20210227222928353](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/elastic-search-demo/image-20210227222928353.png)
 
@@ -38,25 +38,25 @@ REST API与平台和语言无关，只是用于数据交换的语言是XML或JSO
 
 倒排索引，相反于一篇文章包含了哪些词，它从词出发，记载了这个词在哪些文档中出现过，由两部分组成——词典和倒排表。
 
-**加分项**：倒排索引的底层实现是基于：FST（Finite State Transducer）数据结构。
+**加分项**：倒排索引的底层实现是基于：`FST（Finite State Transducer）` 数据结构。
 
-lucene从4+版本后开始大量使用的数据结构是FST。FST有两个优点：
+`lucene` 从 `4+` 版本后开始大量使用的数据结构是 `FST`。`FST` 有两个优点：
 
 1. 空间占用小。通过对词典中单词前缀和后缀的重复利用，压缩了存储空间；
-2. 查询速度快。O(len(str))的查询时间复杂度。
+2. 查询速度快。`O(len(str))` 的查询时间复杂度。
 
  
 
 ## 3.解释 Elasticsearch 中的相关性和得分？
 
-当你在互联网上搜索有关 Apple 的信息时。它可以显示有关水果或苹果公司名称的搜索结果。
+当你在互联网上搜索有关 `Apple` 的信息时。它可以显示有关水果或苹果公司名称的搜索结果。
 
 - 你可能要在线购买水果，检查水果中的食谱或食用水果，苹果对健康的好处。
-- 你也可能要检查Apple.com，以查找该公司提供的最新产品范围，检查评估公司的股价以及最近6个月，1或5年内该公司在纳斯达克的表现。
+- 你也可能要检查 `Apple.com`，以查找该公司提供的最新产品范围，检查评估公司的股价以及最近6个月，1或5年内该公司在纳斯达克的表现。
 
-同样，当我们从 Elasticsearch 中搜索文档（记录）时，你会对获取所需的相关信息感兴趣。基于相关性，通过Lucene评分算法计算获得相关信息的概率。
+同样，当我们从 `Elasticsearch` 中搜索文档（记录）时，你会对获取所需的相关信息感兴趣。基于相关性，通过 `Lucene` 评分算法计算获得相关信息的概率。
 
-ES 会将相关的内容都返回给你，只是：计算得出的评分高的排在前面，评分低的排在后面。
+`ES` 会将相关的内容都返回给你，只是：计算得出的评分高的排在前面，评分低的排在后面。
 
 计算评分相关的两个核心因素是：词频和逆向文档频率（文档的稀缺性）。
 
@@ -66,7 +66,7 @@ ES 会将相关的内容都返回给你，只是：计算得出的评分高的�
 
 ## 4.请解释有关 Elasticsearch的 NRT？
 
-从文档索引（写入）到可搜索到之间的延迟默认一秒钟，因此Elasticsearch是近实时（NRT）搜索平台。
+从文档索引（写入）到可搜索到之间的延迟默认一秒钟，因此 `Elasticsearch` 是近实时（`NRT`）搜索平台。
 
 也就是说：文档写入，最快一秒钟被索引到，不能再快了。
 
@@ -76,24 +76,28 @@ ES 会将相关的内容都返回给你，只是：计算得出的评分高的�
 
 ## 5.elasticsearch 是如何实现 master 选举的
 
-面试官：想了解 ES 集群的底层原理，不再只关注业务层面了。
+面试官：想了解 `ES` 集群的底层原理，不再只关注业务层面了。
 
 前置前提：
 
-1. 只有候选主节点（master：true）的节点才能成为主节点。
-2. 最小主节点数（min_master_nodes）的目的是防止脑裂。
+1. 只有候选主节点（`master：true`）的节点才能成为主节点。
+2. 最小主节点数（`min_master_nodes`）的目的是防止脑裂。
 
-Elasticsearch 的选主是 ZenDiscovery 模块负责的，主要包含 Ping（节点之间通过这个RPC来发现彼此）和 Unicast（单播模块包含一个主机列表以控制哪些节点需要 ping 通）这两部分；
-获取主节点的核心入口为 findMaster，选择主节点成功返回对应 Master，否则返回 null。
+`Elasticsearch` 的选主是 `ZenDiscovery` 模块负责的，主要包含 `Ping`（节点之间通过这个 `RPC` 来发现彼此）和 `Unicast`（单播模块包含一个主机列表以控制哪些节点需要 ping 通）这两部分；
+
+获取主节点的核心入口为 `findMaster`，选择主节点成功返回对应 `Master`，否则返回 `null`。
 
 选举流程大致描述如下：
-第一步：确认候选主节点数达标，elasticsearch.yml 设置的值 discovery.zen.minimum_master_nodes;
-第二步：对所有候选主节点根据nodeId字典排序，每次选举每个节点都把自己所知道节点排一次序，然后选出第一个（第0位）节点，暂且认为它是master节点。
+
+第一步：确认候选主节点数达标，`elasticsearch.yml` 设置的值 `discovery.zen.minimum_master_nodes`;
+
+第二步：对所有候选主节点根据 `nodeId` 字典排序，每次选举每个节点都把自己所知道节点排一次序，然后选出第一个（第0位）节点，暂且认为它是 `master` 节点。
+
 第三步：如果对某个节点的投票数达到一定的值（候选主节点数n/2+1）并且该节点自己也选举自己，那这个节点就是master。否则重新选举一直到满足上述条件。
 
 - 补充：
-  - 这里的 id 为 string 类型。
-  - master 节点的职责主要包括集群、节点和索引的管理，不负责文档级别的管理；data 节点可以关闭 http 功能
+  - 这里的 `id` 为 `string` 类型。
+  - `master` 节点的职责主要包括集群、节点和索引的管理，不负责文档级别的管理；`data` 节点可以关闭 `http` 功能
 
 
 
@@ -110,8 +114,8 @@ Elasticsearch 的选主是 ZenDiscovery 模块负责的，主要包含 Ping（�
 ## 7.在并发情况下，ES如果保证读写一致？
 
 1. 可以通过版本号使用乐观并发控制，以确保新版本不会被旧版本覆盖，由应用层来处理具体的冲突；
-2. 另外对于写操作，一致性级别支持quorum/one/all，默认为quorum，即只有当大多数分片可用时才允许写操作。但即使大多数可用，也可能存在因为网络等原因导致写入副本失败，这样该副本被认为故障，分片将会在一个不同的节点上重建。
-3. 对于读操作，可以设置replication为sync(默认)，这使得操作在主分片和副本分片都完成后才会返回；如果设置replication为async时，也可以通过设置搜索请求参数_preference为primary来查询主分片，确保文档是最新版本。
+2. 另外对于写操作，一致性级别支持 `quorum/one/all`，默认为 `quorum`，即只有当大多数分片可用时才允许写操作。但即使大多数可用，也可能存在因为网络等原因导致写入副本失败，这样该副本被认为故障，分片将会在一个不同的节点上重建。
+3. 对于读操作，可以设置 `replication` 为 `sync` (默认)，这使得操作在主分片和副本分片都完成后才会返回；如果设置 `replication` 为 `async` 时，也可以通过设置搜索请求参数 `_preference` 为 `primary` 来查询主分片，确保文档是最新版本。
 
 
 
@@ -133,13 +137,13 @@ Elasticsearch 的选主是 ZenDiscovery 模块负责的，主要包含 Ping（�
 
    ##### Master选举：[程序员小灰拜占庭将军问题和Raft算法](https://links.jianshu.com/go?to=https%3A%2F%2Fblog.csdn.net%2Fbjweimengshu%2Farticle%2Fdetails%2F80222416)
 
-   ES 数据并发冲突控制是基于的乐观锁和版本号的机制
+   `ES` 数据并发冲突控制是基于的乐观锁和版本号的机制
 
-   一个document第一次创建的时候，它的`_version`内部版本号就是1；以后，每次对这个document执行修改或者删除操作，都会对这个`_version`版本号自动加1；哪怕是删除，也会对这条数据的版本号加1(假删除)。
+   一个 `document` 第一次创建的时候，它的`_version`内部版本号就是1；以后，每次对这个 `document` 执行修改或者删除操作，都会对这个`_version`版本号自动加1；哪怕是删除，也会对这条数据的版本号加1(假删除)。
 
    客户端对es数据做更新的时候，如果带上了版本号，那带的版本号与es中文档的版本号一致才能修改成功，否则抛出异常。如果客户端没有带上版本号，首先会读取最新版本号才做更新尝试，这个尝试类似于CAS操作，可能需要尝试很多次才能成功。乐观锁的好处是不需要互斥锁的参与。
 
-   es节点更新之后会向副本节点同步更新数据(同步写入)，直到所有副本都更新了才返回成功。
+   `es` 节点更新之后会向副本节点同步更新数据(同步写入)，直到所有副本都更新了才返回成功。
 
    
 
@@ -155,7 +159,7 @@ Elasticsearch 的选主是 ZenDiscovery 模块负责的，主要包含 Ping（�
 
 	> There are two fault detection processes running. The first is by the master, to ping all the other nodes in the cluster and verify that they are alive. And on the other end, each node pings to master to verify if its still alive or an election process needs to be initiated.
 
-	1. 由主节点负责ping 所有其他节点，判断是否有节点已经挂掉
+	1. 由主节点负责 `ping` 所有其他节点，判断是否有节点已经挂掉
 	2. 创建或删除索引
 	3. 决定分片在节点之间的分配
 
@@ -167,17 +171,17 @@ Elasticsearch 的选主是 ZenDiscovery 模块负责的，主要包含 Ping（�
 
 3. **ElasticSearch 的数据实时性**
 
-   ElasticSearch 是通过怎样的手段做到数据的近实时搜索的？
+   `ElasticSearch` 是通过怎样的手段做到数据的近实时搜索的？
    
    <img src="https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/elastic-search-demo/4.webp" alt="4" style="zoom:67%;" />
    
-   一个Index由若干段组成,搜索的时候按段搜索,我们索引一条段后，每个段会通过fsync 操作持久化到磁盘，而fsync 操作比较耗时,如果每索引一条数据都做这个full commit(rsync)操作,提交和查询的时延都非常之大,所以在这种情况下做不到实时的一个搜索。
+   一个 `Index` 由若干段组成,搜索的时候按段搜索,我们索引一条段后，每个段会通过 `fsync` 操作持久化到磁盘，而 `fsync` 操作比较耗时,如果每索引一条数据都做这个 `full commit(rsync)` 操作,提交和查询的时延都非常之大,所以在这种情况下做不到实时的一个搜索。
    
    
    
    **FileSystem Cache  与 refresh**
    
-   针对这个问题的解决是在Elasticsearch和磁盘之间引入一层称为FileSystem Cache的系统缓存，正是由于这层cache的存在才使得es能够拥有更快搜索响应能力。
+   针对这个问题的解决是在 `Elasticsearch` 和磁盘之间引入一层称为 `FileSystem Cache` 的系统缓存，正是由于这层 `cache` 的存在才使得 `es` 能够拥有更快搜索响应能力。
    
    **新的文档数据写入缓存区：**
    
@@ -187,15 +191,15 @@ Elasticsearch 的选主是 ZenDiscovery 模块负责的，主要包含 Ping（�
    
    <img src="https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/elastic-search-demo/6.webp" alt="6" style="zoom:80%;" />
    
-   es中新增的document会被收集到indexing buffer区后被重写成一个segment然在es中新增的document会被收集到indexing buffer区后被重写成一个segment然后直接写入filesystem cache中，这个操作是非常轻量级的，相对耗时较少，之后经过一定的间隔或外部触发后才会被flush到磁盘上，这个操作非常耗时。但只要sengment文件被写入cache后，这个segment就可以打开和查询，从而确保在短时间内就可以搜到，而不用执行一个full commit也就是fsync操作，这是一个非常轻量级的处理方式而且是可以高频次的被执行，而不会破坏es的性能。
+   `es` 中新增的 `document` 会被收集到 `indexing buffer` 区后被重写成一个 `segment` 然在 `es` 中新增的 `document` 会被收集到 `indexing buffer` 区后被重写成一个 `segment` 然后直接写入 `filesystem cache` 中，这个操作是非常轻量级的，相对耗时较少，之后经过一定的间隔或外部触发后才会被 `flush` 到磁盘上，这个操作非常耗时。但只要 `sengment` 文件被写入 `cache` 后，这个 `segment` 就可以打开和查询，从而确保在短时间内就可以搜到，而不用执行一个`full commit` 也就是 `fsync` 操作，这是一个非常轻量级的处理方式而且是可以高频次的被执行，而不会破坏 `es` 的性能。
    
-   在elasticsearch里面，这个轻量级的写入和打开一个cache中的segment的操作叫做refresh，默认情况下，es集群中的每个shard会每隔1秒自动refresh一次，这就是我们为什么说es是近实时的搜索引擎而不是实时的，也就是说给索引插入一条数据后，我们需要等待1秒才能被搜到这条数据，这是es对写入和查询一个平衡的设置方式，这样设置既提升了es的索引写入效率同时也使得es能够近实时检索数据。
+   在 `elasticsearch` 里面，这个轻量级的写入和打开一个 `cache` 中的 `segment` 的操作叫做 `refresh`，默认情况下，`es` 集群中的每个 `shard` 会每隔1秒自动 `refresh` 一次，这就是我们为什么说es是近实时的搜索引擎而不是实时的，也就是说给索引插入一条数据后，我们需要等待1秒才能被搜到这条数据，这是`es` 对写入和查询一个平衡的设置方式，这样设置既提升了 `es` 的索引写入效率同时也使得es能够近实时检索数据。
 
 
 
 ## 8.ES对于大数据量（上亿量级）的聚合如何实现？
 
-Elasticsearch 提供的首个近似聚合是cardinality 度量。它提供一个字段的基数，即该字段的distinct或者unique值的数目。它是基于HLL算法的。HLL 会先对我们的输入作哈希运算，然后根据哈希运算的结果中的 bits 做概率估算从而得到基数。
+`Elasticsearch` 提供的首个近似聚合是 `cardinality` 度量。它提供一个字段的基数，即该字段的 `distinct` 或者 `unique` 值的数目。它是基于 `HLL` 算法的。`HLL` 会先对我们的输入作哈希运算，然后根据哈希运算的结果中的 `bits` 做概率估算从而得到基数。
 
 其特点是：可配置的精度，用来控制内存的使用（更精确 ＝ 更多内存）；
 
@@ -205,23 +209,23 @@ Elasticsearch 提供的首个近似聚合是cardinality 度量。它提供一个
 
 ## 9.对于GC方面，在使用ES时要注意什么？
 
-1. 倒排词典的索引需要常驻内存，无法GC，需要监控data node上segment memory增长趋势。
-1. 各类缓存，field cache, filter cache, indexing cache, bulk queue等等，要设置合理的大小，并且要应该根据最坏的情况来看heap是否够用，也就是各类缓存全部占满的时候，还有heap空间可以分配给其他任务吗？避免采用clear cache等“自欺欺人”的方式来释放内存。
-1. 避免返回大量结果集的搜索与聚合。确实需要大量拉取数据的场景，可以采用scan & scroll api来实现。
-1. cluster stats驻留内存并无法水平扩展，超大规模集群可以考虑分拆成多个集群通过tribe node连接。
-1. 想知道heap够不够，必须结合实际应用场景，并对集群的heap使用情况做持续的监控。
+1. 倒排词典的索引需要常驻内存，无法 `GC`，需要监控 `data node`上 `segment memory` 增长趋势。
+1. 各类缓存，`field cache`, `filter cache`, `indexing cache`,` bulk queue` 等等，要设置合理的大小，并且要应该根据最坏的情况来看 `heap` 是否够用，也就是各类缓存全部占满的时候，还有 `heap` 空间可以分配给其他任务吗？避免采用 `clear cache` 等“自欺欺人”的方式来释放内存。
+1. 避免返回大量结果集的搜索与聚合。确实需要大量拉取数据的场景，可以采用 `scan & scroll api` 来实现。
+1. `cluster stats` 驻留内存并无法水平扩展，超大规模集群可以考虑分拆成多个集群通过 `tribe node` 连接。
+1. 想知道 `heap` 够不够，必须结合实际应用场景，并对集群的 `heap` 使用情况做持续的监控。
 
 
 
 ## 10.Elasticsearch作为解决方案需要注意什么？
 
-本文以15年国外经典博客的框架为线索，剔除过时的技术体系、技术栈内容，结合近千万级业务场景和最新Elastic技术洞察重新梳理出：Elasticsearch方案选型必须了解的10件事。
+本文以15年国外经典博客的框架为线索，剔除过时的技术体系、技术栈内容，结合近千万级业务场景和最新 `Elastic` 技术洞察重新梳理出：`Elasticsearch` 方案选型必须了解的10件事。
 
 1. **集群规模**
 
-   Elasticsearch的优点在于它是非常容易扩展。但，索引和查询时间可能因许多因素而异。在集群规模层面一方面要考虑数据量，另一方面比较重要的衡量因素是项目/产品的指标要求。
+   `Elasticsearch` 的优点在于它是非常容易扩展。但，索引和查询时间可能因许多因素而异。在集群规模层面一方面要考虑数据量，另一方面比较重要的衡量因素是项目/产品的指标要求。
 
-   要想达到吞吐量和CPU利用率的指标要求，建议进行一定量的测试，以确认集群承担的负载和性能瓶颈问题。
+   要想达到吞吐量和 `CPU` 利用率的指标要求，建议进行一定量的测试，以确认集群承担的负载和性能瓶颈问题。
 
    测试工具推荐：`Apache Jmeter`。
 
@@ -229,7 +233,7 @@ Elasticsearch 提供的首个近似聚合是cardinality 度量。它提供一个
 
 2. **节点职责**
 
-   Elasticsearch节点可以是主节点（Master），数据节点（Data），客户端/路由节点（Client）或某种组合。 大多数人大规模集群选择专用主节点（至少3个），然后选择一些数据和客户端节点。
+   `Elasticsearch` 节点可以是主节点（`Master`），数据节点（`Data`），客户端/路由节点（`Client`）或某种组合。 大多数人大规模集群选择专用主节点（至少3个），然后选择一些数据和客户端节点。
 
    建议：`职责分离`，并您针对特定工作负载优化每种类型的节点的分配。
 
@@ -263,7 +267,8 @@ Elasticsearch 提供的首个近似聚合是cardinality 度量。它提供一个
 
 2. **数据类型选型**
 
-   若不指定数据类型的动态映射机制，比如：字符串类型会默认存储为text和keyword两种类型，势必会`增加存储成本`。
+   若不指定数据类型的动态映射机制，比如：字符串类型会默认存储为 `text` 和 `keyword` 两种类型，势必会`增加存储成本`。
+
    建议：针对业务场景需求，静态的手动指定好每个字段的数据类型。
 
    考虑因素包含但不限于：
@@ -272,41 +277,42 @@ Elasticsearch 提供的首个近似聚合是cardinality 度量。它提供一个
    - 是否需要存储；
    - 是否需要分词；
    - 是否需要聚合；
-   - 是否需要多表关联（nested类型、join或者是宽表存储）；
-   - 是否需要快速响应（keyword和long类型选型）
+   - 是否需要多表关联（`nested` 类型、`join` 或者是宽表存储）；
+   - 是否需要快速响应（`keyword` 和 `long` 类型选型）
      ……
      此处的`设计时间不能省`。
 
 3. **检索选型**
 
-   Elasticsearch查询DSL非常庞大。如果业务场景不需要计算评分，推荐使用过滤器`filter`。因为基于缓存，更高效。
+   `Elasticsearch` 查询 `DSL` 非常庞大。如果业务场景不需要计算评分，推荐使用过滤器`filter`。因为基于缓存，更高效。
+
    查询相关的API包含但不限于：
 
-    - match/multi_match
-    - match_phrase/match_phrase_prefix
-    - term/terms
-    - wildcard/regexp
-    - query_string
-   
-   选型前，建议通过Demo验证一下是否符合预期。
-   
+    - `match/multi_match`
+    - `match_phrase/match_phrase_prefix`
+    - `term/terms`
+    - `wildcard/regexp`
+    - `query_string`
+
+   选型前，建议通过 `Demo` 验证一下是否符合预期。
+
    了解如何编写高效查询是一回事，但让它们返回最终用户期望的结果是另一回事。
-   
-   业务实战中，建议`花一些时间`调整分析器、分词和评分，以便ES返回期望的正确的命中。
+
+   业务实战中，建议`花一些时间`调整分析器、分词和评分，以便 `ES` 返回期望的正确的命中。
 
 4. **监控和警报**
 
    请务必考虑一个完全独立的“监视”集群机制，该机制仅用于捕获有关群集运行状况的统计信息，并在出现问题时提醒您。
 
-   **监控作用**：能通过可视化的方式，直观的看到内存、JVM、CPU、负载、磁盘等的使用情况，以对可能的突发情况及早做出应对方案。
+   **监控作用**：能通过可视化的方式，直观的看到内存、`JVM`、`CPU`、负载、磁盘等的使用情况，以对可能的突发情况及早做出应对方案。
 
    **警报作用**：异常实时预警。
 
-   ES6.X xpack已经集成watcher工具。它会监视某些条件，并在满足这些条件时提醒您。
+   `ES6.X xpack` 已经集成 `watcher` 工具。它会监视某些条件，并在满足这些条件时提醒您。
 
-   举例：当某些状态（例如JVM堆）达到阈值时，您可以采取一些操作（发送电子邮件，调用Web钩子等）。
+   举例：当某些状态（例如 `JVM` 堆）达到阈值时，您可以采取一些操作（发送电子邮件，调用Web钩子等）。
 
-   如果你的业务场景是：几乎实时地将数据写入Elasticsearch并希望在数据与某些`模式匹配`时收到警报，则推荐使用`ElastAlert`。
+   如果你的业务场景是：几乎实时地将数据写入 `Elasticsearch` 并希望在数据与某些`模式匹配`时收到警报，则推荐使用`ElastAlert`。
 
    https://github.com/Yelp/elastalert
 
@@ -314,30 +320,33 @@ Elasticsearch 提供的首个近似聚合是cardinality 度量。它提供一个
 
     一旦拥有多个节点，就每个节点在软件版本、配置等方面`保持同步`变得具有挑战性。
 
-    有许多开源工具可以帮助解决这个问题。推荐：`Chef`和`Ansible`帮助管理Elasticsearch集群。
+    有许多开源工具可以帮助解决这个问题。推荐：`Chef`和`Ansible`帮助管理 `Elasticsearch` 集群。
 
-    `Ansible`可以自动执行升级和配置传播，而无需在任何Elasticsearch节点上安装任何其他软件。
+    `Ansible`可以自动执行升级和配置传播，而无需在任何 `Elasticsearch` 节点上安装任何其他软件。
 
-    当前可能看不到对自动化的巨大需求，如果要从小规模开始发展，并且希望能够快速发展的话，一个使用Ansible编写的常见任务库可以使你在几分钟内从裸服务器转到完全配置的Elasticsearch节点，`无需人工干预`。
+    当前可能看不到对自动化的巨大需求，如果要从小规模开始发展，并且希望能够快速发展的话，一个使用 `Ansible` 编写的常见任务库可以使你在几分钟内从裸服务器转到完全配置的 `Elasticsearch` 节点，`无需人工干预`。
 
-    增量索引的管理推荐：rollover + curator + crontab，6.6版本的新特性：`Index Lifecycle Management(索引生命周期管理）`，推荐尝鲜使用。
+    增量索引的管理推荐：`rollover + curator + crontab`，6.6版本的新特性：`Index Lifecycle Management(索引生命周期管理）`，推荐尝鲜使用。
 
 6. **备份和恢复**
 
    经常被问到的问题1“ES中误删除的数据（delete或者delete_by_query）能恢复吗？”
+
    ——答案：如果做了备份，是可以的。如果没有，不可以。
 
-   问题2：“迁移节点，直接data路径原封不动拷贝可以吗？”
+   问题2：“迁移节点，直接 `data` 路径原封不动拷贝可以吗？”
+
    ——答案：不可以，不推荐。推荐使用reindex或其他工具实现。
 
-   对于高可用性的业务系统，数据的`备份`功能非常重要。 由于数据的存储可能会涉及多个节点，依赖OS级文件系统备份可能会很冒险。
+   对于高可用性的业务系统，数据的`备份`功能非常重要。 由于数据的存储可能会涉及多个节点，依赖 `OS` 级文件系统备份可能会很冒险。
 
-   推荐使用Elasticsearch内置的“`快照`”功能，可以备份您的索引。
+   推荐使用 `Elasticsearch` 内置的“`快照`”功能，可以备份您的索引。
 
 7. **API选型**
 
-   Elastic`官方`支持API，包含：JAVA、Java Script、.net、PHP、python、Ruby。
-   Elastic民间API（社区贡献）非常庞大：C++、Go等20多种。
+   `Elastic` 官方支持 `API`，包含：`JAVA`、`Java Script`、`.net`、`PHP`、`python`、`Ruby`。
+
+   `Elastic` 民间 `API`（社区贡献）非常庞大：`C++`、Go等20多种。
 
    API选型推荐使用：`官方API`。
 
@@ -346,13 +355,13 @@ Elasticsearch 提供的首个近似聚合是cardinality 度量。它提供一个
    - 版本更新及时、
    - 新特性支持适配更新及时。
 
-   DSL开发推荐使用的Kibana的`Dev-tool`，非常高效、方便。
+   `DSL` 开发推荐使用的 `Kibana` 的 `Dev-tool`，非常高效、方便。
 
 8. **数据接入**
 
-   将数据索引到Elasticsearch很容易。 根据数据源和其他因素，您可以自己编写，也可以使用Elastic中的`Logstash`工具。
+   将数据索引到 `Elasticsearch` 很容易。 根据数据源和其他因素，您可以自己编写，也可以使用 `Elastic` 中的`Logstash`工具。
 
-   Logstash可以查看日志文件或其他输入，然后有效地将数据索引到集群中。
+   `Logstash` 可以查看日志文件或其他输入，然后有效地将数据索引到集群中。
 
    其他大数据组件或开源项目也有类似的功能，举例：
 
@@ -362,19 +371,19 @@ Elasticsearch 提供的首个近似聚合是cardinality 度量。它提供一个
 
 9. **小结**
 
-   安装和运行开箱即用的Elasticsearch集群非常简单。 使其适用于你的实际业务场景并满足你的性能指标非常不容易。
+   安装和运行开箱即用的 `Elasticsearch` 集群非常简单。 使其适用于你的实际业务场景并满足你的性能指标非常不容易。
 
 
 
 ## 12.es分布式架构原理
 
-首先需要明白es是如何存储数据的，es把对应的数据转换为index。
+首先需要明白 `es` 是如何存储数据的，`es` 把对应的数据转换为 `index`。
 
-基于倒排索引的方式，每个index上存储了多个type类型，每个type对应一个document。而一个index会被分成多个shard(默认是5个)。 
+基于倒排索引的方式，每个 `index` 上存储了多个 `type` 类型，每个 `type` 对应一个 `document` 。而一个 `index` 会被分成多个 `shard` (默认是5个)。 
 
-在分布式部署时，每个shard会被复制，即一个shard有primary和replica 每个es进程存储的是不同shard的primary和replica。
+在分布式部署时，每个 `shard` 会被复制，即一个 `shard` 有 `primary` 和 `replica` 每个 `es` 进程存储的是不同 `shard` 的 `primary` 和 `replica`。
 
-es集群多个节点，会自动选举一个节点为master节点，这个master节点其实就是干一些管理的工作的，比如维护索引元数据，负责切换primary shard和replica shard身份。 
+`es` 集群多个节点，会自动选举一个节点为 `master` 节点，这个 `master` 节点其实就是干一些管理的工作的，比如维护索引元数据，负责切换 `primary shard` 和`replica shard` 身份。 
 
 ![image-20210227231935464](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/elastic-search-demo/image-20210227231935464.png)
 
@@ -386,29 +395,29 @@ es集群多个节点，会自动选举一个节点为master节点，这个master
 
 1. **es数据的写入过程**
 
-   注意，客户端是可以在任意节点进行写入数据的，与Kakfa不同。 
+   注意，客户端是可以在任意节点进行写入数据的，与 `Kakfa` 不同。 
 
-   - 客户端选择一个node发送请求过去，这个node就是coordinating node（协调节点）
+   - 客户端选择一个 `node` 发送请求过去，这个 `node` 就是 `coordinating node`（协调节点）
 
-   - coordinating node，对document进行路由得到对应应该存储到哪个shard，将请求转发给对应的node（有primary shard） 
+   - `coordinating node`，对 `document` 进行路由得到对应应该存储到哪个 `shard`，将请求转发给对应的 `node`（有 `primary shard`） 
 
-   - 实际的node上的primary shard处理请求，然后将数据同步到replica node 
+   - 实际的 `node` 上的 `primary shard` 处理请求，然后将数据同步到 `replica node` 
 
-   - coordinating node，如果发现primary node和所有replica node都搞定之后，就返回响应结果给客户端 
+   - `coordinating node`，如果发现 `primary node` 和所有 `replica node` 都搞定之后，就返回响应结果给客户端 
 
    ![image-20210227232231301](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/elastic-search-demo/image-20210227232231301.png)
 
 2. **es数据的写入原理**
 
-   es数据写入原理主要可以分为4个操作：
+   `es` 数据写入原理主要可以分为4个操作：
 
-   - refresh
+   - `refresh`
 
-   - commit
+   - `commit`
 
-   - flush
+   - `flush`
 
-   - merge
+   - `merge`
 
 	|             |                         操作触发条件                         | 操作过程                                                     |
 | ----------- | :----------------------------------------------------------: | ------------------------------------------------------------ |
@@ -425,27 +434,27 @@ es集群多个节点，会自动选举一个节点为master节点，这个master
 
 1. **读取数据**
 
-   使用RestFul API向对应的node发送查询请求，根据did来判断在哪个shard上，返回的是primary和replica的node节点集合 这样会负载均衡地把查询发送到对应节点，之后对应节点接收到请求，将document数据返回协调节点，协调节点把document返回给客户端 
+   使用 `RestFul API` 向对应的 `node` 发送查询请求，根据 `did` 来判断在哪个 `shard` 上，返回的是 `primary` 和 `replica` 的 `node` 节点集合 这样会负载均衡地把查询发送到对应节点，之后对应节点接收到请求，将 `document` 数据返回协调节点，协调节点把 `document` 返回给客户端 
 
 ![up-d7f4d579ea5edca6214b27b8b84e3ae2526](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/elastic-search-demo/up-d7f4d579ea5edca6214b27b8b84e3ae2526.png)
 
 2. **全文检索**
-   - 客户端使用RestFul API向对应的node发送查询请求
-   - 协调节点将请求转发到所有节点（primary或者replica）所有节点将对应的数据查询之后返回对应的doc id 返回给协调节点
-   - 协调节点将doc进行排序聚合
-   - 协调节点再根据doc id 把查询请求发送到对应shard的node，返回document
+   - 客户端使用 `RestFul API` 向对应的 `node` 发送查询请求
+   - 协调节点将请求转发到所有节点（`primary` 或者 `replica`）所有节点将对应的数据查询之后返回对应的 `doc id` 返回给协调节点
+   - 协调节点将 `doc` 进行排序聚合
+   - 协调节点再根据 `doc id` 把查询请求发送到对应 `shard` 的 `node`，返回 `document`
 
 
 
 ## 14.详细描述一下 Elasticsearch 写入索引文档的过程
 
-面试官：想了解 ES 的底层原理，不再只关注业务层面了。
+面试官：想了解 `ES` 的底层原理，不再只关注业务层面了。
 
 解答：
 
-这里的索引文档应该理解为文档写入 ES，创建索引的过程。
+这里的索引文档应该理解为文档写入 `ES`，创建索引的过程。
 
-文档写入包含：单文档写入和批量 bulk 写入，这里只解释一下：单文档写入流程。
+文档写入包含：单文档写入和批量 `bulk` 写入，这里只解释一下：单文档写入流程。
 
 记住官方文档中的这个图。
 
