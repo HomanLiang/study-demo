@@ -8,7 +8,7 @@
 
 ### 1.1. 什么是反射
 
-反射(Reflection)是 Java 程序开发语言的特征之一，它允许运行中的 Java 程序获取自身的信息，并且可以操作类或对象的内部属性。
+反射(`Reflection`)是 `Java` 程序开发语言的特征之一，它允许运行中的 `Java` 程序获取自身的信息，并且可以操作类或对象的内部属性。
 
 **通过反射机制，可以在运行时访问 Java 对象的属性，方法，构造方法等。**
 
@@ -16,14 +16,14 @@
 
 反射的主要应用场景有：
 
-- **开发通用框架** - 反射最重要的用途就是开发各种通用框架。很多框架（比如 Spring）都是配置化的（比如通过 XML 文件配置 JavaBean、Filter 等），为了保证框架的通用性，它们可能需要根据配置文件加载不同的对象或类，调用不同的方法，这个时候就必须用到反射——运行时动态加载需要加载的对象。
-- **动态代理** - 在切面编程（AOP）中，需要拦截特定的方法，通常，会选择动态代理方式。这时，就需要反射技术来实现了。
+- **开发通用框架** - 反射最重要的用途就是开发各种通用框架。很多框架（比如 `Spring`）都是配置化的（比如通过 `XML` 文件配置 `JavaBean`、`Filter` 等），为了保证框架的通用性，它们可能需要根据配置文件加载不同的对象或类，调用不同的方法，这个时候就必须用到反射——运行时动态加载需要加载的对象。
+- **动态代理** - 在切面编程（`AOP`）中，需要拦截特定的方法，通常，会选择动态代理方式。这时，就需要反射技术来实现了。
 - **注解** - 注解本身仅仅是起到标记作用，它需要利用反射机制，根据注解标记去调用注解解释器，执行行为。如果没有反射机制，注解并不比注释更有用。
 - **可扩展性功能** - 应用程序可以通过使用完全限定名称创建可扩展性对象实例来使用外部的用户定义类。
 
 ### 1.3. 反射的缺点
 
-- **性能开销** - 由于反射涉及动态解析的类型，因此无法执行某些 Java 虚拟机优化。因此，反射操作的性能要比非反射操作的性能要差，应该在性能敏感的应用程序中频繁调用的代码段中避免。
+- **性能开销** - 由于反射涉及动态解析的类型，因此无法执行某些 `Java` 虚拟机优化。因此，反射操作的性能要比非反射操作的性能要差，应该在性能敏感的应用程序中频繁调用的代码段中避免。
 - **破坏封装性** - 反射调用方法时可以忽略权限检查，因此可能会破坏封装性而导致安全问题。
 - **内部曝光** - 由于反射允许代码执行在非反射代码中非法的操作，例如访问私有字段和方法，所以反射的使用可能会导致意想不到的副作用，这可能会导致代码功能失常并可能破坏可移植性。反射代码打破了抽象，因此可能会随着平台的升级而改变行为。
 
@@ -35,13 +35,13 @@
 
 类加载的完整过程如下：
 
-1. 在编译时，Java 编译器编译好 `.java` 文件之后，在磁盘中产生 `.class` 文件。`.class` 文件是二进制文件，内容是只有 JVM 能够识别的机器码。
-2. JVM 中的类加载器读取字节码文件，取出二进制数据，加载到内存中，解析.class 文件内的信息。类加载器会根据类的全限定名来获取此类的二进制字节流；然后，将字节流所代表的静态存储结构转化为方法区的运行时数据结构；接着，在内存中生成代表这个类的 `java.lang.Class` 对象。
-3. 加载结束后，JVM 开始进行连接阶段（包含验证、准备、初始化）。经过这一系列操作，类的变量会被初始化。
+1. 在编译时，`Java` 编译器编译好 `.java` 文件之后，在磁盘中产生 `.class` 文件。`.class` 文件是二进制文件，内容是只有 `JVM` 能够识别的机器码。
+2. `JVM` 中的类加载器读取字节码文件，取出二进制数据，加载到内存中，解析 `.class` 文件内的信息。类加载器会根据类的全限定名来获取此类的二进制字节流；然后，将字节流所代表的静态存储结构转化为方法区的运行时数据结构；接着，在内存中生成代表这个类的 `java.lang.Class` 对象。
+3. 加载结束后，`JVM` 开始进行连接阶段（包含验证、准备、初始化）。经过这一系列操作，类的变量会被初始化。
 
 ### 2.2. Class 对象
 
-要想使用反射，首先需要获得待操作的类所对应的 Class 对象。**Java 中，无论生成某个类的多少个对象，这些对象都会对应于同一个 Class 对象。这个 Class 对象是由 JVM 生成的，通过它能够获悉整个类的结构**。所以，`java.lang.Class` 可以视为所有反射 API 的入口点。
+要想使用反射，首先需要获得待操作的类所对应的 `Class` 对象。**Java 中，无论生成某个类的多少个对象，这些对象都会对应于同一个 Class 对象。这个 Class 对象是由 JVM 生成的，通过它能够获悉整个类的结构**。所以，`java.lang.Class` 可以视为所有反射 `API` 的入口点。
 
 **反射的本质就是：在运行时，把 Java 类中的各种成分映射成一个个的 Java 对象。**
 
@@ -53,9 +53,9 @@ User user = new User();
 
 步骤说明：
 
-1. JVM 加载方法的时候，遇到 `new User()`，JVM 会根据 `User` 的全限定名去加载 `User.class` 。
-2. JVM 会去本地磁盘查找 `User.class` 文件并加载 JVM 内存中。
-3. JVM 通过调用类加载器自动创建这个类对应的 `Class` 对象，并且存储在 JVM 的方法区。注意：**一个类有且只有一个 `Class` 对象**。
+1. `JVM` 加载方法的时候，遇到 `new User()`，`JVM` 会根据 `User` 的全限定名去加载 `User.class` 。
+2. `JVM` 会去本地磁盘查找 `User.class` 文件并加载 `JVM` 内存中。
+3. `JVM` 通过调用类加载器自动创建这个类对应的 `Class` 对象，并且存储在 `JVM` 的方法区。注意：**一个类有且只有一个 `Class` 对象**。
 
 ### 2.3. 方法的反射调用
 
@@ -82,7 +82,7 @@ public final class Method extends Executable {
 - `NativeMethodAccessorImpl`：本地方法来实现反射调用
 - `DelegatingMethodAccessorImpl`：委派模式来实现反射调用
 
-每个 `Method` 实例的第一次反射调用都会生成一个委派实现（`DelegatingMethodAccessorImpl`），它所委派的具体实现便是一个本地实现（`NativeMethodAccessorImpl`）。本地实现非常容易理解。当进入了 Java 虚拟机内部之后，我们便拥有了 `Method` 实例所指向方法的具体地址。这时候，反射调用无非就是将传入的参数准备好，然后调用进入目标方法。
+每个 `Method` 实例的第一次反射调用都会生成一个委派实现（`DelegatingMethodAccessorImpl`），它所委派的具体实现便是一个本地实现（`NativeMethodAccessorImpl`）。本地实现非常容易理解。当进入了 `Java` 虚拟机内部之后，我们便拥有了 `Method` 实例所指向方法的具体地址。这时候，反射调用无非就是将传入的参数准备好，然后调用进入目标方法。
 
 【示例】通过抛出异常方式 打印 `Method.invoke` 调用轨迹
 
@@ -111,9 +111,9 @@ public class MethodDemo01 {
 
 为什么反射调用`DelegatingMethodAccessorImpl` 作为中间层，而不是直接交给本地实现？
 
-其实，Java 的反射调用机制还设立了另一种动态生成字节码的实现（下称动态实现），直接使用 invoke 指令来调用目标方法。之所以采用委派实现，便是为了能够在本地实现以及动态实现中切换。动态实现和本地实现相比，其运行效率要快上 20 倍。这是因为动态实现无需经过 Java 到 C++ 再到 Java 的切换，但由于生成字节码十分耗时，仅调用一次的话，反而是本地实现要快上 3 到 4 倍。
+其实，`Java` 的反射调用机制还设立了另一种动态生成字节码的实现（下称动态实现），直接使用 `invoke` 指令来调用目标方法。之所以采用委派实现，便是为了能够在本地实现以及动态实现中切换。动态实现和本地实现相比，其运行效率要快上 `20` 倍。这是因为动态实现无需经过 `Java` 到 `C++` 再到 `Java` 的切换，但由于生成字节码十分耗时，仅调用一次的话，反而是本地实现要快上 3 到 4 倍。
 
-考虑到许多反射调用仅会执行一次，Java 虚拟机设置了一个阈值 15（可以通过 `-Dsun.reflect.inflationThreshold` 来调整），当某个反射调用的调用次数在 15 之下时，采用本地实现；当达到 15 时，便开始动态生成字节码，并将委派实现的委派对象切换至动态实现，这个过程我们称之为 `Inflation`。
+考虑到许多反射调用仅会执行一次，`Java` 虚拟机设置了一个阈值 `15`（可以通过 `-Dsun.reflect.inflationThreshold` 来调整），当某个反射调用的调用次数在 `15` 之下时，采用本地实现；当达到 `15` 时，便开始动态生成字节码，并将委派实现的委派对象切换至动态实现，这个过程我们称之为 `Inflation`。
 
 【示例】执行 `java -verbose:class MethodDemo02` 启动
 
@@ -184,7 +184,7 @@ java.lang.Exception: #16
 
 方法的反射调用会带来不少性能开销，原因主要有三个：
 
-- 变长参数方法导致的 Object 数组
+- 变长参数方法导致的 `Object` 数组
 - 基本类型的自动装箱、拆箱
 - 还有最重要的方法内联
 
@@ -194,7 +194,7 @@ java.lang.Exception: #16
 
 下面只关注反射调用本身的性能开销。
 
-第一，由于 Method.invoke 是一个变长参数方法，在字节码层面它的最后一个参数会是 `Object` 数组（感兴趣的同学私下可以用 `javap` 查看）。`Java` 编译器会在方法调用处生成一个长度为传入参数数量的 `Object` 数组，并将传入参数一一存储进该数组中。
+第一，由于 `Method.invoke` 是一个变长参数方法，在字节码层面它的最后一个参数会是 `Object` 数组（感兴趣的同学私下可以用 `javap` 查看）。`Java` 编译器会在方法调用处生成一个长度为传入参数数量的 `Object` 数组，并将传入参数一一存储进该数组中。
 
 第二，由于 `Object` 数组不能存储基本类型，`Java` 编译器会对传入的基本类型参数进行自动装箱。
 
@@ -370,7 +370,7 @@ public class NewInstanceDemo {
 
 ### 3.5. 创建数组实例
 
-数组在 Java 里是比较特殊的一种类型，它可以赋值给一个对象引用。Java 中，**通过 `Array.newInstance` 创建数组的实例**。
+数组在 `Java` 里是比较特殊的一种类型，它可以赋值给一个对象引用。`Java` 中，**通过 `Array.newInstance` 创建数组的实例**。
 
 【示例】利用反射创建数组
 
@@ -393,7 +393,7 @@ public class ReflectArrayDemo {
 //Scala
 ```
 
-其中的 Array 类为 `java.lang.reflect.Array` 类。我们`Array.newInstance` 的原型是：
+其中的 `Array` 类为 `java.lang.reflect.Array` 类。我们`Array.newInstance` 的原型是：
 
 ```
 public static Object newInstance(Class<?> componentType, int length)
@@ -406,9 +406,9 @@ public static Object newInstance(Class<?> componentType, int length)
 
 `Class` 对象提供以下方法获取对象的成员（`Field`）：
 
-- `getFiled` - 根据名称获取公有的（public）类成员。
+- `getFiled` - 根据名称获取公有的（`public`）类成员。
 - `getDeclaredField` - 根据名称获取已声明的类成员。但不能得到其父类的类成员。
-- `getFields` - 获取所有公有的（public）类成员。
+- `getFields` - 获取所有公有的（`public`）类成员。
 - `getDeclaredFields` - 获取所有已声明的类成员。
 
 示例如下：
@@ -447,10 +447,10 @@ public class ReflectFieldDemo {
 
 `Class` 对象提供以下方法获取对象的方法（`Method`）：
 
-- `getMethod` - 返回类或接口的特定方法。其中第一个参数为方法名称，后面的参数为方法参数对应 Class 的对象。
-- `getDeclaredMethod` - 返回类或接口的特定声明方法。其中第一个参数为方法名称，后面的参数为方法参数对应 Class 的对象。
-- `getMethods` - 返回类或接口的所有 public 方法，包括其父类的 public 方法。
-- `getDeclaredMethods` - 返回类或接口声明的所有方法，包括 public、protected、默认（包）访问和 private 方法，但不包括继承的方法。
+- `getMethod` - 返回类或接口的特定方法。其中第一个参数为方法名称，后面的参数为方法参数对应 `Class` 的对象。
+- `getDeclaredMethod` - 返回类或接口的特定声明方法。其中第一个参数为方法名称，后面的参数为方法参数对应 `Class` 的对象。
+- `getMethods` - 返回类或接口的所有 `public` 方法，包括其父类的 `public` 方法。
+- `getDeclaredMethods` - 返回类或接口声明的所有方法，包括 `public`、`protected`、默认（包）访问和 `private` 方法，但不包括继承的方法。
 
 获取一个 `Method` 对象后，可以用 `invoke` 方法来调用这个方法。
 
@@ -495,9 +495,9 @@ public class ReflectMethodDemo {
 
 `Class` 对象提供以下方法获取对象的构造方法（`Constructor`）：
 
-- `getConstructor` - 返回类的特定 public 构造方法。参数为方法参数对应 Class 的对象。
-- `getDeclaredConstructor` - 返回类的特定构造方法。参数为方法参数对应 Class 的对象。
-- `getConstructors` - 返回类的所有 public 构造方法。
+- `getConstructor` - 返回类的特定 `public` 构造方法。参数为方法参数对应 `Class` 的对象。
+- `getDeclaredConstructor` - 返回类的特定构造方法。参数为方法参数对应 `Class` 的对象。
+- `getConstructors` - 返回类的所有 `public` 构造方法。
 - `getDeclaredConstructors` - 返回类的所有构造方法。
 
 获取一个 `Constructor` 对象后，可以用 `newInstance` 方法来创建类实例。
@@ -531,13 +531,13 @@ public class ReflectMethodConstructorDemo {
 
 ### 3.9. 绕开访问限制
 
-有时候，我们需要通过反射访问私有成员、方法。可以使用 `Constructor/Field/Method.setAccessible(true)` 来绕开 Java 语言的访问限制。
+有时候，我们需要通过反射访问私有成员、方法。可以使用 `Constructor/Field/Method.setAccessible(true)` 来绕开 `Java` 语言的访问限制。
 
 ## 4. 动态代理
 
-动态代理是一种方便运行时动态构建代理、动态处理代理方法调用的机制，很多场景都是利用类似机制做到的，比如用来包装 RPC 调用、面向切面的编程（AOP）。
+动态代理是一种方便运行时动态构建代理、动态处理代理方法调用的机制，很多场景都是利用类似机制做到的，比如用来包装 RPC 调用、面向切面的编程（`AOP`）。
 
-实现动态代理的方式很多，比如 JDK 自身提供的动态代理，就是主要利用了上面提到的反射机制。还有其他的实现方式，比如利用传说中更高性能的字节码操作机制，类似 ASM、cglib（基于 ASM）、Javassist 等。
+实现动态代理的方式很多，比如 `JDK` 自身提供的动态代理，就是主要利用了上面提到的反射机制。还有其他的实现方式，比如利用传说中更高性能的字节码操作机制，类似 `ASM`、`cglib`（基于 `ASM`）、`Javassist` 等。
 
 ### 4.1. 静态代理
 
@@ -547,7 +547,7 @@ public class ReflectMethodConstructorDemo {
 
 ![image-20210320173034348](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/java-core-demo/20210320173034.png)
 
-**Subject** 定义了 RealSubject 和 Proxy 的公共接口，这样就在任何使用 RealSubject 的地方都可以使用 Proxy 。
+**Subject** 定义了 `RealSubject` 和 `Proxy` 的公共接口，这样就在任何使用 `RealSubject` 的地方都可以使用 `Proxy` 。
 
 ```
 abstract class Subject {
@@ -555,7 +555,7 @@ abstract class Subject {
 }
 ```
 
-**RealSubject** 定义 Proxy 所代表的真实实体。
+**RealSubject** 定义 `Proxy` 所代表的真实实体。
 
 ```
 class RealSubject extends Subject {
@@ -566,7 +566,7 @@ class RealSubject extends Subject {
 }
 ```
 
-**Proxy** 保存一个引用使得代理可以访问实体，并提供一个与 Subject 的接口相同的接口，这样代理就可以用来替代实体。
+**Proxy** 保存一个引用使得代理可以访问实体，并提供一个与 `Subject` 的接口相同的接口，这样代理就可以用来替代实体。
 
 ```
 class Proxy extends Subject {
@@ -584,32 +584,32 @@ class Proxy extends Subject {
 
 > 说明：
 >
-> 静态代理模式固然在访问无法访问的资源，增强现有的接口业务功能方面有很大的优点，但是大量使用这种静态代理，会使我们系统内的类的规模增大，并且不易维护；并且由于 Proxy 和 RealSubject 的功能本质上是相同的，Proxy 只是起到了中介的作用，这种代理在系统中的存在，导致系统结构比较臃肿和松散。
+> 静态代理模式固然在访问无法访问的资源，增强现有的接口业务功能方面有很大的优点，但是大量使用这种静态代理，会使我们系统内的类的规模增大，并且不易维护；并且由于 `Proxy` 和 `RealSubject` 的功能本质上是相同的，`Proxy` 只是起到了中介的作用，这种代理在系统中的存在，导致系统结构比较臃肿和松散。
 
 ### 4.2. JDK 动态代理
 
 为了解决静态代理的问题，就有了创建动态代理的想法：
 
-在运行状态中，需要代理的地方，根据 Subject 和 RealSubject，动态地创建一个 Proxy，用完之后，就会销毁，这样就可以避免了 Proxy 角色的 class 在系统中冗杂的问题了。
+在运行状态中，需要代理的地方，根据 `Subject` 和 `RealSubject`，动态地创建一个 `Proxy`，用完之后，就会销毁，这样就可以避免了 `Proxy` 角色的 `class` 在系统中冗杂的问题了。
 
 ![image-20210320173057626](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/java-core-demo/20210320173057.png)
 
-Java 动态代理基于经典代理模式，引入了一个 `InvocationHandler`，`InvocationHandler` 负责统一管理所有的方法调用。
+`Java` 动态代理基于经典代理模式，引入了一个 `InvocationHandler`，`InvocationHandler` 负责统一管理所有的方法调用。
 
 动态代理步骤：
 
-1. 获取 RealSubject 上的所有接口列表；
+1. 获取 `RealSubject` 上的所有接口列表；
 2. 确定要生成的代理类的类名，默认为：`com.sun.proxy.$ProxyXXXX`；
-3. 根据需要实现的接口信息，在代码中动态创建 该 Proxy 类的字节码；
-4. 将对应的字节码转换为对应的 class 对象；
-5. 创建 `InvocationHandler` 实例 handler，用来处理 `Proxy` 所有方法调用；
-6. Proxy 的 class 对象 以创建的 handler 对象为参数，实例化一个 proxy 对象。
+3. 根据需要实现的接口信息，在代码中动态创建 该 `Proxy` 类的字节码；
+4. 将对应的字节码转换为对应的 `class` 对象；
+5. 创建 `InvocationHandler` 实例 `handler`，用来处理 `Proxy` 所有方法调用；
+6. `Proxy` 的 `class` 对象 以创建的 `handler` 对象为参数，实例化一个 `proxy` 对象。
 
-从上面可以看出，JDK 动态代理的实现是基于实现接口的方式，使得 Proxy 和 RealSubject 具有相同的功能。
+从上面可以看出，`JDK` 动态代理的实现是基于实现接口的方式，使得 `Proxy` 和 `RealSubject` 具有相同的功能。
 
-但其实还有一种思路：通过继承。即：让 Proxy 继承 RealSubject，这样二者同样具有相同的功能，Proxy 还可以通过重写 RealSubject 中的方法，来实现多态。CGLIB 就是基于这种思路设计的。
+但其实还有一种思路：通过继承。即：让 `Proxy` 继承 `RealSubject`，这样二者同样具有相同的功能，`Proxy` 还可以通过重写 `RealSubject` 中的方法，来实现多态。`CGLIB` 就是基于这种思路设计的。
 
-在 Java 的动态代理机制中，有两个重要的类（接口），一个是 `InvocationHandler` 接口、另一个则是 `Proxy` 类，这一个类和一个接口是实现我们动态代理所必须用到的。
+在 `Java` 的动态代理机制中，有两个重要的类（接口），一个是 `InvocationHandler` 接口、另一个则是 `Proxy` 类，这一个类和一个接口是实现我们动态代理所必须用到的。
 
 #### 4.2.1.InvocationHandler 接口
 
@@ -624,7 +624,7 @@ public interface InvocationHandler {
 
 每一个动态代理类都必须要实现 `InvocationHandler` 这个接口，并且每个代理类的实例都关联到了一个 Handler，当我们通过代理对象调用一个方法的时候，这个方法的调用就会被转发为由 `InvocationHandler` 这个接口的 `invoke` 方法来进行调用。
 
-我们来看看 InvocationHandler 这个接口的唯一一个方法 invoke 方法：
+我们来看看 `InvocationHandler` 这个接口的唯一一个方法 invoke 方法：
 
 ```
 Object invoke(Object proxy, Method method, Object[] args) throws Throwable
@@ -771,9 +771,9 @@ Subject subject = (Subject)Proxy.newProxyInstance(handler.getClass().getClassLoa
                 .getClass().getInterfaces(), handler);
 ```
 
-可能我以为返回的这个代理对象会是 Subject 类型的对象，或者是 InvocationHandler 的对象，结果却不是，首先我们解释一下**为什么我们这里可以将其转化为 Subject 类型的对象？**
+可能我以为返回的这个代理对象会是 `Subject` 类型的对象，或者是 `InvocationHandler` 的对象，结果却不是，首先我们解释一下**为什么我们这里可以将其转化为 Subject 类型的对象？**
 
-原因就是：在 newProxyInstance 这个方法的第二个参数上，我们给这个代理对象提供了一组什么接口，那么我这个代理对象就会实现了这组接口，这个时候我们当然可以将这个代理对象强制类型转化为这组接口中的任意一个，因为这里的接口是 Subject 类型，所以就可以将其转化为 Subject 类型了。
+原因就是：在 `newProxyInstance` 这个方法的第二个参数上，我们给这个代理对象提供了一组什么接口，那么我这个代理对象就会实现了这组接口，这个时候我们当然可以将这个代理对象强制类型转化为这组接口中的任意一个，因为这里的接口是 `Subject` 类型，所以就可以将其转化为 `Subject` 类型了。
 
 **同时我们一定要记住，通过 `Proxy.newProxyInstance` 创建的代理对象是在 jvm 运行时动态生成的一个对象，它并不是我们的 InvocationHandler 类型，也不是我们定义的那组接口的类型，而是在运行是动态生成的一个对象，并且命名方式都是这样的形式，以$开头，proxy 为中，最后一个数字表示对象的标号**。
 
@@ -784,41 +784,41 @@ subject.hello("World");
 String result = subject.bye();
 ```
 
-这里是通过代理对象来调用实现的那种接口中的方法，这个时候程序就会跳转到由这个代理对象关联到的 handler 中的 invoke 方法去执行，而我们的这个 handler 对象又接受了一个 RealSubject 类型的参数，表示我要代理的就是这个真实对象，所以此时就会调用 handler 中的 invoke 方法去执行。
+这里是通过代理对象来调用实现的那种接口中的方法，这个时候程序就会跳转到由这个代理对象关联到的 `handler` 中的 `invoke` 方法去执行，而我们的这个 `handler` 对象又接受了一个 `RealSubject` 类型的参数，表示我要代理的就是这个真实对象，所以此时就会调用 `handler` 中的 `invoke` 方法去执行。
 
-我们看到，在真正通过代理对象来调用真实对象的方法的时候，我们可以在该方法前后添加自己的一些操作，同时我们看到我们的这个 method 对象是这样的：
+我们看到，在真正通过代理对象来调用真实对象的方法的时候，我们可以在该方法前后添加自己的一些操作，同时我们看到我们的这个 `method` 对象是这样的：
 
 ```
 public abstract void io.github.dunwu.javacore.reflect.InvocationHandlerDemo$Subject.hello(java.lang.String)
 public abstract java.lang.String io.github.dunwu.javacore.reflect.InvocationHandlerDemo$Subject.bye()
 ```
 
-正好就是我们的 Subject 接口中的两个方法，这也就证明了当我通过代理对象来调用方法的时候，起实际就是委托由其关联到的 handler 对象的 invoke 方法中来调用，并不是自己来真实调用，而是通过代理的方式来调用的。
+正好就是我们的 `Subject` 接口中的两个方法，这也就证明了当我通过代理对象来调用方法的时候，起实际就是委托由其关联到的 `handler` 对象的 `invoke` 方法中来调用，并不是自己来真实调用，而是通过代理的方式来调用的。
 
 #### 4.2.4.JDK 动态代理小结
 
 代理类与委托类实现同一接口，主要是通过代理类实现 `InvocationHandler` 并重写 `invoke` 方法来进行动态代理的，在 `invoke` 方法中将对方法进行处理。
 
-JDK 动态代理特点：
+`JDK` 动态代理特点：
 
 - 优点：相对于静态代理模式，不需要硬编码接口，代码复用率高。
 - 缺点：强制要求代理类实现 `InvocationHandler` 接口。
 
 ### 4.3. CGLIB 动态代理
 
-CGLIB 提供了与 JDK 动态代理不同的方案。很多框架，例如 Spring AOP 中，就使用了 CGLIB 动态代理。
+`CGLIB` 提供了与 `JDK` 动态代理不同的方案。很多框架，例如 `Spring AOP` 中，就使用了 `CGLIB` 动态代理。
 
-CGLIB 底层，其实是借助了 ASM 这个强大的 Java 字节码框架去进行字节码增强操作。
+`CGLIB` 底层，其实是借助了 `ASM` 这个强大的 `Java` 字节码框架去进行字节码增强操作。
 
-CGLIB 动态代理的工作步骤：
+`CGLIB` 动态代理的工作步骤：
 
 - 生成代理类的二进制字节码文件；
 - 加载二进制字节码，生成 `Class` 对象( 例如使用 `Class.forName()` 方法 )；
 - 通过反射机制获得实例构造，并创建代理类对象。
 
-CGLIB 动态代理特点：
+`CGLIB` 动态代理特点：
 
-优点：使用字节码增强，比 JDK 动态代理方式性能高。可以在运行时对类或者是接口进行增强操作，且委托类无需实现接口。
+优点：使用字节码增强，比 `JDK` 动态代理方式性能高。可以在运行时对类或者是接口进行增强操作，且委托类无需实现接口。
 
 缺点：不能对 `final` 类以及 `final` 方法进行代理。
 

@@ -4,9 +4,9 @@
 
 ## 1. 简介
 
-`enum` 的全称为 enumeration， 是 JDK5 中引入的特性。
+`enum` 的全称为 `enumeration`， 是 `JDK5` 中引入的特性。
 
-在 Java 中，被 `enum` 关键字修饰的类型就是枚举类型。形式如下：
+在 `Java` 中，被 `enum` 关键字修饰的类型就是枚举类型。形式如下：
 
 ```java
 enum ColorEn { RED, GREEN, BLUE }
@@ -25,7 +25,7 @@ public abstract class Enum<E extends Enum<E>>
         implements Comparable<E>, Serializable { ... }
 ```
 
-新建一个 ColorEn.java 文件，内容如下：
+新建一个 `ColorEn.java` 文件，内容如下：
 
 ```java
 package io.github.dunwu.javacore.enumeration;
@@ -35,7 +35,7 @@ public enum ColorEn {
 }
 ```
 
-执行 `javac ColorEn.java` 命令，生成 ColorEn.class 文件。
+执行 `javac ColorEn.java` 命令，生成 `ColorEn.class` 文件。
 
 然后执行 `javap ColorEn.class` 命令，输出如下内容：
 
@@ -63,12 +63,12 @@ public final class io.github.dunwu.javacore.enumeration.ColorEn extends java.lan
 
 ## 3. 枚举的方法
 
-在 enum 中，提供了一些基本方法：
+在 `enum` 中，提供了一些基本方法：
 
-- `values()`：返回 enum 实例的数组，而且该数组中的元素严格保持在 enum 中声明时的顺序。
+- `values()`：返回 `enum` 实例的数组，而且该数组中的元素严格保持在 `enum` 中声明时的顺序。
 - `name()`：返回实例名。
-- `ordinal()`：返回实例声明时的次序，从 0 开始。
-- `getDeclaringClass()`：返回实例所属的 enum 类型。
+- `ordinal()`：返回实例声明时的次序，从 `0` 开始。
+- `getDeclaringClass()`：返回实例所属的 `enum` 类型。
 - `equals()` ：判断是否为同一个对象。
 
 可以使用 `==` 来比较`enum`实例。
@@ -139,7 +139,7 @@ green == Color.BLUE: false
 
 **如果枚举中没有定义方法，也可以在最后一个实例后面加逗号、分号或什么都不加。**
 
-如果枚举中没有定义方法，**枚举值默认为从 0 开始的有序数值**。以 Color 枚举类型举例，它的枚举常量依次为 `RED：0，GREEN：1，BLUE：2`。
+如果枚举中没有定义方法，**枚举值默认为从 0 开始的有序数值**。以 `Color` 枚举类型举例，它的枚举常量依次为 `RED：0，GREEN：1，BLUE：2`。
 
 ### 4.2. 枚举可以添加方法
 
@@ -259,13 +259,13 @@ public enum ErrorCodeEn2 implements INumberEnum {
 
 **enum 不可以继承另外一个类，当然，也不能继承另一个 enum 。**
 
-因为 `enum` 实际上都继承自 `java.lang.Enum` 类，而 Java 不支持多重继承，所以 `enum` 不能再继承其他类，当然也不能继承另一个 `enum`。
+因为 `enum` 实际上都继承自 `java.lang.Enum` 类，而 `Java` 不支持多重继承，所以 `enum` 不能再继承其他类，当然也不能继承另一个 `enum`。
 
 ## 5. 枚举的应用
 
 ### 5.1. 组织常量
 
-在 JDK5 之前，在 Java 中定义常量都是`public static final TYPE a;` 这样的形式。有了枚举，你可以将有关联关系的常量组织起来，使代码更加易读、安全，并且还可以使用枚举提供的方法。
+在 `JDK5` 之前，在 `Java` 中定义常量都是 `public static final TYPE a;` 这样的形式。有了枚举，你可以将有关联关系的常量组织起来，使代码更加易读、安全，并且还可以使用枚举提供的方法。
 
 下面三种声明方式是等价的：
 
@@ -277,7 +277,7 @@ enum Color { RED, GREEN, BLUE; }
 
 ### 5.2. switch 状态机
 
-我们经常使用 switch 语句来写状态机。JDK7 以后，switch 已经支持 `int`、`char`、`String`、`enum` 类型的参数。这几种类型的参数比较起来，使用枚举的 switch 代码更具有可读性。
+我们经常使用 `switch` 语句来写状态机。`JDK7` 以后，`switch` 已经支持 `int`、`char`、`String`、`enum` 类型的参数。这几种类型的参数比较起来，使用枚举的 `switch` 代码更具有可读性。
 
 ```
 public class StateMachineDemo {
@@ -372,7 +372,7 @@ public class ErrorCodeEnumDemo {
 
 可以将类型相近的枚举通过接口或类组织起来，但是一般用接口方式进行组织。
 
-原因是：Java 接口在编译时会自动为 enum 类型加上 `public static` 修饰符；Java 类在编译时会自动为 `enum` 类型加上 static 修饰符。看出差异了吗？没错，就是说，在类中组织 `enum`，如果你不给它修饰为 `public`，那么只能在本包中进行访问。
+原因是：`Java` 接口在编译时会自动为 `enum` 类型加上 `public static` 修饰符；`Java` 类在编译时会自动为 `enum` 类型加上 `static` 修饰符。看出差异了吗？没错，就是说，在类中组织 `enum`，如果你不给它修饰为 `public`，那么只能在本包中进行访问。
 
 **例：在接口中组织 enum**
 
@@ -475,9 +475,9 @@ public class EnumInClassDemo {
 
 ### 5.5. 策略枚举
 
-Effective Java 中展示了一种策略枚举。这种枚举通过枚举嵌套枚举的方式，将枚举常量分类处理。
+`Effective Java` 中展示了一种策略枚举。这种枚举通过枚举嵌套枚举的方式，将枚举常量分类处理。
 
-这种做法虽然没有 switch 语句简洁，但是更加安全、灵活。
+这种做法虽然没有 `switch` 语句简洁，但是更加安全、灵活。
 
 **例：EffectvieJava 中的策略枚举范例**
 
@@ -542,8 +542,8 @@ System.out.println("时薪100的人在周六工作8小时的收入：" + Payroll
 为了线程安全问题，传统做法有以下几种：
 
 - 饿汉式加载
-- 懒汉式 synchronize 和双重检查
-- 利用 java 的静态加载机制
+- 懒汉式 `synchronize` 和双重检查
+- 利用 `java` 的静态加载机制
 
 相比上述的方法，使用枚举也可以实现单例，而且还更加简单：
 
@@ -577,7 +577,7 @@ public class SingleEnumDemo {
 
 ## 6. 枚举工具类
 
-Java 中提供了两个方便操作 enum 的工具类——`EnumSet` 和 `EnumMap`。
+`Java` 中提供了两个方便操作 `enum` 的工具类——`EnumSet` 和 `EnumMap`。
 
 ### 6.1. EnumSet
 
@@ -585,12 +585,12 @@ Java 中提供了两个方便操作 enum 的工具类——`EnumSet` 和 `EnumMa
 
 主要接口：
 
-- `noneOf` - 创建一个具有指定元素类型的空 EnumSet
-- `allOf` - 创建一个指定元素类型并包含所有枚举值的 EnumSet
-- `range` - 创建一个包括枚举值中指定范围元素的 EnumSet
+- `noneOf` - 创建一个具有指定元素类型的空 `EnumSet`
+- `allOf` - 创建一个指定元素类型并包含所有枚举值的 `EnumSet`
+- `range` - 创建一个包括枚举值中指定范围元素的 `EnumSet`
 - `complementOf` - 初始集合包括指定集合的补集
-- `of` - 创建一个包括参数中所有元素的 EnumSet
-- `copyOf` - 创建一个包含参数容器中的所有元素的 EnumSet
+- `of` - 创建一个包括参数中所有元素的 `EnumSet`
+- `copyOf` - 创建一个包含参数容器中的所有元素的 `EnumSet`
 
 示例：
 
@@ -608,16 +608,16 @@ public class EnumSetDemo {
 
 ### 6.2. EnumMap
 
-`EnumMap` 是专门为枚举类型量身定做的 `Map` 实现。虽然使用其它的 Map 实现（如 HashMap）也能完成枚举类型实例到值得映射，但是使用 EnumMap 会更加高效：它只能接收同一枚举类型的实例作为键值，并且由于枚举类型实例的数量相对固定并且有限，所以 EnumMap 使用数组来存放与枚举类型对应的值。这使得 EnumMap 的效率非常高。
+`EnumMap` 是专门为枚举类型量身定做的 `Map` 实现。虽然使用其它的 `Map` 实现（如 `HashMap`）也能完成枚举类型实例到值得映射，但是使用 `EnumMap` 会更加高效：它只能接收同一枚举类型的实例作为键值，并且由于枚举类型实例的数量相对固定并且有限，所以 `EnumMap` 使用数组来存放与枚举类型对应的值。这使得 `EnumMap` 的效率非常高。
 
 主要接口：
 
 - `size` - 返回键值对数
-- `containsValue` - 是否存在指定的 value
-- `containsKey` - 是否存在指定的 key
-- `get` - 根据指定 key 获取 value
+- `containsValue` - 是否存在指定的 `value`
+- `containsKey` - 是否存在指定的 `key`
+- `get` - 根据指定 `key` 获取 `value`
 - `put` - 取出指定的键值对
-- `remove` - 删除指定 key
+- `remove` - 删除指定 `key`
 - `putAll` - 批量取出键值对
 - `clear` - 清除数据
 - `keySet` - 获取 key 集合

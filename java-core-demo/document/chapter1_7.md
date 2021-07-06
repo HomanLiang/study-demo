@@ -256,7 +256,7 @@ do {
 } while (布尔表达式);
 ```
 
-布尔表达式在循环体的后面，所以语句块在检测布尔表达式之前已经执行了。 如果布尔表达式的值为 true，则语句块一直执行，直到布尔表达式的值为 false。
+布尔表达式在循环体的后面，所以语句块在检测布尔表达式之前已经执行了。 如果布尔表达式的值为 `true`，则语句块一直执行，直到布尔表达式的值为 `false`。
 
 **示例**
 
@@ -298,7 +298,7 @@ for (初始化; 布尔表达式; 更新) {
 ```
 
 - 最先执行初始化步骤。可以声明一种类型，但可初始化一个或多个循环控制变量，也可以是空语句。
-- 然后，检测布尔表达式的值。如果为 true，循环体被执行。如果为 false，循环终止，开始执行循环体后面的语句。
+- 然后，检测布尔表达式的值。如果为 `true`，循环体被执行。如果为 `false`，循环终止，开始执行循环体后面的语句。
 - 执行一次循环后，更新循环控制变量。
 - 再次检测布尔表达式。循环执行上面的过程。
 
@@ -328,7 +328,7 @@ public class ForDemo {
 
 ### 2.4. foreach 循环
 
-Java5 引入了一种主要用于数组的增强型 for 循环。
+`Java5` 引入了一种主要用于数组的增强型 `for` 循环。
 
 **语法**
 
@@ -468,7 +468,7 @@ public class ReturnDemo {
 
 ### X.1.Java 中的 Switch 都支持 String 了，为什么不支持 long？
 
-我们知道 Java Switch 支持byte、short、int 类型，在 JDK 1.5 时，支持了枚举类型，在 JDK 1.7 时，又支持了 String类型。那么它为什么就不能支持 long 类型呢，明明它跟 byte、short、int 一样都是数值型，它又是咋支持 String 类型的呢？
+我们知道 `Java Switch` 支持 `byte`、`short`、`int` 类型，在 `JDK 1.5` 时，支持了枚举类型，在 `JDK 1.7` 时，又支持了 `String` 类型。那么它为什么就不能支持 `long` 类型呢，明明它跟 `byte`、`short`、`int` 一样都是数值型，它又是咋支持 `String` 类型的呢？
 
 #### X.1.1.结论
 
@@ -476,13 +476,13 @@ public class ReturnDemo {
 
 **switch 底层是使用 int 型 来进行判断的，即使是枚举、String类型，最终也是转变成 int 型。由于 long 型表示范围大于 int 型，因此不支持 long 类型。**
 
-下面详细介绍下各个类型是如何被转变成 int 类型的，使用的编译命令为 javac，反编译网站为：http://javare.cn
+下面详细介绍下各个类型是如何被转变成 `int` 类型的，使用的编译命令为 javac，反编译网站为：http://javare.cn
 
 #### X.1.2.枚举类型是咋变成 int 类型的？
 
-在没有实验之前，我想当然的认为它是不是根据枚举的 int 型字段来计算的（因为一般枚举都是一个int型，一个string型），但是转念一想，万一枚举没有 int 型字段呢，万一有多个 int 型字段呢，所以肯定不是这样的，下面看实验吧。
+在没有实验之前，我想当然的认为它是不是根据枚举的 `int` 型字段来计算的（因为一般枚举都是一个 `int` 型，一个 `string` 型），但是转念一想，万一枚举没有 `int` 型字段呢，万一有多个 `int` 型字段呢，所以肯定不是这样的，下面看实验吧。
 
-定义两个枚举类，一个枚举类有一个int型属性，一个string型属性，另外一个枚举类只有一个string属性：
+定义两个枚举类，一个枚举类有一个 `int` 型属性，一个 `string` 型属性，另外一个枚举类只有一个 `string` 属性：
 
 ```
 public enum SexEnum {  
@@ -509,7 +509,7 @@ public enum Sex1Enum {
 }  
 ```
 
-然后编写一个测试类，并且让两个枚举 switch 的 FEMALE 和 MALE 对应的返回值不同：
+然后编写一个测试类，并且让两个枚举 `switch` 的 `FEMALE` 和 `MALE` 对应的返回值不同：
 
 ```
 public class SwitchTest {  
@@ -575,7 +575,7 @@ public enum Sex1Enum {
 }  
 ```
 
-反编译这两个枚举类，发现其中多了一个 $VALUES 数组，内部包含了所有的枚举值。继续反编译测试类：
+反编译这两个枚举类，发现其中多了一个 `$VALUES` 数组，内部包含了所有的枚举值。继续反编译测试类：
 
 ```
 // SwitchTest$1.class  
@@ -622,13 +622,13 @@ class SwitchTest$1 {
 }  
 ```
 
-首先生成了一个名为 SwitchTest$1.java 的链接类，里面定义了两个枚举数组，这两个数组元素添加的顺序完全和测试类中 switch 类调用的顺序一致。
+首先生成了一个名为 `SwitchTest$1.java` 的链接类，里面定义了两个枚举数组，这两个数组元素添加的顺序完全和测试类中 `switch` 类调用的顺序一致。
 
 ![图片](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/java-core-demo/20210505151357.webp)
 
-枚举元素在数组中的下标由 ordinal() 函数决定，该方法就是返回枚举元素在枚举类中的序号。
+枚举元素在数组中的下标由 `ordinal()` 函数决定，该方法就是返回枚举元素在枚举类中的序号。
 
-这里我们其实就已经知道了，在 switch 语句中，是根据枚举元素在枚举中的序号来转变成 int 型的。最后再看下测试类的反编译结果验证下：
+这里我们其实就已经知道了，在 `switch` 语句中，是根据枚举元素在枚举中的序号来转变成 `int` 型的。最后再看下测试类的反编译结果验证下：
 
 ```
 // SwitchTest.class  
@@ -663,7 +663,7 @@ public class SwitchTest {
 
 #### X.1.3.String 类型是咋变成 int 类型的？
 
-首先我们先知道 char 类型是如何变成 int 类型的，很简单，是 ASCII 码，例如存在 switch 语句：
+首先我们先知道 `char` 类型是如何变成 `int` 类型的，很简单，是 `ASCII` 码，例如存在 `switch` 语句：
 
 ```
 public int charSwitch(char c) {  
@@ -693,7 +693,7 @@ public int charSwitch(char var1) {
 }  
 ```
 
-那么对于 String 来说，利用的就是 hashCode() 函数了，但是 两个不同的字符串 hashCode() 是有可能相等的，这时候就得靠 equals() 函数了，例如存在 switch 语句：
+那么对于 `String` 来说，利用的就是 `hashCode()` 函数了，但是 两个不同的字符串 `hashCode()` 是有可能相等的，这时候就得靠 `equals()` 函数了，例如存在 `switch` 语句：
 
 ```
 public int stringSwitch(String ss) {  
@@ -710,7 +710,7 @@ public int stringSwitch(String ss) {
 }  
 ```
 
-其中字符串 ABCDEa123abc 和 ABCDFB123abc 的 hashCode 是相等的，反编译结果为：
+其中字符串 `ABCDEa123abc` 和 `ABCDFB123abc` 的 `hashCode` 是相等的，反编译结果为：
 
 ```
 public int stringSwitch(String var1) {  
@@ -742,11 +742,11 @@ public int stringSwitch(String var1) {
 }  
 ```
 
-可以看到它引入了局部变量 var3，对于 hashCode 相等情况通过 equals() 方法判断，最后再判断 var3 的值。
+可以看到它引入了局部变量 `var3`，对于 `hashCode` 相等情况通过 `equals()` 方法判断，最后再判断 `var3` 的值。
 
 #### X.1.4.它们的包装类型支持吗？
 
-这里以 Integer 类型为例，Character 和 Byte 同理，例如存在 switch 语句：
+这里以 `Integer` 类型为例，`Character` 和 `Byte` 同理，例如存在 `switch` 语句：
 
 ```
 public int integerSwitch(Integer c) {  
@@ -777,9 +777,9 @@ public int integerSwitch(Integer var1) {
 
 可以看到，是支持包装类型的，通过自动拆箱解决。
 
-那万一包装类型是 NULL 咋办，首先我们知道 swtich 的 case 是不给加 null 的，编译都通不过，那如果传 null 呢？
+那万一包装类型是 `NULL` 咋办，首先我们知道 `swtich` 的 `case` 是不给加 `null` 的，编译都通不过，那如果传 `null` 呢？
 
-答案是 NPE，毕竟实际还是包装类型的拆箱，自然就报空指针了。
+答案是 `NPE`，毕竟实际还是包装类型的拆箱，自然就报空指针了。
 
 ![图片](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/java-core-demo/20210505151348.webp)
 
