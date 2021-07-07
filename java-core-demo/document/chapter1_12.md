@@ -8,7 +8,7 @@
 
 ### 1.1.罪状一：Date同时表示日期和时间
 
-java.util.Date被设计为日期 + 时间的结合体。也就是说如果只需要日期，或者只需要单纯的时间，用Date是做不到的。
+`java.util.Date` 被设计为日期 + 时间的结合体。也就是说如果只需要日期，或者只需要单纯的时间，用 `Date` 是做不到的。
 
 ```
 @Test
@@ -54,21 +54,21 @@ public void test2() {
 
 what？年份是121年，这什么鬼？月份返回0，这又是什么鬼？
 
-无奈，看看这两个方法的Javadoc：
+无奈，看看这两个方法的 `Javadoc`：
 
 ![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/java-core-demo/20210505153752.png)
 
 ![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/java-core-demo/20210505153758.png)
 
-尼玛，原来 2021 - 1900 = 121是这么来的。那么问题来了，为何是1900这个数字呢？
+尼玛，原来 `2021 - 1900 = 121` 是这么来的。那么问题来了，为何是 `1900` 这个数字呢？
 
-月份，竟然从0开始，这是学的谁呢？简直打破了我认为的只有index索引值才是从0开始的认知啊，这种做法非常的不符合人类思维有木有。
+月份，竟然从 `0` 开始，这是学的谁呢？简直打破了我认为的只有 `index` 索引值才是从 `0` 开始的认知啊，这种做法非常的不符合人类思维有木有。
 
-> 索引值从0开始就算了，毕竟那是给计算机看的无所谓，但是你这月份主要是给人看的呀
+> 索引值从 `0` 开始就算了，毕竟那是给计算机看的无所谓，但是你这月份主要是给人看的呀
 
 ### 1.3.罪状三：Date是可变的
 
-oh my god，也就是说我把一个Date日期时间对象传给你，你竟然还能给我改掉，真是太没安全感可言了。
+`oh my god`，也就是说我把一个 `Date` 日期时间对象传给你，你竟然还能给我改掉，真是太没安全感可言了。
 
 ```
 @Test
@@ -105,9 +105,9 @@ private static boolean isHoliday(Date date) {
 
 我就像让你帮我判断下遮天是否是假期，然后你竟然连我的日期都给我改了？过分了啊。这是多么可怕的事，存在重大安全隐患有木有。
 
-针对这种case，一般来说我们函数内部操作的参数只能是**副本**：要么调用者传进来的就是副本，要么内部自己生成一个副本。
+针对这种 `case`，一般来说我们函数内部操作的参数只能是**副本**：要么调用者传进来的就是副本，要么内部自己生成一个副本。
 
-在本利中提高程序健壮性只需在isHoliday首行加入这句代码即可：
+在本利中提高程序健壮性只需在 `isHoliday` 首行加入这句代码即可：
 
 ```
 private static boolean isHoliday(Date date) {
@@ -126,15 +126,15 @@ private static boolean isHoliday(Date date) {
 
 bingo。
 
-但是呢，Date作为高频使用的API，并不能要求每个程序员都有这种安全意识，毕竟即使百密也会有一疏。所以说，把Date设计为一个可变的类是非常糟糕的设计。
+但是呢，`Date` 作为高频使用的 `API`，并不能要求每个程序员都有这种安全意识，毕竟即使百密也会有一疏。所以说，把 `Date` 设计为一个可变的类是非常糟糕的设计。
 
 ### 1.4.罪状四：无法理喻的java.sql.Date
 
-来，看看java.util.Date类的继承结构：
+来，看看 `java.util.Date` 类的继承结构：
 
 ![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/java-core-demo/20210505153936.png)
 
-它的三个子类均处于java.sql包内。且先不谈这种垮包继承的合理性问题，直接看下面这个使用例子：
+它的三个子类均处于 `java.sql` 包内。且先不谈这种垮包继承的合理性问题，直接看下面这个使用例子：
 
 ```
 @Test
@@ -159,35 +159,35 @@ java.lang.IllegalArgumentException
 	...
 ```
 
-what？又是一打破认知的结果啊，第一句getHours()就报错啦。走进java.sql.Date的方法源码进去一看，握草重写了父类方法：
+what？又是一打破认知的结果啊，第一句 `getHours()` 就报错啦。走进 `java.sql.Date` 的方法源码进去一看，握草重写了父类方法：
 
 ![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/java-core-demo/20210505154010.png)
 
 还有这么重写父类方法的？还有王法吗？这也算是JDK能干出来的事？赤裸裸的违背里氏替换原则等众多设计原则，子类能力竟然比父类小，使用起来简直让人云里雾里。
 
-java.util.Date的三个子类均位于java.sql包内，他们三是通过Javadoc描述来进行分工的：
+`java.util.Date` 的三个子类均位于 `java.sql` 包内，他们三是通过 `Javadoc` 描述来进行分工的：
 
-- java.sql.Date：只表示日期
-- java.sql.Time：只表示时间
-- java.sql.Timestamp：表示日期 + 时间
+- `java.sql.Date`：只表示日期
+- `java.sql.Time`：只表示时间
+- `java.sql.Timestamp`：表示日期 + 时间
 
-这么一来，似乎可以“理解”java.sql.Date为何重写父类的getHours()方法改为抛出IllegalArgumentException异常了，毕竟它只能表示日期嘛。但是这种通过继承再阉割的实现手法你们接受得了？反正我是不能的~
+这么一来，似乎可以“理解” `java.sql.Date` 为何重写父类的 `getHours()` 方法改为抛出 `IllegalArgumentException` 异常了，毕竟它只能表示日期嘛。但是这种通过继承再阉割的实现手法你们接受得了？反正我是不能的~
 
 ### 1.5.罪状五：无法处理时区
 
-因为日期时间的特殊性，不同的国家地区在**同一时刻**显示的日期时间应该是不一样的，但Date做不到，因为它底层代码是这样的：
+因为日期时间的特殊性，不同的国家地区在**同一时刻**显示的日期时间应该是不一样的，但 `Date` 做不到，因为它底层代码是这样的：
 
 ![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/java-core-demo/20210505154036.png)
 
-也就是说它表示的是一个具体时刻（时间戳），这个数值放在全球任何地方都是一模一样的，也就是说new Date()和System.currentTimeMillis()没啥两样。
+也就是说它表示的是一个具体时刻（时间戳），这个数值放在全球任何地方都是一模一样的，也就是说 `new Date()` 和`System.currentTimeMillis()` 没啥两样。
 
-JDK提供了TimeZone表示时区的概念，但它在Date里并无任何体现，只能使用在格式化器上，这种设计着实让我再一次看不懂了。
+`JDK` 提供了 `TimeZone` 表示时区的概念，但它在 `Date` 里并无任何体现，只能使用在格式化器上，这种设计着实让我再一次看不懂了。
 
 ### 1.6.罪状六：线程不安全的格式化器
 
-关于Date的格式化，站在架构设计的角度来看，首先不得不吐槽的是Date明明属于java.util包，那么它的格式化器DateFormat为毛却跑到java.text里去了呢？这种依赖管理的什么鬼？是不是有点太过于随意了呢？
+关于 `Date` 的格式化，站在架构设计的角度来看，首先不得不吐槽的是 `Date` 明明属于 `java.util` 包，那么它的格式化器 `DateFormat` 为毛却跑到 `java.text` 里去了呢？这种依赖管理的什么鬼？是不是有点太过于随意了呢？
 
-另外，JDK提供了一个DateFormat的子类实现SimpleDateFormat专门用于格式化日期时间。**但是**它却被设计为了线程不安全的，一个定位为模版组件的API竟然被设计为线程不安全的类，实属瞎整。
+另外，`JDK` 提供了一个 `DateFormat` 的子类实现 `SimpleDateFormat` 专门用于格式化日期时间。**但是**它却被设计为了线程不安全的，一个定位为模版组件的 `API` 竟然被设计为线程不安全的类，实属瞎整。
 
 就因为这个坑的存在，让多少初中级工程师泪洒职场，算了说多了都是泪。另外，因为线程不安全问题并非必现问题，因此在黑盒/白盒测试、功能测试阶段都可能测不出来，留下潜在风险。
 
@@ -195,19 +195,19 @@ JDK提供了TimeZone表示时区的概念，但它在Date里并无任何体现�
 
 ### 1.7.罪状七：Calendar难当大任
 
-从JDK 1.1 开始，Java日期时间API似乎进步了些，引入了Calendar类，并且对职责进行了划分：
+从 `JDK 1.1` 开始，`Java` 日期时间 `API` 似乎进步了些，引入了 `Calendar` 类，并且对职责进行了划分：
 
-- Calendar类：日期和时间字段之间转换
-- DateFormat类：格式化和解析字符串
-- Date类：**只**用来承载日期和时间
+- `Calendar` 类：日期和时间字段之间转换
+- `DateFormat` 类：格式化和解析字符串
+- `Date` 类：**只**用来承载日期和时间
 
-有了Calendar后，原有Date中的大部分方法均标记为废弃，交由Calendar代替。
+有了 `Calendar` 后，原有 `Date` 中的大部分方法均标记为废弃，交由 `Calendar` 代替。
 
 ![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/java-core-demo/20210505154115.png)
 
-Date终于单纯了些：只需要展示日期时间而无需再顾及年月日操作、格式化操作等等了。值得注意的是，这些方法只是被标记为过期，并未删除。即便如此，请在实际开发中也**一定不要使用**它们。
+`Date` 终于单纯了些：只需要展示日期时间而无需再顾及年月日操作、格式化操作等等了。值得注意的是，这些方法只是被标记为过期，并未删除。即便如此，请在实际开发中也**一定不要使用**它们。
 
-引入了一个Calendar似乎分离了职责，但Calendar难当大任，设计上依旧存在很多问题。
+引入了一个 `Calendar` 似乎分离了职责，但 `Calendar` 难当大任，设计上依旧存在很多问题。
 
 ```
 @Test
@@ -226,31 +226,31 @@ public void test4() {
 1
 ```
 
-年月日的处理上似乎可以接受没有问题了。从结果中可以发现，Calendar年份的传值不用再减去1900了，这和Date是不一样的，不知道这种行为不一致会不会让有些人抓狂。
+年月日的处理上似乎可以接受没有问题了。从结果中可以发现，`Calendar` 年份的传值不用再减去 `1900` 了，这和 `Date` 是不一样的，不知道这种行为不一致会不会让有些人抓狂。
 
-> 说明：Calendar相关的API是由IBM捐过来的，所以和Date不一样貌似也“情有可原”
+> 说明：`Calendar` 相关的 `API` 是由 `IBM` 捐过来的，所以和 `Date` 不一样貌似也“情有可原”
 
-另外，还有个重点是Calendar依旧是可变的，所以存在不安全因素，参与计算改变值时请使用其副本变量。
+另外，还有个重点是 `Calendar` 依旧是可变的，所以存在不安全因素，参与计算改变值时请使用其副本变量。
 
-总的来说，Calendar在Date的基础上做了改善，但仅限于修修补补，**并未从根本上解决问题**。最重要的是Calendar的API使用起来真的很不方便，而且该类在语义上也完全不符合日期/时间的含义，使用起来更显尴尬。
+总的来说，`Calendar` 在 `Date` 的基础上做了改善，但仅限于修修补补，**并未从根本上解决问题**。最重要的是 `Calendar` 的 `API` 使用起来真的很不方便，而且该类在语义上也完全不符合日期/时间的含义，使用起来更显尴尬。
 
 ### 1.8.自我救赎：JSR 310
 
-因为原生的Date日期时间体系存在“**七宗罪**”，催生了第三方Java日期时间库的诞生，如大名鼎鼎的Joda-Time的流行甚至一度成为标配。
+因为原生的 `Date` 日期时间体系存在“**七宗罪**”，催生了第三方 `Java` 日期时间库的诞生，如大名鼎鼎的 `Joda-Time` 的流行甚至一度成为标配。
 
-对于Java来说，如此重要的API模块岂能被第三方库给占据，开发者本就想简单的处理个日期时间还得导入第三方库，使用也太不方便了吧。当时的Java如日中天，因此就开启了“收编”Joda-Time之旅。
+对于 `Java` 来说，如此重要的 `API` 模块岂能被第三方库给占据，开发者本就想简单的处理个日期时间还得导入第三方库，使用也太不方便了吧。当时的 `Java` 如日中天，因此就开启了“收编” `Joda-Time` 之旅。
 
-2013年9月份，具有划时代意义的Java 8大版本正式发布，该版本带来了非常多的新特性，其中最引入瞩目之一便是全新的日期时间API：JSR 310。
+2013年9月份，具有划时代意义的 `Java 8` 大版本正式发布，该版本带来了非常多的新特性，其中最引入瞩目之一便是全新的日期时间`API`：`JSR 310`。
 
-JSR 310规范的领导者是Stephen Colebourne，此人也是Joda-Time的缔造者。不客气的说JSR 310是在Joda-Time的基础上建立的，参考了其绝大部分的API实现，因此若你之前是Joda-Time的重度使用者，现在迁移到Java 8原生的JSR 310日期时间上来几乎无缝。
+`JSR 310` 规范的领导者是 `Stephen Colebourne`，此人也是 `Joda-Time` 的缔造者。不客气的说 `JSR 310` 是在 `Joda-Time` 的基础上建立的，参考了其绝大部分的 `API` 实现，因此若你之前是 `Joda-Time` 的重度使用者，现在迁移到 `Java 8` 原生的 `JSR 310` 日期时间上来几乎无缝。
 
-即便这样，也并不能说JSR 310就完全等于Joda-Time的官方版本，还是有些许诧异的，例举如下：
+即便这样，也并不能说 `JSR 310` 就完全等于 `Joda-Time` 的官方版本，还是有些许诧异的，例举如下：
 
-1. 首先当然是包名的差别，org.joda.time -> java.time标准日期时间包
+1. 首先当然是包名的差别，`org.joda.time -> java.time` 标准日期时间包
 2. **JSR 310不接受null值，Joda-Time把Null值当0处理**
-3. JSR 310所有抛出的异常是DateTimeException，它是个RuntimeException，而Joda-Time都是checked exception
+3. `JSR 310` 所有抛出的异常是 `DateTimeException`，它是个 `RuntimeException`，而 `Joda-Time` 都是 `checked exception`
 
-简单感受下JSR 310 API：
+简单感受下 `JSR 310 API`：
 
 ```
 @Test
@@ -269,7 +269,7 @@ public void test5() {
 }
 ```
 
-JSR 310的所有对象都是**不可变**的，所以线程安全。和老的日期时间API相比，**最主要**的特征对比如下：
+`JSR 310` 的所有对象都是**不可变**的，所以线程安全。和老的日期时间 `API` 相比，**最主要**的特征对比如下：
 
 | **JSR 310** | **Date/Calendar** | **说明**                                                     |
 | ----------- | ----------------- | ------------------------------------------------------------ |
@@ -277,21 +277,21 @@ JSR 310的所有对象都是**不可变**的，所以线程安全。和老的日
 | 实例不可变  | 实例可变          | 对于日期时间实例，设计为可变确实不合理也不安全。都不敢放心的传递给其它函数使用 |
 | 线程安全    | 线程不安全        | 此特性直接决定了编码方式和健壮性                             |
 
-关于JSR 310日期时间更多介绍此处就不展开了，毕竟前面文章啰嗦过好多次了。总之它是Java的新一代日期时间API，设计得非常好，**几乎没有缺点可言**，可用于100%替代老的日期时间API。
+关于 `JSR 310` 日期时间更多介绍此处就不展开了，毕竟前面文章啰嗦过好多次了。总之它是 `Java` 的新一代日期时间 `API`，设计得非常好，**几乎没有缺点可言**，可用于 `100%` 替代老的日期时间 `API`。
 
 ## 2.Java8日期处理
 
-Java 8 推出了全新的日期时间API，在教程中我们将通过一些简单的实例来学习如何使用新API。
+`Java 8` 推出了全新的日期时间 `API`，在教程中我们将通过一些简单的实例来学习如何使用新API。
 
-Java处理日期、日历和时间的方式一直为社区所诟病，将 java.util.Date设定为可变类型，以及SimpleDateFormat的非线程安全使其应用非常受限。
+`Java` 处理日期、日历和时间的方式一直为社区所诟病，将 `java.util.Date` 设定为可变类型，以及 `SimpleDateFormat` 的非线程安全使其应用非常受限。
 
-新API基于ISO标准日历系统，java.time包下的所有类都是不可变类型而且线程安全。
+新 `API` 基于 `ISO` 标准日历系统，`java.time` 包下的所有类都是不可变类型而且线程安全。
 
 ![图片](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/java-core-demo/20210505154419.webp)
 
 ### 2.1.示例1:Java 8中获取今天的日期
 
-Java 8 中的 LocalDate 用于表示当天日期。和java.util.Date不同，它只有日期，不包含时间。当你仅需要表示日期时就用这个类。
+`Java 8` 中的 `LocalDate` 用于表示当天日期。和 `java.util.Date` 不同，它只有日期，不包含时间。当你仅需要表示日期时就用这个类。
 
 ```
 package com.shxt.demo02;
@@ -330,7 +330,7 @@ public class Demo02 {
 
 ### 2.3.示例3:Java 8中处理特定日期
 
-我们通过静态工厂方法now()非常容易地创建了当天日期，你还可以调用另一个有用的工厂方法LocalDate.of()创建任意日期， 该方法需要传入年、月、日做参数，返回对应的LocalDate实例。这个方法的好处是没再犯老API的设计错误，比如年度起始于1900，月份是从0开 始等等。
+我们通过静态工厂方法 `now()` 非常容易地创建了当天日期，你还可以调用另一个有用的工厂方法 `LocalDate.of()` 创建任意日期， 该方法需要传入年、月、日做参数，返回对应的 `LocalDate` 实例。这个方法的好处是没再犯老API的设计错误，比如年度起始于1900，月份是从0开 始等等。
 
 ```
 package com.shxt.demo02;
@@ -416,7 +416,7 @@ public class Demo06 {
 
 ### 2.7.示例7:Java 8中获取当前时
 
-通过增加小时、分、秒来计算将来的时间很常见。Java 8除了不变类型和线程安全的好处之外，还提供了更好的plusHours()方法替换add()，并且是兼容的。注意，这些方法返回一个全新的LocalTime实例，由于其不可变性，返回后一定要用变量赋值。
+通过增加小时、分、秒来计算将来的时间很常见。`Java 8` 除了不变类型和线程安全的好处之外，还提供了更好的 `plusHours()` 方法替换 `add()`，并且是兼容的。注意，这些方法返回一个全新的 `LocalTime` 实例，由于其不可变性，返回后一定要用变量赋值。
 
 ```
 package com.shxt.demo02;
@@ -435,7 +435,7 @@ public class Demo07 {
 
 ### 2.8.示例8:Java 8如何计算一周后的日期
 
-和上个例子计算3小时以后的时间类似，这个例子会计算一周后的日期。LocalDate日期不包含时间信息，它的plus()方法用来增加天、周、月，ChronoUnit类声明了这些时间单位。由于LocalDate也是不变类型，返回后一定要用变量赋值。
+和上个例子计算 `3` 小时以后的时间类似，这个例子会计算一周后的日期。`LocalDate` 日期不包含时间信息，它的 `plus()` 方法用来增加天、周、月，`ChronoUnit` 类声明了这些时间单位。由于 `LocalDate` 也是不变类型，返回后一定要用变量赋值。
 
 ```
 package com.shxt.demo02;
@@ -454,11 +454,11 @@ public class Demo08 {
 }
 ```
 
-可以看到新日期离当天日期是7天，也就是一周。你可以用同样的方法增加1个月、1年、1小时、1分钟甚至一个世纪，更多选项可以查看Java 8 API中的ChronoUnit类
+可以看到新日期离当天日期是 `7` 天，也就是一周。你可以用同样的方法增加1个月、1年、1小时、1分钟甚至一个世纪，更多选项可以查看 `Java 8 API` 中的 `ChronoUnit` 类
 
 ### 2.9.示例9:Java 8计算一年前或一年后的日期
 
-利用minus()方法计算一年前的日期
+利用 `minus()` 方法计算一年前的日期
 
 ```
 package com.shxt.demo02;
@@ -482,7 +482,7 @@ public class Demo09 {
 
 ### 2.10.示例10:Java 8的Clock时钟
 
-Java 8增加了一个Clock时钟类用于获取当时的时间戳，或当前时区下的日期时间信息。以前用到System.currentTimeInMillis()和TimeZone.getDefault()的地方都可用Clock替换。
+`Java 8` 增加了一个 `Clock` 时钟类用于获取当时的时间戳，或当前时区下的日期时间信息。以前用到 `System.currentTimeInMillis()` 和 `TimeZone.getDefault()` 的地方都可用 `Clock` 替换。
 
 ```
 package com.shxt.demo02;
@@ -505,7 +505,7 @@ public class Demo10 {
 
 ### 2.11.示例11:如何用Java判断日期是早于还是晚于另一个日期
 
-另一个工作中常见的操作就是如何判断给定的一个日期是大于某天还是小于某天？在Java 8中，LocalDate类有两类方法isBefore()和isAfter()用于比较日期。调用isBefore()方法时，如果给定日期小于当前日期则返回true。
+另一个工作中常见的操作就是如何判断给定的一个日期是大于某天还是小于某天？在 `Java 8` 中，`LocalDate` 类有两类方法 `isBefore()` 和 `isAfter()` 用于比较日期。调用 `isBefore()` 方法时，如果给定日期小于当前日期则返回 `true`。
 
 ```
 package com.shxt.demo02;
@@ -533,7 +533,7 @@ public class Demo11 {
 
 ### 2.12.示例12:Java 8中处理时区
 
-Java 8不仅分离了日期和时间，也把时区分离出来了。现在有一系列单独的类如ZoneId来处理特定时区，ZoneDateTime类来表示某时区下的时间。这在Java 8以前都是 GregorianCalendar类来做的。下面这个例子展示了如何把本时区的时间转换成另一个时区的时间。
+`Java 8` 不仅分离了日期和时间，也把时区分离出来了。现在有一系列单独的类如 `ZoneId` 来处理特定时区，`ZoneDateTime` 类来表示某时区下的时间。这在 `Java 8` 以前都是 `GregorianCalendar` 类来做的。下面这个例子展示了如何把本时区的时间转换成另一个时区的时间。
 
 ```
 package com.shxt.demo02;
@@ -555,7 +555,7 @@ public class Demo12 {
 
 ### 2.13.示例13:如何表示信用卡到期这类固定日期，答案就在YearMont
 
-与 MonthDay检查重复事件的例子相似，YearMonth是另一个组合类，用于表示信用卡到期日、FD到期日、期货期权到期日等。还可以用这个类得到 当月共有多少天，YearMonth实例的lengthOfMonth()方法可以返回当月的天数，在判断2月有28天还是29天时非常有用。
+与 `MonthDay` 检查重复事件的例子相似，`YearMonth` 是另一个组合类，用于表示信用卡到期日、FD到期日、期货期权到期日等。还可以用这个类得到 当月共有多少天，`YearMonth` 实例的 `lengthOfMonth()` 方法可以返回当月的天数，在判断2月有28天还是29天时非常有用。
 
 ```
 package com.shxt.demo02;
@@ -594,7 +594,7 @@ public class Demo14 {
 
 ### 2.15.示例15:计算两个日期之间的天数和月数
 
-有一个常见日期操作是计算两个日期之间的天数、周数或月数。在Java 8中可以用java.time.Period类来做计算。
+有一个常见日期操作是计算两个日期之间的天数、周数或月数。在 `Java 8` 中可以用 `java.time.Period` 类来做计算。
 
 下面这个例子中，我们计算了当天和将来某一天之间的月数。
 
@@ -621,7 +621,7 @@ public class Demo15 {
 
 ### 2.16.示例16:在Java 8中获取当前的时间戳
 
-Instant类有一个静态工厂方法now()会返回当前的时间戳，如下所示：
+`Instant` 类有一个静态工厂方法 `now()` 会返回当前的时间戳，如下所示：
 
 ```
 package com.shxt.demo02;
@@ -636,7 +636,7 @@ public class Demo16 {
 }
 ```
 
-时间戳信息里同时包含了日期和时间，这和java.util.Date很像。实际上Instant类确实等同于 Java 8之前的Date类，你可以使用Date类和Instant类各自的转换方法互相转换，例如：Date.from(Instant) 将Instant转换成java.util.Date，Date.toInstant()则是将Date类转换成Instant类。
+时间戳信息里同时包含了日期和时间，这和 `java.util.Date` 很像。实际上 `Instant` 类确实等同于 `Java 8` 之前的 `Date` 类，你可以使用 `Date` 类和 `Instant` 类各自的转换方法互相转换，例如：`Date.from(Instant)` 将 `Instant` 转换成 `java.util.Date`，`Date.toInstant()` 则是将 `Date` 类转换成 `Instant` 类。
 
 ### 2.17.示例17:Java 8中如何使用预定义的格式化工具去解析或格式化日期
 

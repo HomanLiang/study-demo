@@ -6,7 +6,7 @@
 
 ## 1.Default Methods for Interfaces(接口的默认方法)
 
-Java 8 使我们能够通过使用 `default` 关键字将非抽象方法实现添加到接口。这个功能也被称为虚拟扩展方法。
+`Java 8` 使我们能够通过使用 `default` 关键字将非抽象方法实现添加到接口。这个功能也被称为虚拟扩展方法。
 
 这是我们的第一个例子：
 
@@ -34,11 +34,11 @@ formula.calculate(100);     // 100.0
 formula.sqrt(16);           // 4.0
 ```
 
-`Formula` 被实现为一个匿名对象。代码非常冗长：用于 `sqrt(a * 100)` 这样简单的计算的 6 行代码。正如我们将在下一节中看到的，在 Java 8 中实现单个方法对象有更好的方法。
+`Formula` 被实现为一个匿名对象。代码非常冗长：用于 `sqrt(a * 100)` 这样简单的计算的 6 行代码。正如我们将在下一节中看到的，在 `Java 8` 中实现单个方法对象有更好的方法。
 
 ## 2.Lambda expressions(Lambda 表达式)
 
-让我们从一个简单的例子来说明如何在以前版本的 Java 中对字符串列表进行排序：
+让我们从一个简单的例子来说明如何在以前版本的 `Java` 中对字符串列表进行排序：
 
 ```
 List<String> names = Arrays.asList("peter", "anna", "mike", "xenia");
@@ -53,7 +53,7 @@ Collections.sort(names, new Comparator<String>() {
 
 静态工具方法 `Collections.sort` 为了对指定的列表进行排序，接受一个列表和一个比较器。您会发现自己经常需要创建匿名比较器并将其传递给排序方法。
 
-Java 8 使用更简短的 **lambda 表达式**来避免常常创建匿名对象的问题：
+`Java 8` 使用更简短的 **lambda 表达式**来避免常常创建匿名对象的问题：
 
 ```
 Collections.sort(names, (String a, String b) -> {
@@ -77,9 +77,9 @@ names.sort((a, b) -> b.compareTo(a));
 
 ## 3.Functional Interfaces(函数接口)
 
-lambda 表达式如何适应 Java 的类型系统？每个 lambda 对应一个由接口指定的类型。一个所谓的*函数接口*必须包含一个**抽象方法声明**。该类型的每个 lambda 表达式都将与此抽象方法匹配。由于默认方法不是抽象的，所以你可以自由地添加默认方法到你的函数接口。
+`lambda` 表达式如何适应 `Java` 的类型系统？每个 `lambda` 对应一个由接口指定的类型。一个所谓的*函数接口*必须包含一个**抽象方法声明**。该类型的每个 `lambda` 表达式都将与此抽象方法匹配。由于默认方法不是抽象的，所以你可以自由地添加默认方法到你的函数接口。
 
-只要保证接口仅包含一个抽象方法，就可以使用任意的接口作为 lambda 表达式。为确保您的接口符合要求，您应该添加 `@FunctionalInterface`注解。编译器注意到这个注解后，一旦您尝试在接口中添加第二个抽象方法声明，编译器就会抛出编译器错误。
+只要保证接口仅包含一个抽象方法，就可以使用任意的接口作为 `lambda` 表达式。为确保您的接口符合要求，您应该添加 `@FunctionalInterface`注解。编译器注意到这个注解后，一旦您尝试在接口中添加第二个抽象方法声明，编译器就会抛出编译器错误。
 
 示例：
 
@@ -135,7 +135,7 @@ class Person {
 }
 ```
 
-接着，我们指定一个用于创建 Person 对象的 PersonFactory 接口。
+接着，我们指定一个用于创建 `Person` 对象的 `PersonFactory` 接口。
 
 ```
 interface PersonFactory<P extends Person> {
@@ -150,7 +150,7 @@ PersonFactory<Person> personFactory = Person::new;
 Person person = personFactory.create("Peter", "Parker");
 ```
 
-我们通过 `Person::new` 来创建一个 Person 构造器的引用。Java 编译器会根据`PersonFactory.create` 的签名自动匹配正确的构造器。
+我们通过 `Person::new` 来创建一个 `Person` 构造器的引用。Java 编译器会根据`PersonFactory.create` 的签名自动匹配正确的构造器。
 
 ## 5.Lambda Scopes(Lambda 作用域)
 
@@ -158,7 +158,7 @@ Person person = personFactory.create("Peter", "Parker");
 
 ### 5.1.Accessing local variables(访问本地变量)
 
-我们可以访问 lambda 表达式作用域外部的常量：
+我们可以访问 `lambda` 表达式作用域外部的常量：
 
 ```
 final int num = 1;
@@ -187,7 +187,7 @@ Converter<Integer, String> stringConverter =
 num = 3;
 ```
 
-此外，在 lambda 表达式中对 `num` 做写操作也是被禁止的。
+此外，在 `lambda` 表达式中对 `num` 做写操作也是被禁止的。
 
 ### 5.2.Accessing fields and static variables(访问成员变量和静态变量)
 
@@ -292,7 +292,7 @@ comparator.reversed().compare(p1, p2);  // < 0
 
 `Optional` 不是功能性接口，而是防止 `NullPointerException` 的好工具。这是下一节的一个重要概念，所以让我们快速看看 `Optional` 是如何工作的。
 
-`Optional` 是一个简单的容器，其值可以是 null 或非 null。想想一个可能返回一个非空结果的方法，但有时候什么都不返回。不是返回 null，而是返回 Java 8 中的 `Optional`。
+`Optional` 是一个简单的容器，其值可以是 `null` 或非 `null`。想想一个可能返回一个非空结果的方法，但有时候什么都不返回。不是返回 `null`，而是返回 Java 8 中的 `Optional`。
 
 ```
 Optional<String> optional = Optional.of("bam");
@@ -324,11 +324,11 @@ stringCollection.add("bbb2");
 stringCollection.add("ddd1");
 ```
 
-Java 8 中的集合已被扩展，因此您可以通过调用 `Collection.stream()` 或`Collection.parallelStream()` 来简单地创建流。以下各节介绍最常见的流操作。
+`Java 8` 中的集合已被扩展，因此您可以通过调用 `Collection.stream()` 或`Collection.parallelStream()` 来简单地创建流。以下各节介绍最常见的流操作。
 
 ### 8.1.Filter
 
-过滤器接受一个谓词来过滤流的所有元素。这个操作是中间的，使我们能够调用另一个流操作（`forEach`）的结果。 ForEach 接受一个消费者被执行的过滤流中的每个元素。 ForEach 是一个终端操作。它是无效的，所以我们不能调用另一个流操作。
+过滤器接受一个谓词来过滤流的所有元素。这个操作是中间的，使我们能够调用另一个流操作（`forEach`）的结果。 ForEach 接受一个消费者被执行的过滤流中的每个元素。 `ForEach` 是一个终端操作。它是无效的，所以我们不能调用另一个流操作。
 
 ```
 stringCollection
@@ -403,7 +403,7 @@ System.out.println(noneStartsWithZ);      // true
 
 ### 8.5.Count
 
-Count 是一个终端操作，返回流中元素的个数。
+`Count` 是一个终端操作，返回流中元素的个数。
 
 ```
 long startsWithB =
@@ -485,9 +485,9 @@ System.out.println(String.format("parallel sort took: %d ms", millis));
 
 ## 10.Maps
 
-如前所述，map 不直接支持流。Map 接口本身没有可用的 `stream()` 方法，但是你可以通过 `map.keySet().stream()` 、 `map.values().stream()` 和 `map.entrySet().stream()` 创建指定的流。
+如前所述，`map` 不直接支持流。`Map` 接口本身没有可用的 `stream()` 方法，但是你可以通过 `map.keySet().stream()` 、 `map.values().stream()` 和 `map.entrySet().stream()` 创建指定的流。
 
-此外，map 支持各种新的、有用的方法来处理常见任务。
+此外，`map` 支持各种新的、有用的方法来处理常见任务。
 
 ```
 Map<Integer, String> map = new HashMap<>();
@@ -499,9 +499,9 @@ for (int i = 0; i < 10; i++) {
 map.forEach((id, val) -> System.out.println(val));
 ```
 
-上面的代码应该是自我解释的：`putIfAbsent` 阻止我们写入额外的空值检查；`forEach` 接受消费者为 map 的每个值实现操作。
+上面的代码应该是自我解释的：`putIfAbsent` 阻止我们写入额外的空值检查；`forEach` 接受消费者为 `map` 的每个值实现操作。
 
-这个例子展示了如何利用函数来计算 map 上的代码：
+这个例子展示了如何利用函数来计算 `map` 上的代码：
 
 ```
 map.computeIfPresent(3, (num, val) -> val + num);
@@ -533,7 +533,7 @@ map.get(3);             // null
 map.getOrDefault(42, "not found");  // not found
 ```
 
-合并一个 map 的 entry 很简单：
+合并一个 `map` 的 `entry` 很简单：
 
 ```
 map.merge(9, "val9", (value, newValue) -> value.concat(newValue));
@@ -543,7 +543,7 @@ map.merge(9, "concat", (value, newValue) -> value.concat(newValue));
 map.get(9);             // val9concat
 ```
 
-如果不存在该键的条目，合并或者将键/值放入 map 中；否则将调用合并函数来更改现有值。
+如果不存在该键的条目，合并或者将键/值放入 `map` 中；否则将调用合并函数来更改现有值。
 
 ## 11.Date API
 
@@ -778,15 +778,15 @@ Project bytecode version 选择 1.8
 
 #### 13.2.1.修改环境变量
 
-修改 `/etc/profile` 中的 **JAVA_HOME**，设置 为 jdk8 所在路径。
+修改 `/etc/profile` 中的 **JAVA_HOME**，设置 为 `jdk8` 所在路径。
 
 修改后，执行 `source /etc/profile` 生效。
 
-编译、发布脚本中如果有 `export JAVA_HOME` ，需要注意，需要使用 jdk8 的路径。
+编译、发布脚本中如果有 `export JAVA_HOME` ，需要注意，需要使用 `jdk8` 的路径。
 
 #### 13.2.2.修改 maven
 
-settings.xml 中 profile 的激活条件如果是 jdk，需要修改一下 jdk 版本
+`settings.xml` 中 `profile` 的激活条件如果是 `jdk`，需要修改一下 `jdk` 版本
 
 ```
 <activation>
@@ -796,7 +796,7 @@ settings.xml 中 profile 的激活条件如果是 jdk，需要修改一下 jdk �
 
 #### 13.2.3.修改 server
 
-修改 server 中的 javac 版本，以 resin 为例：
+修改 `server` 中的 `javac` 版本，以 `resin` 为例：
 
 修改 resin 配置文件中的 javac 参数。
 
@@ -806,11 +806,11 @@ settings.xml 中 profile 的激活条件如果是 jdk，需要修改一下 jdk �
 
 ### 13.3.sun.* 包缺失问题
 
-JDK8 不再提供 `sun.*` 包供开发者使用，因为这些接口不是公共接口，不能保证在所有 Java 兼容的平台上工作。
+`JDK8` 不再提供 `sun.*` 包供开发者使用，因为这些接口不是公共接口，不能保证在所有 `Java` 兼容的平台上工作。
 
-使用了这些 API 的程序如果要升级到 JDK 1.8 需要寻求替代方案。
+使用了这些 `API` 的程序如果要升级到 `JDK 1.8` 需要寻求替代方案。
 
-虽然，也可以自己导入包含 `sun.*` 接口 jar 包到 classpath 目录，但这不是一个好的做法。
+虽然，也可以自己导入包含 `sun.*` 接口 `jar` 包到 `classpath` 目录，但这不是一个好的做法。
 
 需要详细了解为什么不要使用 `sun.*` ，可以参考官方文档：[Why Developers Should Not Write Programs That Call 'sun' Packages](http://www.oracle.com/technetwork/java/faq-sun-packages-142232.html)
 
@@ -818,7 +818,7 @@ JDK8 不再提供 `sun.*` 包供开发者使用，因为这些接口不是公共
 
 升级后估计有些小伙伴在使用不安全算法时可能会发生错误，so，支持不安全算法还是有必要的
 
-找到$JAVA_HOME 下 `jre/lib/security/java.security` ，将禁用的算法设置为空：`jdk.certpath.disabledAlgorithms=` 。
+找到 `$JAVA_HOME` 下 `jre/lib/security/java.security` ，将禁用的算法设置为空：`jdk.certpath.disabledAlgorithms=` 。
 
 ### 13.5.JVM 参数调整
 
@@ -834,23 +834,23 @@ Sets the maximum permanent generation space size (in bytes). This option was dep
 Sets the space (in bytes) allocated to the permanent generation that triggers a garbage collection if it is exceeded. This option was deprecated un JDK 8, and superseded by the -XX:MetaspaceSize option.
 ```
 
-JDK8 中再也没有 `PermGen` 了。其中的某些部分，如被 intern 的字符串，在 JDK7 中已经移到了普通堆里。**其余结构在 JDK8 中会被移到称作“Metaspace”的本机内存区中，该区域在默认情况下会自动生长，也会被垃圾回收。它有两个标记：MetaspaceSize 和 MaxMetaspaceSize。**
+JDK8 中再也没有 `PermGen` 了。其中的某些部分，如被 `intern` 的字符串，在 `JDK7` 中已经移到了普通堆里。**其余结构在 JDK8 中会被移到称作“Metaspace”的本机内存区中，该区域在默认情况下会自动生长，也会被垃圾回收。它有两个标记：MetaspaceSize 和 MaxMetaspaceSize。**
 
--XX:MetaspaceSize=size
+`-XX:MetaspaceSize=size`
 
 > Sets the size of the allocated class metadata space that will trigger a garbage collection the first time it is exceeded. This threshold for a garbage collection is increased or decreased depending on the amount of metadata used. The default size depends on the platform.
 
--XX:MaxMetaspaceSize=size
+`-XX:MaxMetaspaceSize=size`
 
 > Sets the maximum amount of native memory that can be allocated for class metadata. By default, the size is not limited. The amount of metadata for an application depends on the application itself, other running applications, and the amount of memory available on the system.
 
-以下示例显示如何将类类元数据的上限设置为 256 MB：
+以下示例显示如何将类类元数据的上限设置为 `256 MB`：
 
-XX:MaxMetaspaceSize=256m
+`XX:MaxMetaspaceSize=256m`
 
 ### 13.6.字节码问题
 
-ASM 5.0 beta 开始支持 JDK8
+`ASM 5.0 beta` 开始支持 `JDK8`
 
 **字节码错误**
 
@@ -881,34 +881,34 @@ Caused by: java.io.IOException: invalid constant type: 15
 
 > **注意**
 >
-> 有些部署工具不会删除旧版本 jar 包，所以可以尝试手动删除老版本 jar 包。
+> 有些部署工具不会删除旧版本 `jar` 包，所以可以尝试手动删除老版本 `jar` 包。
 
 http://asm.ow2.org/history.html
 
 ### 13.7.Java 连接 redis 启动报错 Error redis clients jedis HostAndPort cant resolve localhost address
 
-错误环境: 本地 window 开发环境没有问题。上到 Linux 环境,启动出现问题。 错误信息: Error redis clients jedis HostAndPort cant resolve localhost address
+错误环境: 本地 `window` 开发环境没有问题。上到 `Linux` 环境,启动出现问题。 错误信息: `Error redis clients jedis HostAndPort cant resolve localhost address`
 
 解决办法:
 
-（1）查看 Linux 系统的主机名
+（1）查看 `Linux` 系统的主机名
 
 ```
 # hostname
 template
 ```
 
-（2）查看/etc/hosts 文件中是否有 127.0.0.1 对应主机名，如果没有则添加
+（2）查看 `/etc/hosts` 文件中是否有 `127.0.0.1` 对应主机名，如果没有则添加
 
 ### 13.8.Resin 容器指定 JDK 1.8
 
-如果 resin 容器原来版本低于 JDK1.8，运行 JDK 1.8 编译的 web app 时，可能会提示错误：
+如果 `resin` 容器原来版本低于 `JDK1.8`，运行 `JDK 1.8` 编译的 `web app` 时，可能会提示错误：
 
 ```
 java.lang.UnsupportedClassVersionError: PR/Sort : Unsupported major.minor version 52.0
 ```
 
-解决方法就是，使用 JDK 1.8 要重新编译一下。然后，我在部署时出现过编译后仍报错的情况，重启一下服务器后，问题解决，不知是什么原因。
+解决方法就是，使用 `JDK 1.8` 要重新编译一下。然后，我在部署时出现过编译后仍报错的情况，重启一下服务器后，问题解决，不知是什么原因。
 
 ```
 ./configure --prefix=/usr/local/resin  --with-java=/usr/local/jdk1.8.0_121

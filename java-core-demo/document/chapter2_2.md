@@ -8,7 +8,7 @@
 
 ### 1.1. 正则表达式是什么
 
-正则表达式（Regular Expression）是一个用正则符号写出的公式，程序对这个公式进行语法分析，建立一个语法分析树，再根据这个分析树结合正则表达式的引擎生成执行程序（这个执行程序我们把它称作状态机，也叫状态自动机），用于字符匹配。
+正则表达式（`Regular Expression`）是一个用正则符号写出的公式，程序对这个公式进行语法分析，建立一个语法分析树，再根据这个分析树结合正则表达式的引擎生成执行程序（这个执行程序我们把它称作状态机，也叫状态自动机），用于字符匹配。
 
 ### 1.2. 如何学习正则
 
@@ -20,7 +20,7 @@
 
 ## 2. 正则工具类
 
-JDK 中的 `java.util.regex` 包提供了对正则表达式的支持。
+`JDK` 中的 `java.util.regex` 包提供了对正则表达式的支持。
 
 `java.util.regex` 有三个核心类：
 
@@ -28,15 +28,15 @@ JDK 中的 `java.util.regex` 包提供了对正则表达式的支持。
 - **Matcher 类：**`Matcher` 是对输入字符串进行解释和匹配操作的引擎。
 - **PatternSyntaxException：**`PatternSyntaxException` 是一个非强制异常类，它表示一个正则表达式模式中的语法错误。
 
-**注：**需要格外注意一点，在 Java 中使用反斜杠"\"时必须写成 `"\\"`。所以本文的代码出现形如 `String regex = "\\$\\{.*?\\}"` 其实就是 `\$\{.\*?\}`。
+**注：**需要格外注意一点，在 `Java` 中使用反斜杠"\"时必须写成 `"\\"`。所以本文的代码出现形如 `String regex = "\\$\\{.*?\\}"` 其实就是 `\$\{.\*?\}`。
 
 ### 2.1. Pattern 类
 
-`Pattern`类没有公共构造方法。要创建一个`Pattern`对象，你必须首先调用其**静态方法**`compile`，加载正则规则字符串，然后返回一个 Pattern 对象。
+`Pattern`类没有公共构造方法。要创建一个`Pattern`对象，你必须首先调用其**静态方法**`compile`，加载正则规则字符串，然后返回一个 `Pattern` 对象。
 
 与`Pattern`类一样，`Matcher`类也没有公共构造方法。你需要调用`Pattern`对象的`matcher`方法来获得一个`Matcher`对象。
 
-【示例】Pattern 和 Matcher 的初始化
+【示例】`Pattern` 和 `Matcher` 的初始化
 
 ```
 Pattern p = Pattern.compile(regex);
@@ -49,7 +49,7 @@ Matcher m = p.matcher(content);
 
 #### 2.2.1.校验
 
-为了校验文本是否与正则规则匹配，Matcher 提供了以下几个返回值为 `boolean` 的方法。
+为了校验文本是否与正则规则匹配，`Matcher` 提供了以下几个返回值为 `boolean` 的方法。
 
 | **序号** | **方法及说明**                                               |
 | -------- | ------------------------------------------------------------ |
@@ -60,7 +60,7 @@ Matcher m = p.matcher(content);
 
 如果你傻傻分不清上面的查找方法有什么区别，那么下面一个例子就可以让你秒懂。
 
-【示例】lookingAt、find、matches
+【示例】`lookingAt`、`find`、`matches`
 
 ```java
 public static void main(String[] args) {
@@ -120,11 +120,11 @@ helloworld	matches： helloworld
 
 **说明**
 
-`regex = "world"` 表示的正则规则是以 world 开头的字符串，`regex = "hello"` 和 `regex = "helloworld"` 也是同理。
+`regex = "world"` 表示的正则规则是以 `world` 开头的字符串，`regex = "hello"` 和 `regex = "helloworld"` 也是同理。
 
-- `lookingAt`方法从头部开始，检查 content 字符串是否有子字符串于正则规则匹配。
-- `find`方法检查 content 字符串是否有子字符串于正则规则匹配，不管字符串所在位置。
-- `matches`方法检查 content 字符串整体是否与正则规则匹配。
+- `lookingAt`方法从头部开始，检查 `content` 字符串是否有子字符串于正则规则匹配。
+- `find`方法检查 `content ` 字符串是否有子字符串于正则规则匹配，不管字符串所在位置。
+- `matches`方法检查 `content` 字符串整体是否与正则规则匹配。
 
 #### 2.2.2.查找
 
@@ -139,7 +139,7 @@ helloworld	matches： helloworld
 | 5        | **public String group()**返回前一个符合匹配条件的子序列。    |
 | 6        | **public String group(int group)**返回指定的符合匹配条件的子序列。 |
 
-【示例】使用 start()、end()、group() 查找所有匹配正则条件的子序列
+【示例】使用 `start()`、`end()`、`group()` 查找所有匹配正则条件的子序列
 
 ```java
 public static void main(String[] args) {
@@ -186,7 +186,7 @@ start: 16, end: 21, group: world
 | 4        | **public String replaceFirst(String replacement)** 替换模式与给定替换字符串匹配的输入序列的第一个子序列。 |
 | 5        | **public static String quoteReplacement(String s)**返回指定字符串的字面替换字符串。这个方法返回一个字符串，就像传递给 Matcher 类的 appendReplacement 方法一个字面字符串一样工作。 |
 
-【示例】replaceFirst 和 replaceAll
+【示例】`replaceFirst` 和 `replaceAll`
 
 ```java
 public static void main(String[] args) {
@@ -213,11 +213,11 @@ replaceAll: I can not because I think I can not.
 
 **说明**
 
-replaceFirst：替换第一个匹配正则规则的子序列。
+`replaceFirst`：替换第一个匹配正则规则的子序列。
 
-replaceAll：替换所有匹配正则规则的子序列。
+`replaceAll`：替换所有匹配正则规则的子序列。
 
-【示例】appendReplacement、appendTail 和 replaceAll
+【示例】`appendReplacement`、`appendTail` 和 `replaceAll`
 
 ```java
 public static void main(String[] args) {
@@ -253,7 +253,7 @@ appendTail: I can not because I think I can not.
 
 如果你查看`replaceAll`的源码，会发现其内部就是使用`appendReplacement`和`appendTail`方法组合来实现的。
 
-【示例】quoteReplacement 和 replaceAll，解决特殊字符替换问题
+【示例】`quoteReplacement` 和 `replaceAll`，解决特殊字符替换问题
 
 ```java
 public static void main(String[] args) {
@@ -293,11 +293,11 @@ Exception in thread "main" java.lang.IllegalArgumentException: No group with nam
 
 如何解决这个问题?
 
-JDK1.5 引入了`quoteReplacement`方法。它可以用来转换特殊字符。其实源码非常简单，就是判断字符串中如果有`\`或`$`，就为它加一个转义字符`\`
+`JDK1.5` 引入了`quoteReplacement`方法。它可以用来转换特殊字符。其实源码非常简单，就是判断字符串中如果有`\`或`$`，就为它加一个转义字符`\`
 
 我们对上面的代码略作调整：
 
-`m.replaceAll(replace)`改为`m.replaceAll(Matcher.quoteReplacement(replace))`，新代码如下：
+`m.replaceAll(replace)` 改为 `m.replaceAll(Matcher.quoteReplacement(replace))`，新代码如下：
 
 ```java
 public static void main(String[] args) {
@@ -327,7 +327,7 @@ replaceAll: product is ${product}.
 
 ## 3. 元字符
 
-元字符(metacharacters)就是正则表达式中具有特殊意义的专用字符。
+元字符(`metacharacters`)就是正则表达式中具有特殊意义的专用字符。
 
 ### 3.1. 基本元字符
 
@@ -734,14 +734,14 @@ Assert.assertTrue(findAll("(?:\\b(?:\\w+)\\W*)+\\.", "This is a short sentence. 
 
 ### 4.4. 零宽断言
 
-用于查找在某些内容(但并不包括这些内容)之前或之后的东西，也就是说它们像\b,^,$那样用于指定一个位置，这个位置应该满足一定的条件(即断言)，因此它们也被称为零宽断言。
+用于查找在某些内容(但并不包括这些内容)之前或之后的东西，也就是说它们像 `\b`,`^`,`$` 那样用于指定一个位置，这个位置应该满足一定的条件(即断言)，因此它们也被称为零宽断言。
 
-| 表达式     | 描述                        |
-| ---------- | --------------------------- |
-| `(?=exp)`  | 匹配 exp 前面的位置         |
-| `(?<=exp)` | 匹配 exp 后面的位置         |
-| `(?!exp)`  | 匹配后面跟的不是 exp 的位置 |
-| `(?<!exp)` | 匹配前面不是 exp 的位置     |
+| 表达式     | 描述                          |
+| ---------- | ----------------------------- |
+| `(?=exp)`  | 匹配 `exp` 前面的位置         |
+| `(?<=exp)` | 匹配 `exp` 后面的位置         |
+| `(?!exp)`  | 匹配后面跟的不是 `exp` 的位置 |
+| `(?<!exp)` | 匹配前面不是 `exp` 的位置     |
 
 #### 4.4.1.匹配 exp 前面的位置
 

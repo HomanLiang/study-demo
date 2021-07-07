@@ -8,7 +8,7 @@
 
 ### 1.1. 注解的形式
 
-Java 中，注解是以 `@` 字符开始的修饰符。如下：
+`Java` 中，注解是以 `@` 字符开始的修饰符。如下：
 
 ```
 @Override
@@ -25,7 +25,7 @@ void mySuperMethod() { ... }
 class MyClass() { ... }
 ```
 
-如果只有一个名为 value 的属性，那么名称可以省略，如：
+如果只有一个名为 `value` 的属性，那么名称可以省略，如：
 
 ```
 @SuppressWarnings("unchecked")
@@ -40,26 +40,26 @@ void myMethod() { ... }
 
 解析一个注解往往有两种形式：
 
-- **编译期直接的扫描** - 编译器的扫描指的是编译器在对 java 代码编译字节码的过程中会检测到某个类或者方法被一些注解修饰，这时它就会对于这些注解进行某些处理。这种情况只适用于 JDK 内置的注解类。
-- **运行期的反射** - 如果要自定义注解，Java 编译器无法识别并处理这个注解，它只能根据该注解的作用范围来选择是否编译进字节码文件。如果要处理注解，必须利用反射技术，识别该注解以及它所携带的信息，然后做相应的处理。
+- **编译期直接的扫描** - 编译器的扫描指的是编译器在对 `java` 代码编译字节码的过程中会检测到某个类或者方法被一些注解修饰，这时它就会对于这些注解进行某些处理。这种情况只适用于 `JDK` 内置的注解类。
+- **运行期的反射** - 如果要自定义注解，`Java` 编译器无法识别并处理这个注解，它只能根据该注解的作用范围来选择是否编译进字节码文件。如果要处理注解，必须利用反射技术，识别该注解以及它所携带的信息，然后做相应的处理。
 
 ### 1.3. 注解的作用
 
 注解有许多用途：
 
 - 编译器信息 - 编译器可以使用注解来检测错误或抑制警告。
-- 编译时和部署时的处理 - 程序可以处理注解信息以生成代码，XML 文件等。
+- 编译时和部署时的处理 - 程序可以处理注解信息以生成代码，`XML` 文件等。
 - 运行时处理 - 可以在运行时检查某些注解并处理。
 
-作为 Java 程序员，多多少少都曾经历过被各种配置文件（xml、properties）支配的恐惧。过多的配置文件会使得项目难以维护。个人认为，使用注解以减少配置文件或代码，是注解最大的用处。
+作为 `Java` 程序员，多多少少都曾经历过被各种配置文件（`xml`、`properties`）支配的恐惧。过多的配置文件会使得项目难以维护。个人认为，使用注解以减少配置文件或代码，是注解最大的用处。
 
 ### 1.4. 注解的代价
 
 凡事有得必有失，注解技术同样如此。使用注解也有一定的代价：
 
 - 显然，它是一种侵入式编程，那么，自然就存在着增加程序耦合度的问题。
-- 自定义注解的处理需要在运行时，通过反射技术来获取属性。如果注解所修饰的元素是类的非 public 成员，也可以通过反射获取。这就违背了面向对象的封装性。
-- 注解所产生的问题，相对而言，更难以 debug 或定位。
+- 自定义注解的处理需要在运行时，通过反射技术来获取属性。如果注解所修饰的元素是类的非 `public` 成员，也可以通过反射获取。这就违背了面向对象的封装性。
+- 注解所产生的问题，相对而言，更难以 `debug` 或定位。
 
 但是，正所谓瑕不掩瑜，注解所付出的代价，相较于它提供的功能而言，还是可以接受的。
 
@@ -67,7 +67,7 @@ void myMethod() { ... }
 
 注解可以应用于类、字段、方法和其他程序元素的声明。
 
-JDK8 开始，注解的应用范围进一步扩大，以下是新的应用范围：
+`JDK8` 开始，注解的应用范围进一步扩大，以下是新的应用范围：
 
 类实例初始化表达式：
 
@@ -109,7 +109,7 @@ JDK 中内置了以下注解：
 
 **[`@Override`](https://docs.oracle.com/javase/8/docs/api/java/lang/Override.html) 用于表明被修饰方法覆写了父类的方法。**
 
-如果试图使用 `@Override` 标记一个实际上并没有覆写父类的方法时，java 编译器会告警。
+如果试图使用 `@Override` 标记一个实际上并没有覆写父类的方法时，`java` 编译器会告警。
 
 `@Override` 示例：
 
@@ -153,7 +153,7 @@ public class OverrideAnnotationDemo {
 
 `@Deprecated` 有一定的**延续性**：如果我们在代码中通过继承或者覆盖的方式使用了过时的类或类成员，即使子类或子方法没有标记为 `@Deprecated`，但编译器仍然会告警。
 
-> 🔔 注意： `@Deprecated` 这个注解类型和 javadoc 中的 `@deprecated` 这个 tag 是有区别的：前者是 java 编译器识别的；而后者是被 javadoc 工具所识别用来生成文档（包含程序成员为什么已经过时、它应当如何被禁止或者替代的描述）。
+> 🔔 注意： `@Deprecated` 这个注解类型和 `javadoc` 中的 `@deprecated` 这个 `tag` 是有区别的：前者是 `java` 编译器识别的；而后者是被 `javadoc` 工具所识别用来生成文档（包含程序成员为什么已经过时、它应当如何被禁止或者替代的描述）。
 
 `@Deprecated` 示例：
 
@@ -201,7 +201,7 @@ public class DeprecatedAnnotationDemo {
 
 **[`@SuppressWarnings`](https://docs.oracle.com/javase/8/docs/api/java/lang/SuppressWarnings.html) 用于关闭对类、方法、成员编译时产生的特定警告。**
 
-`@SuppressWarning` 不是一个标记注解。它有一个类型为 `String[]` 的数组成员，这个数组中存储的是要关闭的告警类型。对于 javac 编译器来讲，对 `-Xlint` 选项有效的警告名也同样对 `@SuppressWarings` 有效，同时编译器会忽略掉无法识别的警告名。
+`@SuppressWarning` 不是一个标记注解。它有一个类型为 `String[]` 的数组成员，这个数组中存储的是要关闭的告警类型。对于 `javac` 编译器来讲，对 `-Xlint` 选项有效的警告名也同样对 `@SuppressWarings` 有效，同时编译器会忽略掉无法识别的警告名。
 
 `@SuppressWarning` 示例：
 
@@ -232,11 +232,11 @@ public class SuppressWarningsAnnotationDemo {
 `@SuppressWarnings` 注解的常见参数值的简单说明：
 
 - `deprecation` - 使用了不赞成使用的类或方法时的警告；
-- `unchecked` - 执行了未检查的转换时的警告，例如当使用集合时没有用泛型 (Generics) 来指定集合保存的类型;
-- `fallthrough` - 当 Switch 程序块直接通往下一种情况而没有 Break 时的警告;
+- `unchecked` - 执行了未检查的转换时的警告，例如当使用集合时没有用泛型 (`Generics`) 来指定集合保存的类型;
+- `fallthrough` - 当 `Switch` 程序块直接通往下一种情况而没有 `Break` 时的警告;
 - `path` - 在类路径、源文件路径等中有不存在的路径时的警告;
-- `serial` - 当在可序列化的类上缺少 serialVersionUID 定义时的警告;
-- `finally` - 任何 finally 子句不能正常完成时的警告;
+- `serial` - 当在可序列化的类上缺少 `serialVersionUID` 定义时的警告;
+- `finally` - 任何 `finally` 子句不能正常完成时的警告;
 - `all` - 所有的警告。
 
 ```
@@ -283,7 +283,7 @@ public class InternalAnnotationDemo {
 
 ### 2.4. @SafeVarargs
 
-`@SafeVarargs` 在 JDK7 中引入。
+`@SafeVarargs` 在 `JDK7` 中引入。
 
 **[`@SafeVarargs`](https://docs.oracle.com/javase/8/docs/api/java/lang/SafeVarargs.html) 的作用是：告诉编译器，在可变长参数中的泛型是类型安全的。可变长参数是使用数组存储的，而数组和泛型不能很好的混合使用。**
 
@@ -332,7 +332,7 @@ public class SafeVarargsAnnotationDemo {
 
 ### 2.5. @FunctionalInterface
 
-`@FunctionalInterface` 在 JDK8 引入。
+`@FunctionalInterface` 在 `JDK8` 引入。
 
 **[`@FunctionalInterface`](https://docs.oracle.com/javase/8/docs/api/java/lang/FunctionalInterface.html) 用于指示被修饰的接口是函数式接口。**
 
@@ -340,13 +340,13 @@ public class SafeVarargsAnnotationDemo {
 
 **什么是函数式接口？**
 
-函数式接口(Functional Interface)就是一个有且仅有一个抽象方法，但是可以有多个非抽象方法的接口。函数式接口可以被隐式转换为 lambda 表达式。
+函数式接口(`Functional Interface`)就是一个有且仅有一个抽象方法，但是可以有多个非抽象方法的接口。函数式接口可以被隐式转换为 `lambda` 表达式。
 
 函数式接口的特点：
 
 - 接口有且只能有个一个抽象方法（抽象方法只有方法定义，没有方法体）。
-- 不能在接口中覆写 Object 类中的 public 方法（写了编译器也会报错）。
-- 允许有 default 实现方法。
+- 不能在接口中覆写 `Object` 类中的 `public` 方法（写了编译器也会报错）。
+- 允许有 `default` 实现方法。
 
 示例：
 
@@ -378,11 +378,11 @@ public class FunctionalInterfaceAnnotationDemo {
 
 ## 3. 元注解
 
-JDK 中虽然内置了几个注解，但这远远不能满足开发过程中遇到的千变万化的需求。所以我们需要自定义注解，而这就需要用到元注解。
+`JDK` 中虽然内置了几个注解，但这远远不能满足开发过程中遇到的千变万化的需求。所以我们需要自定义注解，而这就需要用到元注解。
 
 **元注解的作用就是用于定义其它的注解**。
 
-Java 中提供了以下元注解类型：
+`Java` 中提供了以下元注解类型：
 
 - `@Retention`
 - `@Target`
@@ -410,7 +410,7 @@ public @interface Retention {
 `RetentionPolicy` 是一个枚举类型，它定义了被 `@Retention` 修饰的注解所支持的保留级别：
 
 - `RetentionPolicy.SOURCE` - 标记的注解仅在源文件中有效，编译器会忽略。
-- `RetentionPolicy.CLASS` - 标记的注解在 class 文件中有效，JVM 会忽略。
+- `RetentionPolicy.CLASS` - 标记的注解在 `class` 文件中有效，`JVM` 会忽略。
 - `RetentionPolicy.RUNTIME` - 标记的注解在运行时有效。
 
 `@Retention` 示例：
@@ -428,7 +428,7 @@ public @interface Column {
 
 ### 3.2. @Documented
 
-[`@Documented`](https://docs.oracle.com/javase/8/docs/api/java/lang/annotation/Documented.html) 表示无论何时使用指定的注解，都应使用 Javadoc（默认情况下，注释不包含在 Javadoc 中）。更多内容可以参考：[Javadoc tools page](https://docs.oracle.com/javase/8/docs/technotes/guides/javadoc/index.html)。
+[`@Documented`](https://docs.oracle.com/javase/8/docs/api/java/lang/annotation/Documented.html) 表示无论何时使用指定的注解，都应使用 `Javadoc`（默认情况下，注释不包含在 `Javadoc` 中）。更多内容可以参考：[Javadoc tools page](https://docs.oracle.com/javase/8/docs/technotes/guides/javadoc/index.html)。
 
 `@Documented` 示例：
 
@@ -541,7 +541,7 @@ public class TaskRunner {
 
 ## 4. 自定义注解
 
-使用 `@interface` 自定义注解时，自动继承了 `java.lang.annotation.Annotation` 接口，由编译程序自动完成其他细节。在定义注解时，不能继承其他的注解或接口。`@interface` 用来声明一个注解，其中的每一个方法实际上是声明了一个配置参数。方法的名称就是参数的名称，返回值类型就是参数的类型（返回值类型只能是基本类型、Class、String、enum）。可以通过 `default` 来声明参数的默认值。
+使用 `@interface` 自定义注解时，自动继承了 `java.lang.annotation.Annotation` 接口，由编译程序自动完成其他细节。在定义注解时，不能继承其他的注解或接口。`@interface` 用来声明一个注解，其中的每一个方法实际上是声明了一个配置参数。方法的名称就是参数的名称，返回值类型就是参数的类型（返回值类型只能是基本类型、`Class`、`String`、`enum`）。可以通过 `default` 来声明参数的默认值。
 
 这里，我会通过实现一个名为 `RegexValid` 的正则校验注解工具来展示自定义注解的全步骤。
 
@@ -569,7 +569,7 @@ public @interface RegexValid {}
 > - 上面的代码中定义了一个名为 `@RegexValid` 的注解。
 > - `@Documented` 表示 `@RegexValid` 应该使用 javadoc。
 > - `@Target({ElementType.FIELD, ElementType.PARAMETER})` 表示 `@RegexValid` 可以在类成员或方法参数上修饰。
-> - @Retention(RetentionPolicy.RUNTIME) 表示 `@RegexValid` 在运行时有效。
+> - `@Retention(RetentionPolicy.RUNTIME)` 表示 `@RegexValid` 在运行时有效。
 
 此时，我们已经定义了一个没有任何属性的注解，如果到此为止，它仅仅是一个标记注解。作为正则工具，没有属性可什么也做不了。接下来，我们将为它添加注解属性。
 
@@ -581,7 +581,7 @@ public @interface RegexValid {}
 [访问级别修饰符] [数据类型] 名称() default 默认值;
 ```
 
-例如，我们要定义在注解中定义一个名为 value 的字符串属性，其默认值为空字符串，访问级别为默认级别，那么应该定义如下：
+例如，我们要定义在注解中定义一个名为 `value` 的字符串属性，其默认值为空字符串，访问级别为默认级别，那么应该定义如下：
 
 ```
 String value() default "";
@@ -593,14 +593,14 @@ String value() default "";
 
 - **注解属性只能使用 `public` 或默认访问级别（即不指定访问级别修饰符）修饰**。
 - **注解属性的数据类型有限制要求**。支持的数据类型如下：
-  - 所有基本数据类型（byte、char、short、int、long、float、double、boolean）
-  - String 类型
-  - Class 类
-  - enum 类型
-  - Annotation 类型
+  - 所有基本数据类型（`byte`、`char`、`short`、`int`、`long`、`float`、`double`、`boolean`）
+  - `String` 类型
+  - `Class` 类
+  - `enum` 类型
+  - `Annotation` 类型
   - 以上所有类型的数组
-- **注解属性必须有确定的值，建议指定默认值**。注解属性只能通过指定默认值或使用注解时指定属性值，相较之下，指定默认值的方式更为可靠。注解属性如果是引用类型，不可以为 null。这个约束使得注解处理器很难判断注解属性是默认值，或是使用注解时所指定的属性值。为此，我们设置默认值时，一般会定义一些特殊的值，例如空字符串或者负数。
-- 如果注解中只有一个属性值，最好将其命名为 value。因为，指定属性名为 value，在使用注解时，指定 value 的值可以不指定属性名称。
+- **注解属性必须有确定的值，建议指定默认值**。注解属性只能通过指定默认值或使用注解时指定属性值，相较之下，指定默认值的方式更为可靠。注解属性如果是引用类型，不可以为 `null`。这个约束使得注解处理器很难判断注解属性是默认值，或是使用注解时所指定的属性值。为此，我们设置默认值时，一般会定义一些特殊的值，例如空字符串或者负数。
+- 如果注解中只有一个属性值，最好将其命名为 `value`。因为，指定属性名为 `value`，在使用注解时，指定 `value` 的值可以不指定属性名称。
 
     ```
     // 这两种方式效果相同
@@ -650,7 +650,7 @@ public @interface RegexValid {
 
 ### 4.3. 注解处理器
 
-如果没有用来读取注解的方法和工作，那么注解也就不会比注释更有用处了。使用注解的过程中，很重要的一部分就是创建于使用注解处理器。JDK5 扩展了反射机制的 API，以帮助程序员快速的构造自定义注解处理器。
+如果没有用来读取注解的方法和工作，那么注解也就不会比注释更有用处了。使用注解的过程中，很重要的一部分就是创建于使用注解处理器。`JDK5` 扩展了反射机制的 `API`，以帮助程序员快速的构造自定义注解处理器。
 
 **`java.lang.annotation.Annotation` 是一个接口，程序可以通过反射来获取指定程序元素的注解对象，然后通过注解对象来获取注解里面的元数据**。
 

@@ -8,7 +8,7 @@
 
 通讯的发达，使得世界各地交流越来越紧密。许多的软件产品也要面向世界上不同国家的用户。其中，语言障碍显然是产品在不同语种用户中进行推广的一个重要问题。
 
-本文围绕本地化这一主题，先介绍国际标准的语言编码，然后讲解在 Java 应用中如何去实现本地化。
+本文围绕本地化这一主题，先介绍国际标准的语言编码，然后讲解在 `Java` 应用中如何去实现本地化。
 
 ### 1.1.语言编码、国家/地区编码
 
@@ -102,7 +102,7 @@
 
 #### 2.1.1.定义 properties 文件
 
-在`src/main/resources/locales` 路径下定义名为 content 的不同语种资源文件：
+在`src/main/resources/locales` 路径下定义名为 `content` 的不同语种资源文件：
 
 **content_en_US.properties**
 
@@ -118,13 +118,13 @@ helloWorld = \u4e16\u754c\uff0c\u4f60\u597d\uff01
 time = \u5f53\u524d\u65f6\u95f4\u662f\u0025\u0073\u3002
 ```
 
-可以看到：几个资源文件中，定义的 Key 完全一致，只是 Value 是对应语言的字符串。
+可以看到：几个资源文件中，定义的 `Key` 完全一致，只是 `Value` 是对应语言的字符串。
 
-虽然属性值各不相同，但属性名却是相同的，这样应用程序就可以通过 Locale 对象和属性名精确调用到某个具体的属性值了。
+虽然属性值各不相同，但属性名却是相同的，这样应用程序就可以通过 `Locale` 对象和属性名精确调用到某个具体的属性值了。
 
 #### 2.1.2.Unicode 转换工具
 
-上一节中，我们定义的中文资源文件中的属性值都是以\u 开头的四位 16 进制数。其实，这表示的是一个 Unicode 编码。
+上一节中，我们定义的中文资源文件中的属性值都是以 `\u` 开头的四位 `16` 进制数。其实，这表示的是一个 `Unicode` 编码。
 
 ```
 helloWorld = \u4e16\u754c\uff0c\u4f60\u597d\uff01
@@ -135,7 +135,7 @@ time = \u5f53\u524d\u65f6\u95f4\u662f\u0025\u0073\u3002
 
 怎么将非 `ASCII` 字符转为 `Unicode` 编码呢？
 
-JDK 在 bin 目录下为我们提供了一个转换工具：**native2ascii**。
+`JDK` 在 `bin` 目录下为我们提供了一个转换工具：**native2ascii**。
 
 它可以将中文字符的资源文件转换为 `Unicode` 代码格式的文件，命令格式如下：
 
@@ -155,13 +155,13 @@ native2ascii -encoding utf-8 d:\content_zh_CN.properties d:\content_zh_CN_new.pr
 
 #### 2.2.1.Locale
 
-在 Java 中，一个 `java.util.Locale` 对象表示了特定的地理、政治和文化地区。需要 Locale 来执行其任务的操作称为语言环境敏感的操作，它使用 Locale 为用户量身定制本地信息。
+在 `Java` 中，一个 `java.util.Locale` 对象表示了特定的地理、政治和文化地区。需要 `Locale` 来执行其任务的操作称为语言环境敏感的操作，它使用 `Locale` 为用户量身定制本地信息。
 
 它有三个构造方法
 
 `Locale(String language)` ：根据语言编码初始化 `Locale(String language, String country)` ：根据语言编码、国家编码初始化 `Locale(String language, String country, String variant)` ：根据语言编码、国家编码、变体初始化
 
-此外，Locale 定义了一些常用的 Locale 常量：`Locale.ENGLISH`、`Locale.CHINESE` 等。
+此外，`Locale` 定义了一些常用的 `Locale` 常量：`Locale.ENGLISH`、`Locale.CHINESE` 等。
 
 ```
 // 初始化一个通用英语的locale.
@@ -178,9 +178,9 @@ Locale locale4 = Locale.SIMPLIFIED_CHINESE;
 
 #### 2.3.1.ResourceBoundle
 
-Java 为我们提供了用于加载本地化资源文件的工具类：`java.util.ResourceBoundle`。
+`Java` 为我们提供了用于加载本地化资源文件的工具类：`java.util.ResourceBoundle`。
 
-`ResourceBoundle` 提供了多个名为 `getBundle` 的静态重载方法，这些方法的作用是用来根据资源名、Locale 选择指定语种的资源文件。需要说明的是： `getBundle` 方法的第一个参数一般都是`baseName` ，这个参数表示资源文件名。
+`ResourceBoundle` 提供了多个名为 `getBundle` 的静态重载方法，这些方法的作用是用来根据资源名、`Locale` 选择指定语种的资源文件。需要说明的是： `getBundle` 方法的第一个参数一般都是`baseName` ，这个参数表示资源文件名。
 
 `ResourceBoundle` 还提供了名为 `getString` 的方法，用来获取资源文件中 key 对应的 value。
 
@@ -214,7 +214,7 @@ default：世界，你好！
 default：当前时间是08:00。
 ```
 
-注：在加载资源时，如果指定的本地化资源文件不存在，它会尝试按下面的顺序加载其他的资源：本地系统默认本地化对象对应的资源 -> 默认的资源。如果指定错误，Java 会提示找不到资源文件。
+注：在加载资源时，如果指定的本地化资源文件不存在，它会尝试按下面的顺序加载其他的资源：本地系统默认本地化对象对应的资源 -> 默认的资源。如果指定错误，`Java` 会提示找不到资源文件。
 
 ## 3.支持本地化的工具类
 
@@ -234,7 +234,7 @@ public static void main(String[] args) {
 
 ### 3.2.DateFormat
 
-DateFormat 是日期、时间格式化类的抽象类。它支持基于语言习惯的日期、时间格式。
+`DateFormat` 是日期、时间格式化类的抽象类。它支持基于语言习惯的日期、时间格式。
 
 ```
 public static void main(String[] args) {
@@ -248,7 +248,7 @@ public static void main(String[] args) {
 
 ### 3.3.MessageFormat
 
-Messageformat 提供一种与语言无关的拼接消息的方式。通过这种拼接方式，将最终呈现返回给使用者。
+`Messageformat` 提供一种与语言无关的拼接消息的方式。通过这种拼接方式，将最终呈现返回给使用者。
 
 ```
 public static void main(String[] args) {
