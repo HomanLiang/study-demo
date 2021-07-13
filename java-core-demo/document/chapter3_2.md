@@ -10,7 +10,7 @@
 
 `AbstractList` 是一个抽象类，它继承于 `AbstractCollection`。`AbstractList` 实现了 `List` 接口中除 `size()`、`get(int location)` 之外的函数。
 
-`AbstractSequentialList` 是一个抽象类，它继承于 `AbstractList`。`AbstractSequentialList` 实现了“链表中，根据 index 索引值操作链表的全部函数”。
+`AbstractSequentialList` 是一个抽象类，它继承于 `AbstractList`。`AbstractSequentialList` 实现了“链表中，根据 `index` 索引值操作链表的全部函数”。
 
 ### 1.1. ArrayList 和 LinkedList
 
@@ -44,7 +44,7 @@ public class ArrayList<E> extends AbstractList<E>
         implements List<E>, RandomAccess, Cloneable, java.io.Serializable
 ```
 
-从 ArrayList 的定义，不难看出 ArrayList 的一些基本特性：
+从 `ArrayList` 的定义，不难看出 `ArrayList` 的一些基本特性：
 
 - `ArrayList` 实现了 `List` 接口，并继承了 `AbstractList`，它支持所有 `List` 的操作。
 - `ArrayList` 实现了 `RandomAccess` 接口，**支持随机访问**。`RandomAccess` 是一个标志接口，它意味着“只要实现该接口的 `List` 类，都支持快速随机访问”。在 `ArrayList` 中，我们即可以**通过元素的序号快速获取元素对象**；这就是快速随机访问。
@@ -56,7 +56,7 @@ public class ArrayList<E> extends AbstractList<E>
 
 #### 2.2.1.ArrayList 的数据结构
 
-ArrayList 包含了两个重要的元素：`elementData` 和 `size`。
+`ArrayList` 包含了两个重要的元素：`elementData` 和 `size`。
 
 ```
 // 默认初始化容量
@@ -74,18 +74,18 @@ private int size;
 
 `ArrayList` 具有动态扩容特性，因此保存元素的数组不一定都会被使用，那么就没必要全部进行序列化。为此，`ArrayList` 定制了其序列化方式。具体做法是：
 
-- 存储元素的 `Object` 数组（即 `elementData`）使用 `transient` 修饰，使得它可以被 Java 序列化所忽略。
+- 存储元素的 `Object` 数组（即 `elementData`）使用 `transient` 修饰，使得它可以被 `Java` 序列化所忽略。
 - `ArrayList` 重写了 `writeObject()` 和 `readObject()` 来控制序列化数组中有元素填充那部分内容。
 
 #### 2.2.3.ArrayList 构造方法
 
-ArrayList 类实现了三个构造函数：
+`ArrayList` 类实现了三个构造函数：
 
-- 第一个是默认构造方法，ArrayList 会创建一个空数组；
-- 第二个是创建 ArrayList 对象时，传入一个初始化值；
+- 第一个是默认构造方法，`ArrayList` 会创建一个空数组；
+- 第二个是创建 `ArrayList` 对象时，传入一个初始化值；
 - 第三个是传入一个集合类型进行初始化。
 
-当 ArrayList 新增元素时，如果所存储的元素已经超过其当前容量，它会计算容量后再进行动态扩容。数组的动态扩容会导致整个数组进行一次内存复制。因此，**初始化 ArrayList 时，指定数组初始大小，有助于减少数组的扩容次数，从而提高系统性能**。
+当 `ArrayList` 新增元素时，如果所存储的元素已经超过其当前容量，它会计算容量后再进行动态扩容。数组的动态扩容会导致整个数组进行一次内存复制。因此，**初始化 ArrayList 时，指定数组初始大小，有助于减少数组的扩容次数，从而提高系统性能**。
 
 ```
 public ArrayList() {

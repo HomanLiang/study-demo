@@ -1478,25 +1478,25 @@ blocking_lock_id：某一事务的锁的 ID，该事务阻塞了另一事务的�
 - 直接查看 `innodb_lock_waits` 表
 
   ```
-  SELECT * FROM innodb_lock_waits;
+  SELECT * FROM information_schema.innodb_lock_waits;
   ```
 
 - `innodb_locks` 表和 `innodb_lock_waits` 表结合：
 
   ```
-  SELECT * FROM innodb_locks WHERE lock_trx_id IN (SELECT blocking_trx_id FROM innodb_lock_waits);
+  SELECT * FROM information_schema.innodb_locks WHERE lock_trx_id IN (SELECT blocking_trx_id FROM information_schema.innodb_lock_waits);
   ```
 
 - `innodb_locks` 表 `JOIN` `innodb_lock_waits` 表:
 
   ```
-  SELECT innodb_locks.* FROM innodb_locks JOIN innodb_lock_waits ON (innodb_locks.lock_trx_id = innodb_lock_waits.blocking_trx_id);
+  SELECT innodb_locks.* FROM information_schema.innodb_locks JOIN information_schema.innodb_lock_waits ON (innodb_locks.lock_trx_id = innodb_lock_waits.blocking_trx_id);
   ```
 
 - 查询 `innodb_trx` 表:
 
   ```
-  SELECT trx_id, trx_requested_lock_id, trx_mysql_thread_id, trx_query FROM innodb_trx WHERE trx_state = 'LOCK WAIT';
+  SELECT trx_id, trx_requested_lock_id, trx_mysql_thread_id, trx_query FROM information_schema.innodb_trx WHERE trx_state = 'LOCK WAIT';
   ```
 
 - `trx_mysql_thread_id` 即 `kill` 掉事务线程 ID
