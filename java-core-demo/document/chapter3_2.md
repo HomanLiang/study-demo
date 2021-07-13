@@ -326,8 +326,8 @@ public ArrayList(int initialCapacity) {
 ```
 
 - 如果`initialCapacity > 0`，就创建一个新的长度是`initialCapacity`的数组
-- 如果`initialCapacity == 0`，就使用EMPTY_ELEMENTDATA
-- 其他情况，`initialCapacity`不合法，抛出异常
+- 如果`initialCapacity == 0`，就使用 `EMPTY_ELEMENTDATA`
+- 其他情况，`initialCapacity` 不合法，抛出异常
 
 **无参构造方法**
 
@@ -441,9 +441,9 @@ public static <T,U> T[] copyOf(U[] original,
 }
 ```
 
-我们知道ArrayList中`elementData`就是`Object[]`类型，所以ArrayList的`toArray()`方法必然会返回`Object[]`。
+我们知道 `ArrayList` 中 `elementData` 就是`Object[]`类型，所以 `ArrayList` 的`toArray()`方法必然会返回`Object[]`。
 
-我们再看一下`java.util.Arrays`的内部ArrayList源码（截取的部分源码）：
+我们再看一下`java.util.Arrays`的内部 `ArrayList` 源码（截取的部分源码）：
 
 ```Java
 private static class ArrayList<E> extends AbstractList<E>
@@ -484,11 +484,11 @@ public static <T> List<T> asList(T... a) {
 }
 ```
 
-不难看出来`java.util.Arrays`的内部ArrayList的`toArray()`方法，是构造方法接收什么类型的数组，就返回什么类型的数组。
+不难看出来 `java.util.Arrays` 的内部 `ArrayList` 的 `toArray()` 方法，是构造方法接收什么类型的数组，就返回什么类型的数组。
 
-所以，在我们上面的例子中，实际上返回的是String类型的数组，再将其中的元素赋值成`Object`类型的，自然报错。
+所以，在我们上面的例子中，实际上返回的是 `String` 类型的数组，再将其中的元素赋值成 `Object` 类型的，自然报错。
 
-我们还是继续看ArrayList吧...
+我们还是继续看 `ArrayList` 吧...
 
 #### 2.3.4.插入方法
 
@@ -773,7 +773,7 @@ public E get(int index) {
 }
 ```
 
-> 该方法直接返回`elementData`数组指定下标的元素，效率还是很高的。所以ArrayList，`for`循环遍历效率也是很高的。
+> 该方法直接返回 `elementData` 数组指定下标的元素，效率还是很高的。所以 `ArrayList`，`for`循环遍历效率也是很高的。
 
 #### 2.3.8.序列化方法
 
@@ -871,8 +871,8 @@ private class SubList extends AbstractList<E> implements RandomAccess {
 }
 ```
 
-- SubList的 `set()` 方法，**是直接修改ArrayList**中 `elementData` 数组的，使用中应该注意
-- SubList是没有实现 `Serializable` 接口的，**是不能序列化的**
+- `SubList` 的 `set()` 方法，**是直接修改ArrayList**中 `elementData` 数组的，使用中应该注意
+- `SubList` 是没有实现 `Serializable` 接口的，**是不能序列化的**
 
 #### 2.3.11.迭代器
 
@@ -991,29 +991,29 @@ public void remove() {
 
 #### 2.3.12.ArrayList类注释翻译
 
-类注释还是要看的，能给我们一个整体的了解这个类。我将ArrayList的类注释大概翻译整理了一下：
+类注释还是要看的，能给我们一个整体的了解这个类。我将 `ArrayList` 的类注释大概翻译整理了一下：
 
-- ArrayList是实现`List`接口的可自动扩容的数组。实现了所有的`List`操作，允许所有的元素，包括`null`值。
-- ArrayList大致和Vector相同，除了ArrayList是非同步的。
+- `ArrayList` 是实现 `List` 接口的可自动扩容的数组。实现了所有的 `List` 操作，允许所有的元素，包括 `null` 值。
+- `ArrayList` 大致和 `Vector` 相同，除了 `ArrayList` 是非同步的。
 - `size` `isEmpty` `get` `set` `iterator` 和 `listIterator` 方法时间复杂度是`O(1)`，常量时间。其他方法是`O(n)`，线性时间。
-- 每一个ArrayList实例都有一个`capacity`（容量）。`capacity`是用于存储列表中元素的数组的大小。`capacity`至少和列表的大小一样大。
-- 如果多个线程同时访问ArrayList的实例，并且至少一个线程会修改，必须在外部保证ArrayList的同步。修改包括添加删除扩容等操作，仅仅设置值不包括。这种场景可以用其他的一些封装好的同步的`list`。如果不存在这样的`Object`，ArrayList应该用 `Collections.synchronizedList` 包装起来最好在创建的时候就包装起来，来保证同步访问。
+- 每一个 `ArrayList` 实例都有一个`capacity`（容量）。`capacity`是用于存储列表中元素的数组的大小。`capacity`至少和列表的大小一样大。
+- 如果多个线程同时访问 `ArrayList` 的实例，并且至少一个线程会修改，必须在外部保证 `ArrayList` 的同步。修改包括添加删除扩容等操作，仅仅设置值不包括。这种场景可以用其他的一些封装好的同步的`list`。如果不存在这样的`Object`，`ArrayList` 应该用 `Collections.synchronizedList` 包装起来最好在创建的时候就包装起来，来保证同步访问。
 - `iterator()` 和 `listIterator(int)` 方法是 `fail-fast` 的，如果在迭代器创建之后，列表进行结构化修改，迭代器会抛出`ConcurrentModificationException`。
 - 面对并发修改，迭代器快速失败、清理，而不是在未知的时间不确定的情况下冒险。请注意，快速失败行为不能被保证。通常来讲，不能同步进行的并发修改几乎不可能做任何保证。因此，写依赖这个异常的程序的代码是错误的，快速失败行为应该仅仅用于防止`bug`。
 
 #### 2.3.13.总结
 
-- ArrayList底层的数据结构是数组
-- ArrayList可以自动扩容，不传初始容量或者初始容量是`0`，都会初始化一个空数组，但是如果添加元素，会自动进行扩容，所以，创建ArrayList的时候，给初始容量是必要的
-- `Arrays.asList()`方法返回的是的`Arrays`内部的ArrayList，用的时候需要注意
-- `subList()`返回内部类，不能序列化，和ArrayList共用同一个数组
+- `ArrayList` 底层的数据结构是数组
+- `ArrayList` 可以自动扩容，不传初始容量或者初始容量是 `0`，都会初始化一个空数组，但是如果添加元素，会自动进行扩容，所以，创建 `ArrayList` 的时候，给初始容量是必要的
+- `Arrays.asList()`方法返回的是的`Arrays`内部的 `ArrayList`，用的时候需要注意
+- `subList()` 返回内部类，不能序列化，和 `ArrayList` 共用同一个数组
 - 迭代删除要用，迭代器的`remove`方法，或者可以用倒序的`for`循环
-- ArrayList重写了序列化、反序列化方法，避免序列化、反序列化全部数组，浪费时间和空间
+- `ArrayList` 重写了序列化、反序列化方法，避免序列化、反序列化全部数组，浪费时间和空间
 - `elementData`不使用`private`修饰，可以简化内部类的访问
 
 ## 3. LinkedList
 
-> LinkedList 从数据结构角度来看，可以视为双链表。
+> `LinkedList` 从数据结构角度来看，可以视为双链表。
 
 ![687474703a2f2f64756e77752e746573742e757063646e2e6e65742f736e61702f32303230303232313134323533352e706e67](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/java-core-demo/20210321123305.png)
 
@@ -1106,14 +1106,14 @@ Node<E> node(int index) {
 }
 ```
 
-获取 `LinkedList` 第 index 个元素的算法是：
+获取 `LinkedList` 第 `index` 个元素的算法是：
 
-- 判断 index 在链表前半部分，还是后半部分。
+- 判断 `index` 在链表前半部分，还是后半部分。
 - 如果是前半部分，从头节点开始查找；如果是后半部分，从尾结点开始查找。
 
-`LinkedList` 这种访问元素的性能是 `O(N)` 级别的（极端情况下，扫描 N/2 个元素）；相比于 `ArrayList` 的 `O(1)`，显然要慢不少。
+`LinkedList` 这种访问元素的性能是 `O(N)` 级别的（极端情况下，扫描 `N/2` 个元素）；相比于 `ArrayList` 的 `O(1)`，显然要慢不少。
 
-**推荐使用迭代器遍历 `LinkedList` ，不要使用传统的 `for` 循环**。注：foreach 语法会被编译器转换成迭代器遍历，但是它的遍历过程中不允许修改 `List` 长度，即不能进行增删操作。
+**推荐使用迭代器遍历 `LinkedList` ，不要使用传统的 `for` 循环**。注：`foreach` 语法会被编译器转换成迭代器遍历，但是它的遍历过程中不允许修改 `List` 长度，即不能进行增删操作。
 
 #### 3.2.4.LinkedList 添加元素
 
@@ -1261,17 +1261,17 @@ E unlink(Node<E> x) {
 
 #### 3.3.1.准备
 
-**LinkedList是基于双向链表数据结构实现的Java集合**(jdk1.8以前基于双向循环链表)，在阅读源码之前，有必要简单了解一下链表。
+**LinkedList是基于双向链表数据结构实现的Java集合**(`jdk1.8` 以前基于双向循环链表)，在阅读源码之前，有必要简单了解一下链表。
 
 先了解一下链表的概念：链表是由一系列非连续的节点组成的存储结构，简单分下类的话，链表又分为单向链表和双向链表，而单向/双向链表又可以分为循环链表和非循环链表。
 
-- 单向链表：单向链表就是通过每个结点的指针指向下一个结点从而链接起来的结构，最后一个节点的next指向null。
-- 单向循环链表：单向循环链表和单向列表的不同是，最后一个节点的next不是指向null，而是指向head节点，形成一个“环”。
-- 双向链表：向链表是包含两个指针的，pre指向前一个节点，next指向后一个节点，但是第一个节点head的pre指向null，最后一个节点的tail指向null。
+- 单向链表：单向链表就是通过每个结点的指针指向下一个结点从而链接起来的结构，最后一个节点的 `next` 指向 `null`。
+- 单向循环链表：单向循环链表和单向列表的不同是，最后一个节点的 `next` 不是指向 `null`，而是指向 `head` 节点，形成一个“环”。
+- 双向链表：向链表是包含两个指针的，`pre` 指向前一个节点， `next` 指向后一个节点，但是第一个节点 `head` 的 `pre` 指向 `null`，最后一个节点的 `tail` 指向 `null`。
 
 ![image-20210321140213866](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/java-core-demo/20210321140214.png)
 
-- 双向循环链表：向循环链表和双向链表的不同在于，第一个节点的pre指向最后一个节点，最后一个节点的next指向第一个节点，也形成一个“环”。
+- 双向循环链表：向循环链表和双向链表的不同在于，第一个节点的 `pre` 指向最后一个节点，最后一个节点的 `next` 指向第一个节点，也形成一个“环”。
 
 ![image-20210321140234338](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/java-core-demo/20210321140234.png)
 
@@ -1279,13 +1279,13 @@ E unlink(Node<E> x) {
 
 ![image-20210321140303687](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/java-core-demo/20210321140303.png)
 
-通过类图可以看到，LinkedList不仅实现了List接口，而且实现了现了Queue和Deque接口，所以它既能作为List使用，也能作为双端队列使用，也可以作为栈使用。
+通过类图可以看到，`LinkedList` 不仅实现了 `List` 接口，而且实现了现了 `Queue` 和 `Deque` 接口，所以它既能作为 `List` 使用，也能作为双端队列使用，也可以作为栈使用。
 
 #### 3.3.3.源码分析
 
 **节点类**
 
-LinkedList有一个静态内部类，我们看到在双链表中每个节点有前趋、后继、数据域，节点类实现了这个结构。
+`LinkedList` 有一个静态内部类，我们看到在双链表中每个节点有前趋、后继、数据域，节点类实现了这个结构。
 ![image-20210321140329412](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/java-core-demo/20210321140329.png)
 
 ```java
@@ -1307,7 +1307,7 @@ LinkedList有一个静态内部类，我们看到在双链表中每个节点有�
 
 **属性**
 
-看一下LinkedList的主要属性。first和last对应了双链表的头结点和尾结点。
+看一下 `LinkedList` 的主要属性。`first` 和 `last` 对应了双链表的头结点和尾结点。
 
 ![image-20210321140352716](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/java-core-demo/20210321140352.png)
 
@@ -1434,7 +1434,7 @@ public LinkedList(Collection<? extends E> c) {
         }
     ```
 
-在链表头部和尾部插入时间复杂度都是O(1)，头插法和尾插法的示意图如下：
+在链表头部和尾部插入时间复杂度都是 `O(1)`，头插法和尾插法的示意图如下：
 
 ![image-20210321140504427](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/java-core-demo/20210321140504.png)
 
@@ -1560,7 +1560,7 @@ public LinkedList(Collection<? extends E> c) {
     
     **注意：**
     
-    不管是上一节的头插入和未插入，还是这一节的删除头节点和删除尾结点，都没有在List中定义。前面提到，LinkedList实现了Deque接口，所以这是作为双向队列的LinkedList插入和删除元素的方式。还有获取头结点和尾结点的方法getFirst()和getLast()，同样都是双向队列的实现。
+    不管是上一节的头插入和未插入，还是这一节的删除头节点和删除尾结点，都没有在 `List` 中定义。前面提到，`LinkedList` 实现了`Deque` 接口，所以这是作为双向队列的 `LinkedList` 插入和删除元素的方式。还有获取头结点和尾结点的方法 `getFirst()` 和`getLast()`，同样都是双向队列的实现。
 
 - **删除指定位置的节点**
 
@@ -1613,9 +1613,9 @@ public LinkedList(Collection<? extends E> c) {
 
     ```
   
-  删除头尾节点，时间复杂度为O(1)。
+  删除头尾节点，时间复杂度为 `O(1)`。
   
-  在中间删除元素，首先要找到删除位置的节点，再修改前后指针，时间复杂度为O(n)。
+  在中间删除元素，首先要找到删除位置的节点，再修改前后指针，时间复杂度为 `O(n)`。
 
 **前面还提到，LinkedList可以作为栈使用，栈的特点是先进后出，LinkedList同样有作为栈的方法实现。**
 
@@ -1641,7 +1641,7 @@ public LinkedList(Collection<? extends E> c) {
 
 #### 3.3.4.与ArrayList
 
-LinkedList、ArrayList基本操作时间效率对比如下(粗略对比)：
+`LinkedList`、`ArrayList` 基本操作时间效率对比如下(粗略对比)：
 
 | 操作                      | ArrayList                       | LinkedList         |
 | ------------------------- | ------------------------------- | ------------------ |
@@ -1650,7 +1650,7 @@ LinkedList、ArrayList基本操作时间效率对比如下(粗略对比)：
 | add(int index, E element) | O(n) ,平均n / 2步               | O(n)，平均 n / 4步 |
 | remove(int index)         | O(n) 平均n /2步                 | O(n)，平均 n / 4步 |
 
-简而言之，需要频繁读取集合中的元素时，使用ArrayList效率较高，而在插入和删除操作较多时，使用LinkedList效率较高。
+简而言之，需要频繁读取集合中的元素时，使用 `ArrayList` 效率较高，而在插入和删除操作较多时，使用 `LinkedList` 效率较高。
 
 
 
@@ -1662,7 +1662,7 @@ LinkedList、ArrayList基本操作时间效率对比如下(粗略对比)：
 
 在业务开发中，我们常常会把原始的数组转换为 `List` 类数据结构，来继续展开各种 `Stream` 操作。通常，我们会使用 `Arrays.asList` 方法可以把数组一键转换为 `List`。
 
-【示例】Arrays.asList 转换基本类型数组
+【示例】`Arrays.asList` 转换基本类型数组
 
 ```
 int[] arr = { 1, 2, 3 };
@@ -1680,7 +1680,7 @@ log.info("list:{} size:{} class:{}", list, list.size(), list.get(0).getClass());
 
 由此可知， `Arrays.asList` 第一个问题点：**不能直接使用 `Arrays.asList` 来转换基本类型数组**。
 
-其原因是：`Arrays.asList` 方法传入的是一个泛型 T 类型可变参数，最终 `int` 数组整体作为了一个对象成为了泛型类型 T：
+其原因是：`Arrays.asList` 方法传入的是一个泛型 `T` 类型可变参数，最终 `int` 数组整体作为了一个对象成为了泛型类型 T：
 
 ```
 public static <T> List<T> asList(T... a) {
@@ -1688,7 +1688,7 @@ public static <T> List<T> asList(T... a) {
 }
 ```
 
-直接遍历这样的 `List` 必然会出现 Bug，修复方式有两种，如果使用 Java8 以上版本可以使用 `Arrays.stream` 方法来转换，否则可以把 `int` 数组声明为包装类型 `Integer` 数组：
+直接遍历这样的 `List` 必然会出现 `Bug`，修复方式有两种，如果使用 `Java8` 以上版本可以使用 `Arrays.stream` 方法来转换，否则可以把 `int` 数组声明为包装类型 `Integer` 数组：
 
 【示例】转换整型数组为 List 的正确方式
 
@@ -1702,7 +1702,7 @@ List list2 = Arrays.asList(arr2);
 log.info("list:{} size:{} class:{}", list2, list2.size(), list2.get(0).getClass());
 ```
 
-【示例】Arrays.asList 转换引用类型数组
+【示例】`Arrays.asList` 转换引用类型数组
 
 ```
 String[] arr = { "1", "2", "3" };
@@ -1773,7 +1773,7 @@ log.info("arr:{} list:{}", Arrays.toString(arr), list);
 
 ### 4.2. List.subList 问题点
 
-List.subList 直接引用了原始的 List，也可以认为是共享“存储”，而且对原始 List 直接进行结构性修改会导致 SubList 出现异常。
+`List.subList` 直接引用了原始的 `List`，也可以认为是共享“存储”，而且对原始 `List` 直接进行结构性修改会导致 `SubList` 出现异常。
 
 ```
 private static List<List<Integer>> data = new ArrayList<>();
@@ -1786,7 +1786,7 @@ private static void oom() {
 }
 ```
 
-出现 OOM 的原因是，循环中的 1000 个具有 10 万个元素的 List 始终得不到回收，因为它始终被 subList 方法返回的 List 强引用。
+出现 `OOM` 的原因是，循环中的 `1000` 个具有 `10` 万个元素的 `List` 始终得不到回收，因为它始终被 `subList` 方法返回的 `List` 强引用。
 
 解决方法是：
 
@@ -1799,7 +1799,7 @@ private static void oomfix() {
 }
 ```
 
-【示例】子 List 强引用原始的 List
+【示例】子 `List` 强引用原始的 `List`
 
 ```
 private static void wrong() {
@@ -1821,9 +1821,9 @@ private static void wrong() {
 
 解决方法：
 
-一种是，不直接使用 subList 方法返回的 SubList，而是重新使用 new ArrayList，在构造方法传入 SubList，来构建一个独立的 ArrayList；
+- 一种是，不直接使用 `subList` 方法返回的 `SubList`，而是重新使用 `new ArrayList`，在构造方法传入 `SubList`，来构建一个独立的 `ArrayList`；
 
-另一种是，对于 Java 8 使用 Stream 的 skip 和 limit API 来跳过流中的元素，以及限制流中元素的个数，同样可以达到 SubList 切片的目的。
+- 另一种是，对于 `Java 8` 使用 `Stream` 的 `skip` 和 `limit API` 来跳过流中的元素，以及限制流中元素的个数，同样可以达到 `SubList` 切片的目的。
 
 ```
 //方式一：
@@ -1844,7 +1844,7 @@ List<Integer> subList = list.stream().skip(1).limit(3).collect(Collectors.toList
 public class Stack<E> extends Vector<E> {
 ```
 
-由此知道 Stack 继承自 Vector，Vector是个什么鬼，接触不多，但我们大概知道它跟 ArrayList 似乎有那么点关系(因为面试的时候会涉及到)，具体啥关系，不清楚，那么接着看源码：
+由此知道 `Stack` 继承自 `Vector`，`Vector` 是个什么鬼，接触不多，但我们大概知道它跟 `ArrayList` 似乎有那么点关系(因为面试的时候会涉及到)，具体啥关系，不清楚，那么接着看源码：
 
 ```java
 public class Vector<E>extends AbstractList<E>
@@ -1853,23 +1853,23 @@ public class Vector<E>extends AbstractList<E>
 
 这里，我们知道了两点：
 
-1. Vector 是 AbstractList 子类
-2. Vector 实现了 List 接口
+1. `Vector` 是 `AbstractList` 子类
+2. `Vector` 实现了 `List` 接口
 
- ok，让我们再稍微追溯下 ArrayList 源码：
+ ok，让我们再稍微追溯下 `ArrayList` 源码：
 
 ```java
 public class ArrayList<E> extends AbstractList<E>
         implements List<E>, RandomAccess, Cloneable, java.io.Serializable{
 ```
 
-ArrayList 是 List 的一个实现类，这大家都清楚，关键是这里我们知道了一个信息：ArrayList 是 AbstractList 子类
+`ArrayList` 是 `List` 的一个实现类，这大家都清楚，关键是这里我们知道了一个信息：`ArrayList` 是 `AbstractList` 子类
 
-那么，ArrayList 和 Vector 关系总算清楚了，他们是哥们关系，并且都继承自 AbstractList
+那么，`ArrayList` 和 `Vector` 关系总算清楚了，他们是哥们关系，并且都继承自 `AbstractList`
 
-从上面所有的分析，我们知道了Stack 本质也是一个 List。其具备 List 所有方法。
+从上面所有的分析，我们知道了 `Stack` 本质也是一个 `List`。其具备 `List` 所有方法。
 
-然后，我们需要了解的是，Stack 栈是一个 "先进后出"的原理。
+然后，我们需要了解的是，`Stack` 栈是一个 "先进后出"的原理。
 
 那么基于以上，我们需要记住的是：
 
@@ -1897,8 +1897,9 @@ isEmpty()
 push(E item)
 ```
 
-我们知道 Stack 也是一个List，而List的添加是 add(E e),那么Stack的 push 和 add 方法有啥不同呢?
- 下面先看 源码中Stack 的add方法：
+我们知道 `Stack` 也是一个 `List`，而 `List` 的添加是 `add(E e)`,那么 `Stack` 的 `push` 和 `add` 方法有啥不同呢?
+
+下面先看 源码中 `Stack` 的 `add` 方法：
 
 ```java
     public synchronized boolean add(E e) {
@@ -1909,7 +1910,7 @@ push(E item)
     }
 ```
 
-Stack 中push方法的源码:
+`Stack` 中 `push` 方法的源码:
 
 ```cpp
 public E push(E item) {
@@ -1919,7 +1920,7 @@ public E push(E item) {
     }
 ```
 
-追溯 addElement(item) 方法：
+追溯 `addElement(item)` 方法：
 
 ```java
     public synchronized void addElement(E obj) {
@@ -1929,7 +1930,7 @@ public E push(E item) {
     }
 ```
 
-发现了没？原来stack的push方法最后调用的和stack的add方法是同一个方法，即push调用的其实还是 add方法。
+发现了没？原来 `stack` 的 `push` 方法最后调用的和 `stack` 的 `add` 方法是同一个方法，即 `push` 调用的其实还是 `add` 方法。
 
 **5.2.4.获取栈顶值,元素不出栈(栈为空时抛异常)**
 
@@ -1937,7 +1938,7 @@ public E push(E item) {
 peek()
 ```
 
-这里需要注意的是，stack调用peek后，item还是在栈中的，并未被移除，然后在调用peek时要判断stack中是否有元素，否则会引发异常
+这里需要注意的是，`stack` 调用 `peek` 后，`item` 还是在栈中的，并未被移除，然后在调用 `peek` 时要判断 `stack` 中是否有元素，否则会引发异常
 
 **5.2.5.是否存在obj**
 
@@ -1945,7 +1946,7 @@ peek()
 search(Object obj)
 ```
 
-返回值为int，若存在，返回值为obj距离栈顶的位置，若不存在，返回 -1
+返回值为 `int`，若存在，返回值为 `obj` 距离栈顶的位置，若不存在，返回 -1
 
 **5.2.6.移除栈顶**
 
@@ -1957,7 +1958,7 @@ pop()
 
 **5.2.7.其他方法**
 
-stack 作为 list，具备 list 常用方法，如：
+`stack` 作为 `list`，具备 `list` 常用方法，如：
 
 ```csharp
 //获取stack长度
@@ -1974,17 +1975,17 @@ remove(int index)
 clear()
 ```
 
-其他关于 list 的方法，这里就不多讲了。
+其他关于 `list` 的方法，这里就不多讲了。
 
 **5.2.8.Stack的通常操作**
 
-- push 入栈
-- pop 栈顶元素出栈，并返回
-- peek 获取栈顶元素，并不删除
+- `push` 入栈
+- `pop` 栈顶元素出栈，并返回
+- `peek` 获取栈顶元素，并不删除
 
 ### 5.3.Stack 和 ArrayList 的区别
 
-stack 和 ArrayList 的最大区别是 stack 是线程安全的，而 ArrayList 不是线程安全的。所以，当涉及到多线程问题的时候，优先考虑使用 stack
+`stack` 和 `ArrayList` 的最大区别是 `stack` 是线程安全的，而 `ArrayList` 不是线程安全的。所以，当涉及到多线程问题的时候，优先考虑使用 `stack`
 
 ### 5.4.使用示例及结果
 
