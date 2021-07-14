@@ -79,7 +79,7 @@ public interface SortedMap<K,V> extends Map<K,V> { }
 1. `void`（无参数）构造方法，它创建一个空的有序 `Map`，按照键的自然顺序进行排序。
 2. 带有一个 `Comparator` 类型参数的构造方法，它创建一个空的有序 `Map`，根据指定的比较器进行排序。
 3. 带有一个 `Map` 类型参数的构造方法，它创建一个新的有序 `Map`，其键-值映射关系与参数相同，按照键的自然顺序进行排序。
-4. 带有一个 `SortedMap` 类型参数的构造方法，它创建一个新的有序 `Map`，其键-值映射关系和排序方法与输入的有序 Map 相同。无法保证强制实施此建议，因为接口不能包含构造方法。
+4. 带有一个 `SortedMap` 类型参数的构造方法，它创建一个新的有序 `Map`，其键-值映射关系和排序方法与输入的有序 `Map` 相同。无法保证强制实施此建议，因为接口不能包含构造方法。
 
 ### 1.6. NavigableMap 接口
 
@@ -120,7 +120,7 @@ NavigableMap 分别提供了获取“键”、“键-值对”、“键集”、
 public abstract class Dictionary<K,V> {}
 ```
 
-`Dictionary` 是 JDK 1.0 定义的操作键值对的抽象类，它包括了操作键值对的基本方法。
+`Dictionary` 是 `JDK 1.0` 定义的操作键值对的抽象类，它包括了操作键值对的基本方法。
 
 ## 2. HashMap 类
 
@@ -666,7 +666,7 @@ Step 1 怎么理解呢？其实是对一个二进制数依次向右移位，然�
 
 但是还有一种特殊情况套用以上公式不行，这些数字就是2的幂自身。如果数字4套用公式的话。得到的会是 8，不过其实这个问题也被解决了。
 
-总之，HashMap根据用户传入的初始化容量，利用无符号右移和按位或运算等方式计算出第一个大于该数的2的幂。
+总之，`HashMap` 根据用户传入的初始化容量，利用无符号右移和按位或运算等方式计算出第一个大于该数的2的幂。
 
 #### 2.3.5.扩容
 
@@ -1383,7 +1383,7 @@ public V put(K key, V value) {
 - 链表法就是将相同 `hash` 值的对象组织成一个链表放在 `hash` 值对应的槽位；
 - 开放地址法是通过一个探测算法，当某个槽位已经被占据的情况下继续查找下一个可以使用的槽位。
 
-java.util.HashMap采用的链表法的方式，链表是单向链表。形成单链表的核心代码如下：
+`java.util.HashMap` 采用的链表法的方式，链表是单向链表。形成单链表的核心代码如下：
 
 ```
 void addEntry(int hash, K key, V value, int bucketIndex) {  
@@ -1412,7 +1412,7 @@ bsp;
 
 #### X.7.2.HashMap的数据结构
 
-HashMap的底层主要是基于数组和链表来实现的，它之所以有相当快的查询速度主要是因为它是通过计算散列码来决定存储的位置。**HashMap中主要是通过key的hashCode来计算hash值的，只要hashCode相同，计算出来的hash值就一样。如果存储的对象对多了，就有可能不同的对象所算出来的hash值是相同的，这就出现了所谓的hash冲突。**学过数据结构的同学都知道，解决hash冲突的方法有很多，HashMap底层是**通过链表来解决hash冲突**的。
+`HashMap` 的底层主要是基于数组和链表来实现的，它之所以有相当快的查询速度主要是因为它是通过计算散列码来决定存储的位置。**HashMap中主要是通过key的hashCode来计算hash值的，只要hashCode相同，计算出来的hash值就一样。如果存储的对象对多了，就有可能不同的对象所算出来的hash值是相同的，这就出现了所谓的hash冲突。**学过数据结构的同学都知道，解决 `hash` 冲突的方法有很多，`HashMap` 底层是**通过链表来解决hash冲突**的。
 
 ![640 (1)](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/java-core-demo/20210321163459.webp)
 
@@ -1566,7 +1566,7 @@ public HashMap(int initialCapacity, float loadFactor) {
     }
 ```
 
-我们可以看到在构造 `HashMap` 的时候如果我们指定了加载因子和初始容量的话就调用第一个构造方法，否则的话就是用默认的。默认初始容量为16，默认加载因子为0.75。我们可以看到上面代码中13-15行，这段代码的作用是确保容量为2的n次幂，使 `capacity` 为大于`initialCapacity` 的最小的2的n次幂，至于为什么要把容量设置为2的n次幂，我们等下再看。
+我们可以看到在构造 `HashMap` 的时候如果我们指定了加载因子和初始容量的话就调用第一个构造方法，否则的话就是用默认的。默认初始容量为16，默认加载因子为 `0.75`。我们可以看到上面代码中13-15行，这段代码的作用是确保容量为2的n次幂，使 `capacity` 为大于`initialCapacity` 的最小的2的n次幂，至于为什么要把容量设置为2的n次幂，我们等下再看。
 
 重点分析下 `HashMap` 中用的最多的两个方法 `put` 和 `get`
 
@@ -1648,7 +1648,7 @@ static int indexFor(int h, int length) { //根据hash值和数组长度算出索
 
 这个我们要重点说下，我们一般对哈希表的散列很自然地会想到用 `hash` 值对 `length` 取模（即除法散列法），`Hashtable` 中也是这样实现的，这种方法基本能保证元素在哈希表中散列的比较均匀，但取模会用到除法运算，效率很低，`HashMap` 中则通过 `h&(length-1)` 的方法来代替取模，同样实现了均匀的散列，但效率要高很多，这也是 `HashMap` 对 `Hashtable` 的一个改进。
 
-接下来，我们分析下为什么哈希表的容量一定要是2的整数次幂。首先，`length` 为2的整数次幂的话，`h&(length-1)` 就相当于对 `length` 取模，这样便保证了散列的均匀，同时也提升了效率；其次，`length` 为2的整数次幂的话，为偶数，这样 `length-1` 为奇数，奇数的最后一位是1，这样便保证了 `h&(length-1)` 的最后一位可能为0，也可能为1（这取决于h的值），即与后的结果可能为偶数，也可能为奇数，这样便可以保证散列的均匀性，而如果 `length` 为奇数的话，很明显 `length-1` 为偶数，它的最后一位是0，这样`h&(length-1)`的最后一位肯定为0，即只能为偶数，这样任何hash值都只会被散列到数组的偶数下标位置上，这便浪费了近一半的空间，因此，length取2的整数次幂，是为了使不同hash值发生碰撞的概率较小，这样就能使元素在哈希表中均匀地散列。
+接下来，我们分析下为什么哈希表的容量一定要是2的整数次幂。首先，`length` 为2的整数次幂的话，`h&(length-1)` 就相当于对 `length` 取模，这样便保证了散列的均匀，同时也提升了效率；其次，`length` 为2的整数次幂的话，为偶数，这样 `length-1` 为奇数，奇数的最后一位是1，这样便保证了 `h&(length-1)` 的最后一位可能为0，也可能为1（这取决于h的值），即与后的结果可能为偶数，也可能为奇数，这样便可以保证散列的均匀性，而如果 `length` 为奇数的话，很明显 `length-1` 为偶数，它的最后一位是0，这样`h&(length-1)`的最后一位肯定为0，即只能为偶数，这样任何 `hash` 值都只会被散列到数组的偶数下标位置上，这便浪费了近一半的空间，因此，`length` 取2的整数次幂，是为了使不同 `hash` 值发生碰撞的概率较小，这样就能使元素在哈希表中均匀地散列。
 
 这看上去很简单，其实比较有玄机的，我们举个例子来说明：
 
@@ -1663,11 +1663,11 @@ static int indexFor(int h, int length) { //根据hash值和数组长度算出索
        9 & (16-1)：                                 0101                   &              1111                   =                0101
 ```
 
-从上面的例子中可以看出：当它们和15-1（1110）“与”的时候，产生了相同的结果，也就是说它们会定位到数组中的同一个位置上去，这就产生了碰撞，8和9会被放到数组中的同一个位置上形成链表，那么查询的时候就需要遍历这个链 表，得到8或者9，这样就降低了查询的效率。同时，我们也可以发现，当数组长度为15的时候，hash值会与15-1（1110）进行“与”，那么 最后一位永远是0，而0001，0011，0101，1001，1011，0111，1101这几个位置永远都不能存放元素了，空间浪费相当大，更糟的是这种情况中，数组可以使用的位置比数组长度小了很多，这意味着进一步增加了碰撞的几率，减慢了查询的效率！而当数组长度为16时，即为2的n次方时，2n-1得到的二进制数的每个位上的值都为1，这使得在低位上&时，得到的和原hash的低位相同，加之hash(int h)方法对key的hashCode的进一步优化，加入了高位计算，就使得只有相同的hash值的两个值才会被放到数组中的同一个位置上形成链表。
+从上面的例子中可以看出：当它们和 `15-1（1110）`“与”的时候，产生了相同的结果，也就是说它们会定位到数组中的同一个位置上去，这就产生了碰撞，8和9会被放到数组中的同一个位置上形成链表，那么查询的时候就需要遍历这个链 表，得到8或者9，这样就降低了查询的效率。同时，我们也可以发现，当数组长度为15的时候，hash值会与15-1（1110）进行“与”，那么 最后一位永远是0，而0001，0011，0101，1001，1011，0111，1101这几个位置永远都不能存放元素了，空间浪费相当大，更糟的是这种情况中，数组可以使用的位置比数组长度小了很多，这意味着进一步增加了碰撞的几率，减慢了查询的效率！而当数组长度为16时，即为2的n次方时，2n-1得到的二进制数的每个位上的值都为1，这使得在低位上&时，得到的和原 `hash` 的低位相同，加之 `hash(int h)` 方法对 `key` 的`hashCode` 的进一步优化，加入了高位计算，就使得只有相同的 `hash` 值的两个值才会被放到数组中的同一个位置上形成链表。
 
-所以说，当数组长度为2的n次幂的时候，不同的key算得得index相同的几率较小，那么数据在数组上分布就比较均匀，也就是说碰撞的几率小，相对的，查询的时候就不用遍历某个位置上的链表，这样查询效率也就较高了。
+所以说，当数组长度为2的n次幂的时候，不同的 `key` 算得得 `index` 相同的几率较小，那么数据在数组上分布就比较均匀，也就是说碰撞的几率小，相对的，查询的时候就不用遍历某个位置上的链表，这样查询效率也就较高了。
 
-根据上面 put 方法的源代码可以看出，当程序试图将一个key-value对放入HashMap中时，程序首先根据该 key 的 hashCode() 返回值决定该 Entry 的存储位置：如果两个 Entry 的 key 的 hashCode() 返回值相同，那它们的存储位置相同。如果这两个 Entry 的 key 通过 equals 比较返回 true，新添加 Entry 的 value 将覆盖集合中原有 Entry 的 value，但key不会覆盖。如果这两个 Entry 的 key 通过 equals 比较返回 false，新添加的 Entry 将与集合中原有 Entry 形成 Entry 链，而且新添加的 Entry 位于 Entry 链的头部——具体说明继续看 addEntry() 方法的说明。
+根据上面 `put` 方法的源代码可以看出，当程序试图将一个 `key-value` 对放入 `HashMap` 中时，程序首先根据该 `key` 的 `hashCode()` 返回值决定该 `Entry` 的存储位置：如果两个 `Entry` 的 `key` 的 `hashCode()` 返回值相同，那它们的存储位置相同。如果这两个 `Entry` 的 `key` 通过 `equals` 比较返回 `true`，新添加 `Entry` 的 `value` 将覆盖集合中原有 `Entry` 的 `value`，但 `key` 不会覆盖。如果这两个 `Entry` 的 `key` 通过 `equals` 比较返回 `false`，新添加的 `Entry` 将与集合中原有 `Entry` 形成 `Entry` 链，而且新添加的 `Entry` 位于 `Entry` 链的头部——具体说明继续看 `addEntry()` 方法的说明。
 
 ```
 void addEntry(int hash, K key, V value, int bucketIndex) {
@@ -1678,15 +1678,15 @@ void addEntry(int hash, K key, V value, int bucketIndex) {
     }
 ```
 
-参数bucketIndex就是indexFor函数计算出来的索引值，第2行代码是取得数组中索引为bucketIndex的Entry对象，第3行就是用hash、key、value构建一个新的Entry对象放到索引为bucketIndex的位置，并且将该位置原先的对象设置为新对象的next构成链表。
+参数 `bucketIndex` 就是 `indexFor` 函数计算出来的索引值，第2行代码是取得数组中索引为 `bucketIndex` 的 `Entry` 对象，第3行就是用 `hash`、`key`、`value` 构建一个新的 `Entry` 对象放到索引为 `bucketIndex` 的位置，并且将该位置原先的对象设置为新对象的 `next` 构成链表。
 
-第4行和第5行就是判断put后size是否达到了临界值threshold，如果达到了临界值就要进行扩容，HashMap扩容是扩为原来的两倍。
+第4行和第5行就是判断 `put` 后 `size` 是否达到了临界值 `threshold`，如果达到了临界值就要进行扩容，`HashMap` 扩容是扩为原来的两倍。
 
 ##### X.7.3.4.调整大小
 
-resize()方法如下：
+`resize()` 方法如下：
 
-重新调整HashMap的大小，newCapacity是调整后的单位
+重新调整 `HashMap` 的大小，`newCapacity` 是调整后的单位
 
 ```
 void resize(int newCapacity) {
@@ -1704,11 +1704,11 @@ void resize(int newCapacity) {
     }
 ```
 
-新建了一个HashMap的底层数组，上面代码中第10行为调用transfer方法，将HashMap的全部元素添加到新的HashMap中,并重新计算元素在新的数组中的索引位置
+新建了一个 `HashMap` 的底层数组，上面代码中第10行为调用 `transfer` 方法，将 `HashMap` 的全部元素添加到新的 `HashMap` 中,并重新计算元素在新的数组中的索引位置
 
-当HashMap中的元素越来越多的时候，hash冲突的几率也就越来越高，因为数组的长度是固定的。所以为了提高查询的效率，就要对HashMap的数组进行扩容，数组扩容这个操作也会出现在ArrayList中，这是一个常用的操作，而在HashMap数组扩容之后，最消耗性能的点就出现了：原数组中的数据必须重新计算其在新数组中的位置，并放进去，这就是resize。
+当 `HashMap` 中的元素越来越多的时候，`hash` 冲突的几率也就越来越高，因为数组的长度是固定的。所以为了提高查询的效率，就要对 `HashMap` 的数组进行扩容，数组扩容这个操作也会出现在 `ArrayList` 中，这是一个常用的操作，而在 `HashMap` 数组扩容之后，最消耗性能的点就出现了：原数组中的数据必须重新计算其在新数组中的位置，并放进去，这就是 `resize`。
 
-那么HashMap什么时候进行扩容呢？**当HashMap中的元素个数超过数组大小\*loadFactor时，就会进行数组扩容，loadFactor的默认值为0.75，这是一个折中的取值。**也就是说，默认情况下，数组大小为16，那么当HashMap中元素个数超过 `16*0.75=12` 的时候，就把数组的大小扩展为  `2*16=32`，即扩大一倍，然后重新计算每个元素在数组中的位置，扩容是需要进行数组复制的，复制数组是非常消耗性能的操作，所以如果我们已经预知HashMap中元素的个数，那么预设元素的个数能够有效的提高HashMap的性能。
+那么 `HashMap` 什么时候进行扩容呢？**当HashMap中的元素个数超过数组大小\*loadFactor时，就会进行数组扩容，loadFactor的默认值为0.75，这是一个折中的取值。**也就是说，默认情况下，数组大小为16，那么当 `HashMap` 中元素个数超过 `16*0.75=12` 的时候，就把数组的大小扩展为  `2*16=32`，即扩大一倍，然后重新计算每个元素在数组中的位置，扩容是需要进行数组复制的，复制数组是非常消耗性能的操作，所以如果我们已经预知 `HashMap` 中元素的个数，那么预设元素的个数能够有效的提高 `HashMap` 的性能。
 
 ##### X.7.3.5.数据读取
 
@@ -1728,28 +1728,33 @@ public V get(Object key) {
 }
 ```
 
-有了上面存储时的hash算法作为基础，理解起来这段代码就很容易了。从上面的源代码中可以看出：从HashMap中get元素时，首先计算key的hashCode，找到数组中对应位置的某一元素，然后通过key的equals方法在对应位置的链表中找到需要的元素。
+有了上面存储时的 `hash` 算法作为基础，理解起来这段代码就很容易了。从上面的源代码中可以看出：从 `HashMap` 中 `get` 元素时，首先计算 `key` 的`hashCode`，找到数组中对应位置的某一元素，然后通过 `key` 的 `equals` 方法在对应位置的链表中找到需要的元素。
 
 ##### X.7.3.6.HashMap的性能参数：
 
-HashMap 包含如下几个构造器：
+`HashMap` 包含如下几个构造器：
 
-- **HashMap()：**构建一个初始容量为 16，负载因子为 0.75 的 HashMap。
-- **HashMap(int initialCapacity)：**构建一个初始容量为 initialCapacity，负载因子为 0.75 的 HashMap。
-- **HashMap(int initialCapacity, float loadFactor)：**以指定初始容量、指定的负载因子创建一个 HashMap。
-  HashMap的基础构造器HashMap(int initialCapacity, float loadFactor)带有两个参数，它们是初始容量initialCapacity和加载因子loadFactor。
-- **initialCapacity：**HashMap的最大容量，即为底层数组的长度。
-- **loadFactor：**负载因子loadFactor定义为：散列表的实际元素数目(n)/ 散列表的容量(m)。
+- **HashMap()：**构建一个初始容量为 `16`，负载因子为 `0.75` 的 `HashMap`。
 
-负载因子衡量的是一个散列表的空间的使用程度，负载因子越大表示散列表的装填程度越高，反之愈小。对于使用链表法的散列表来说，查找一个元素的平均时间是O(1+a)，因此如果负载因子越大，对空间的利用更充分，然而后果是查找效率的降低；如果负载因子太小，那么散列表的数据将过于稀疏，对空间造成严重浪费。
+- **HashMap(int initialCapacity)：**构建一个初始容量为 `initialCapacity`，负载因子为 `0.75` 的 `HashMap`。
 
-HashMap的实现中，通过threshold字段来判断HashMap的最大容量：
+- **HashMap(int initialCapacity, float loadFactor)：**以指定初始容量、指定的负载因子创建一个 `HashMap`。
+  
+  `HashMap` 的基础构造器 `HashMap(int initialCapacity, float loadFactor)` 带有两个参数，它们是初始容量 `initialCapacity` 和加载因子`loadFactor`。
+  
+- **initialCapacity：**`HashMap`的最大容量，即为底层数组的长度。
+
+- **loadFactor：**负载因子 `loadFactor` 定义为：散列表的实际元素数目(n)/ 散列表的容量(m)。
+
+负载因子衡量的是一个散列表的空间的使用程度，负载因子越大表示散列表的装填程度越高，反之愈小。对于使用链表法的散列表来说，查找一个元素的平均时间是 `O(1+a)`，因此如果负载因子越大，对空间的利用更充分，然而后果是查找效率的降低；如果负载因子太小，那么散列表的数据将过于稀疏，对空间造成严重浪费。
+
+`HashMap` 的实现中，通过 `threshold` 字段来判断 `HashMap` 的最大容量：
 
 ```
 threshold = (int)(capacity * loadFactor);  
 ```
 
-结合负载因子的定义公式可知，threshold就是在此loadFactor和capacity对应下允许的最大元素数目，超过这个数目就重新resize，以降低实际的负载因子。默认的的负载因子0.75是对空间和时间效率的一个平衡选择。当容量超出此最大容量时，resize后的HashMap容量是容量的两倍。
+结合负载因子的定义公式可知，`threshold` 就是在此 `loadFactor` 和 `capacity` 对应下允许的最大元素数目，超过这个数目就重新 `resize`，以降低实际的负载因子。默认的的负载因子 `0.75` 是对空间和时间效率的一个平衡选择。当容量超出此最大容量时，`resize` 后的 `HashMap` 容量是容量的两倍。
 
 
 
@@ -1757,19 +1762,19 @@ threshold = (int)(capacity * loadFactor);
 
 #### X.8.1.ConcurrentHashMap的简介
 
-> 我想有基础的同学知道在jdk1.7中是采用Segment + HashEntry + ReentrantLock的方式进行实现的，而1.8中放弃了Segment臃肿的设计，取而代之的是采用Node + CAS + Synchronized来保证并发安全进行实现。
+> 我想有基础的同学知道在 `jdk1.7` 中是采用 `Segment + HashEntry + ReentrantLock` 的方式进行实现的，而 `1.8` 中放弃了 `Segment` 臃肿的设计，取而代之的是采用 `Node + CAS + Synchronized` 来保证并发安全进行实现。
 
-- JDK1.8的实现降低锁的粒度，JDK1.7版本锁的粒度是基于Segment的，包含多个HashEntry，而JDK1.8锁的粒度就是HashEntry（首节点）
-- JDK1.8版本的数据结构变得更加简单，使得操作也更加清晰流畅，因为已经使用synchronized来进行同步，所以不需要分段锁的概念，也就不需要Segment这种数据结构了，由于粒度的降低，实现的复杂度也增加了
-- JDK1.8使用红黑树来优化链表，基于长度很长的链表的遍历是一个很漫长的过程，而红黑树的遍历效率是很快的，代替一定阈值的链表，这样形成一个最佳拍档
+- `JDK1.8` 的实现降低锁的粒度，`JDK1.7` 版本锁的粒度是基于 `Segment` 的，包含多个 `HashEntry`，而 `JDK1.8` 锁的粒度就是 `HashEntry`（首节点）
+- `JDK1.8` 版本的数据结构变得更加简单，使得操作也更加清晰流畅，因为已经使用 `synchronized` 来进行同步，所以不需要分段锁的概念，也就不需要`Segment` 这种数据结构了，由于粒度的降低，实现的复杂度也增加了
+- `JDK1.8` 使用红黑树来优化链表，基于长度很长的链表的遍历是一个很漫长的过程，而红黑树的遍历效率是很快的，代替一定阈值的链表，这样形成一个最佳拍档
 
 ![640](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/java-core-demo/20210321170949.png)
 
 #### X.8.2.get操作源码
 
-- 首先计算hash值，定位到该table索引位置，如果是首节点符合就返回
-- 如果遇到扩容的时候，会调用标志正在扩容节点ForwardingNode的find方法，查找该节点，匹配就返回
-- 以上都不符合的话，就往下遍历节点，匹配就返回，否则最后就返回null
+- 首先计算 `hash` 值，定位到该 `table` 索引位置，如果是首节点符合就返回
+- 如果遇到扩容的时候，会调用标志正在扩容节点 `ForwardingNode` 的 `find` 方法，查找该节点，匹配就返回
+- 以上都不符合的话，就往下遍历节点，匹配就返回，否则最后就返回 `null`
 
 ```
 //会发现源码中没有一处加了锁
@@ -1798,29 +1803,29 @@ public V get(Object key) {
 }
 ```
 
-> get没有加锁的话，ConcurrentHashMap是如何保证读到的数据不是脏数据的呢？
+> `get` 没有加锁的话，`ConcurrentHashMap` 是如何保证读到的数据不是脏数据的呢？
 
 #### X.8.3.volatile登场
 
-对于可见性，Java提供了volatile关键字来保证可见性、有序性。但不保证原子性。
+对于可见性，`Java` 提供了 `volatile` 关键字来保证可见性、有序性。但不保证原子性。
 
 普通的共享变量不能保证可见性，因为普通共享变量被修改之后，什么时候被写入主存是不确定的，当其他线程去读取时，此时内存中可能还是原来的旧值，因此无法保证可见性。
 
-- volatile关键字对于基本类型的修改可以在随后对多个线程的读保持一致，但是对于引用类型如数组，实体bean，仅仅保证引用的可见性，但并不保证引用内容的可见性。。
+- `volatile` 关键字对于基本类型的修改可以在随后对多个线程的读保持一致，但是对于引用类型如数组，实体 `bean`，仅仅保证引用的可见性，但并不保证引用内容的可见性。。
 - 禁止进行指令重排序。
 
 背景：为了提高处理速度，处理器不直接和内存进行通信，而是先将系统内存的数据读到内部缓存（L1，L2或其他）后再进行操作，但操作完不知道何时会写到内存。
 
-- 如果对声明了volatile的变量进行写操作，JVM就会向处理器发送一条指令，将这个变量所在缓存行的数据写回到系统内存。但是，就算写回到内存，如果其他处理器缓存的值还是旧的，再执行计算操作就会有问题。
-- 在多处理器下，为了保证各个处理器的缓存是一致的，就会实现缓存一致性协议，当某个CPU在写数据时，如果发现操作的变量是共享变量，则会通知其他CPU告知该变量的缓存行是无效的，因此其他CPU在读取该变量时，发现其无效会重新从主存中加载数据。
+- 如果对声明了 `volatile` 的变量进行写操作，`JVM` 就会向处理器发送一条指令，将这个变量所在缓存行的数据写回到系统内存。但是，就算写回到内存，如果其他处理器缓存的值还是旧的，再执行计算操作就会有问题。
+- 在多处理器下，为了保证各个处理器的缓存是一致的，就会实现缓存一致性协议，当某个 `CPU` 在写数据时，如果发现操作的变量是共享变量，则会通知其他`CPU` 告知该变量的缓存行是无效的，因此其他 `CPU` 在读取该变量时，发现其无效会重新从主存中加载数据。
 
 ![640](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/java-core-demo/20210321171016.jpg)
 
 **总结下来：**
 
-- 第一：使用volatile关键字会强制将修改的值立即写入主存；
+- 第一：使用 `volatile` 关键字会强制将修改的值立即写入主存；
 
-- 第二：使用volatile关键字的话，当线程2进行修改时，会导致线程1的工作内存中缓存变量的缓存行无效（反映到硬件层的话，就是CPU的L1或者L2缓存中对应的缓存行无效）；
+- 第二：使用 `volatile` 关键字的话，当线程2进行修改时，会导致线程1的工作内存中缓存变量的缓存行无效（反映到硬件层的话，就是CPU的L1或者L2缓存中对应的缓存行无效）；
 
 - 第三：由于线程1的工作内存中缓存变量的缓存行无效，所以线程1再次读取变量的值时会去主存读取。
 
@@ -1834,11 +1839,11 @@ public V get(Object key) {
     transient volatile Node<K,V>[] table;
 ```
 
-我们知道volatile可以修饰数组的，只是意思和它表面上看起来的样子不同。举个栗子，volatile int array[10]是指array的地址是volatile的而不是数组元素的值是volatile的.
+我们知道 `volatile` 可以修饰数组的，只是意思和它表面上看起来的样子不同。举个栗子，`volatile int array[10]` 是指 `array` 的地址是 `volatile` 的而不是数组元素的值是 `volatile` 的.
 
 #### X.8.5.用volatile修饰的Node
 
-get操作可以无锁是由于Node的元素val和指针next是用volatile修饰的，在多线程环境下线程A修改结点的val或者新增节点的时候是对线程B可见的。
+`get` 操作可以无锁是由于 `Node` 的元素 `val` 和指针 `next` 是用 `volatile` 修饰的，在多线程环境下线程 `A` 修改结点的 `val` 或者新增节点的时候是对线程 `B` 可见的。
 
 ```
 static class Node<K,V> implements Map.Entry<K,V> {
@@ -1892,13 +1897,13 @@ static class Node<K,V> implements Map.Entry<K,V> {
 
 > 既然volatile修饰数组对get操作没有效果那加在数组上的volatile的目的是什么呢？
 
-其实就是为了使得Node数组在扩容的时候对其他线程具有可见性而加的volatile
+其实就是为了使得 `Node` 数组在扩容的时候对其他线程具有可见性而加的 `volatile`
 
 #### X.8.6.总结
 
-- 在1.8中ConcurrentHashMap的get操作全程不需要加锁，这也是它比其他并发集合比如hashtable、用Collections.synchronizedMap()包装的hashmap;安全效率高的原因之一。
-- get操作全程不需要加锁是因为Node的成员val是用volatile修饰的和数组用volatile修饰没有关系。
-- 数组用volatile修饰主要是保证在数组扩容的时候保证可见性。
+- 在1.8中 `ConcurrentHashMap` 的 `get` 操作全程不需要加锁，这也是它比其他并发集合比如 `hashtable`、用 `Collections.synchronizedMap()` 包装的`hashmap`;安全效率高的原因之一。
+- `get` 操作全程不需要加锁是因为 `Node` 的成员 `val` 是用 `volatile` 修饰的和数组用 `volatile` 修饰没有关系。
+- 数组用 `volatile` 修饰主要是保证在数组扩容的时候保证可见性。
 
 
 
@@ -1906,45 +1911,45 @@ static class Node<K,V> implements Map.Entry<K,V> {
 
 **介绍**
 
-`TreeMap<K,V>`的Key值是要求实现`java.lang.Comparable`，所以迭代的时候TreeMap默认是按照Key值升序排序的；TreeMap的实现是基于红黑树结构。适用于按自然顺序或自定义顺序遍历键（key）。
+`TreeMap<K,V>`的Key值是要求实现`java.lang.Comparable`，所以迭代的时候 `TreeMap` 默认是按照 `Key` 值升序排序的；`TreeMap` 的实现是基于红黑树结构。适用于按自然顺序或自定义顺序遍历键（`key`）。
 
-`HashMap<K,V>`的Key值实现散列`hashCode()`，分布是散列的、均匀的，不支持排序；数据结构主要是桶(数组)，链表或红黑树。适用于在Map中插入、删除和定位元素。
+`HashMap<K,V>` 的 `Key` 值实现散列 `hashCode()`，分布是散列的、均匀的，不支持排序；数据结构主要是桶(数组)，链表或红黑树。适用于在 `Map` 中插入、删除和定位元素。
 
 **结论**
 
-如果你需要得到一个有序的结果时就应该使用TreeMap（因为HashMap中元素的排列顺序是不固定的）。除此之外，由于HashMap有更好的性能，所以大多不需要排序的时候我们会使用HashMap。
+如果你需要得到一个有序的结果时就应该使用 `TreeMap`（因为 `HashMap` 中元素的排列顺序是不固定的）。除此之外，由于 `HashMap` 有更好的性能，所以大多不需要排序的时候我们会使用 `HashMap`。
 
 **拓展**
 
 **X.9.1.HashMap 和 TreeMap 的实现**
 
-**HashMap：** 基于哈希表实现。使用HashMap要求添加的键类明确定义了`hashCode()`和`equals()`[可以重写`hashCode()`和`equals()`]，为了优化HashMap空间的使用，您可以调优初始容量和负载因子。
+**HashMap：** 基于哈希表实现。使用HashMap要求添加的键类明确定义了`hashCode()`和`equals()`[可以重写`hashCode()`和`equals()`]，为了优化 `HashMap` 空间的使用，您可以调优初始容量和负载因子。
 
-- HashMap(): 构建一个空的哈希映像
-- HashMap(Map m): 构建一个哈希映像，并且添加映像m的所有映射
-- HashMap(int initialCapacity): 构建一个拥有特定容量的空的哈希映像
-- HashMap(int initialCapacity, float loadFactor): 构建一个拥有特定容量和加载因子的空的哈希映像
+- `HashMap()`: 构建一个空的哈希映像
+- `HashMap(Map m)`: 构建一个哈希映像，并且添加映像m的所有映射
+- `HashMap(int initialCapacity)`: 构建一个拥有特定容量的空的哈希映像
+- `HashMap(int initialCapacity, float loadFactor)`: 构建一个拥有特定容量和加载因子的空的哈希映像
 
 **TreeMap：** 基于红黑树实现。TreeMap没有调优选项，因为该树总处于平衡状态。
 
-- TreeMap()：构建一个空的映像树
-- TreeMap(Map m): 构建一个映像树，并且添加映像m中所有元素
-- TreeMap(Comparator c): 构建一个映像树，并且使用特定的比较器对关键字进行排序
-- TreeMap(SortedMap s): 构建一个映像树，添加映像树s中所有映射，并且使用与有序映像s相同的比较器排序
+- `TreeMap()`：构建一个空的映像树
+- `TreeMap(Map m)`: 构建一个映像树，并且添加映像m中所有元素
+- `TreeMap(Comparator c)`: 构建一个映像树，并且使用特定的比较器对关键字进行排序
+- `TreeMap(SortedMap s)`: 构建一个映像树，添加映像树s中所有映射，并且使用与有序映像s相同的比较器排序
 
 **X.9.2.HashMap 和 TreeMap 都是非线程安全**
 
-HashMap继承AbstractMap抽象类，TreeMap继承自SortedMap接口。
+`HashMap` 继承 `AbstractMap` 抽象类，`TreeMap` 继承自 `SortedMap` 接口。
 
-**AbstractMap抽象类：** 覆盖了equals()和hashCode()方法以确保两个相等映射返回相同的哈希码。如果两个映射大小相等、包含同样的键且每个键在这两个映射中对应的值都相同，则这两个映射相等。映射的哈希码是映射元素哈希码的总和，其中每个元素是Map.Entry接口的一个实现。因此，不论映射内部顺序如何，两个相等映射会报告相同的哈希码。
+**AbstractMap抽象类：** 覆盖了 `equals()` 和 `hashCode()` 方法以确保两个相等映射返回相同的哈希码。如果两个映射大小相等、包含同样的键且每个键在这两个映射中对应的值都相同，则这两个映射相等。映射的哈希码是映射元素哈希码的总和，其中每个元素是 `Map.Entry` 接口的一个实现。因此，不论映射内部顺序如何，两个相等映射会报告相同的哈希码。
 
-**SortedMap接口：** 它用来保持键的有序顺序。SortedMap接口为映像的视图(子集)，包括两个端点提供了访问方法。除了排序是作用于映射的键以外，处理SortedMap和处理SortedSet一样。添加到SortedMap实现类的元素必须实现Comparable接口，否则您必须给它的构造函数提供一个Comparator接口的实现。TreeMap类是它的唯一一个实现。
+**SortedMap接口：** 它用来保持键的有序顺序。`SortedMap` 接口为映像的视图(子集)，包括两个端点提供了访问方法。除了排序是作用于映射的键以外，处理`SortedMap` 和处理 `SortedSet` 一样。添加到 `SortedMap` 实现类的元素必须实现 `Comparable` 接口，否则您必须给它的构造函数提供一个 `Comparator` 接口的实现。`TreeMap` 类是它的唯一一个实现。
 
 **X.9.3.TreeMap中默认是按照升序进行排序的，如何让他降序**
 
 通过自定义的比较器来实现
 
-定义一个比较器类，实现Comparator接口，重写compare方法，有两个参数，这两个参数通过调用compareTo进行比较，而compareTo默认规则是：
+定义一个比较器类，实现 `Comparator` 接口，重写 `compare` 方法，有两个参数，这两个参数通过调用 `compareTo` 进行比较，而 `compareTo` 默认规则是：
 
 > - 如果参数字符串等于此字符串，则返回 0 值；
 > - 如果此字符串小于字符串参数，则返回一个小于 0 的值；
@@ -1964,7 +1969,7 @@ static class MyComparator implements Comparator{
 }
 ```
 
-之后，通过MyComparator类初始化一个比较器实例，将其作为参数传进TreeMap的构造方法中：
+之后，通过 `MyComparator` 类初始化一个比较器实例，将其作为参数传进 `TreeMap` 的构造方法中：
 
 ```
 MyComparator comparator = new MyComparator();
