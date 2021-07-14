@@ -30,20 +30,20 @@ public abstract class AbstractQueue<E>
 
 ### 1.3. Deque 接口
 
-Deque 接口是 double ended queue 的缩写，即 **双端队列**。Deque 继承 Queue 接口，并扩展支持**在队列的两端插入和删除元素**。
+`Deque` 接口是 `double ended queue` 的缩写，即 **双端队列**。`Deque` 继承 `Queue` 接口，并扩展支持**在队列的两端插入和删除元素**。
 
 所以提供了特定的方法，如：
 
 - 尾部插入时需要的 [addLast(e)](https://docs.oracle.com/javase/9/docs/api/java/util/Deque.html#addLast-E-)、[offerLast(e)](https://docs.oracle.com/javase/9/docs/api/java/util/Deque.html#offerLast-E-)。
 - 尾部删除所需要的 [removeLast()](https://docs.oracle.com/javase/9/docs/api/java/util/Deque.html#removeLast--)、[pollLast()](https://docs.oracle.com/javase/9/docs/api/java/util/Deque.html#pollLast--)。
 
-大多数的实现对元素的数量没有限制，但这个接口既支持有容量限制的 deque，也支持没有固定大小限制的。
+大多数的实现对元素的数量没有限制，但这个接口既支持有容量限制的 `deque`，也支持没有固定大小限制的。
 
 ## 2. ArrayDeque
 
 ### 2.1 前言
 
-Java里有一个叫做*Stack*的类，却没有叫做 *Queue* 的类（它是个接口名字）。当需要使用栈时，Java已不推荐使用 *Stack* ，而是推荐使用更高效的 *ArrayDeque*；既然*Queue*只是一个接口，当需要使用队列时也就首选*ArrayDeque* 了（次选是*LinkedList*）。
+`Java` 里有一个叫做*Stack*的类，却没有叫做 *Queue* 的类（它是个接口名字）。当需要使用栈时，`Java` 已不推荐使用 *Stack* ，而是推荐使用更高效的 *ArrayDeque*；既然*Queue*只是一个接口，当需要使用队列时也就首选*ArrayDeque* 了（次选是*LinkedList*）。
 
 ### 2.2 总体介绍
 
@@ -254,7 +254,7 @@ public class PriorityQueue<E> extends AbstractQueue<E>
 - `PriorityQueue` 不接受 null 值元素。
 - `PriorityQueue` 不是线程安全的。
 
-Java中PriorityQueue通过二叉小顶堆实现，可以用一棵完全二叉树表示。本文从Queue接口函数出发，结合生动的图解，深入浅出地分析PriorityQueue每个操作的具体过程和时间复杂度，将让读者建立对PriorityQueue建立清晰而深入的认识。
+`Java` 中 `PriorityQueue` 通过二叉小顶堆实现，可以用一棵完全二叉树表示。本文从 `Queue` 接口函数出发，结合生动的图解，深入浅出地分析 `PriorityQueue` 每个操作的具体过程和时间复杂度，将让读者建立对 `PriorityQueue` 建立清晰而深入的认识。
 
 ### 4.1 总体介绍
 

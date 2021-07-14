@@ -11,13 +11,13 @@
 **Set 家族成员简介：**
 
 - `Set` 继承了 `Collection` 的接口。实际上 `Set` 就是 `Collection`，只是行为略有不同：`Set` 集合不允许有重复元素。
-- `SortedSet` 继承了 `Set` 的接口。`SortedSet` 中的内容是排序的唯一值，排序的方法是通过比较器(Comparator)。
+- `SortedSet` 继承了 `Set` 的接口。`SortedSet` 中的内容是排序的唯一值，排序的方法是通过比较器(`Comparator`)。
 - `NavigableSet` 继承了 `SortedSet` 的接口。它提供了丰富的查找方法：如"获取大于/等于某值的元素"、“获取小于/等于某值的元素”等等。
-- `AbstractSet` 是一个抽象类，它继承于 `AbstractCollection`，`AbstractCollection` 实现了 Set 中的绝大部分方法，为实现 `Set` 的实例类提供了便利。
+- `AbstractSet` 是一个抽象类，它继承于 `AbstractCollection`，`AbstractCollection` 实现了 `Set` 中的绝大部分方法，为实现 `Set` 的实例类提供了便利。
 - `HashSet` 类依赖于 `HashMap`，它实际上是通过 `HashMap` 实现的。`HashSet` 中的元素是无序的、散列的。
-- `TreeSet` 类依赖于 `TreeMap`，它实际上是通过 `TreeMap` 实现的。`TreeSet` 中的元素是有序的，它是按自然排序或者用户指定比较器排序的 Set。
-- `LinkedHashSet` 是按插入顺序排序的 Set。
-- `EnumSet` 是只能存放 Emum 枚举类型的 Set。
+- `TreeSet` 类依赖于 `TreeMap`，它实际上是通过 `TreeMap` 实现的。`TreeSet` 中的元素是有序的，它是按自然排序或者用户指定比较器排序的 `Set`。
+- `LinkedHashSet` 是按插入顺序排序的 `Set`。
+- `EnumSet` 是只能存放 `Emum` 枚举类型的 `Set`。
 
 ### 1.1. Set 接口
 
@@ -47,7 +47,7 @@ public interface SortedSet<E> extends Set<E> {}
 - `tailSet` - 返回大于指定元素的子集
 - `first` - 返回第一个元素
 - `last` - 返回最后一个元素
-- spliterator
+- `spliterator`
 
 ### 1.3. NavigableSet 接口
 
@@ -61,17 +61,17 @@ public interface NavigableSet<E> extends SortedSet<E> {}
 
 `NavigableSet` 接口新扩展的方法：
 
-- lower - 返回小于指定值的元素中最接近的元素
-- higher - 返回大于指定值的元素中最接近的元素
-- floor - 返回小于或等于指定值的元素中最接近的元素
-- ceiling - 返回大于或等于指定值的元素中最接近的元素
-- pollFirst - 检索并移除第一个（最小的）元素
-- pollLast - 检索并移除最后一个（最大的）元素
-- descendingSet - 返回反序排列的 Set
-- descendingIterator - 返回反序排列的 Set 的迭代器
-- subSet - 返回指定区间的子集
-- headSet - 返回小于指定元素的子集
-- tailSet - 返回大于指定元素的子集
+- `lower` - 返回小于指定值的元素中最接近的元素
+- `higher` - 返回大于指定值的元素中最接近的元素
+- `floor` - 返回小于或等于指定值的元素中最接近的元素
+- `ceiling` - 返回大于或等于指定值的元素中最接近的元素
+- `pollFirst` - 检索并移除第一个（最小的）元素
+- `pollLast` - 检索并移除最后一个（最大的）元素
+- `descendingSet` - 返回反序排列的 Set
+- `descendingIterator` - 返回反序排列的 Set 的迭代器
+- `subSet` - 返回指定区间的子集
+- `headSet` - 返回小于指定元素的子集
+- `tailSet` - 返回大于指定元素的子集
 
 ### 1.4. AbstractSet 抽象类
 
@@ -103,7 +103,7 @@ public class HashSet<E>
 - `HashSet` 实现了 `Cloneable`，所以支持克隆。
 - `HashSet` 实现了 `Serializable`，所以支持序列化。
 - `HashSet` 中存储的元素是无序的。
-- `HashSet` 允许 null 值的元素。
+- `HashSet` 允许 `null` 值的元素。
 - `HashSet` 不是线程安全的。
 
 ### 2.2. HashSet 原理
@@ -116,16 +116,15 @@ private transient HashMap<E,Object> map;
 
 // PRESENT 是用于关联 map 中当前操作元素的一个虚拟值
 private static final Object PRESENT = new Object();
-}
 ```
 
-- `HashSet`中维护了一个`HashMap`对象 map，`HashSet`的重要方法，如`add`、`remove`、`iterator`、`clear`、`size` 等都是围绕 map 实现的。
+- `HashSet`中维护了一个`HashMap`对象 `map`，`HashSet`的重要方法，如`add`、`remove`、`iterator`、`clear`、`size` 等都是围绕 `map` 实现的。
 - `HashSet` 类中通过定义 `writeObject()` 和 `readObject()` 方法确定了其序列化和反序列化的机制。
-- PRESENT 是用于关联 map 中当前操作元素的一个虚拟值。
+- `PRESENT` 是用于关联 `map` 中当前操作元素的一个虚拟值。
 
 ## 3. TreeSet 类
 
-`TreeSet` 类依赖于 `TreeMap`，它实际上是通过 `TreeMap` 实现的。`TreeSet` 中的元素是有序的，它是按自然排序或者用户指定比较器排序的 Set。
+`TreeSet` 类依赖于 `TreeMap`，它实际上是通过 `TreeMap` 实现的。`TreeSet` 中的元素是有序的，它是按自然排序或者用户指定比较器排序的 `Set`。
 
 `TreeSet` 类定义如下：
 
@@ -154,12 +153,12 @@ private transient NavigableMap<E,Object> m;
 private static final Object PRESENT = new Object();
 ```
 
-- `TreeSet` 中维护了一个 `NavigableMap` 对象 map（实际上是一个 TreeMap 实例），`TreeSet` 的重要方法，如 `add`、`remove`、`iterator`、`clear`、`size` 等都是围绕 map 实现的。
-- `PRESENT` 是用于关联 `map` 中当前操作元素的一个虚拟值。`TreeSet` 中的元素都被当成 `TreeMap` 的 key 存储，而 value 都填的是 `PRESENT`。
+- `TreeSet` 中维护了一个 `NavigableMap` 对象 `map`（实际上是一个 `TreeMap` 实例），`TreeSet` 的重要方法，如 `add`、`remove`、`iterator`、`clear`、`size` 等都是围绕 `map` 实现的。
+- `PRESENT` 是用于关联 `map` 中当前操作元素的一个虚拟值。`TreeSet` 中的元素都被当成 `TreeMap` 的 `key` 存储，而 `value` 都填的是 `PRESENT`。
 
 ## 4. LinkedHashSet 类
 
-`LinkedHashSet` 是按插入顺序排序的 Set。
+`LinkedHashSet` 是按插入顺序排序的 `Set`。
 
 `LinkedHashSet` 类定义如下：
 
@@ -230,51 +229,51 @@ public abstract class EnumSet<E extends Enum<E>> extends AbstractSet<E>
 
 **Set接口**
 
-Set不允许包含相同的元素，如果试图把两个相同元素加入同一个集合中，add方法返回false。
+`Set` 不允许包含相同的元素，如果试图把两个相同元素加入同一个集合中，`add` 方法返回 `false`。
 
-Set判断两个对象相同不是使用==运算符，而是根据equals方法。也就是说，只要两个对象用equals方法比较返回true，Set就不会接受这两个对象。
+`Set` 判断两个对象相同不是使用 `==` 运算符，而是根据 `equals` 方法。也就是说，只要两个对象用 `equals` 方法比较返回 `true`，`Set` 就不会接受这两个对象。
 
 **HashSet**
 
-HashSet有以下特点
+`HashSet` 有以下特点
 
 - 不能保证元素的排列顺序，顺序有可能发生变化
 
 - 不是同步的
 
-- 集合元素可以是null,但只能放入一个null
+- 集合元素可以是 `null`，但只能放入一个 `null`
 
-当向HashSet结合中存入一个元素时，HashSet会调用该对象的hashCode()方法来得到该对象的hashCode值，然后根据 hashCode值来决定该对象在HashSet中存储位置。
+当向 `HashSet` 结合中存入一个元素时，`HashSet` 会调用该对象的 `hashCode()` 方法来得到该对象的 `hashCode` 值，然后根据 `hashCode` 值来决定该对象在 `HashSet` 中存储位置。
 
-简单的说，HashSet集合判断两个元素相等的标准是两个对象通过equals方法比较相等，并且两个对象的hashCode()方法返回值相 等
+简单的说，`HashSet` 集合判断两个元素相等的标准是两个对象通过 `equals` 方法比较相等，并且两个对象的 `hashCode()` 方法返回值相 等
 
-注意，如果要把一个对象放入HashSet中，重写该对象对应类的equals方法，也应该重写其hashCode()方法。其规则是如果两个对 象通过equals方法比较返回true时，其hashCode也应该相同。另外，对象中用作equals比较标准的属性，都应该用来计算 hashCode的值。
+注意，如果要把一个对象放入 `HashSet` 中，重写该对象对应类的 `equals` 方法，也应该重写其 `hashCode()` 方法。其规则是如果两个对 象通过 `equals` 方法比较返回 `true` 时，其 `hashCode` 也应该相同。另外，对象中用作 `equals` 比较标准的属性，都应该用来计算 `hashCode` 的值。
 
 **LinkedHashSet**
 
-LinkedHashSet集合同样是根据元素的hashCode值来决定元素的存储位置，但是它同时使用链表维护元素的次序。这样使得元素看起 来像是以插入顺序保存的，也就是说，当遍历该集合时候，LinkedHashSet将会以元素的添加顺序访问集合的元素。
+`LinkedHashSet` 集合同样是根据元素的 `hashCode` 值来决定元素的存储位置，但是它同时使用链表维护元素的次序。这样使得元素看起 来像是以插入顺序保存的，也就是说，当遍历该集合时候，`LinkedHashSet` 将会以元素的添加顺序访问集合的元素。
 
-LinkedHashSet在迭代访问Set中的全部元素时，性能比HashSet好，但是插入时性能稍微逊色于HashSet。
+`LinkedHashSet` 在迭代访问 `Set` 中的全部元素时，性能比 `HashSet` 好，但是插入时性能稍微逊色于 `HashSet`。
 
 **TreeSet类**
 
-TreeSet是SortedSet接口的唯一实现类，TreeSet可以确保集合元素处于排序状态。TreeSet支持两种排序方式，自然排序 和定制排序，其中自然排序为默认的排序方式。向TreeSet中加入的应该是同一个类的对象。
+`TreeSet` 是 `SortedSet` 接口的唯一实现类，`TreeSet` 可以确保集合元素处于排序状态。`TreeSet` 支持两种排序方式，自然排序 和定制排序，其中自然排序为默认的排序方式。向 `TreeSet` 中加入的应该是同一个类的对象。
 
-TreeSet判断两个对象不相等的方式是两个对象通过equals方法返回false，或者通过CompareTo方法比较没有返回0
+`TreeSet` 判断两个对象不相等的方式是两个对象通过 `equals` 方法返回 `false`，或者通过 `CompareTo` 方法比较没有返回 `0`
 
 - **自然排序**
 
   自然排序使用要排序元素的 `CompareTo（Object obj）`方法来比较元素之间大小关系，然后将元素按照升序排列。
 
-  Java提供了一个Comparable接口，该接口里定义了一个 `compareTo(Object obj)` 方法，该方法返回一个整数值，实现了该接口的对象就可以比较大小。
+  `Java` 提供了一个 `Comparable` 接口，该接口里定义了一个 `compareTo(Object obj)` 方法，该方法返回一个整数值，实现了该接口的对象就可以比较大小。
 
-  `obj1.compareTo(obj2)` 方法如果返回0，则说明被比较的两个对象相等，如果返回一个正数，则表明obj1大于obj2，如果是 负数，则表明obj1小于obj2。
+  `obj1.compareTo(obj2)` 方法如果返回0，则说明被比较的两个对象相等，如果返回一个正数，则表明 `obj1` 大于 `obj2`，如果是 负数，则表明 `obj1` 小于 `obj2`。
 
-  如果我们将两个对象的equals方法总是返回true，则这两个对象的compareTo方法返回应该返回0
+  如果我们将两个对象的 `equals` 方法总是返回 `true`，则这两个对象的 `compareTo` 方法返回应该返回 `0`
 
 - **定制排序**
 
-  自然排序是根据集合元素的大小，以升序排列，如果要定制排序，应该使用Comparator接口，实现 `int compare(T o1,T o2)` 方法
+  自然排序是根据集合元素的大小，以升序排列，如果要定制排序，应该使用 `Comparator` 接口，实现 `int compare(T o1,T o2)` 方法
 
 
 
