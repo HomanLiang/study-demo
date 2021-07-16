@@ -8,8 +8,6 @@
 
 确保线程安全最常见的做法是利用锁机制（`Lock`、`sychronized`）来对共享数据做互斥同步，这样在同一个时刻，只有一个线程可以执行某个方法或者某个代码块，那么操作必然是原子性的，线程安全的。
 
-在工作、面试中，经常会听到各种五花八门的锁，听的人云里雾里。锁的概念术语很多，它们是针对不同的问题所提出的，通过简单的梳理，也不难理解。
-
 ### 1.1. 可重入锁
 
 **可重入锁，顾名思义，指的是线程可以重复获取同一把锁**。即同一个线程在外层方法获取了锁，在进入内层方法会自动获取锁。
@@ -92,7 +90,7 @@ class Task {
 - **独享锁** - 独享锁是指 **锁一次只能被一个线程所持有**。
 - **共享锁** - 共享锁是指 **锁可被多个线程所持有**。
 
-独享锁与共享锁在 Java 中的典型实现：
+独享锁与共享锁在 `Java` 中的典型实现：
 
 - **`synchronized` 、`ReentrantLock` 只支持独享锁**。
 - **`ReentrantReadWriteLock` 其写锁是独享锁，其读锁是共享锁**。读锁是共享锁使得并发读是非常高效的，读写，写读 ，写写的过程是互斥的。
@@ -104,18 +102,18 @@ class Task {
 - **悲观锁** - 悲观锁对于并发采取悲观的态度，认为：**不加锁的并发操作一定会出问题**。**悲观锁适合写操作频繁的场景**。
 - **乐观锁** - 乐观锁对于并发采取乐观的态度，认为：**不加锁的并发操作也没什么问题。对于同一个数据的并发操作，是不会发生修改的**。在更新数据的时候，会采用不断尝试更新的方式更新数据。**乐观锁适合读多写少的场景**。
 
-悲观锁与乐观锁在 Java 中的典型实现：
+悲观锁与乐观锁在 `Java` 中的典型实现：
 
-- 悲观锁在 Java 中的应用就是通过使用 `synchronized` 和 `Lock` 显示加锁来进行互斥同步，这是一种阻塞同步。
-- 乐观锁在 Java 中的应用就是采用 `CAS` 机制（`CAS` 操作通过 `Unsafe` 类提供，但这个类不直接暴露为 API，所以都是间接使用，如各种原子类）。
+- 悲观锁在 `Java` 中的应用就是通过使用 `synchronized` 和 `Lock` 显示加锁来进行互斥同步，这是一种阻塞同步。
+- 乐观锁在 `Java` 中的应用就是采用 `CAS` 机制（`CAS` 操作通过 `Unsafe` 类提供，但这个类不直接暴露为 `API`，所以都是间接使用，如各种原子类）。
 
 ### 1.5. 偏向锁、轻量级锁、重量级锁
 
 所谓轻量级锁与重量级锁，指的是锁控制粒度的粗细。显然，控制粒度越细，阻塞开销越小，并发性也就越高。
 
-Java 1.6 以前，重量级锁一般指的是 `synchronized` ，而轻量级锁指的是 `volatile`。
+`Java 1.6` 以前，重量级锁一般指的是 `synchronized` ，而轻量级锁指的是 `volatile`。
 
-Java 1.6 以后，针对 `synchronized` 做了大量优化，引入 4 种锁状态： 无锁状态、偏向锁、轻量级锁和重量级锁。锁可以单向的从偏向锁升级到轻量级锁，再从轻量级锁升级到重量级锁 。
+`Java 1.6` 以后，针对 `synchronized` 做了大量优化，引入 4 种锁状态： 无锁状态、偏向锁、轻量级锁和重量级锁。锁可以单向的从偏向锁升级到轻量级锁，再从轻量级锁升级到重量级锁 。
 
 - **偏向锁** - 偏向锁是指一段同步代码一直被一个线程所访问，那么该线程会自动获取锁。降低获取锁的代价。
 - **轻量级锁** - 是指当锁是偏向锁的时候，被另一个线程所访问，偏向锁就会升级为轻量级锁，其他线程会通过自旋的形式尝试获取锁，不会阻塞，提高性能。
@@ -125,21 +123,21 @@ Java 1.6 以后，针对 `synchronized` 做了大量优化，引入 4 种锁状�
 
 分段锁其实是一种锁的设计，并不是具体的一种锁。所谓分段锁，就是把锁的对象分成多段，每段独立控制，使得锁粒度更细，减少阻塞开销，从而提高并发性。这其实很好理解，就像高速公路上的收费站，如果只有一个收费口，那所有的车只能排成一条队缴费；如果有多个收费口，就可以分流了。
 
-`Hashtable` 使用 `synchronized` 修饰方法来保证线程安全性，那么面对线程的访问，Hashtable 就会锁住整个对象，所有的其它线程只能等待，这种阻塞方式的吞吐量显然很低。
+`Hashtable` 使用 `synchronized` 修饰方法来保证线程安全性，那么面对线程的访问，`Hashtable` 就会锁住整个对象，所有的其它线程只能等待，这种阻塞方式的吞吐量显然很低。
 
-Java 1.7 以前的 `ConcurrentHashMap` 就是分段锁的典型案例。`ConcurrentHashMap` 维护了一个 `Segment` 数组，一般称为分段桶。
+`Java 1.7` 以前的 `ConcurrentHashMap` 就是分段锁的典型案例。`ConcurrentHashMap` 维护了一个 `Segment` 数组，一般称为分段桶。
 
 ```
 final Segment<K,V>[] segments;
 ```
 
-当有线程访问 `ConcurrentHashMap` 的数据时，`ConcurrentHashMap` 会先根据 hashCode 计算出数据在哪个桶（即哪个 Segment），然后锁住这个 `Segment`。
+当有线程访问 `ConcurrentHashMap` 的数据时，`ConcurrentHashMap` 会先根据 `hashCode` 计算出数据在哪个桶（即哪个 `Segment`），然后锁住这个 `Segment`。
 
 ### 1.7. 显示锁和内置锁
 
-Java 1.5 之前，协调对共享对象的访问时可以使用的机制只有 `synchronized` 和 `volatile`。这两个都属于内置锁，即锁的申请和释放都是由 JVM 所控制。
+`Java 1.5` 之前，协调对共享对象的访问时可以使用的机制只有 `synchronized` 和 `volatile`。这两个都属于内置锁，即锁的申请和释放都是由 `JVM` 所控制。
 
-Java 1.5 之后，增加了新的机制：`ReentrantLock`、`ReentrantReadWriteLock` ，这类锁的申请和释放都可以由程序所控制，所以常被称为显示锁。
+`Java 1.5` 之后，增加了新的机制：`ReentrantLock`、`ReentrantReadWriteLock` ，这类锁的申请和释放都可以由程序所控制，所以常被称为显示锁。
 
 > 🔔 注意：如果不需要 `ReentrantLock`、`ReentrantReadWriteLock` 所提供的高级同步特性，**应该优先考虑使用 `synchronized`** 。理由如下：
 >
@@ -150,7 +148,7 @@ Java 1.5 之后，增加了新的机制：`ReentrantLock`、`ReentrantReadWriteL
 以下对比一下显示锁和内置锁的差异：
 
 - 主动获取锁和释放锁
-  - `synchronized` 不能主动获取锁和释放锁。获取锁和释放锁都是 JVM 控制的。
+  - `synchronized` 不能主动获取锁和释放锁。获取锁和释放锁都是 `JVM` 控制的。
   - `ReentrantLock` 可以主动获取锁和释放锁。（如果忘记释放锁，就可能产生死锁）。
 - 响应中断
   - `synchronized` 不能响应中断。
@@ -174,15 +172,15 @@ Java 1.5 之后，增加了新的机制：`ReentrantLock`、`ReentrantReadWriteL
 
 并发编程领域，有两大核心问题：一个是**互斥**，即同一时刻只允许一个线程访问共享资源；另一个是**同步**，即线程之间如何通信、协作。这两大问题，管程都是能够解决的。**Java SDK 并发包通过 Lock 和 Condition 两个接口来实现管程，其中 Lock 用于解决互斥问题，Condition 用于解决同步问题**。
 
-synchronized 是管程的一种实现，既然如此，何必再提供 Lock 和 Condition。
+`synchronized` 是管程的一种实现，既然如此，何必再提供 `Lock` 和 `Condition`。
 
-JDK 1.6 以前，synchronized 还没有做优化，性能远低于 Lock。但是，性能不是引入 Lock 的最重要因素。真正关键在于：synchronized 使用不当，可能会出现死锁。
+`JDK 1.6` 以前，`synchronized` 还没有做优化，性能远低于 `Lock`。但是，性能不是引入 `Lock` 的最重要因素。真正关键在于：`synchronized` 使用不当，可能会出现死锁。
 
-synchronized 无法通过**破坏不可抢占条件**来避免死锁。原因是 synchronized 申请资源的时候，如果申请不到，线程直接进入阻塞状态了，而线程进入阻塞状态，啥都干不了，也释放不了线程已经占有的资源。
+`synchronized` 无法通过**破坏不可抢占条件**来避免死锁。原因是 `synchronized` 申请资源的时候，如果申请不到，线程直接进入阻塞状态了，而线程进入阻塞状态，啥都干不了，也释放不了线程已经占有的资源。
 
 与内置锁 `synchronized` 不同的是，**`Lock` 提供了一组无条件的、可轮询的、定时的以及可中断的锁操作**，所有获取锁、释放锁的操作都是显式的操作。
 
-- **能够响应中断**。synchronized 的问题是，持有锁 A 后，如果尝试获取锁 B 失败，那么线程就进入阻塞状态，一旦发生死锁，就没有任何机会来唤醒阻塞的线程。但如果阻塞状态的线程能够响应中断信号，也就是说当我们给阻塞的线程发送中断信号的时候，能够唤醒它，那它就有机会释放曾经持有的锁 A。这样就破坏了不可抢占条件了。
+- **能够响应中断**。`synchronized` 的问题是，持有锁 A 后，如果尝试获取锁 B 失败，那么线程就进入阻塞状态，一旦发生死锁，就没有任何机会来唤醒阻塞的线程。但如果阻塞状态的线程能够响应中断信号，也就是说当我们给阻塞的线程发送中断信号的时候，能够唤醒它，那它就有机会释放曾经持有的锁 A。这样就破坏了不可抢占条件了。
 - **支持超时**。如果线程在一段时间之内没有获取到锁，不是进入阻塞状态，而是返回一个错误，那这个线程也有机会释放曾经持有的锁。这样也能破坏不可抢占条件。
 - **非阻塞地获取锁**。如果尝试获取锁失败，并不进入阻塞状态，而是直接返回，那这个线程也有机会释放曾经持有的锁。这样也能破坏不可抢占条件。
 
@@ -216,7 +214,7 @@ public interface Lock {
 
 在单线程中，一段代码的执行可能依赖于某个状态，如果不满足状态条件，代码就不会被执行（典型的场景，如：`if ... else ...`）。在并发环境中，当一个线程判断某个状态条件时，其状态可能是由于其他线程的操作而改变，这时就需要有一定的协调机制来确保在同一时刻，数据只能被一个线程锁修改，且修改的数据状态被所有线程所感知。
 
-Java 1.5 之前，主要是利用 `Object` 类中的 `wait`、`notify`、`notifyAll` 配合 `synchronized` 来进行线程间通信。
+`Java 1.5` 之前，主要是利用 `Object` 类中的 `wait`、`notify`、`notifyAll` 配合 `synchronized` 来进行线程间通信。
 
 `wait`、`notify`、`notifyAll` 需要配合 `synchronized` 使用，不适用于 `Lock`。而使用 `Lock` 的线程，彼此间通信应该使用 `Condition` 。这可以理解为，什么样的锁配什么样的钥匙。**内置锁（`synchronized`）配合内置条件队列（`wait`、`notify`、`notifyAll` ），显式锁（`Lock`）配合显式条件队列（`Condition` ）**。
 
@@ -516,10 +514,10 @@ java.util.concurrent.locks.ReentrantLock@64fcd88a[Locked by thread Thread-C]
 
 #### 3.2.3.tryLock 方法
 
-与无条件获取锁相比，tryLock 有更完善的容错机制。
+与无条件获取锁相比，`tryLock` 有更完善的容错机制。
 
-- `tryLock()` - **可轮询获取锁**。如果成功，则返回 true；如果失败，则返回 false。也就是说，这个方法**无论成败都会立即返回**，获取不到锁（锁已被其他线程获取）时不会一直等待。
-- `tryLock(long, TimeUnit)` - **可定时获取锁**。和 `tryLock()` 类似，区别仅在于这个方法在**获取不到锁时会等待一定的时间**，在时间期限之内如果还获取不到锁，就返回 false。如果如果一开始拿到锁或者在等待期间内拿到了锁，则返回 true。
+- `tryLock()` - **可轮询获取锁**。如果成功，则返回 `true`；如果失败，则返回 `false`。也就是说，这个方法**无论成败都会立即返回**，获取不到锁（锁已被其他线程获取）时不会一直等待。
+- `tryLock(long, TimeUnit)` - **可定时获取锁**。和 `tryLock()` 类似，区别仅在于这个方法在**获取不到锁时会等待一定的时间**，在时间期限之内如果还获取不到锁，就返回 `false`。如果如果一开始拿到锁或者在等待期间内拿到了锁，则返回 `true`。
 
 示例：`ReentrantLock` 的 `tryLock()` 操作
 
@@ -620,10 +618,10 @@ class X {
 }
 ```
 
-ReentrantLock，内部持有一个 volatile 的成员变量 state，获取锁的时候，会读写 state 的值；解锁的时候，也会读写 state 的值（简化后的代码如下面所示）。也就是说，在执行 value+=1 之前，程序先读写了一次 volatile 变量 state，在执行 value+=1 之后，又读写了一次 volatile 变量 state。根据相关的 Happens-Before 规则：
+`ReentrantLock`，内部持有一个 `volatile` 的成员变量 `state`，获取锁的时候，会读写 `state` 的值；解锁的时候，也会读写 `state` 的值（简化后的代码如下面所示）。也就是说，在执行 `value+=1` 之前，程序先读写了一次 `volatile` 变量 `state`，在执行 `value+=1` 之后，又读写了一次 `volatile` 变量 `state`。根据相关的 `Happens-Before` 规则：
 
-1. **顺序性规则**：对于线程 T1，value+=1 Happens-Before 释放锁的操作 unlock()；
-2. **volatile 变量规则**：由于 state = 1 会先读取 state，所以线程 T1 的 unlock() 操作 Happens-Before 线程 T2 的 lock() 操作；
+1. **顺序性规则**：对于线程 `T1`，`value+=1 Happens-Before` 释放锁的操作 `unlock()`；
+2. **volatile 变量规则**：由于 `state = 1` 会先读取 `state`，所以线程 T1 的 `unlock()` 操作 `Happens-Before` 线程 T2 的 `lock()` 操作；
 3. **传递性规则**：线程 T1 的 `value+=1` Happens-Before 线程 T2 的 `lock()` 操作。
 
 #### 3.3.2.ReentrantLock 的数据结构
@@ -634,7 +632,7 @@ ReentrantLock，内部持有一个 volatile 的成员变量 state，获取锁的
 private final Sync sync;
 ```
 
-- `sync` - 内部抽象类 `ReentrantLock.Sync` 对象，`Sync` 继承自 AQS。它有两个子类：
+- `sync` - 内部抽象类 `ReentrantLock.Sync` 对象，`Sync` 继承自 `AQS`。它有两个子类：
   - `ReentrantLock.FairSync` - 公平锁。
   - `ReentrantLock.NonfairSync` - 非公平锁。
 
@@ -642,15 +640,15 @@ private final Sync sync;
 
 #### 3.3.3.ReentrantLock 的获取锁和释放锁
 
-ReentrantLock 获取锁和释放锁的接口，从表象看，是调用 `ReentrantLock.FairSync` 或 `ReentrantLock.NonfairSync` 中各自的实现；从本质上看，是基于 AQS 的实现。
+`ReentrantLock` 获取锁和释放锁的接口，从表象看，是调用 `ReentrantLock.FairSync` 或 `ReentrantLock.NonfairSync` 中各自的实现；从本质上看，是基于 `AQS` 的实现。
 
 仔细阅读源码很容易发现：
 
-- `void lock()` 调用 Sync 的 lock() 方法。
-- `void lockInterruptibly()` 直接调用 AQS 的 获取可中断的独占锁方法 `lockInterruptibly()`。
-- `boolean tryLock()` 调用 Sync 的 `nonfairTryAcquire()` 。
-- `boolean tryLock(long time, TimeUnit unit)` 直接调用 AQS 的 获取超时等待式的独占锁 方法 `tryAcquireNanos(int arg, long nanosTimeout)`。
-- `void unlock()` 直接调用 AQS 的 释放独占锁 方法 `release(int arg)` 。
+- `void lock()` 调用 `Sync` 的 `lock()` 方法。
+- `void lockInterruptibly()` 直接调用 `AQS` 的 获取可中断的独占锁方法 `lockInterruptibly()`。
+- `boolean tryLock()` 调用 `Sync` 的 `nonfairTryAcquire()` 。
+- `boolean tryLock(long time, TimeUnit unit)` 直接调用 `AQS` 的 获取超时等待式的独占锁 方法 `tryAcquireNanos(int arg, long nanosTimeout)`。
+- `void unlock()` 直接调用 `AQS` 的 释放独占锁 方法 `release(int arg)` 。
 
 `nonfairTryAcquire` 方法源码如下：
 
@@ -679,19 +677,19 @@ final boolean nonfairTryAcquire(int acquires) {
 
 处理流程很简单：
 
-- 如果同步状态为 0，设置同步状态设为 acquires，并设置当前线程为排它线程，然后返回 true，获取锁成功。
-- 如果同步状态不为 0 且当前线程为排它线程，设置同步状态为当前状态值+acquires 值，然后返回 true，获取锁成功。
-- 否则，返回 false，获取锁失败。
+- 如果同步状态为 `0`，设置同步状态设为 `acquires`，并设置当前线程为排它线程，然后返回 `true`，获取锁成功。
+- 如果同步状态不为 `0` 且当前线程为排它线程，设置同步状态为当前状态值+acquires 值，然后返回 `true`，获取锁成功。
+- 否则，返回 `false`，获取锁失败。
 
 #### 3.3.4.公平锁和非公平锁
 
-`ReentrantLock` 这个类有两个构造函数，一个是无参构造函数，一个是传入 fair 参数的构造函数。fair 参数代表的是锁的公平策略，如果传入 true 就表示需要构造一个公平锁，反之则表示要构造一个非公平锁。
+`ReentrantLock` 这个类有两个构造函数，一个是无参构造函数，一个是传入 `fair` 参数的构造函数。`fair` 参数代表的是锁的公平策略，如果传入 `true` 就表示需要构造一个公平锁，反之则表示要构造一个非公平锁。
 
 锁都对应着一个等待队列，如果一个线程没有获得锁，就会进入等待队列，当有线程释放锁的时候，就需要从等待队列中唤醒一个等待的线程。如果是公平锁，唤醒的策略就是谁等待的时间长，就唤醒谁，很公平；如果是非公平锁，则不提供这个公平保证，有可能等待时间短的线程反而先被唤醒。
 
-lock 方法在公平锁和非公平锁中的实现：
+`lock` 方法在公平锁和非公平锁中的实现：
 
-二者的区别仅在于申请非公平锁时，如果同步状态为 0，尝试将其设为 1，如果成功，直接将当前线程置为排它线程；否则和公平锁一样，调用 AQS 获取独占锁方法 `acquire`。
+二者的区别仅在于申请非公平锁时，如果同步状态为 0，尝试将其设为 1，如果成功，直接将当前线程置为排它线程；否则和公平锁一样，调用 `AQS` 获取独占锁方法 `acquire`。
 
 ```
 // 非公平锁实现
@@ -719,7 +717,7 @@ final void lock() {
 
 `ReentrantReadWriteLock` 维护了一对读写锁，将读写锁分开，有利于提高并发效率。
 
-读写锁，并不是 Java 语言特有的，而是一个广为使用的通用技术，所有的读写锁都遵守以下三条基本原则：
+读写锁，并不是 `Java` 语言特有的，而是一个广为使用的通用技术，所有的读写锁都遵守以下三条基本原则：
 
 - 允许多个线程同时读共享变量；
 - 只允许一个线程写共享变量；
@@ -729,7 +727,7 @@ final void lock() {
 
 ### 4.1. ReentrantReadWriteLock 的特性
 
-ReentrantReadWriteLock 的特性如下：
+`ReentrantReadWriteLock` 的特性如下：
 
 - **`ReentrantReadWriteLock` 适用于读多写少的场景**。如果是写多读少的场景，由于 `ReentrantReadWriteLock` 其内部实现比 `ReentrantLock` 复杂，性能可能反而要差一些。如果存在这样的问题，需要具体问题具体分析。由于 `ReentrantReadWriteLock` 的读写锁（`ReadLock`、`WriteLock`）都实现了 `Lock` 接口，所以要替换为 `ReentrantLock` 也较为容易。
 - `ReentrantReadWriteLock` 实现了 `ReadWriteLock` 接口，支持了 `ReentrantLock` 所不具备的读写锁分离。`ReentrantReadWriteLock` 维护了一对读写锁（`ReadLock`、`WriteLock`）。将读写锁分开，有利于提高并发效率。`ReentrantReadWriteLock` 的加锁策略是：**允许多个读操作并发执行，但每次只允许一个写操作**。
@@ -840,7 +838,7 @@ static class UnboundedCache<K, V> {
 
 说明：
 
-- 使用 `WeakHashMap` 而不是 `HashMap` 来存储键值对。`WeakHashMap` 中存储的对象是弱引用，JVM GC 时会自动清除没有被引用的弱引用对象。
+- 使用 `WeakHashMap` 而不是 `HashMap` 来存储键值对。`WeakHashMap` 中存储的对象是弱引用，`JVM GC` 时会自动清除没有被引用的弱引用对象。
 - 向 `Map` 写数据前加写锁，写完后，释放写锁。
 - 向 `Map` 读数据前加读锁，读完后，释放读锁。
 
@@ -1045,31 +1043,31 @@ try {
 
 1. `StampedLock `是不可重入锁，使用过程中一定要注意；
 2. 悲观读、写锁都不支持条件变量 `Conditon` ，当需要这个特性的时候需要注意；
-3. 如果线程阻塞在 StampedLock 的 `readLock()` 或者 `writeLock()` 上时，此时调用该阻塞线程的 `interrupt()` 方法，会导致 CPU 飙升。所以，**使用 StampedLock 一定不要调用中断操作，如果需要支持中断功能，一定使用可中断的悲观读锁 `readLockInterruptibly()` 和写锁 `writeLockInterruptibly()`**。这个规则一定要记清楚。
+3. 如果线程阻塞在 `StampedLock` 的 `readLock()` 或者 `writeLock()` 上时，此时调用该阻塞线程的 `interrupt()` 方法，会导致 `CPU` 飙升。所以，**使用 StampedLock 一定不要调用中断操作，如果需要支持中断功能，一定使用可中断的悲观读锁 `readLockInterruptibly()` 和写锁 `writeLockInterruptibly()`**。这个规则一定要记清楚。
 
 ### 5.4 原理分析
 
 ![3715140683-346ed056f18c3bb1_fix732](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/java-core-demo/20210324224708.png)
 
-我们发现它并不像其他锁一样通过定义内部类继承 `AbstractQueuedSynchronizer`抽象类然后子类实现模板方法实现同步逻辑。但是实现思路还是有类似，依然使用了 CLH 队列来管理线程，通过同步状态值 state 来标识锁的状态。
+我们发现它并不像其他锁一样通过定义内部类继承 `AbstractQueuedSynchronizer`抽象类然后子类实现模板方法实现同步逻辑。但是实现思路还是有类似，依然使用了 `CLH` 队列来管理线程，通过同步状态值 state 来标识锁的状态。
 
-其内部定义了很多变量，这些变量的目的还是跟 `ReentrantReadWriteLock` 一样，将状态为按位切分，通过位运算对 state 变量操作用来区分同步状态。
+其内部定义了很多变量，这些变量的目的还是跟 `ReentrantReadWriteLock` 一样，将状态为按位切分，通过位运算对 `state` 变量操作用来区分同步状态。
 
-比如写锁使用的是第八位为 1 则表示写锁，读锁使用 0-7 位，所以一般情况下获取读锁的线程数量为 1-126，超过以后，会使用 readerOverflow int 变量保存超出的线程数。
+比如写锁使用的是第八位为 1 则表示写锁，读锁使用 0-7 位，所以一般情况下获取读锁的线程数量为 1-126，超过以后，会使用 `readerOverflow int` 变量保存超出的线程数。
 
 **自旋优化**
 
-对多核 CPU 也进行一定优化，NCPU 获取核数，当核数目超过 1 的时候，线程获取锁的重试、入队钱的重试都有自旋操作。主要就是通过内部定义的一些变量来判断，如图所示。
+对多核 `CPU` 也进行一定优化，`NCPU` 获取核数，当核数目超过 1 的时候，线程获取锁的重试、入队钱的重试都有自旋操作。主要就是通过内部定义的一些变量来判断，如图所示。
 
 #### 5.4.1 等待队列
 
-队列的节点通过 WNode 定义，如上图所示。等待队列的节点相比 AQS 更简单，只有三种状态分别是：
+队列的节点通过 `WNode` 定义，如上图所示。等待队列的节点相比 `AQS` 更简单，只有三种状态分别是：
 
 - 0：初始状态；
 - -1：等待中；
 - 取消；
 
-另外还有一个字段 cowait ，通过该字段指向一个栈，保存读线程。结构如图所示
+另外还有一个字段 `cowait` ，通过该字段指向一个栈，保存读线程。结构如图所示
 
 ![814893817-b02b66feef7df3ee_fix732](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/java-core-demo/20210324224824.png)
 
@@ -1082,7 +1080,7 @@ private transient volatile WNode whead;
 private transient volatile WNode wtail;
 ```
 
-另外有一个需要注意点就是 cowait， 保存所有的读节点数据，使用的是头插法。
+另外有一个需要注意点就是 `cowait`， 保存所有的读节点数据，使用的是头插法。
 
 当读写线程竞争形成等待队列的数据如下图所示：
 
@@ -1099,9 +1097,9 @@ public long writeLock() {
 }
 ```
 
-获取写锁，如果获取失败则构建节点放入队列，同时阻塞线程，需要注意的时候该方法不响应中断，如需中断需要调用 `writeLockInterruptibly()`。否则会造成高 CPU 占用的问题。
+获取写锁，如果获取失败则构建节点放入队列，同时阻塞线程，需要注意的时候该方法不响应中断，如需中断需要调用 `writeLockInterruptibly()`。否则会造成高 `CPU` 占用的问题。
 
-`(s = state) & ABITS` 标识读锁和写锁未被使用，那么久直接执行 `U.compareAndSwapLong(this, STATE, s, next = s + WBIT))` CAS 操作将第八位设置 1，标识写锁占用成功。CAS失败的话则调用 `acquireWrite(false, 0L)`加入等待队列，同时将线程阻塞。
+`(s = state) & ABITS` 标识读锁和写锁未被使用，那么久直接执行 `U.compareAndSwapLong(this, STATE, s, next = s + WBIT))` `CAS` 操作将第八位设置 1，标识写锁占用成功。`CAS` 失败的话则调用 `acquireWrite(false, 0L)`加入等待队列，同时将线程阻塞。
 
 另外`acquireWrite(false, 0L)` 方法很复杂，运用大量自旋操作，比如自旋入队列。
 
@@ -1126,19 +1124,19 @@ public long readLock() {
 
 当 A 线程获取了写锁，B 线程去获取读锁的时候，调用 acquireRead 方法，则会加入阻塞队列，并阻塞 B 线程。方法内部依然很复杂，大致流程梳理后如下：
 
-1. 如果写锁未被占用，则立即尝试获取读锁，通过CAS修改状态为标志成功则直接返回。
-2. 如果写锁被占用，则将当前线程包装成 WNode 读节点，并插入等待队列。**如果是写线程节点则直接放入队尾，否则放入队尾专门存放读线程的 WNode cowait 指向的栈**。栈结构是头插法的方式插入数据，最终唤醒读节点，从栈顶开始。
+1. 如果写锁未被占用，则立即尝试获取读锁，通过 `CAS` 修改状态为标志成功则直接返回。
+2. 如果写锁被占用，则将当前线程包装成 `WNode` 读节点，并插入等待队列。**如果是写线程节点则直接放入队尾，否则放入队尾专门存放读线程的 WNode cowait 指向的栈**。栈结构是头插法的方式插入数据，最终唤醒读节点，从栈顶开始。
 
 #### 5.4.4 释放锁
 
-无论是 `unlockRead` 释放读锁还是 `unlockWrite`释放写锁，总体流程基本都是通过 CAS 操作，修改 state 成功后调用 release 方法唤醒等待队列的头结点的后继节点线程。
+无论是 `unlockRead` 释放读锁还是 `unlockWrite`释放写锁，总体流程基本都是通过 `CAS` 操作，修改 `state` 成功后调用 `release` 方法唤醒等待队列的头结点的后继节点线程。
 
 1. 想将头结点等待状态设置为 0 ，标识即将唤醒后继节点。
-2. 唤醒后继节点通过CAS方式获取锁，如果是读节点则会唤醒 cowait 锁指向的栈所有读节点。
+2. 唤醒后继节点通过`CAS`方式获取锁，如果是读节点则会唤醒 `cowait` 锁指向的栈所有读节点。
 
 **释放读锁**
 
-`unlockRead(long stamp)` 如果传入的 stamp 与锁持有的 stamp 一致，则释放非排它锁，内部主要是通过自旋 + CAS 修改 state 成功，在修改 state 之前做了判断是否超过读线程数限制，若是小于限制才通过CAS 修改 state 同步状态，接着调用 release 方法唤醒 whead 的后继节点。
+`unlockRead(long stamp)` 如果传入的 `stamp` 与锁持有的 `stamp` 一致，则释放非排它锁，内部主要是通过自旋 + CAS 修改 state 成功，在修改 state 之前做了判断是否超过读线程数限制，若是小于限制才通过CAS 修改 state 同步状态，接着调用 release 方法唤醒 whead 的后继节点。
 
 **释放写锁**
 
@@ -1164,7 +1162,7 @@ StampedLock 并不能完全代替`ReentrantReadWriteLock` ，在读多写少的�
 
 **AQS 提供了对独享锁与共享锁的支持**。
 
-在 `java.util.concurrent.locks` 包中的相关锁（常用的有 `ReentrantLock`、 `ReadWriteLock`）都是基于 AQS 来实现。这些锁都没有直接继承 AQS，而是定义了一个 `Sync` 类去继承 AQS。为什么要这样呢？因为锁面向的是使用用户，而同步器面向的则是线程控制，那么在锁的实现中聚合同步器而不是直接继承 AQS 就可以很好的隔离二者所关注的事情。
+在 `java.util.concurrent.locks` 包中的相关锁（常用的有 `ReentrantLock`、 `ReadWriteLock`）都是基于 `AQS` 来实现。这些锁都没有直接继承 `AQS`，而是定义了一个 `Sync` 类去继承 `AQS`。为什么要这样呢？因为锁面向的是使用用户，而同步器面向的则是线程控制，那么在锁的实现中聚合同步器而不是直接继承 `AQS` 就可以很好的隔离二者所关注的事情。
 
 ### 6.2. AQS 的应用
 
@@ -1188,13 +1186,13 @@ public final boolean release(int arg)
 - `tryAcquireNanos` - 尝试在指定时间内获取可中断的独占锁。在以下三种情况下回返回：
 - 在超时时间内，当前线程成功获取了锁；
   - 当前线程在超时时间内被中断；
-  - 超时时间结束，仍未获得锁返回 false。
+  - 超时时间结束，仍未获得锁返回 `false`。
   
 - `release` - 释放独占锁。
 
 #### 6.2.2.共享锁 API
 
-获取、释放共享锁的主要 API 如下：
+获取、释放共享锁的主要 `API` 如下：
 
 ```
 public final void acquireShared(int arg)
@@ -1242,10 +1240,10 @@ public abstract class AbstractQueuedSynchronizer
 }
 ```
 
-- `state` - AQS 使用一个整型的`volatile`变量来维护同步状态。
+- `state` - `AQS` 使用一个整型的`volatile`变量来维护同步状态。
 - 这个整数状态的意义由子类来赋予，如`ReentrantLock` 中该状态值表示所有者线程已经重复获取该锁的次数，`Semaphore` 中该状态值表示剩余的许可数量。
   
-- `head` 和 `tail` - AQS **维护了一个 `Node` 类型（AQS 的内部类）的双链表来完成同步状态的管理**。这个双链表是一个双向的 FIFO 队列，通过 `head` 和 `tail` 指针进行访问。当 **有线程获取锁失败后，就被添加到队列末尾**。
+- `head` 和 `tail` - `AQS` **维护了一个 `Node` 类型（AQS 的内部类）的双链表来完成同步状态的管理**。这个双链表是一个双向的 `FIFO` 队列，通过 `head` 和 `tail` 指针进行访问。当 **有线程获取锁失败后，就被添加到队列末尾**。
 
 ![687474703a2f2f64756e77752e746573742e757063646e2e6e65742f63732f6a6176612f6a617661636f72652f636f6e63757272656e742f6171735f312e706e67](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/java-core-demo/20210322220304.png)
 
@@ -1277,9 +1275,9 @@ static final class Node {
 }
 ```
 
-很显然，Node 是一个双链表结构。
+很显然，`Node` 是一个双链表结构。
 
-- `waitStatus` - `Node`使用一个整型的`volatile`变量来 维护 AQS 同步队列中线程节点的状态。`waitStatus`有五个状态值：
+- `waitStatus` - `Node`使用一个整型的`volatile`变量来 维护 `AQS` 同步队列中线程节点的状态。`waitStatus`有五个状态值：
 - `CANCELLED(1)` - 此状态表示：该节点的线程可能由于超时或被中断而 **处于被取消(作废)状态**，一旦处于这个状态，表示这个节点应该从等待队列中移除。
   - `SIGNAL(-1)` - 此状态表示：**后继节点会被挂起**，因此在当前节点释放锁或被取消之后，必须唤醒(`unparking`)其后继结点。
   - `CONDITION(-2)` - 此状态表示：该节点的线程 **处于等待条件状态**，不会被当作是同步队列上的节点，直到被唤醒(`signal`)，设置其值为 0，再重新进入阻塞状态。
@@ -1290,10 +1288,10 @@ static final class Node {
 
 ##### 6.3.2.1.获取独占锁
 
-AQS 中使用 `acquire(int arg)` 方法获取独占锁，其大致流程如下：
+`AQS` 中使用 `acquire(int arg)` 方法获取独占锁，其大致流程如下：
 
 1. 先尝试获取同步状态，如果获取同步状态成功，则结束方法，直接返回。
-2. 如果获取同步状态不成功，AQS 会不断尝试利用 CAS 操作将当前线程插入等待同步队列的队尾，直到成功为止。
+2. 如果获取同步状态不成功，`AQS` 会不断尝试利用 `CAS` 操作将当前线程插入等待同步队列的队尾，直到成功为止。
 3. 接着，不断尝试为等待队列中的线程节点获取独占锁。
 
 ![687474703a2f2f64756e77752e746573742e757063646e2e6e65742f63732f6a6176612f6a617661636f72652f636f6e63757272656e742f6171735f322e706e67](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/java-core-demo/20210322220446.png)
@@ -1306,53 +1304,53 @@ AQS 中使用 `acquire(int arg)` 方法获取独占锁，其大致流程如下�
 
 ##### 6.3.2.2.释放独占锁
 
-AQS 中使用 `release(int arg)` 方法释放独占锁，其大致流程如下：
+`AQS` 中使用 `release(int arg)` 方法释放独占锁，其大致流程如下：
 
 1. 先尝试获取解锁线程的同步状态，如果获取同步状态不成功，则结束方法，直接返回。
-2. 如果获取同步状态成功，AQS 会尝试唤醒当前线程节点的后继节点。
+2. 如果获取同步状态成功，`AQS` 会尝试唤醒当前线程节点的后继节点。
 
 ##### 6.3.2.3.获取可中断的独占锁
 
-AQS 中使用 `acquireInterruptibly(int arg)` 方法获取可中断的独占锁。
+`AQS` 中使用 `acquireInterruptibly(int arg)` 方法获取可中断的独占锁。
 
 `acquireInterruptibly(int arg)` 实现方式**相较于获取独占锁方法（ `acquire`）非常相似**，区别仅在于它会**通过 `Thread.interrupted` 检测当前线程是否被中断**，如果是，则立即抛出中断异常（`InterruptedException`）。
 
 ##### 6.3.2.4.获取超时等待式的独占锁
 
-AQS 中使用 `tryAcquireNanos(int arg)` 方法获取超时等待的独占锁。
+`AQS` 中使用 `tryAcquireNanos(int arg)` 方法获取超时等待的独占锁。
 
-doAcquireNanos 的实现方式 **相较于获取独占锁方法（ `acquire`）非常相似**，区别在于它会根据超时时间和当前时间计算出截止时间。在获取锁的流程中，会不断判断是否超时，如果超时，直接返回 false；如果没超时，则用 `LockSupport.parkNanos` 来阻塞当前线程。
+`doAcquireNanos` 的实现方式 **相较于获取独占锁方法（ `acquire`）非常相似**，区别在于它会根据超时时间和当前时间计算出截止时间。在获取锁的流程中，会不断判断是否超时，如果超时，直接返回 `false`；如果没超时，则用 `LockSupport.parkNanos` 来阻塞当前线程。
 
 #### 6.3.3.共享锁的获取和释放
 
 ##### 6.3.3.1.获取共享锁
 
-AQS 中使用 `acquireShared(int arg)` 方法获取共享锁。
+`AQS` 中使用 `acquireShared(int arg)` 方法获取共享锁。
 
 `acquireShared` 方法和 `acquire` 方法的逻辑很相似，区别仅在于自旋的条件以及节点出队的操作有所不同。
 
 成功获得共享锁的条件如下：
 
-- `tryAcquireShared(arg)` 返回值大于等于 0 （这意味着共享锁的 permit 还没有用完）。
+- `tryAcquireShared(arg)` 返回值大于等于 0 （这意味着共享锁的 `permit` 还没有用完）。
 - 当前节点的前驱节点是头结点。
 
 ##### 6.3.3.2.释放共享锁
 
-AQS 中使用 `releaseShared(int arg)` 方法释放共享锁。
+`AQS` 中使用 `releaseShared(int arg)` 方法释放共享锁。
 
 `releaseShared` 首先会尝试释放同步状态，如果成功，则解锁一个或多个后继线程节点。释放共享锁和释放独享锁流程大体相似，区别在于：
 
-对于独享模式，如果需要 SIGNAL，释放仅相当于调用头节点的 `unparkSuccessor`。
+对于独享模式，如果需要 `SIGNAL`，释放仅相当于调用头节点的 `unparkSuccessor`。
 
 ##### 6.3.3.3.获取可中断的共享锁
 
-AQS 中使用 `acquireSharedInterruptibly(int arg)` 方法获取可中断的共享锁。
+`AQS` 中使用 `acquireSharedInterruptibly(int arg)` 方法获取可中断的共享锁。
 
 `acquireSharedInterruptibly` 方法与 `acquireInterruptibly` 几乎一致，不再赘述。
 
 ##### 6.3.3.4.获取超时等待式的共享锁
 
-AQS 中使用 `tryAcquireSharedNanos(int arg)` 方法获取超时等待式的共享锁。
+`AQS` 中使用 `tryAcquireSharedNanos(int arg)` 方法获取超时等待式的共享锁。
 
 `tryAcquireSharedNanos` 方法与 `tryAcquireNanos` 几乎一致，不再赘述。
 
@@ -1364,27 +1362,27 @@ AQS 中使用 `tryAcquireSharedNanos(int arg)` 方法获取超时等待式的共
 
 ### 7.2. 如何定位死锁
 
-定位死锁最常见的方式就是利用 jstack 等工具获取线程栈，然后定位互相之间的依赖关系，进而找到死锁。如果是比较明显的死锁，往往 jstack 等就能直接定位，类似 JConsole 甚至可以在图形界面进行有限的死锁检测。
+定位死锁最常见的方式就是利用 `jstack` 等工具获取线程栈，然后定位互相之间的依赖关系，进而找到死锁。如果是比较明显的死锁，往往 `jstack` 等就能直接定位，类似 `JConsole` 甚至可以在图形界面进行有限的死锁检测。
 
-如果我们是开发自己的管理工具，需要用更加程序化的方式扫描服务进程、定位死锁，可以考虑使用 Java 提供的标准管理 API，`ThreadMXBean`，其直接就提供了 `findDeadlockedThreads()` 方法用于定位。
+如果我们是开发自己的管理工具，需要用更加程序化的方式扫描服务进程、定位死锁，可以考虑使用 `Java` 提供的标准管理 `API`，`ThreadMXBean`，其直接就提供了 `findDeadlockedThreads()` 方法用于定位。
 
 ### 7.3. 如何避免死锁
 
 基本上死锁的发生是因为：
 
-- 互斥，类似 Java 中 Monitor 都是独占的。
+- 互斥，类似 `Java` 中 `Monitor` 都是独占的。
 - 长期保持互斥，在使用结束之前，不会释放，也不能被其他线程抢占。
 - 循环依赖，多个个体之间出现了锁的循环依赖，彼此依赖上一环释放锁。
 
 由此，我们可以分析出避免死锁的思路和方法。
 
-（1）避免一个线程同时获取多个锁。
+- 避免一个线程同时获取多个锁。
 
-避免一个线程在锁内同时占用多个资源，尽量保证每个锁只占用一个资源。
+- 避免一个线程在锁内同时占用多个资源，尽量保证每个锁只占用一个资源。
 
-尝试使用定时锁 `lock.tryLock(timeout)`，避免锁一直不能释放。
+- 尝试使用定时锁 `lock.tryLock(timeout)`，避免锁一直不能释放。
 
-对于数据库锁，加锁和解锁必须在一个数据库连接中里，否则会出现解锁失败的情况。
+- 对于数据库锁，加锁和解锁必须在一个数据库连接中里，否则会出现解锁失败的情况。
 
 
 
@@ -1441,19 +1439,19 @@ synchronized void setB() throws Exception{
 - 独享锁是指该锁一次只能被一个线程所持有。
 - 共享锁是指该锁可被多个线程所持有。
 
-对于Java ReentrantLock而言，其是独享锁。但是对于Lock的另一个实现类ReadWriteLock，其读锁是共享锁，其写锁是独享锁。
+对于 `Java ReentrantLock` 而言，其是独享锁。但是对于 `Lock` 的另一个实现类 `ReadWriteLock`，其读锁是共享锁，其写锁是独享锁。
 
 - 读锁的共享锁可保证并发读是非常高效的，读写，写读 ，写写的过程是互斥的。
-- 独享锁与共享锁也是通过AQS来实现的，通过实现不同的方法，来实现独享或者共享。
+- 独享锁与共享锁也是通过 `AQS` 来实现的，通过实现不同的方法，来实现独享或者共享。
 
-对于Synchronized而言，当然是独享锁。
+对于 `Synchronized` 而言，当然是独享锁。
 
 #### X.2.4.互斥锁/读写锁
 
 上面讲的独享锁/共享锁就是一种广义的说法，互斥锁/读写锁就是具体的实现。
 
-- 互斥锁在Java中的具体实现就是ReentrantLock
-- 读写锁在Java中的具体实现就是ReadWriteLock
+- 互斥锁在 `Java` 中的具体实现就是 `ReentrantLock`
+- 读写锁在 `Java` 中的具体实现就是 `ReadWriteLock`
 
 #### X.2.5.乐观锁/悲观锁
 
@@ -1473,15 +1471,15 @@ synchronized void setB() throws Exception{
 
 我们以 `ConcurrentHashMap` 来说一下分段锁的含义以及设计思想，**`ConcurrentHashMap` 中的分段锁称为 `Segment`，它即类似于 `HashMap`（JDK7与JDK8中 `HashMap` 的实现）的结构，即内部拥有一个Entry数组，数组中的每个元素又是一个链表；同时又是一个 `ReentrantLock`（ `Segment` 继承了`ReentrantLock`)。**
 
-当需要put元素的时候，并不是对整个hashmap进行加锁，而是先通过hashcode来知道他要放在那一个分段中，然后对这个分段进行加锁，所以当多线程put的时候，只要不是放在一个分段中，就实现了真正的并行的插入。
+当需要 `put` 元素的时候，并不是对整个 `hashmap` 进行加锁，而是先通过 `hashcode` 来知道他要放在那一个分段中，然后对这个分段进行加锁，所以当多线程put的时候，只要不是放在一个分段中，就实现了真正的并行的插入。
 
-但是，在统计size的时候，可就是获取hashmap全局信息的时候，就需要获取所有的分段锁才能统计。
+但是，在统计 `size` 的时候，可就是获取 `hashmap` 全局信息的时候，就需要获取所有的分段锁才能统计。
 
 分段锁的设计目的是细化锁的粒度，当操作不需要更新整个数组的时候，就仅仅针对数组中的一项进行加锁操作。
 
 #### X.2.7.偏向锁/轻量级锁/重量级锁
 
-这三种锁是指锁的状态，并且是针对Synchronized。在Java 5通过引入锁升级的机制来实现高效Synchronized。这三种锁的状态是通过对象监视器在对象头中的字段来表明的。
+这三种锁是指锁的状态，并且是针对 `Synchronized`。在 `Java 5` 通过引入锁升级的机制来实现高效 `Synchronized`。这三种锁的状态是通过对象监视器在对象头中的字段来表明的。
 
 - 偏向锁是指一段同步代码一直被一个线程所访问，那么该线程会自动获取锁。降低获取锁的代价。
 - 轻量级锁是指当锁是偏向锁的时候，被另一个线程所访问，偏向锁就会升级为轻量级锁，其他线程会通过自旋的形式尝试获取锁，不会阻塞，提高性能。
@@ -1489,7 +1487,7 @@ synchronized void setB() throws Exception{
 
 #### X.2.8.自旋锁
 
-在Java中，自旋锁是指尝试获取锁的线程不会立即阻塞，而是采用循环的方式去尝试获取锁，这样的好处是减少线程上下文切换的消耗，缺点是循环会消耗CPU。
+在 `Java` 中，自旋锁是指尝试获取锁的线程不会立即阻塞，而是采用循环的方式去尝试获取锁，这样的好处是减少线程上下文切换的消耗，缺点是循环会消耗 `CPU`。
 
 
 
