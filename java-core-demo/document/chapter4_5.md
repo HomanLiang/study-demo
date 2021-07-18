@@ -8,11 +8,11 @@
 
 ### 1.1. 为何需要原子变量类
 
-保证线程安全是 Java 并发编程必须要解决的重要问题。Java 从原子性、可见性、有序性这三大特性入手，确保多线程的数据一致性。
+保证线程安全是 `Java` 并发编程必须要解决的重要问题。`Java` 从原子性、可见性、有序性这三大特性入手，确保多线程的数据一致性。
 
 - 确保线程安全最常见的做法是利用锁机制（`Lock`、`sychronized`）来对共享数据做互斥同步，这样在同一个时刻，只有一个线程可以执行某个方法或者某个代码块，那么操作必然是原子性的，线程安全的。互斥同步最主要的问题是线程阻塞和唤醒所带来的性能问题。
 - `volatile` 是轻量级的锁（自然比普通锁性能要好），它保证了共享变量在多线程中的可见性，但无法保证原子性。所以，它只能在一些特定场景下使用。
-- 为了兼顾原子性以及锁带来的性能问题，Java 引入了 CAS （主要体现在 `Unsafe` 类）来实现非阻塞同步（也叫乐观锁）。并基于 CAS ，提供了一套原子工具类。
+- 为了兼顾原子性以及锁带来的性能问题，`Java` 引入了 `CAS` （主要体现在 `Unsafe` 类）来实现非阻塞同步（也叫乐观锁）。并基于 `CAS`，提供了一套原子工具类。
 
 ### 1.2. 原子变量类的作用
 
@@ -20,7 +20,7 @@
 
 原子变量类相当于一种泛化的 `volatile` 变量，能够**支持原子的、有条件的读/改/写操**作。
 
-原子类在内部使用 CAS 指令（基于硬件的支持）来实现同步。这些指令通常比锁更快。
+原子类在内部使用 `CAS` 指令（基于硬件的支持）来实现同步。这些指令通常比锁更快。
 
 原子变量类可以分为 4 组：
 
@@ -43,7 +43,7 @@
 
 ## 2. 基本类型
 
-这一类型的原子类是针对 Java 基本类型进行操作。
+这一类型的原子类是针对 `Java` 基本类型进行操作。
 
 - `AtomicBoolean` - 布尔类型原子类
 - `AtomicInteger` - 整型原子类
@@ -125,7 +125,7 @@ Java 数据类型分为 **基本数据类型** 和 **引用数据类型** 两大
 - `AtomicMarkableReference` - 带有标记位的引用类型原子类
 - `AtomicStampedReference` - 带有版本号的引用类型原子类
 
-> `AtomicStampedReference` 类在引用类型原子类中，彻底地解决了 ABA 问题，其它的 CAS 能力与另外两个类相近，所以最具代表性。因此，本节只针对 `AtomicStampedReference` 进行说明。
+> `AtomicStampedReference` 类在引用类型原子类中，彻底地解决了 `ABA` 问题，其它的 `CAS` 能力与另外两个类相近，所以最具代表性。因此，本节只针对 `AtomicStampedReference` 进行说明。
 
 示例：基于 `AtomicReference` 实现一个简单的自旋锁
 
@@ -194,9 +194,9 @@ public class AtomicReferenceDemo2 {
 }
 ```
 
-原子类的实现基于 CAS 机制，而 CAS 存在 ABA 问题。正是为了解决 ABA 问题，才有了 `AtomicMarkableReference` 和 `AtomicStampedReference`。
+原子类的实现基于 `CAS` 机制，而 `CAS` 存在 `ABA` 问题。正是为了解决 `ABA` 问题，才有了 `AtomicMarkableReference` 和 `AtomicStampedReference`。
 
-`AtomicMarkableReference` 使用一个布尔值作为标记，修改时在 true / false 之间切换。这种策略不能根本上解决 ABA 问题，但是可以降低 ABA 发生的几率。常用于缓存或者状态描述这样的场景。
+`AtomicMarkableReference` 使用一个布尔值作为标记，修改时在 `true`/`false` 之间切换。这种策略不能根本上解决 `ABA` 问题，但是可以降低 `ABA` 发生的几率。常用于缓存或者状态描述这样的场景。
 
 ```
 public class AtomicMarkableReferenceDemo {
@@ -234,7 +234,7 @@ public class AtomicMarkableReferenceDemo {
 }
 ```
 
-**`AtomicStampedReference` 使用一个整型值做为版本号，每次更新前先比较版本号，如果一致，才进行修改**。通过这种策略，可以根本上解决 ABA 问题。
+**`AtomicStampedReference` 使用一个整型值做为版本号，每次更新前先比较版本号，如果一致，才进行修改**。通过这种策略，可以根本上解决 `ABA` 问题。
 
 ```
 public class AtomicStampedReferenceDemo {
@@ -280,7 +280,7 @@ public class AtomicStampedReferenceDemo {
 
 ## 4. 数组类型
 
-Java 提供了以下针对数组的原子类：
+`Java` 提供了以下针对数组的原子类：
 
 - `AtomicIntegerArray` - 整形数组原子类
 - `AtomicLongArray` - 长整型数组原子类
@@ -428,7 +428,7 @@ public class AtomicReferenceFieldUpdaterDemo {
 
 `LongAdder` 内部由一个 `base` 变量和一个 `cell[]` 数组组成。
 
-- 当只有一个写线程，没有竞争的情况下，`LongAdder` 会直接使用 `base` 变量作为原子操作变量，通过 CAS 操作修改变量；
+- 当只有一个写线程，没有竞争的情况下，`LongAdder` 会直接使用 `base` 变量作为原子操作变量，通过 `CAS` 操作修改变量；
 - 当有多个写线程竞争的情况下，除了占用 `base` 变量的一个写线程之外，其它各个线程会将修改的变量写入到自己的槽 `cell[]` 数组中。
 
 我们可以发现，`LongAdder` 在操作后的返回值只是一个近似准确的数值，但是 `LongAdder` 最终返回的是一个准确的数值， 所以在一些对实时性要求比较高的场景下，`LongAdder` 并不能取代 `AtomicInteger` 或 `AtomicLong`。

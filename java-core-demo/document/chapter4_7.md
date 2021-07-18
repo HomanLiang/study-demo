@@ -34,23 +34,23 @@
 
 **1.3.2 资源不足**
 
-线程池的一个优点在于：相对于其它替代调度机制（有些我们已经讨论过）而言，它们通常执行得很好。**但只有恰当地调整了线程池大小时才是这样的。**线程消耗包括内存和其它系统资源在内的大量资源。除了 Thread 对象所需的内存之外，每个线程都需要两个可能很大的执行调用堆栈。除此以外，JVM 可能会为每个 Java 线程创建一个本机线程，这些本机线程将消耗额外的系统资源。最后，虽然线程之间切换的调度开销很小，但如果有很多线程，环境切换也可能严重地影响程序的性能。
+线程池的一个优点在于：相对于其它替代调度机制（有些我们已经讨论过）而言，它们通常执行得很好。**但只有恰当地调整了线程池大小时才是这样的。**线程消耗包括内存和其它系统资源在内的大量资源。除了 `Thread` 对象所需的内存之外，每个线程都需要两个可能很大的执行调用堆栈。除此以外，`JVM` 可能会为每个 `Java` 线程创建一个本机线程，这些本机线程将消耗额外的系统资源。最后，虽然线程之间切换的调度开销很小，但如果有很多线程，环境切换也可能严重地影响程序的性能。
 
-如果线程池太大，那么被那些线程消耗的资源可能严重地影响系统性能。在线程之间进行切换将会浪费时间，而且使用超出比您实际需要的线程可能会引起资源匮乏问题，因为池线程正在消耗一些资源，而这些资源可能会被其它任务更有效地利用。除了线程自身所使用的资源以外，服务请求时所做的工作可能需要其它资源，例如 JDBC 连接、套接字或文件。这些也都是有限资源，有太多的并发请求也可能引起失效，例如不能分配 JDBC 连接。
+如果线程池太大，那么被那些线程消耗的资源可能严重地影响系统性能。在线程之间进行切换将会浪费时间，而且使用超出比您实际需要的线程可能会引起资源匮乏问题，因为池线程正在消耗一些资源，而这些资源可能会被其它任务更有效地利用。除了线程自身所使用的资源以外，服务请求时所做的工作可能需要其它资源，例如 `JDBC` 连接、套接字或文件。这些也都是有限资源，有太多的并发请求也可能引起失效，例如不能分配 `JDBC` 连接。
 
 **1.3.3 线程泄漏**
 
-各种类型的线程池中一个严重的风险是线程泄漏，当从池中除去一个线程以执行一项任务，而在任务完成后该线程却没有返回池时，会发生这种情况。发生线程泄漏的一种情形出现在任务抛出一个 RuntimeException 或一个 Error 时。如果池类没有捕捉到它们，那么线程只会退出而线程池的大小将会永久减少一个。当这种情况发生的次数足够多时，线程池最终就为空，而且系统将停止，因为没有可用的线程来处理任务。
+各种类型的线程池中一个严重的风险是线程泄漏，当从池中除去一个线程以执行一项任务，而在任务完成后该线程却没有返回池时，会发生这种情况。发生线程泄漏的一种情形出现在任务抛出一个 `RuntimeException` 或一个 `Error` 时。如果池类没有捕捉到它们，那么线程只会退出而线程池的大小将会永久减少一个。当这种情况发生的次数足够多时，线程池最终就为空，而且系统将停止，因为没有可用的线程来处理任务。
 
 有些任务可能会永远等待某些资源或来自用户的输入，而这些资源又不能保证变得可用，用户可能也已经回家了，诸如此类的任务会永久停止，而这些停止的任务也会引起和线程泄漏同样的问题。如果某个线程被这样一个任务永久地消耗着，那么它实际上就被从池除去了。对于这样的任务，应该要么只给予它们自己的线程，要么只让它们等待有限的时间。
 
 ## 2. Executor 框架
 
-> Executor 框架是一个根据一组执行策略调用，调度，执行和控制的异步任务的框架，目的是提供一种将”任务提交”与”任务如何运行”分离开来的机制。
+> `Executor` 框架是一个根据一组执行策略调用，调度，执行和控制的异步任务的框架，目的是提供一种将”任务提交”与”任务如何运行”分离开来的机制。
 
 ### 2.1. 核心 API 概述
 
-Executor 框架核心 API 如下：
+`Executor` 框架核心 `API` 如下：
 
 - `Executor` - 运行任务的简单接口。
 
@@ -243,7 +243,7 @@ public ThreadPoolExecutor(int corePoolSize,
   - 当线程池中的线程数量大于 `corePoolSize` 的时候，如果这时没有新的任务提交，核心线程外的线程不会立即销毁，而是会等待，直到等待的时间超过了 `keepAliveTime`。
   - 所以，如果任务很多，并且每个任务执行的时间比较短，可以调大这个时间，提高线程的利用率。
 
-- `unit` - **`keepAliveTime` 的时间单位**。有 7 种取值。可选的单位有天（DAYS），小时（HOURS），分钟（MINUTES），毫秒(MILLISECONDS)，微秒(MICROSECONDS, 千分之一毫秒)和毫微秒(NANOSECONDS, 千分之一微秒)。
+- `unit` - **`keepAliveTime` 的时间单位**。有 7 种取值。可选的单位有天（`DAYS`），小时（`HOURS`），分钟（`MINUTES`），毫秒(`MILLISECONDS`)，微秒(`MICROSECONDS`, 千分之一毫秒)和毫微秒(`NANOSECONDS`, 千分之一微秒)。
 
 - `workQueue` - 等待执行的任务队列。用于保存等待执行的任务的阻塞队列。 可以选择以下几个阻塞队列。
 
@@ -302,7 +302,7 @@ public ThreadPoolExecutor(int corePoolSize,
 - `shutdown` - 不会立即终止线程池，而是要等所有任务缓存队列中的任务都执行完后才终止，但再也不会接受新的任务。
 
   - 将线程池切换到 `SHUTDOWN` 状态；
-  - 并调用 `interruptIdleWorkers` 方法请求中断所有空闲的 worker；
+  - 并调用 `interruptIdleWorkers` 方法请求中断所有空闲的 `worker`；
   - 最后调用 `tryTerminate` 尝试结束线程池。
 
 - `shutdownNow` - 立即终止线程池，并尝试打断正在执行的任务，并且清空任务缓存队列，返回尚未执行的任务。与`shutdown`方法类似，不同的地方在于：
@@ -369,49 +369,49 @@ public class ThreadPoolExecutorDemo {
 
 ![640](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/java-core-demo/20210323231250.webp)
 
-- 判断当前活跃线程数是否小于corePoolSize,如果小于，则调用addWorker创建线程执行任务
-- 如果不小于corePoolSize，则将任务添加到workQueue队列。
-- 如果放入workQueue失败，则创建线程执行任务，如果这时创建线程失败(当前线程数不小于maximumPoolSize时)，就会调用reject(内部调用handler)拒绝接受任务。
+- 判断当前活跃线程数是否小于 `corePoolSize`，如果小于，则调用 `addWorker` 创建线程执行任务
+- 如果不小于 `corePoolSize`，则将任务添加到 `workQueue` 队列。
+- 如果放入 `workQueue` 失败，则创建线程执行任务，如果这时创建线程失败(当前线程数不小于 `maximumPoolSize` 时)，就会调用`reject` (内部调用 `handler` )拒绝接受任务。
 
 **2、再看下addWorker的方法实现**
 
 ![640](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/java-core-demo/20210323231312.jpg)
 
-这块代码是在创建非核心线程时，即core等于false。判断当前线程数是否大于等于maximumPoolSize，如果大于等于则返回false，即上边说到的③中创建线程失败的情况。
+这块代码是在创建非核心线程时，即 `core` 等于 `false`。判断当前线程数是否大于等于 `maximumPoolSize`，如果大于等于则返回`false`，即上边说到的③中创建线程失败的情况。
 
-addWorker方法的下半部分：
+`addWorker` 方法的下半部分：
 
 ![640 (1)](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/java-core-demo/20210323231324.webp)
 
-- 创建Worker对象，同时也会实例化一个Thread对象。
+- 创建 `Worker` 对象，同时也会实例化一个 `Thread` 对象。
 - 启动这个线程
 
 **3、再到Worker里看看其实现**
 
 ![640](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/java-core-demo/20210323231332.png)
 
-可以看到在创建Worker时会调用threadFactory来创建一个线程。上边的②中启动一个线程就会触发Worker的run方法被线程调用。
+可以看到在创建 `Worker` 时会调用 `threadFactory` 来创建一个线程。上边的②中启动一个线程就会触发 `Worker` 的 `run` 方法被线程调用。
 
 **4、接下来咱们看看runWorker方法的逻辑**
 
 ![640 (1)](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/java-core-demo/20210323231342.jpg)
 
-线程调用runWoker，会while循环调用getTask方法从workerQueue里读取任务，然后执行任务。只要getTask方法不返回null,此线程就不会退出。
+线程调用 `runWoker`，会 `while` 循环调用 `getTask` 方法从 `workerQueue` 里读取任务，然后执行任务。只要 `getTask` 方法不返回 `null`，此线程就不会退出。
 
 **5、最后在看看getTask方法实现**
 
 ![640 (2)](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/java-core-demo/20210323231358.webp)
 
-- 咱们先不管allowCoreThreadTimeOut，这个变量默认值是false。wc>corePoolSize则是判断当前线程数是否大于corePoolSize。
-- 如果当前线程数大于corePoolSize，则会调用workQueue的poll方法获取任务，超时时间是keepAliveTime。如果超过keepAliveTime时长，poll返回了null，上边提到的while循序就会退出，线程也就执行完了。
+- 咱们先不管 `allowCoreThreadTimeOut`，这个变量默认值是 `false`。`wc>corePoolSize` 则是判断当前线程数是否大于`corePoolSize`。
+- 如果当前线程数大于 `corePoolSize`，则会调用 `workQueue` 的 `poll` 方法获取任务，超时时间是 `keepAliveTime`。如果超过`keepAliveTime` 时长，`poll` 返回了 `null`，上边提到的 `while` 循序就会退出，线程也就执行完了。
 
-如果当前线程数小于corePoolSize，则会调用workQueue的take方法阻塞在当前。
+- 如果当前线程数小于 `corePoolSize`，则会调用 `workQueue` 的 `take` 方法阻塞在当前。
 
 ## 4. Executors
 
-JDK 的 `Executors` 类中提供了几种具有代表性的线程池，这些线程池 **都是基于 `ThreadPoolExecutor` 的定制化实现**。
+`JDK` 的 `Executors` 类中提供了几种具有代表性的线程池，这些线程池 **都是基于 `ThreadPoolExecutor` 的定制化实现**。
 
-在实际使用线程池的场景中，我们往往不是直接使用 `ThreadPoolExecutor` ，而是使用 JDK 中提供的具有代表性的线程池实例。
+在实际使用线程池的场景中，我们往往不是直接使用 `ThreadPoolExecutor` ，而是使用 `JDK` 中提供的具有代表性的线程池实例。
 
 ### 4.1. newSingleThreadExecutor
 
@@ -477,7 +477,7 @@ public class FixedThreadPoolDemo {
 
 - 如果线程池大小超过处理任务所需要的线程数，就会回收部分空闲的线程；
 - 如果长时间没有往线程池中提交任务，即如果工作线程空闲了指定的时间（默认为 1 分钟），则该工作线程将自动终止。终止后，如果你又提交了新的任务，则线程池重新创建一个工作线程。
-- 此线程池不会对线程池大小做限制，线程池大小完全依赖于操作系统（或者说 JVM）能够创建的最大线程大小。 因此，使用 `CachedThreadPool` 时，一定要注意控制任务的数量，否则，由于大量线程同时运行，很有会造成系统瘫痪。
+- 此线程池不会对线程池大小做限制，线程池大小完全依赖于操作系统（或者说 `JVM`）能够创建的最大线程大小。 因此，使用 `CachedThreadPool` 时，一定要注意控制任务的数量，否则，由于大量线程同时运行，很有会造成系统瘫痪。
 
 示例：
 
@@ -551,17 +551,17 @@ Java 8 才引入。
 
 ### 5.1. 计算线程数量
 
-一般多线程执行的任务类型可以分为 CPU 密集型和 I/O 密集型，根据不同的任务类型，我们计算线程数的方法也不一样。
+一般多线程执行的任务类型可以分为 `CPU` 密集型和 `I/O` 密集型，根据不同的任务类型，我们计算线程数的方法也不一样。
 
-**CPU 密集型任务：**这种任务消耗的主要是 CPU 资源，可以将线程数设置为 N（CPU 核心数）+1，比 CPU 核心数多出来的一个线程是为了防止线程偶发的缺页中断，或者其它原因导致的任务暂停而带来的影响。一旦任务暂停，CPU 就会处于空闲状态，而在这种情况下多出来的一个线程就可以充分利用 CPU 的空闲时间。
+**CPU 密集型任务：**这种任务消耗的主要是 `CPU` 资源，可以将线程数设置为 N（`CPU` 核心数）+1，比 `CPU` 核心数多出来的一个线程是为了防止线程偶发的缺页中断，或者其它原因导致的任务暂停而带来的影响。一旦任务暂停，`CPU` 就会处于空闲状态，而在这种情况下多出来的一个线程就可以充分利用 `CPU` 的空闲时间。
 
-**I/O 密集型任务：**这种任务应用起来，系统会用大部分的时间来处理 I/O 交互，而线程在处理 I/O 的时间段内不会占用 CPU 来处理，这时就可以将 CPU 交出给其它线程使用。因此在 I/O 密集型任务的应用中，我们可以多配置一些线程，具体的计算方法是 2N。
+**I/O 密集型任务：**这种任务应用起来，系统会用大部分的时间来处理 `I/O` 交互，而线程在处理 `I/O` 的时间段内不会占用 `CPU` 来处理，这时就可以将 `CPU` 交出给其它线程使用。因此在 `I/O` 密集型任务的应用中，我们可以多配置一些线程，具体的计算方法是 `2N`。
 
 ### 5.2. 建议使用有界阻塞队列
 
-不建议使用 `Executors` 的最重要的原因是：`Executors` 提供的很多方法默认使用的都是无界的 `LinkedBlockingQueue`，高负载情境下，无界队列很容易导致 OOM，而 OOM 会导致所有请求都无法处理，这是致命问题。所以**强烈建议使用有界队列**。
+不建议使用 `Executors` 的最重要的原因是：`Executors` 提供的很多方法默认使用的都是无界的 `LinkedBlockingQueue`，高负载情境下，无界队列很容易导致 `OOM`，而 `OOM` 会导致所有请求都无法处理，这是致命问题。所以**强烈建议使用有界队列**。
 
-《阿里巴巴 Java 开发手册》中提到，禁止使用这些方法来创建线程池，而应该手动 `new ThreadPoolExecutor` 来创建线程池。制订这条规则是因为容易导致生产事故，最典型的就是 `newFixedThreadPool` 和 `newCachedThreadPool`，可能因为资源耗尽导致 OOM 问题。
+《阿里巴巴 Java 开发手册》中提到，禁止使用这些方法来创建线程池，而应该手动 `new ThreadPoolExecutor` 来创建线程池。制订这条规则是因为容易导致生产事故，最典型的就是 `newFixedThreadPool` 和 `newCachedThreadPool`，可能因为资源耗尽导致 `OOM` 问题。
 
 【示例】`newFixedThreadPool` OOM
 
@@ -620,11 +620,11 @@ threadPool.awaitTermination(1, TimeUnit.HOURS);
 
 ### 5.5. 在为时间可能很长的操作使用合用的线程时要小心
 
-如果程序必须等待诸如 I/O 完成这样的某个资源，那么请指定最长的等待时间，以及随后是失效还是将任务重新排队以便稍后执行。这样做保证了：通过将某个线程释放给某个可能成功完成的任务，从而将最终取得某些进展。
+如果程序必须等待诸如 `I/O` 完成这样的某个资源，那么请指定最长的等待时间，以及随后是失效还是将任务重新排队以便稍后执行。这样做保证了：通过将某个线程释放给某个可能成功完成的任务，从而将最终取得某些进展。
 
 ### 5.6. 理解任务
 
-要有效地调整线程池大小，您需要理解正在排队的任务以及它们正在做什么。它们是 CPU 限制的（CPU-bound）吗？它们是 I/O 限制的（I/O-bound）吗？您的答案将影响您如何调整应用程序。如果您有不同的任务类，这些类有着截然不同的特征，那么为不同任务类设置多个工作队列可能会有意义，这样可以相应地调整每个池。
+要有效地调整线程池大小，您需要理解正在排队的任务以及它们正在做什么。它们是 `CPU` 限制的（`CPU-bound`）吗？它们是 `I/O` 限制的（`I/O-bound`）吗？您的答案将影响您如何调整应用程序。如果您有不同的任务类，这些类有着截然不同的特征，那么为不同任务类设置多个工作队列可能会有意义，这样可以相应地调整每个池。
 
 
 
@@ -634,13 +634,13 @@ threadPool.awaitTermination(1, TimeUnit.HOURS);
 
 工作上的问题到这里就找到原因了，之后的解决过程也十分简单，这里就不提了。
 
-但是疑问又来了，为什么使用线程池的时候，线程因异常被中断却没有抛出任何信息呢？还有平时如果是在 main 函数里面的异常也会被抛出来，而不是像线程池这样被吞掉。
+但是疑问又来了，为什么使用线程池的时候，线程因异常被中断却没有抛出任何信息呢？还有平时如果是在 `main` 函数里面的异常也会被抛出来，而不是像线程池这样被吞掉。
 
 如果子线程抛出了异常，线程池会如何进行处理呢？
 
-> 我提交任务到线程池的方式是: `threadPoolExecutor.submit(Runnbale task);` ，后面了解到使用 execute() 方式提交任务会把异常日志给打出来，这里研究一下为什么使用 submit 提交任务，在任务中的异常会被“吞掉”。
+> 我提交任务到线程池的方式是: `threadPoolExecutor.submit(Runnbale task);` ，后面了解到使用 `execute()` 方式提交任务会把异常日志给打出来，这里研究一下为什么使用 `submit` 提交任务，在任务中的异常会被“吞掉”。
 
-对于 submit() 形式提交的任务，我们直接看源码：
+对于 `submit()` 形式提交的任务，我们直接看源码：
 
 ```
 public Future<?> submit(Runnable task) {
@@ -652,7 +652,7 @@ public Future<?> submit(Runnable task) {
 }
 ```
 
-它会被线程池包装成 RunnableFuture 对象，而最终它其实是一个 FutureTask 对象，在被添加到线程池的工作队列，然后调用 start() 方法后， FutureTask 对象的 run() 方法开始运行，即本任务开始执行。
+它会被线程池包装成 `RunnableFuture` 对象，而最终它其实是一个 `FutureTask` 对象，在被添加到线程池的工作队列，然后调用 `start()` 方法后，`FutureTask` 对象的 `run()` 方法开始运行，即本任务开始执行。
 
 ```
 public void run() {
@@ -684,15 +684,15 @@ public void run() {
 }
 ```
 
-在 FutureTask 对象的 `run()` 方法中，该任务抛出的异常被捕获，然后在 `setException(ex); ` 方法中，抛出的异常会被放到 outcome 对象中，这个对象就是 `submit() ` 方法会返回的 FutureTask 对象执行 `get()`  方法得到的结果。
+在 `FutureTask` 对象的 `run()` 方法中，该任务抛出的异常被捕获，然后在 `setException(ex); ` 方法中，抛出的异常会被放到 outcome 对象中，这个对象就是 `submit() ` 方法会返回的 `FutureTask` 对象执行 `get()`  方法得到的结果。
 
 但是在线程池中，并没有获取执行子线程的结果，所以异常也就没有被抛出来，即被“吞掉”了。
 
-这就是线程池的 submit() 方法提交任务没有异常抛出的原因。
+这就是线程池的 `submit()` 方法提交任务没有异常抛出的原因。
 
 **线程池自定义异常处理方法**
 
-在定义 ThreadFactory 的时候调用`setUncaughtExceptionHandler`方法，自定义异常处理方法。例如：
+在定义 `ThreadFactory` 的时候调用`setUncaughtExceptionHandler`方法，自定义异常处理方法。例如：
 
 ```
 ThreadFactory namedThreadFactory = new ThreadFactoryBuilder()
@@ -707,7 +707,7 @@ ThreadFactory namedThreadFactory = new ThreadFactoryBuilder()
 
 ### 7.1.ExecutorService VS CompletionService
 
-假设我们有 4 个任务(A, B, C, D)用来执行复杂的计算，每个任务的执行时间随着输入参数的不同而不同，如果将任务提交到 ExecutorService， 相信你已经可以“信手拈来”
+假设我们有 4 个任务(A, B, C, D)用来执行复杂的计算，每个任务的执行时间随着输入参数的不同而不同，如果将任务提交到 `ExecutorService`， 相信你已经可以“信手拈来”
 
 ```java
 ExecutorService executorService = Executors.newFixedThreadPool(4);
@@ -724,7 +724,7 @@ for (Future future:futures) {
 }
 ```
 
-先直入主题，用 CompletionService 实现同样的场景
+先直入主题，用 `CompletionService` 实现同样的场景
 
 ```java
 ExecutorService executorService = Executors.newFixedThreadPool(4);
@@ -745,7 +745,7 @@ for (int i=0; i<futures.size(); i++) {
 }
 ```
 
-两种方式在代码实现上几乎一毛一样，我们曾经说过 JDK 中不会重复造轮子，如果要造一个新轮子，必定是原有的轮子在某些场景的使用上有致命缺陷
+两种方式在代码实现上几乎一毛一样，我们曾经说过 `JDK` 中不会重复造轮子，如果要造一个新轮子，必定是原有的轮子在某些场景的使用上有致命缺陷
 
 既然新轮子出来了，二者到底有啥不同呢？ 但是 `Future get()` 方法的致命缺陷:
 
@@ -753,7 +753,7 @@ for (int i=0; i<futures.size(); i++) {
 
 先来看第一种实现方式，假设任务 A 由于参数原因，执行时间相对任务 B,C,D 都要长很多，但是按照程序的执行顺序，程序在 get() 任务 A 的执行结果会阻塞在那里，导致任务 B,C,D 的后续任务没办法执行。又因为每个任务执行时间是不固定的，**所以无论怎样调整将任务放到 List 的顺序，都不合适，这就是致命弊端**
 
-新轮子自然要解决这个问题，它的设计理念就是哪个任务先执行完成，get() 方法就会获取到相应的任务结果，这么做的好处是什么呢？来看个图你就瞬间理解了
+新轮子自然要解决这个问题，它的设计理念就是哪个任务先执行完成，`get()` 方法就会获取到相应的任务结果，这么做的好处是什么呢？来看个图你就瞬间理解了
 
 ![1583165-20200812090855367-1588324368](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/java-core-demo/20210323235146.png)
 
@@ -765,7 +765,7 @@ for (int i=0; i<futures.size(); i++) {
 
 ### 7.2.远看CompletionService 轮廓
 
-如果你使用过消息队列，你应该秒懂我要说什么了，CompletionService 实现原理很简单
+如果你使用过消息队列，你应该秒懂我要说什么了，`CompletionService` 实现原理很简单
 
 > 就是一个将异步任务的生产和任务完成结果的消费解耦的服务
 
@@ -973,22 +973,22 @@ void solve(Executor e,
  }
 ```
 
-这两种方式都是非常经典的 CompletionService 使用 **范式** ，请大家仔细品味每一行代码的用意
+这两种方式都是非常经典的 `CompletionService` 使用 **范式** ，请大家仔细品味每一行代码的用意
 
-范式没有说明 Executor 的使用，使用 ExecutorCompletionService，需要自己创建线程池，看上去虽然有些麻烦，但好处是你可以让多个 ExecutorCompletionService 的线程池隔离，这种隔离性能避免几个特别耗时的任务拖垮整个应用的风险 （这也是我们反复说过多次的，**不要所有业务共用一个线程池**）
+范式没有说明 `Executor` 的使用，使用 `ExecutorCompletionService`，需要自己创建线程池，看上去虽然有些麻烦，但好处是你可以让多个 `ExecutorCompletionService` 的线程池隔离，这种隔离性能避免几个特别耗时的任务拖垮整个应用的风险 （这也是我们反复说过多次的，**不要所有业务共用一个线程池**）
 
 ### 7.5.总结
 
-CompletionService 的应用场景还是非常多的，比如
+`CompletionService` 的应用场景还是非常多的，比如
 
-- Dubbo 中的 Forking Cluster
+- `Dubbo` 中的 `Forking Cluster`
 - 多仓库文件/镜像下载（从最近的服务中心下载后终止其他下载过程）
 - 多服务调用（天气预报服务，最先获取到的结果）
 
-CompletionService 不但能满足获取最快结果，还能起到一定 "load balancer" 作用，获取可用服务的结果，使用也非常简单， 只需要遵循范式即可
+`CompletionService` 不但能满足获取最快结果，还能起到一定 `load balancer` 作用，获取可用服务的结果，使用也非常简单， 只需要遵循范式即可
 
 
 
-## 技术文章
+## X.技术文章
 
 [Java线程池实现原理及其在美团业务中的实践](https://tech.meituan.com/2020/04/02/java-pooling-pratice-in-meituan.html)

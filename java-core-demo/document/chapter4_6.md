@@ -8,7 +8,7 @@
 
 ### 1.1. 同步容器简介
 
-在 Java 中，同步容器主要包括 2 类：
+在 `Java` 中，同步容器主要包括 2 类：
 
 - `Vector`、`Stack`、`Hashtable`
   - `Vector` - `Vector` 实现了 `List` 接口。`Vector` 实际上就是一个数组，和 `ArrayList` 类似。但是 `Vector` 中的方法都是 `synchronized`方法，即进行了同步措施。
@@ -87,7 +87,7 @@ public class VectorDemo {
 
 `Vector` 是线程安全的，那为什么还会报这个错？
 
-这是因为，对于 Vector，虽然能保证每一个时刻只能有一个线程访问它，但是不排除这种可能：
+这是因为，对于 `Vector`，虽然能保证每一个时刻只能有一个线程访问它，但是不排除这种可能：
 
 当某个线程在某个时刻执行这句时：
 
@@ -96,7 +96,7 @@ for(int i=0;i<vector.size();i++)
     vector.get(i);
 ```
 
-假若此时 vector 的 size 方法返回的是 10，i 的值为 9
+假若此时 `vector` 的 `size` 方法返回的是 10，i 的值为 9
 
 然后另外一个线程执行了这句：
 
@@ -169,9 +169,9 @@ public class VectorDemo2 {
 
 同步容器将所有对容器状态的访问都串行化，以保证线程安全性，这种策略会严重降低并发性。
 
-Java 1.5 后提供了多种并发容器，**使用并发容器来替代同步容器，可以极大地提高伸缩性并降低风险**。
+`Java 1.5` 后提供了多种并发容器，**使用并发容器来替代同步容器，可以极大地提高伸缩性并降低风险**。
 
-J.U.C 包中提供了几个非常有用的并发容器作为线程安全的容器：
+`J.U.C`  包中提供了几个非常有用的并发容器作为线程安全的容器：
 
 | 并发容器                | 对应的普通容器 | 描述                                                         |
 | ----------------------- | -------------- | ------------------------------------------------------------ |
@@ -208,9 +208,9 @@ J.U.C 包中提供的并发容器命名一般分为三类：
 
 ## 3. Map
 
-`Map` 接口的两个实现是 `ConcurrentHashMap` 和 `ConcurrentSkipListMap`，它们从应用的角度来看，主要区别在于**ConcurrentHashMap 的 key 是无序的，而 ConcurrentSkipListMap 的 key 是有序的**。所以如果你需要保证 key 的顺序，就只能使用 `ConcurrentSkipListMap`。
+`Map` 接口的两个实现是 `ConcurrentHashMap` 和 `ConcurrentSkipListMap`，它们从应用的角度来看，主要区别在于**ConcurrentHashMap 的 key 是无序的，而 ConcurrentSkipListMap 的 key 是有序的**。所以如果你需要保证 `key` 的顺序，就只能使用 `ConcurrentSkipListMap`。
 
-使用 `ConcurrentHashMap` 和 `ConcurrentSkipListMap` 需要注意的地方是，它们的 key 和 value 都不能为空，否则会抛出`NullPointerException`这个运行时异常。
+使用 `ConcurrentHashMap` 和 `ConcurrentSkipListMap` 需要注意的地方是，它们的 `key` 和 `value` 都不能为空，否则会抛出`NullPointerException`这个运行时异常。
 
 ### 3.1. ConcurrentHashMap
 
@@ -288,7 +288,7 @@ public class ConcurrentHashMapDemo {
 
 #### 3.1.3.ConcurrentHashMap 的原理
 
-> `ConcurrentHashMap` 一直在演进，尤其在 Java 1.7 和 Java 1.8，其数据结构和并发机制有很大的差异。
+> `ConcurrentHashMap` 一直在演进，尤其在 `Java 1.7` 和 `Java 1.8`，其数据结构和并发机制有很大的差异。
 
 - Java 1.7
   - 数据结构：**数组＋单链表**
@@ -299,7 +299,7 @@ public class ConcurrentHashMapDemo {
 
 ##### 3.1.3.1.Java 1.7 的实现
 
-分段锁，是将内部进行分段（Segment），里面是 `HashEntry` 数组，和 `HashMap` 类似，哈希相同的条目也是以链表形式存放。 `HashEntry` 内部使用 `volatile` 的 `value` 字段来保证可见性，也利用了不可变对象的机制，以改进利用 `Unsafe` 提供的底层能力，比如 `volatile access`，去直接完成部分操作，以最优化性能，毕竟 `Unsafe` 中的很多操作都是 `JVM intrinsic` 优化过的。
+分段锁，是将内部进行分段（`Segment`），里面是 `HashEntry` 数组，和 `HashMap` 类似，哈希相同的条目也是以链表形式存放。 `HashEntry` 内部使用 `volatile` 的 `value` 字段来保证可见性，也利用了不可变对象的机制，以改进利用 `Unsafe` 提供的底层能力，比如 `volatile access`，去直接完成部分操作，以最优化性能，毕竟 `Unsafe` 中的很多操作都是 `JVM intrinsic` 优化过的。
 
 ![687474703a2f2f64756e77752e746573742e757063646e2e6e65742f736e61702f32303230303630353231343430352e706e67](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/java-core-demo/20210322221618.png)
 
@@ -331,10 +331,10 @@ public class ConcurrentHashMap<K, V> extends AbstractMap<K, V>
 
 ##### 3.1.3.2.Java 1.8 的实现
 
-- 数据结构改进：与 HashMap 一样，将原先 **数组＋单链表** 的数据结构，变更为 **数组＋单链表＋红黑树** 的结构。当出现哈希冲突时，数据会存入数组指定桶的单链表，当链表长度达到 8，则将其转换为红黑树结构，这样其查询的时间复杂度可以降低到 $$O(logN)$$，以改进性能。
+- 数据结构改进：与 `HashMap` 一样，将原先 **数组＋单链表** 的数据结构，变更为 **数组＋单链表＋红黑树** 的结构。当出现哈希冲突时，数据会存入数组指定桶的单链表，当链表长度达到 8，则将其转换为红黑树结构，这样其查询的时间复杂度可以降低到 `O(logN)`，以改进性能。
 - 并发机制改进：
-  - 取消 segments 字段，**直接采用 `transient volatile HashEntry<K,V>[] table` 保存数据，采用 table 数组元素作为锁，从而实现了对每一行数据进行加锁，进一步减少并发冲突的概率**。
-  - 使用 CAS + `sychronized` 操作，在特定场景进行无锁并发操作。使用 Unsafe、LongAdder 之类底层手段，进行极端情况的优化。现代 JDK 中，synchronized 已经被不断优化，可以不再过分担心性能差异，另外，相比于 ReentrantLock，它可以减少内存消耗，这是个非常大的优势。
+  - 取消 `segments` 字段，**直接采用 `transient volatile HashEntry<K,V>[] table` 保存数据，采用 table 数组元素作为锁，从而实现了对每一行数据进行加锁，进一步减少并发冲突的概率**。
+  - 使用 `CAS` + `sychronized` 操作，在特定场景进行无锁并发操作。使用 `Unsafe`、`LongAdder` 之类底层手段，进行极端情况的优化。现代 `JDK` 中，`synchronized` 已经被不断优化，可以不再过分担心性能差异，另外，相比于 `ReentrantLock`，它可以减少内存消耗，这是个非常大的优势。
 
 ```
 final V putVal(K key, V value, boolean onlyIfAbsent) {
@@ -463,12 +463,12 @@ final V putVal(K key, V value, boolean onlyIfAbsent) {
 `ConcurrentHashMap` 对外提供的方法或能力的限制：
 
 - 使用了 `ConcurrentHashMap`，不代表对它的多个操作之间的状态是一致的，是没有其他线程在操作它的，如果需要确保需要手动加锁。
-- 诸如 size、isEmpty 和 containsValue 等聚合方法，在并发情况下可能会反映 ConcurrentHashMap 的中间状态。因此在并发情况下，这些方法的返回值只能用作参考，而不能用于流程控制。显然，利用 size 方法计算差异值，是一个流程控制。
-- 诸如 putAll 这样的聚合方法也不能确保原子性，在 putAll 的过程中去获取数据可能会获取到部分数据。
+- 诸如 `size`、`isEmpty` 和 `containsValue` 等聚合方法，在并发情况下可能会反映 `ConcurrentHashMap` 的中间状态。因此在并发情况下，这些方法的返回值只能用作参考，而不能用于流程控制。显然，利用 `size` 方法计算差异值，是一个流程控制。
+- 诸如 `putAll` 这样的聚合方法也不能确保原子性，在 `putAll` 的过程中去获取数据可能会获取到部分数据。
 
 ##### 3.1.4.2.ConcurrentHashMap 错误示例修正 1.0 版
 
-通过 synchronized 加锁，当然可以保证数据一致性，但是牺牲了 ConcurrentHashMap 的性能，没哟真正发挥出 ConcurrentHashMap 的特性。
+通过 `synchronized` 加锁，当然可以保证数据一致性，但是牺牲了 `ConcurrentHashMap` 的性能，没有真正发挥出 `ConcurrentHashMap` 的特性。
 
 ```
     //线程个数
@@ -591,8 +591,8 @@ final V putVal(K key, V value, boolean onlyIfAbsent) {
 
 ![687474703a2f2f64756e77752e746573742e757063646e2e6e65742f736e61702f32303230303730323230343534312e706e67](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/java-core-demo/20210322221733.png)
 
-- lock - 执行写时复制操作，需要使用可重入锁加锁
-- array - 对象数组，用于存放元素
+- `lock` - 执行写时复制操作，需要使用可重入锁加锁
+- `array` - 对象数组，用于存放元素
 
 ```
 /** The lock protecting all mutators */
@@ -608,7 +608,7 @@ private transient volatile Object[] array;
 
 在 `CopyOnWriteAarrayList` 中，读操作不同步，因为它们在内部数组的快照上工作，所以多个迭代器可以同时遍历而不会相互阻塞（图 1,2,4）。
 
-CopyOnWriteArrayList 的读操作是不用加锁的，性能很高。
+`CopyOnWriteArrayList` 的读操作是不用加锁的，性能很高。
 
 ```
 public E get(int index) {
@@ -627,7 +627,7 @@ private E get(Object[] a, int index) {
 
 写时复制集合返回的迭代器不会抛出 `ConcurrentModificationException`，因为它们在数组的快照上工作，并且无论后续的修改如何，都会像迭代器创建时那样完全返回元素。
 
-**添加操作** - 添加的逻辑很简单，先将原容器 copy 一份，然后在新副本上执行写操作，之后再切换引用。当然此过程是要加锁的。
+**添加操作** - 添加的逻辑很简单，先将原容器 `copy` 一份，然后在新副本上执行写操作，之后再切换引用。当然此过程是要加锁的。
 
 ```
 public boolean add(E e) {
@@ -809,11 +809,11 @@ public class WrongCopyOnWriteList {
 
 ## 5. Set
 
-Set 接口的两个实现是 CopyOnWriteArraySet 和 ConcurrentSkipListSet，使用场景可以参考前面讲述的 CopyOnWriteArrayList 和 ConcurrentSkipListMap，它们的原理都是一样的。
+`Set` 接口的两个实现是 `CopyOnWriteArraySet` 和 `ConcurrentSkipListSet`，使用场景可以参考前面讲述的 `CopyOnWriteArrayList` 和 `ConcurrentSkipListMap`，它们的原理都是一样的。
 
 ## 6. Queue
 
-Java 并发包里面 Queue 这类并发容器是最复杂的，你可以从以下两个维度来分类。一个维度是**阻塞与非阻塞**，所谓阻塞指的是：**当队列已满时，入队操作阻塞；当队列已空时，出队操作阻塞**。另一个维度是**单端与双端**，单端指的是只能队尾入队，队首出队；而双端指的是队首队尾皆可入队出队。Java 并发包里**阻塞队列都用 Blocking 关键字标识，单端队列使用 Queue 标识，双端队列使用 Deque 标识**。
+`Java` 并发包里面 `Queue` 这类并发容器是最复杂的，你可以从以下两个维度来分类。一个维度是**阻塞与非阻塞**，所谓阻塞指的是：**当队列已满时，入队操作阻塞；当队列已空时，出队操作阻塞**。另一个维度是**单端与双端**，单端指的是只能队尾入队，队首出队；而双端指的是队首队尾皆可入队出队。Java 并发包里**阻塞队列都用 Blocking 关键字标识，单端队列使用 Queue 标识，双端队列使用 Deque 标识**。
 
 ### 6.1. BlockingQueue
 
@@ -1031,9 +1031,9 @@ public class SynchronousQueue<E> extends AbstractQueue<E>
 
 ### 6.7. Queue 的并发应用
 
-Queue 被广泛使用在生产者 - 消费者场景。而在并发场景，利用 `BlockingQueue` 的阻塞机制，可以减少很多并发协调工作。
+`Queue` 被广泛使用在生产者 - 消费者场景。而在并发场景，利用 `BlockingQueue` 的阻塞机制，可以减少很多并发协调工作。
 
-这么多并发 Queue 的实现，如何选择呢？
+这么多并发 `Queue` 的实现，如何选择呢？
 
 - 考虑应用场景中对队列边界的要求。`ArrayBlockingQueue` 是有明确的容量限制的，而 `LinkedBlockingQueue` 则取决于我们是否在创建时指定，`SynchronousQueue` 则干脆不能缓存任何元素。
 - 从空间利用角度，数组结构的 `ArrayBlockingQueue` 要比 `LinkedBlockingQueue` 紧凑，因为其不需要创建所谓节点，但是其初始分配阶段就需要一段连续的空间，所以初始内存需求更大。

@@ -10,9 +10,9 @@
 
 ### 1.1.什么是CompletableFuture？
 
-Java 8 新特性
+`Java 8` 新特性
 
-在Java中CompletableFuture用于异步编程，异步编程是编写非阻塞的代码，运行的任务在一个单独的线程，与主线程隔离，并且会通知主线程它的进度，成功或者失败。
+在 `Java` 中 `CompletableFuture` 用于异步编程，异步编程是编写非阻塞的代码，运行的任务在一个单独的线程，与主线程隔离，并且会通知主线程它的进度，成功或者失败。
 
 在这种方式中，主线程不会被阻塞，不需要一直等到子线程完成。主线程可以并行的执行其他任务。
 
@@ -20,47 +20,47 @@ Java 8 新特性
 
 ### 1.2.Future vs CompletableFuture
 
-CompletableFuture 是 [Future API](https://docs.oracle.com/javase/7/docs/api/java/util/concurrent/Future.html) 的扩展。
+`CompletableFuture` 是 [Future API](https://docs.oracle.com/javase/7/docs/api/java/util/concurrent/Future.html) 的扩展。
 
-Future 被用于作为一个异步计算结果的引用。提供一个 `isDone()` 方法来检查计算任务是否完成。当任务完成时，`get()` 方法用来接收计算任务的结果。
+`Future` 被用于作为一个异步计算结果的引用。提供一个 `isDone()` 方法来检查计算任务是否完成。当任务完成时，`get()` 方法用来接收计算任务的结果。
 
-从 [Callbale和 Future 教程](https://www.callicoder.com/java-callable-and-future-tutorial/) 可以学习更多关于 Future 知识.
+从 [Callbale和 Future 教程](https://www.callicoder.com/java-callable-and-future-tutorial/) 可以学习更多关于 `Future` 知识.
 
-Future API 是非常好的 Java 异步编程进阶，但是它缺乏一些非常重要和有用的特性。
+`Future API` 是非常好的 `Java` 异步编程进阶，但是它缺乏一些非常重要和有用的特性。
 
 ### 1.3.Future 的局限性
 
-1. 不能手动完成。当你写了一个函数，用于通过一个远程API获取一个电子商务产品最新价格。因为这个 API 太耗时，你把它允许在一个独立的线程中，并且从你的函数中返回一个 Future。现在假设这个API服务宕机了，这时你想通过该产品的最新缓存价格手工完成这个Future 。你会发现无法这样做。
-2. Future 的结果在非阻塞的情况下，不能执行更进一步的操作 Future 不会通知你它已经完成了，它提供了一个阻塞的 `get()` 方法通知你结果。你无法给 Future 植入一个回调函数，当 Future 结果可用的时候，用该回调函数自动的调用 Future 的结果。
-3. 多个 Future 不能串联在一起组成链式调用 有时候你需要执行一个长时间运行的计算任务，并且当计算任务完成的时候，你需要把它的计算结果发送给另外一个长时间运行的计算任务等等。你会发现你无法使用 Future 创建这样的一个工作流。
-4. 不能组合多个 Future 的结果 假设你有10个不同的Future，你想并行的运行，然后在它们运行未完成后运行一些函数。你会发现你也无法使用 Future 这样做。
-5. 没有异常处理 Future API 没有任务的异常处理结构居然有如此多的限制，幸好我们有CompletableFuture，你可以使用 CompletableFuture 达到以上所有目的。
+1. 不能手动完成。当你写了一个函数，用于通过一个远程 `API` 获取一个电子商务产品最新价格。因为这个 `API` 太耗时，你把它允许在一个独立的线程中，并且从你的函数中返回一个 `Future`。现在假设这个 `API` 服务宕机了，这时你想通过该产品的最新缓存价格手工完成这个 `Future` 。你会发现无法这样做。
+2. `Future` 的结果在非阻塞的情况下，不能执行更进一步的操作 `Future` 不会通知你它已经完成了，它提供了一个阻塞的 `get()` 方法通知你结果。你无法给 `Future` 植入一个回调函数，当 `Future` 结果可用的时候，用该回调函数自动的调用 `Future` 的结果。
+3. 多个 `Future` 不能串联在一起组成链式调用 有时候你需要执行一个长时间运行的计算任务，并且当计算任务完成的时候，你需要把它的计算结果发送给另外一个长时间运行的计算任务等等。你会发现你无法使用 `Future` 创建这样的一个工作流。
+4. 不能组合多个 `Future` 的结果 假设你有 `10` 个不同的 `Future`，你想并行的运行，然后在它们运行未完成后运行一些函数。你会发现你也无法使用 `Future` 这样做。
+5. 没有异常处理 `Future API` 没有任务的异常处理结构居然有如此多的限制，幸好我们有 `CompletableFuture`，你可以使用 `CompletableFuture` 达到以上所有目的。
 
-CompletableFuture 实现了 `Future`  和 `CompletionStage`接口，并且提供了许多关于创建，链式调用和组合多个 Future 的便利方法集，而且有广泛的异常处理支持。
+`CompletableFuture` 实现了 `Future`  和 `CompletionStage ` 接口，并且提供了许多关于创建，链式调用和组合多个 `Future` 的便利方法集，而且有广泛的异常处理支持。
 
 ### 1.4.创建 CompletableFuture
 
-**1. 简单的例子** 可以使用如下无参构造函数简单的创建 CompletableFuture：
+**1. 简单的例子** 可以使用如下无参构造函数简单的创建 `CompletableFuture`：
 
 ```
 CompletableFuture<String> completableFuture = new CompletableFuture<String>();
 ```
 
-这是一个最简单的 CompletableFuture，想获取CompletableFuture 的结果可以使用 `CompletableFuture.get()` 方法：
+这是一个最简单的 `CompletableFuture`，想获取 `CompletableFuture` 的结果可以使用 `CompletableFuture.get()` 方法：
 
 ```
 String result = completableFuture.get()
 ```
 
-`get()` 方法会一直阻塞直到 Future 完成。因此，以上的调用将被永远阻塞，因为该Future一直不会完成。
+`get()` 方法会一直阻塞直到 `Future` 完成。因此，以上的调用将被永远阻塞，因为该 `Future` 一直不会完成。
 
-你可以使用 `CompletableFuture.complete()` 手工的完成一个 Future：
+你可以使用 `CompletableFuture.complete()` 手工的完成一个 `Future`：
 
 ```
 completableFuture.complete("Future's Result")
 ```
 
-所有等待这个 Future 的客户端都将得到一个指定的结果，并且 `completableFuture.complete()` 之后的调用将被忽略。
+所有等待这个 `Future` 的客户端都将得到一个指定的结果，并且 `completableFuture.complete()` 之后的调用将被忽略。
 
 **2. 使用 `runAsync()` 运行异步计算** 如果你想异步的运行一个后台任务并且不想改任务返回任务东西，这时候可以使用 `CompletableFuture.runAsync()`方法，它持有一个[Runnable ](https://docs.oracle.com/javase/7/docs/api/java/lang/Runnable.html)对象，并返回 `CompletableFuture<Void>`。
 
@@ -83,7 +83,7 @@ CompletableFuture<Void> future = CompletableFuture.runAsync(new Runnable() {
 future.get()
 ```
 
-你也可以以 lambda 表达式的形式传入 Runnable 对象：
+你也可以以 `lambda` 表达式的形式传入 `Runnable` 对象：
 
 ```
 // Using Lambda Expression
@@ -98,11 +98,11 @@ CompletableFuture<Void> future = CompletableFuture.runAsync(() -> {
 });
 ```
 
-在本文中，我使用lambda表达式会比较频繁，如果以前你没有使用过，建议你也多使用lambda 表达式。
+在本文中，我使用 `lambda` 表达式会比较频繁，如果以前你没有使用过，建议你也多使用 `lambda` 表达式。
 
 **3. 使用 `supplyAsync()` 运行一个异步任务并且返回结果** 当任务不需要返回任何东西的时候， `CompletableFuture.runAsync()` 非常有用。但是如果你的后台任务需要返回一些结果应该要怎么样？
 
-`CompletableFuture.supplyAsync()` 就是你的选择。它持有`supplier<T>` 并且返回`CompletableFuture<T>`，`T` 是通过调用 传入的supplier取得的值的类型。
+`CompletableFuture.supplyAsync()` 就是你的选择。它持有`supplier<T>` 并且返回`CompletableFuture<T>`，`T` 是通过调用 传入的`supplier` 取得的值的类型。
 
 ```
 // Run a task specified by a Supplier object asynchronously
@@ -165,11 +165,11 @@ CompletableFuture<String> future = CompletableFuture.supplyAsync(() -> {
 
 ### 1.5.在 CompletableFuture 转换和运行
 
-`CompletableFuture.get()` 方法是阻塞的。它会一直等到Future完成并且在完成后返回结果。 但是，这是我们想要的吗？对于构建异步系统，我们应该附上一个回调给CompletableFuture，当Future完成的时候，自动的获取结果。 如果我们不想等待结果返回，我们可以把需要等待Future完成执行的逻辑写入到回调函数中。
+`CompletableFuture.get()` 方法是阻塞的。它会一直等到 `Future` 完成并且在完成后返回结果。 但是，这是我们想要的吗？对于构建异步系统，我们应该附上一个回调给 `CompletableFuture`，当 `Future` 完成的时候，自动的获取结果。 如果我们不想等待结果返回，我们可以把需要等待 `Future` 完成执行的逻辑写入到回调函数中。
 
-可以使用 `thenApply()`, `thenAccept()` 和`thenRun()`方法附上一个回调给CompletableFuture。
+可以使用 `thenApply()`, `thenAccept()` 和`thenRun()`方法附上一个回调给 `CompletableFuture`。
 
-**1. thenApply()** 可以使用 `thenApply()` 处理和改变CompletableFuture的结果。持有一个`Function<R,T>`作为参数。`Function<R,T>`是一个简单的函数式接口，接受一个T类型的参数，产出一个R类型的结果。
+**1. thenApply()** 可以使用 `thenApply()` 处理和改变 `CompletableFuture` 的结果。持有一个`Function<R,T>`作为参数。`Function<R,T>`是一个简单的函数式接口，接受一个T类型的参数，产出一个R类型的结果。
 
 ```
 // Create a CompletableFuture
@@ -191,7 +191,7 @@ CompletableFuture<String> greetingFuture = whatsYourNameFuture.thenApply(name ->
 System.out.println(greetingFuture.get()); // Hello Rajeev
 ```
 
-你也可以通过附加一系列的`thenApply()`在回调方法 在CompletableFuture写一个连续的转换。这样的话，结果中的一个 `thenApply`方法就会传递给该系列的另外一个 `thenApply`方法。
+你也可以通过附加一系列的`thenApply()`在回调方法 在 `CompletableFuture` 写一个连续的转换。这样的话，结果中的一个 `thenApply`方法就会传递给该系列的另外一个 `thenApply`方法。
 
 ```
 CompletableFuture<String> welcomeText = CompletableFuture.supplyAsync(() -> {
@@ -211,7 +211,7 @@ System.out.println(welcomeText.get());
 // Prints - Hello Rajeev, Welcome to the CalliCoder Blog
 ```
 
-**2. thenAccept() 和 thenRun()** 如果你不想从你的回调函数中返回任何东西，仅仅想在Future完成后运行一些代码片段，你可以使用`thenAccept()`和 `thenRun()`方法，这些方法经常在调用链的最末端的最后一个回调函数中使用。 `CompletableFuture.thenAccept()`持有一个`Consumer<T>`，返回一个`CompletableFuture<Void>`。它可以访问`CompletableFuture`的结果：
+**2. thenAccept() 和 thenRun()** 如果你不想从你的回调函数中返回任何东西，仅仅想在 `Future` 完成后运行一些代码片段，你可以使用`thenAccept()`和 `thenRun()`方法，这些方法经常在调用链的最末端的最后一个回调函数中使用。 `CompletableFuture.thenAccept()`持有一个`Consumer<T>`，返回一个`CompletableFuture<Void>`。它可以访问`CompletableFuture`的结果：
 
 ```
 // thenAccept() example
@@ -222,7 +222,7 @@ CompletableFuture.supplyAsync(() -> {
 });
 ```
 
-虽然`thenAccept()`可以访问CompletableFuture的结果，但`thenRun()`不能访Future的结果，它持有一个Runnable返回CompletableFuture：
+虽然`thenAccept()`可以访问 `CompletableFuture` 的结果，但`thenRun()`不能访 `Future` 的结果，它持有一个 `Runnable` 返回`CompletableFuture`：
 
 ```
 // thenRun() example
@@ -233,7 +233,7 @@ CompletableFuture.supplyAsync(() -> {
 });
 ```
 
-> **异步回调方法的笔记** CompletableFuture提供的所有回调方法都有两个变体： `// thenApply() variants <U> CompletableFuture<U> thenApply(Function<? super T,? extends U> fn) <U> CompletableFuture<U> thenApplyAsync(Function<? super T,? extends U> fn) <U> CompletableFuture<U> thenApplyAsync(Function<? super T,? extends U> fn, Executor executor)` 这些异步回调变体通过在独立的线程中执行回调任务帮助你进一步执行并行计算。 以下示例：
+> **异步回调方法的笔记** `CompletableFuture` 提供的所有回调方法都有两个变体： `// thenApply() variants <U> CompletableFuture<U> thenApply(Function<? super T,? extends U> fn) <U> CompletableFuture<U> thenApplyAsync(Function<? super T,? extends U> fn) <U> CompletableFuture<U> thenApplyAsync(Function<? super T,? extends U> fn, Executor executor)` 这些异步回调变体通过在独立的线程中执行回调任务帮助你进一步执行并行计算。 以下示例：
 
 ```
 CompletableFuture.supplyAsync(() -> {
@@ -524,23 +524,23 @@ System.out.println("Maturity : " + maturityFuture.get());
 
 ## 2. CompletionStage
 
-CompletionStage 接口可以清晰地描述任务之间的时序关系，如**串行关系、并行关系、汇聚关系**等。
+`CompletionStage` 接口可以清晰地描述任务之间的时序关系，如**串行关系、并行关系、汇聚关系**等。
 
 ### 2.1. 串行关系
 
-CompletionStage 接口里面描述串行关系，主要是 thenApply、thenAccept、thenRun 和 thenCompose 这四个系列的接口。
+`CompletionStage` 接口里面描述串行关系，主要是 `thenApply`、`thenAccept`、`thenRun` 和 `thenCompose` 这四个系列的接口。
 
-thenApply 系列函数里参数 fn 的类型是接口 `Function<T, R>`，这个接口里与 CompletionStage 相关的方法是 `R apply(T t)`，这个方法既能接收参数也支持返回值，所以 thenApply 系列方法返回的是`CompletionStage`。
+`thenApply` 系列函数里参数 fn 的类型是接口 `Function<T, R>`，这个接口里与 `CompletionStage` 相关的方法是 `R apply(T t)`，这个方法既能接收参数也支持返回值，所以 `thenApply` 系列方法返回的是`CompletionStage`。
 
-而 thenAccept 系列方法里参数 consumer 的类型是接口 `Consumer<T>`，这个接口里与 CompletionStage 相关的方法是 `void accept(T t)`，这个方法虽然支持参数，但却不支持回值，所以 thenAccept 系列方法返回的是`CompletionStage<Void>`。
+而 `thenAccept` 系列方法里参数 `consumer` 的类型是接口 `Consumer<T>`，这个接口里与 `CompletionStage` 相关的方法是 `void accept(T t)`，这个方法虽然支持参数，但却不支持回值，所以 `thenAccept` 系列方法返回的是`CompletionStage<Void>`。
 
-thenRun 系列方法里 action 的参数是 Runnable，所以 action 既不能接收参数也不支持返回值，所以 thenRun 系列方法返回的也是`CompletionStage<Void>`。
+`thenRun` 系列方法里 `action` 的参数是 `Runnable`，所以 `action` 既不能接收参数也不支持返回值，所以 `thenRun` 系列方法返回的也是`CompletionStage<Void>`。
 
-这些方法里面 Async 代表的是异步执行 fn、consumer 或者 action。其中，需要你注意的是 thenCompose 系列方法，这个系列的方法会新创建出一个子流程，最终结果和 thenApply 系列是相同的。
+这些方法里面 `Async` 代表的是异步执行 `fn`、`consumer` 或者 `action`。其中，需要你注意的是 `thenCompose` 系列方法，这个系列的方法会新创建出一个子流程，最终结果和 `thenApply` 系列是相同的。
 
 ### 2.2. 描述 AND 汇聚关系
 
-CompletionStage 接口里面描述 AND 汇聚关系，主要是 thenCombine、thenAcceptBoth 和 runAfterBoth 系列的接口，这些接口的区别也是源自 fn、consumer、action 这三个核心参数不同。
+`CompletionStage` 接口里面描述 `AND` 汇聚关系，主要是 `thenCombine`、`thenAcceptBoth` 和 `runAfterBoth` 系列的接口，这些接口的区别也是源自 `fn`、`consumer`、`action` 这三个核心参数不同。
 
 ```
 CompletionStage<R> thenCombine(other, fn);
@@ -553,7 +553,7 @@ CompletionStage<Void> runAfterBothAsync(other, action);
 
 ### 2.3. 描述 OR 汇聚关系
 
-CompletionStage 接口里面描述 OR 汇聚关系，主要是 applyToEither、acceptEither 和 runAfterEither 系列的接口，这些接口的区别也是源自 fn、consumer、action 这三个核心参数不同。
+`CompletionStage` 接口里面描述 `OR` 汇聚关系，主要是 `applyToEither`、`acceptEither` 和 `runAfterEither` 系列的接口，这些接口的区别也是源自 `fn`、`consumer`、`action` 这三个核心参数不同。
 
 ```
 CompletionStage applyToEither(other, fn);
@@ -564,7 +564,7 @@ CompletionStage runAfterEither(other, action);
 CompletionStage runAfterEitherAsync(other, action);
 ```
 
-下面的示例代码展示了如何使用 applyToEither() 方法来描述一个 OR 汇聚关系。
+下面的示例代码展示了如何使用 `applyToEither()` 方法来描述一个 `OR` 汇聚关系。
 
 ```
 CompletableFuture<String> f1 =
@@ -589,7 +589,7 @@ System.out.println(f3.join());
 
 ### 2.4. 异常处理
 
-虽然上面我们提到的 fn、consumer、action 它们的核心方法都**不允许抛出可检查异常，但是却无法限制它们抛出运行时异常**，例如下面的代码，执行 `7/0` 就会出现除零错误这个运行时异常。非异步编程里面，我们可以使用 try{}catch{} 来捕获并处理异常，那在异步编程里面，异常该如何处理呢？
+虽然上面我们提到的 `fn`、`consumer`、`action` 它们的核心方法都**不允许抛出可检查异常，但是却无法限制它们抛出运行时异常**，例如下面的代码，执行 `7/0` 就会出现除零错误这个运行时异常。非异步编程里面，我们可以使用 `try{}catch{}` 来捕获并处理异常，那在异步编程里面，异常该如何处理呢？
 
 ```
 CompletableFuture<Integer>
@@ -599,7 +599,7 @@ CompletableFuture<Integer>
 System.out.println(f0.join());
 ```
 
-CompletionStage 接口给我们提供的方案非常简单，比 try{}catch{}还要简单，下面是相关的方法，使用这些方法进行异常处理和串行操作是一样的，都支持链式编程方式。
+`CompletionStage` 接口给我们提供的方案非常简单，比 `try{}catch{}` 还要简单，下面是相关的方法，使用这些方法进行异常处理和串行操作是一样的，都支持链式编程方式。
 
 ```
 CompletionStage exceptionally(fn);
@@ -609,7 +609,7 @@ CompletionStage<R> handle(fn);
 CompletionStage<R> handleAsync(fn);
 ```
 
-下面的示例代码展示了如何使用 exceptionally() 方法来处理异常，exceptionally() 的使用非常类似于 try{}catch{}中的 catch{}，但是由于支持链式编程方式，所以相对更简单。既然有 try{}catch{}，那就一定还有 try{}finally{}，whenComplete() 和 handle() 系列方法就类似于 try{}finally{}中的 finally{}，无论是否发生异常都会执行 whenComplete() 中的回调函数 consumer 和 handle() 中的回调函数 fn。whenComplete() 和 handle() 的区别在于 whenComplete() 不支持返回结果，而 handle() 是支持返回结果的。
+下面的示例代码展示了如何使用 `exceptionally()` 方法来处理异常，`exceptionally()` 的使用非常类似于 `try{}catch{}` 中的 `catch{}`，但是由于支持链式编程方式，所以相对更简单。既然有 `try{}catch{}`，那就一定还有 `try{}finally{}`，`whenComplete()` 和 `handle()` 系列方法就类似于 `try{}finally{}` 中的 `finally{}`，无论是否发生异常都会执行 `whenComplete()` 中的回调函数 `consumer` 和 `handle()` 中的回调函数 `fn`。`whenComplete()` 和 `handle()` 的区别在于 `whenComplete()` 不支持返回结果，而 `handle()` 是支持返回结果的。
 
 ```
 CompletableFuture<Integer>
@@ -622,45 +622,45 @@ System.out.println(f0.join());
 
 ## 3. Fork/Join
 
-ForkJoin是由JDK1.7之后提供的多线程并发处理框架。ForkJoin框架的基本思想是分而治之。什么是分而治之？分而治之就是将一个复杂的计算，按照设定的阈值分解成多个计算，然后将各个计算结果进行汇总。相应的，ForkJoin将复杂的计算当做一个任务，而分解的多个计算则是当做一个个子任务来并行执行。
+`ForkJoin` 是由 `JDK1.7` 之后提供的多线程并发处理框架。`ForkJoin` 框架的基本思想是分而治之。什么是分而治之？分而治之就是将一个复杂的计算，按照设定的阈值分解成多个计算，然后将各个计算结果进行汇总。相应的，`ForkJoin` 将复杂的计算当做一个任务，而分解的多个计算则是当做一个个子任务来并行执行。
 
-Fork/Join 是一个并行计算的框架，主要就是用来支持分治任务模型的，这个计算框架里的**Fork 对应的是分治任务模型里的任务分解，Join 对应的是结果合并**。Fork/Join 计算框架主要包含两部分，一部分是**分治任务的线程池 ForkJoinPool**，另一部分是**分治任务 ForkJoinTask**。这两部分的关系类似于 ThreadPoolExecutor 和 Runnable 的关系，都可以理解为提交任务到线程池，只不过分治任务有自己独特类型 ForkJoinTask。
+`Fork/Join` 是一个并行计算的框架，主要就是用来支持分治任务模型的，这个计算框架里的**Fork 对应的是分治任务模型里的任务分解，Join 对应的是结果合并**。`Fork/Join` 计算框架主要包含两部分，一部分是**分治任务的线程池 ForkJoinPool**，另一部分是**分治任务 ForkJoinTask**。这两部分的关系类似于 `ThreadPoolExecutor` 和 `Runnable` 的关系，都可以理解为提交任务到线程池，只不过分治任务有自己独特类型 `ForkJoinTask`。
 
-ForkJoinTask 是一个抽象类，它的方法有很多，最核心的是 `fork() `方法和 `join()` 方法，其中 `fork()` 方法会异步地执行一个子任务，而 join() 方法则会阻塞当前线程来等待子任务的执行结果。ForkJoinTask 有两个子类——RecursiveAction 和 RecursiveTask，通过名字你就应该能知道，它们都是用递归的方式来处理分治任务的。这两个子类都定义了抽象方法 `compute()`，不过区别是 RecursiveAction 定义的 `compute()` 没有返回值，而 RecursiveTask 定义的 `compute()` 方法是有返回值的。这两个子类也是抽象类，在使用的时候，需要你定义子类去扩展。
+`ForkJoinTask` 是一个抽象类，它的方法有很多，最核心的是 `fork() `方法和 `join()` 方法，其中 `fork()` 方法会异步地执行一个子任务，而 `join()` 方法则会阻塞当前线程来等待子任务的执行结果。`ForkJoinTask` 有两个子类——`RecursiveAction` 和 `RecursiveTask`，通过名字你就应该能知道，它们都是用递归的方式来处理分治任务的。这两个子类都定义了抽象方法 `compute()`，不过区别是 `RecursiveAction` 定义的 `compute()` 没有返回值，而 `RecursiveTask` 定义的 `compute()` 方法是有返回值的。这两个子类也是抽象类，在使用的时候，需要你定义子类去扩展。
 
 ### 3.1. ForkJoinPool 工作原理
 
-Fork/Join 并行计算的核心组件是 ForkJoinPool，所以下面我们就来简单介绍一下 ForkJoinPool 的工作原理。
+`Fork/Join` 并行计算的核心组件是 `ForkJoinPool`，所以下面我们就来简单介绍一下 `ForkJoinPool` 的工作原理。
 
-通过专栏前面文章的学习，你应该已经知道 ThreadPoolExecutor 本质上是一个生产者 - 消费者模式的实现，内部有一个任务队列，这个任务队列是生产者和消费者通信的媒介；ThreadPoolExecutor 可以有多个工作线程，但是这些工作线程都共享一个任务队列。
+通过专栏前面文章的学习，你应该已经知道 `ThreadPoolExecutor` 本质上是一个生产者 - 消费者模式的实现，内部有一个任务队列，这个任务队列是生产者和消费者通信的媒介；`ThreadPoolExecutor` 可以有多个工作线程，但是这些工作线程都共享一个任务队列。
 
-ForkJoinPool 本质上也是一个生产者 - 消费者的实现，但是更加智能，你可以参考下面的 ForkJoinPool 工作原理图来理解其原理。ThreadPoolExecutor 内部只有一个任务队列，而 ForkJoinPool 内部有多个任务队列，当我们通过 ForkJoinPool 的 invoke() 或者 submit() 方法提交任务时，ForkJoinPool 根据一定的路由规则把任务提交到一个任务队列中，如果任务在执行过程中会创建出子任务，那么子任务会提交到工作线程对应的任务队列中。
+`ForkJoinPool` 本质上也是一个生产者 - 消费者的实现，但是更加智能，你可以参考下面的 `ForkJoinPool` 工作原理图来理解其原理。`ThreadPoolExecutor` 内部只有一个任务队列，而 `ForkJoinPool` 内部有多个任务队列，当我们通过 `ForkJoinPool` 的 `invoke()` 或者 `submit()` 方法提交任务时，`ForkJoinPool` 根据一定的路由规则把任务提交到一个任务队列中，如果任务在执行过程中会创建出子任务，那么子任务会提交到工作线程对应的任务队列中。
 
-如果工作线程对应的任务队列空了，是不是就没活儿干了呢？不是的，ForkJoinPool 支持一种叫做“**任务窃取**”的机制，如果工作线程空闲了，那它可以“窃取”其他工作任务队列里的任务，例如下图中，线程 T2 对应的任务队列已经空了，它可以“窃取”线程 T1 对应的任务队列的任务。如此一来，所有的工作线程都不会闲下来了。
+如果工作线程对应的任务队列空了，是不是就没活儿干了呢？不是的，`ForkJoinPool` 支持一种叫做“**任务窃取**”的机制，如果工作线程空闲了，那它可以“窃取”其他工作任务队列里的任务，例如下图中，线程 T2 对应的任务队列已经空了，它可以“窃取”线程 T1 对应的任务队列的任务。如此一来，所有的工作线程都不会闲下来了。
 
-ForkJoinPool 中的任务队列采用的是双端队列，工作线程正常获取任务和“窃取任务”分别是从任务队列不同的端消费，这样能避免很多不必要的数据竞争。我们这里介绍的仅仅是简化后的原理，ForkJoinPool 的实现远比我们这里介绍的复杂，如果你感兴趣，建议去看它的源码。
+`ForkJoinPool` 中的任务队列采用的是双端队列，工作线程正常获取任务和“窃取任务”分别是从任务队列不同的端消费，这样能避免很多不必要的数据竞争。我们这里介绍的仅仅是简化后的原理，`ForkJoinPool` 的实现远比我们这里介绍的复杂，如果你感兴趣，建议去看它的源码。
 
 ![687474703a2f2f64756e77752e746573742e757063646e2e6e65742f736e61702f32303230303730333134313332362e706e67](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/java-core-demo/20210322225703.png)
 
 ### 3.2. ForkJoin框架的实现
 
-ForkJoin框架中一些重要的类如下所示。
+`ForkJoin` 框架中一些重要的类如下所示。
 
 ![20200411235333318](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/java-core-demo/20210323235725.jpg)
 
-ForkJoinPool 框架中涉及的主要类如下所示。
+`ForkJoinPool` 框架中涉及的主要类如下所示。
 
 **1.ForkJoinPool类**
 
-实现了ForkJoin框架中的线程池，由类图可以看出，ForkJoinPool类实现了线程池的Executor接口。
+实现了 `ForkJoin` 框架中的线程池，由类图可以看出，`ForkJoinPool` 类实现了线程池的 `Executor` 接口。
 
-我们也可以从下图中看出ForkJoinPool的类图关系。
+我们也可以从下图中看出 `ForkJoinPool` 的类图关系。
 
 ![20200411235346149](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/java-core-demo/20210323235738.jpg)
 
-其中，可以使用Executors.newWorkStealPool()方法创建ForkJoinPool。
+其中，可以使用 `Executors.newWorkStealPool()` 方法创建 `ForkJoinPool`。
 
-ForkJoinPool中提供了如下提交任务的方法。
+`ForkJoinPool` 中提供了如下提交任务的方法。
 
 ```java
 public void execute(ForkJoinTask<?> task)
@@ -675,35 +675,35 @@ public ForkJoinTask<?> submit(Runnable task)
 
 **2.ForkJoinWorkerThread类**
 
-实现ForkJoin框架中的线程。
+实现 `ForkJoin` 框架中的线程。
 
 **3.ForkJoinTask类**
 
-ForkJoinTask封装了数据及其相应的计算，并且支持细粒度的数据并行。ForkJoinTask比线程要轻量，ForkJoinPool中少量工作线程能够运行大量的ForkJoinTask。
+`ForkJoinTask` 封装了数据及其相应的计算，并且支持细粒度的数据并行。`ForkJoinTask` 比线程要轻量，`ForkJoinPool` 中少量工作线程能够运行大量的 `ForkJoinTask`。
 
-ForkJoinTask类中主要包括两个方法fork()和join()，分别实现任务的分拆与合并。
+`ForkJoinTask` 类中主要包括两个方法 `fork()` 和 `join()`，分别实现任务的分拆与合并。
 
-fork()方法类似于Thread.start()，但是它并不立即执行任务，而是将任务放入工作队列中。跟Thread.join()方法不同，ForkJoinTask的join()方法并不简单的阻塞线程，而是利用工作线程运行其他任务，当一个工作线程中调用join()，它将处理其他任务，直到注意到目标子任务已经完成。
+`fork()` 方法类似于 `Thread.start()`，但是它并不立即执行任务，而是将任务放入工作队列中。跟 `Thread.join()` 方法不同，`ForkJoinTask` 的 `join()` 方法并不简单的阻塞线程，而是利用工作线程运行其他任务，当一个工作线程中调用 `join()`，它将处理其他任务，直到注意到目标子任务已经完成。
 
 我们可以使用下图来表示这个过程。
 
 ![20200411235408792](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/java-core-demo/20210323235750.jpg)
 
-ForkJoinTask有3个子类：
+`ForkJoinTask` 有3个子类：
 
 ![20200411235448186](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/java-core-demo/20210323235758.jpg)
 
-- RecursiveAction：无返回值的任务。
-- RecursiveTask：有返回值的任务。
-- CountedCompleter：完成任务后将触发其他任务。
+- `RecursiveAction`：无返回值的任务。
+- `RecursiveTask`：有返回值的任务。
+- `CountedCompleter`：完成任务后将触发其他任务。
 
 **4.RecursiveTask 类**
 
-有返回结果的ForkJoinTask实现Callable。
+有返回结果的 `ForkJoinTask` 实现 `Callable`。
 
 **5.RecursiveAction类**
 
-无返回结果的ForkJoinTask实现Runnable。
+无返回结果的 `ForkJoinTask` 实现 `Runnable`。
 
 **6.CountedCompleter 类**
 
