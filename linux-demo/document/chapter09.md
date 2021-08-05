@@ -203,7 +203,7 @@ adm:x:4:syslog
 
 **4.4.1.管理用户的工具或命令**
 
-- useradd 或 adduesr： 添加用户
+- useradd 或 adduser： 添加用户
 - passwd： 为用户设置密码
 - usermod： 修改用户属性，如登录名、用户的home目录等
 - pwcov： 同步用户从 `/etc/passwd` 到 `/etc/shadow`
