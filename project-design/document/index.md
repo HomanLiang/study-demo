@@ -64,7 +64,9 @@
 6. 用户权限
    1. [登录接口](https://github.com/HomanLiang/study-demo/blob/main/project-design/document/chapter3_06_01.md)
 7. 延迟队列
-   1. 延迟队列](https://github.com/HomanLiang/study-demo/blob/main/project-design/document/chapter3_07_01.md)
+   1. [延迟队列](https://github.com/HomanLiang/study-demo/blob/main/project-design/document/chapter3_07_01.md)
+8. 电子签章
+   1. [电子签章==e签宝](https://github.com/HomanLiang/study-demo/blob/main/project-design/document/chapter3_08_01.md)
 
 ## 分布式
 
