@@ -14,7 +14,9 @@
 10. [Java 反射](https://github.com/HomanLiang/study-demo/blob/main/java-core-demo/document/chapter1_10.md)
 11. [Java 注解](https://github.com/HomanLiang/study-demo/blob/main/java-core-demo/document/chapter1_11.md)
 12. [Java 日期时间](https://github.com/HomanLiang/study-demo/blob/main/java-core-demo/document/chapter1_12.md)
-13. [Java 基础面试题](https://github.com/HomanLiang/study-demo/blob/main/java-core-demo/document/chapter1_XX.md)
+13. [Java Optional](https://github.com/HomanLiang/study-demo/blob/main/java-core-demo/document/chapter1_13.md)
+14. [Java 内部类](https://github.com/HomanLiang/study-demo/blob/main/java-core-demo/document/chapter1_14.md)
+15. [Java 基础面试题](https://github.com/HomanLiang/study-demo/blob/main/java-core-demo/document/chapter1_XX.md)
 
 ## Java 高级
 
