@@ -37,6 +37,7 @@
 5. [Java 容器之 Queue](https://github.com/HomanLiang/study-demo/blob/main/java-core-demo/document/chapter3_5.md)
 6. [Java 容器面试题](https://github.com/HomanLiang/study-demo/blob/main/java-core-demo/document/chapter3_6.md)
 7. [Java 容器最佳实践](https://github.com/HomanLiang/study-demo/blob/main/java-core-demo/document/chapter3_7.md)
+8. [Java Stream](https://github.com/HomanLiang/study-demo/blob/main/java-core-demo/document/chapter3_8.md)
 
 ## Java 并发
 
