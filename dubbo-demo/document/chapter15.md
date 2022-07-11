@@ -613,3 +613,126 @@ tcp        0  65160 192.168.1.7:20880       192.168.1.5:60760       ESTABLISHED
 #### 1.3.5.结论
 
 要想充分利用网络带宽， 缓冲区不能太小，如果太小有可能一次传输的报文就大于了缓冲区，严重影响传输效率。但是太大了也没有用，还需要多个连接数才能够充分利用 `CPU` 资源，连接数起码要超过 `CPU` 核数。
+
+
+
+## 2.dubbo接口统一异常处理的两种方式
+
+### 2.1.dubbo提供了Filter接口，我们只需继承Filter接口实现invoke方法即可
+
+1. 实现Filter接口，实现invoke方法
+
+   ```
+   @Activate(group = Constants.PROVIDER)
+   public class ExceptionFilter implements Filter {
+       private static final Logger logger = LogManager.getLogger(ExceptionFilter.class);
+   
+       public Result invoke(Invoker<?> invoker, Invocation invocation) {
+           Result result = null;
+           try {
+               result = invoker.invoke(invocation);
+               if (result.hasException() && GenericService.class != invoker.getInterface()) {
+                   Throwable exception = result.getException();
+                   String data = String.format("\r\n[level]:Error，[createTime]:%s，[platform]:%s，[serviceName]:%s，[methodName]:%s，[inputParam]:%s", DateUtil.formatDateTime(new Date()), PlatformNameEnum.PAY, invoker.getInterface().getName(), invocation.getMethodName(), JSON.toJSONString(invocation.getArguments()));
+                   logger.error(data, exception);
+                   ResultVo resultVo = new ResultVo(false);
+                   resultVo.setResultCode(PayCenterErrorCodeEnum.PAY_ERR_100000.getCode());
+                   resultVo.setResultMessage(PayCenterErrorCodeEnum.PAY_ERR_100000.getMsg());
+                   //出现异常，打印日志后返回错误码
+                   return new RpcResult(resultVo);
+               }
+           } catch (RuntimeException e) {
+               String data = String.format("\r\n[level]:Error，[createTime]:%s，[platform]:%s，[serviceName]:%s，[methodName]:%s，[inputParam]:%s", DateUtil.formatDateTime(new Date()), PlatformNameEnum.PAY, invoker.getInterface().getName(), invocation.getMethodName(), JSON.toJSONString(invocation.getArguments()));
+               logger.error(data, e);
+           }
+           return result;
+       }
+   }
+   ```
+
+2. 在resources目录下添加纯文本文件META-INF/dubbo/com.alibaba.dubbo.rpc.Filter，内容如下：
+
+   ```
+   exceptionFilter=com.zcz.filter.ExceptionFilter
+   ```
+
+3. 修改dubbo的provider配置文件，在dubbo:provider中添加配置的filter，如下：
+
+   ```
+   <dubbo:provider filter="exceptionFilter"></dubbo:provider>
+   ```
+
+### 2.2.aop拦截
+
+1. 引入aop相关的jar包
+
+   spring-aop、spring-aspects、aspectjrt
+
+2. 编写统一异常处理AOP代码
+
+   ```
+   public class ExceptionAop {
+       private static final Logger logger = LogManager.getLogger(ExceptionAop.class);
+   
+       public Object handlerControllerMethod(ProceedingJoinPoint pjp) {
+           long startTime = System.currentTimeMillis();
+   
+           ResultVo result;
+   
+           try {
+               result = (ResultVo) pjp.proceed();
+               logger.info(pjp.getSignature() + "use time:" + (System.currentTimeMillis() - startTime));
+           } catch (Throwable e) {
+               result = handlerException(pjp, e);
+           }
+   
+           return result;
+       }
+   
+       private ResultVo handlerException(ProceedingJoinPoint pjp, Throwable e) {
+           ResultVo result = new ResultVo(false);
+           pjp.getArgs();
+   
+           // 已知异常
+           if (e instanceof BusinessException) {
+               result.setResultCode(Integer.parseInt(((BusinessException) e).getExceptionCode()));
+               result.setResultMessage(((BusinessException) e).getExceptionMsg());
+           } else {
+               logger.error(pjp.getSignature() + " error ", e);
+   
+               //TODO 未知的异常，应该格外注意，可以发送邮件通知等
+               result.setResultCode(PayCenterErrorCodeEnum.PAY_ERR_100000.getCode());
+               result.setResultMessage(PayCenterErrorCodeEnum.PAY_ERR_100000.getMsg());
+           }
+   
+           return result;
+       }
+   }
+   ```
+
+3. 配置Spring Aop的XML
+
+   ```
+   <bean id="exceptionAop" class="com.zcz.pay.aop.ExceptionAop"/>
+       <aop:config>
+           <aop:pointcut id="target"
+                         expression="execution(* com.zcz.pay.api..*.*(..))"/>
+           <aop:aspect id="myAop" ref="exceptionAop">
+               <!-- 配置环绕通知 -->
+               <aop:around method="handlerControllerMethod" pointcut-ref="target"/>
+           </aop:aspect>
+       </aop:config>
+   ```
+
+   
+
+
+
+
+
+
+
+
+
+
+

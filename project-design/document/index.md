@@ -237,3 +237,11 @@
 
           提供了一个简单的、可扩展的框架来在一个 XML 文件中定义校验器（校验方法）和校验规则。支持校验规则和错误消息的国际化。
 
+
+
+## 服务治理
+
+1. [pinpoint](https://github.com/HomanLiang/study-demo/blob/main/project-design/document/chapter7_01.md)
+
+
+
