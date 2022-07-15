@@ -18,6 +18,9 @@
 4. [如何快速降低一个员工的积极性？](https://github.com/HomanLiang/study-demo/blob/main/team-manage/document/chapter3_04.md)
 5. [快速成长从写一份走心的周报开始](https://github.com/HomanLiang/study-demo/blob/main/team-manage/document/chapter3_05.md)
 6. [职场新人如何快速融入团队](https://github.com/HomanLiang/study-demo/blob/main/team-manage/document/chapter3_06.md)
+7. [技术出身的我，如何做好一个管理者？ ](https://github.com/HomanLiang/study-demo/blob/main/team-manage/document/chapter3_07.md)
+8. [为什么人们都讨厌开会？ ](https://github.com/HomanLiang/study-demo/blob/main/team-manage/document/chapter3_08.md)
+9. [中小团队的技术负责人如何做好技术团队建设 ](https://github.com/HomanLiang/study-demo/blob/main/team-manage/document/chapter3_09.md)
 
 ## 写作技能
 
@@ -35,6 +38,9 @@
 
 1. [如何判断一个人的能力](https://github.com/HomanLiang/study-demo/blob/main/team-manage/document/chapter6_01.md)
 2. [一个不错的技术面试官是怎么样的？](https://github.com/HomanLiang/study-demo/blob/main/team-manage/document/chapter6_02.md)
+3. [分享一个作为面试官的面试思路](https://github.com/HomanLiang/study-demo/blob/main/team-manage/document/chapter6_03.md)
+4. [如何写出杀手级简历](https://github.com/HomanLiang/study-demo/blob/main/team-manage/document/chapter6_04.md)
+5. [面经](https://github.com/HomanLiang/study-demo/blob/main/team-manage/document/chapter6_05.md)
 
 
 
