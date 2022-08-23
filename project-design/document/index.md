@@ -63,6 +63,7 @@
    1. [企业内部应用开发](https://github.com/HomanLiang/study-demo/blob/main/project-design/document/chapter3_05_01.md)
 6. 用户权限
    1. [登录接口](https://github.com/HomanLiang/study-demo/blob/main/project-design/document/chapter3_06_01.md)
+   2. [JWT](https://github.com/HomanLiang/study-demo/blob/main/project-design/document/chapter3_06_02.md)
 7. 延迟队列
    1. [延迟队列](https://github.com/HomanLiang/study-demo/blob/main/project-design/document/chapter3_07_01.md)
 8. 电子签章
@@ -98,6 +99,7 @@
 3. [高并发 - 案例1](https://github.com/HomanLiang/study-demo/blob/main/project-design/document/chapter5_03.md)
 4. [高并发 - 案例2（微信抢红包）](https://github.com/HomanLiang/study-demo/blob/main/project-design/document/chapter5_04.md)
 6. 高并发 - 下单
+6. [高并发 - 术语](https://github.com/HomanLiang/study-demo/blob/main/project-design/document/chapter5_06.md)
 
 
 
@@ -236,6 +238,8 @@
       34. Commons Validator
 
           提供了一个简单的、可扩展的框架来在一个 XML 文件中定义校验器（校验方法）和校验规则。支持校验规则和错误消息的国际化。
+
+4. [免费常用API接口](https://github.com/HomanLiang/study-demo/blob/main/project-design/document/chapter6_04.md)
 
 
 

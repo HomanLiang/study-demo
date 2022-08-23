@@ -8,6 +8,7 @@
 4. [编码规范](https://github.com/HomanLiang/study-demo/blob/main/project-manage/document/chapter1_04.md)
 5. [代码重构](https://github.com/HomanLiang/study-demo/blob/main/project-manage/document/chapter1_05.md)
 6. [怎么设置开发规范](https://github.com/HomanLiang/study-demo/blob/main/project-manage/document/chapter1_06.md)
+7. [避免线上故障的10条建议](https://github.com/HomanLiang/study-demo/blob/main/project-manage/document/chapter1_07.md)
 
 ## 项目管理工具
 
