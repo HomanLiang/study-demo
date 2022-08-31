@@ -2035,4 +2035,620 @@ public class DateConverter implements Converter<String, Date> {
 }
 ```
 
+## 9.Spring 与 Mybatis 中的 @Repository 与 @Mapper
+
+### 9.1.@Mapper
+
+@Mapper 是 Mybatis 的注解，和 Spring 没有关系，@Repository 是 Spring 的注解，用于声明一个 Bean。（重要）
+
+使用 Mybatis 有 XML 文件或者注解的两种使用方式，如果是使用 XML 文件的方式，我们需要在配置文件中指定 XML 的位置，这里只研究注解开发的方式。
+
+在 Spring 程序中，Mybatis 需要找到对应的 mapper，在编译的时候动态生成代理类，实现数据库查询功能，所以我们需要在接口上添加 @Mapper 注解。
+
+```
+@Mapper
+public interface UserDao {
+	...
+}
+```
+
+但是，仅仅使用@Mapper注解，我们会发现，在其他变量中依赖注入，IDEA 会提示错误，但是不影响运行（亲测～）。因为我们没有显式标注这是一个 Bean，IDEA 认为运行的时候会找不到实例注入，所以提示我们错误。如下图，会有红色波浪线。
+
+尽管这个错误提示并不影响运行，但是看起来很不舒服，所以我们可以在对应的接口上添加 bean 的声明，如下：
+
+```
+@Repository // 也可以使用@Component，效果都是一样的，只是为了声明为bean
+@Mapper
+public interface UserDao {
+	
+	@Insert("insert into user(account, password, user_name) " +
+            "values(#{user.account}, #{user.password}, #{user.name})")
+    int insertUser(@Param("user") User user) throws RuntimeException;
+}
+```
+
+
+
+### 9.2.@Repository
+
+正如上面说的，@Repository 用于声明 dao 层的 bean，如果我们要真正地使用 @Repository 来进行开发，那是基于代码的开发，简单来说就是手写 JDBC。
+
+和 @Service、@Controller 一样，我们将 @Repository 添加到对应的实现类上，如下：
+
+```
+@Repository
+public class UserDaoImpl implements UserDao{
+	
+	@Override
+	public int insertUser(){
+		JdbcTemplate template = new JdbcTemplate();
+		...
+	}
+}
+```
+
+### 9.3 - 其他扫描手段
+
+基于注解的开发也有其他手段帮助 Mybatis 找到 mapper，那就是 @MapperScan 注解，可以在启动类上添加该注解，自动扫描包路径下的所有接口。
+
+```
+@SpringBootApplication
+@MapperScan("com.scut.thunderlearn.dao")
+public class UserEurekaClientApplication {
+
+    public static void main(String[] args) {
+        SpringApplication.run(UserEurekaClientApplication.class, args);
+    }
+}
+```
+
+使用这种方法，接口上不用添加任何注解。
+
+### 9.4 - 总结
+
+@Mapper 一定要有，否则 Mybatis 找不到 mapper。
+
+@Repository 可有可无，可以消去依赖注入的报错信息。
+
+@MapperScan 可以替代 @Mapper。
+
+
+
+## 10.Spring 中 @Component、@Service 等注解如何被解析？
+
+@Component和@Service都是工作中常用的注解，Spring如何解析？
+
+### 10.1.@Component解析流程
+
+**找入口**
+
+Spring Framework2.0开始，引入可扩展的XML编程机制，该机制要求XML Schema命名空间需要与Handler建立映射关系。
+
+该关系配置在相对于classpath下的/META-INF/spring.handlers中。
+
+![图片](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/spring-demo/20220825135654.jpeg)
+
+​	如上图所示 **ContextNamespaceHandler对应context:... 分析的入口。**
+
+**找核心方法**
+
+浏览ContextNamespaceHandler
+
+![图片](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/spring-demo/20220825135713.jpeg)
+
+在parse中有一个很重要的注释
+
+> // Actually scan for bean definitions and register them.
+>
+> ClassPathBeanDefinitionScanner scanner  = configureScanner(parserContext, element);
+
+大意是：**ClassPathBeanDefinitionScanner#doScan是扫描BeanDefinition并注册的实现****。**
+
+ClassPathBeanDefinitionScanner 的源码如下：
+
+```
+protected Set<BeanDefinitionHolder> doScan(String... basePackages) {
+   Assert.notEmpty(basePackages, "At least one base package must be specified");
+   Set<BeanDefinitionHolder> beanDefinitions = new LinkedHashSet<>();
+   for (String basePackage : basePackages) {
+      //findCandidateComponents 读资源装换为BeanDefinition
+      Set<BeanDefinition> candidates = findCandidateComponents(basePackage);
+      for (BeanDefinition candidate : candidates) {
+         ScopeMetadata scopeMetadata = this.scopeMetadataResolver.resolveScopeMetadata(candidate);
+         candidate.setScope(scopeMetadata.getScopeName());
+         String beanName = this.beanNameGenerator.generateBeanName(candidate, this.registry);
+         if (candidate instanceof AbstractBeanDefinition) {
+            postProcessBeanDefinition((AbstractBeanDefinition) candidate, beanName);
+         }
+         if (candidate instanceof AnnotatedBeanDefinition) {
+            AnnotationConfigUtils.processCommonDefinitionAnnotations((AnnotatedBeanDefinition) candidate);
+         }
+         if (checkCandidate(beanName, candidate)) {
+            BeanDefinitionHolder definitionHolder = new BeanDefinitionHolder(candidate, beanName);
+            definitionHolder =
+                  AnnotationConfigUtils.applyScopedProxyMode(scopeMetadata, definitionHolder, this.registry);
+            beanDefinitions.add(definitionHolder);
+            registerBeanDefinition(definitionHolder, this.registry);
+         }
+      }
+   }
+   return beanDefinitions;
+}
+```
+
+上边的代码，从方法名，猜测：
+
+**findCandidateComponents：从classPath扫描组件，并转换为备选BeanDefinition，也就是要做的解析@Component的核心方法。**
+
+**概要分析**
+
+**findCandidateComponents在其父类ClassPathScanningCandidateComponentProvider 中。**
+
+```
+public class ClassPathScanningCandidateComponentProvider implements EnvironmentCapable, ResourceLoaderAware {
+//省略其他代码
+public Set<BeanDefinition> findCandidateComponents(String basePackage) {
+   if (this.componentsIndex != null && indexSupportsIncludeFilters()) {
+      return addCandidateComponentsFromIndex(this.componentsIndex, basePackage);
+   }
+   else {
+      return scanCandidateComponents(basePackage);
+   }
+}
+private Set<BeanDefinition> scanCandidateComponents(String basePackage) {
+   Set<BeanDefinition> candidates = new LinkedHashSet<>();
+   try {
+      String packageSearchPath = ResourcePatternResolver.CLASSPATH_ALL_URL_PREFIX +
+            resolveBasePackage(basePackage) + '/' + this.resourcePattern;
+      Resource[] resources = getResourcePatternResolver().getResources(packageSearchPath);
+        //省略部分代码
+      for (Resource resource : resources) {
+        //省略部分代码
+         if (resource.isReadable()) {
+            try {
+               MetadataReader metadataReader = getMetadataReaderFactory().getMetadataReader(resource);
+               if (isCandidateComponent(metadataReader)) {
+                  ScannedGenericBeanDefinition sbd = new ScannedGenericBeanDefinition(metadataReader);
+                  sbd.setSource(resource);
+                  if (isCandidateComponent(sbd)) {
+                     candidates.add(sbd);
+                //省略部分代码
+      }
+   }
+   catch (IOException ex) {//省略部分代码 }
+   return candidates;
+}
+}
+```
+
+**findCandidateComponents大体思路如下：**
+
+1. String packageSearchPath = ResourcePatternResolver.CLASSPATH_ALL_URL_PREFIX resolveBasePackage(basePackage) + '/' + this.resourcePattern;                             将package转化为ClassLoader类资源搜索路径packageSearchPath，例如：com.wl.spring.boot转化为classpath*:com/wl/spring/boot/**/*.class
+2. Resource[] resources = getResourcePatternResolver().getResources(packageSearchPath);  加载搜素路径下的资源。
+3. isCandidateComponent 判断是否是备选组件
+4. candidates.add(sbd); 添加到返回结果的list
+
+ClassPathScanningCandidateComponentProvider#isCandidateComponent其源码如下：
+
+```
+protected boolean isCandidateComponent(MetadataReader metadataReader) throws IOException {
+    //省略部分代码
+   for (TypeFilter tf : this.includeFilters) {
+      if (tf.match(metadataReader, getMetadataReaderFactory())) {
+         return isConditionMatch(metadataReader);
+      }
+   }
+   return false;
+}
+```
+
+includeFilters由registerDefaultFilters()设置初始值，有@Component，没有@Service啊？
+
+```
+protected void registerDefaultFilters() {
+   this.includeFilters.add(new AnnotationTypeFilter(Component.class));
+   ClassLoader cl = ClassPathScanningCandidateComponentProvider.class.getClassLoader();
+   try {
+      this.includeFilters.add(new AnnotationTypeFilter(
+            ((Class<? extends Annotation>) ClassUtils.forName("javax.annotation.ManagedBean", cl)), false));
+      logger.trace("JSR-250 'javax.annotation.ManagedBean' found and supported for component scanning");
+   }
+   catch (ClassNotFoundException ex) {
+      // JSR-250 1.1 API (as included in Java EE 6) not available - simply skip.
+   }
+   try {
+      this.includeFilters.add(new AnnotationTypeFilter(
+            ((Class<? extends Annotation>) ClassUtils.forName("javax.inject.Named", cl)), false));
+      logger.trace("JSR-330 'javax.inject.Named' annotation found and supported for component scanning");
+   }
+   catch (ClassNotFoundException ex) {
+      // JSR-330 API not available - simply skip.
+   }
+}
+```
+
+Spring如何处理@Service的注解的呢？？？？
+
+### 10.2.查文档找思路
+
+查阅官方文档，下面这话：
+
+https://docs.spring.io/spring/docs/5.0.17.RELEASE/spring-framework-reference/core.html#beans-meta-annotations
+
+> @Component is a generic stereotype for any Spring-managed component. @Repository, @Service, and @Controller are specializations of @Component
+
+大意如下：
+
+@Component是任何Spring管理的组件的通用原型。@Repository、@Service和@Controller是派生自@Component。
+
+```
+@Target({ElementType.TYPE})
+@Retention(RetentionPolicy.RUNTIME)
+@Documented
+// @Service 派生自@Component
+@Component
+public @interface Service {
+
+   /**
+    * The value may indicate a suggestion for a logical component name,
+    * to be turned into a Spring bean in case of an autodetected component.
+    * @return the suggested component name, if any (or empty String otherwise)
+    */
+   @AliasFor(annotation = Component.class)
+   String value() default "";
+
+}
+```
+
+@Component是@Service的元注解，Spring 大概率，在读取@Service，也读取了它的元注解，并将@Service作为@Component处理。
+
+### 10.3. 探寻@Component派生性流程
+
+回顾ClassPathScanningCandidateComponentProvider 中的关键的代码片段如下：
+
+```
+private Set<BeanDefinition> scanCandidateComponents(String basePackage) {
+ //省略其他代码
+ MetadataReader metadataReader   
+             =getMetadataReaderFactory().getMetadataReader(resource);  
+   if(isCandidateComponent(metadataReader)){
+       //....
+   }         
+}
+public final MetadataReaderFactory getMetadataReaderFactory() {
+   if (this.metadataReaderFactory == null) {
+      this.metadataReaderFactory = new CachingMetadataReaderFactory();
+   }
+   return this.metadataReaderFactory;
+}
+```
+
+**1. 确定metadataReader**
+
+CachingMetadataReaderFactory继承自 SimpleMetadataReaderFactory，就是对SimpleMetadataReaderFactory加了一层缓存。
+
+其内部的SimpleMetadataReaderFactory#getMetadataReader 为：
+
+```
+public class SimpleMetadataReaderFactory implements MetadataReaderFactory {
+    @Override
+    public MetadataReader getMetadataReader(Resource resource) throws IOException {
+       return new SimpleMetadataReader(resource, this.resourceLoader.getClassLoader());
+    }
+}
+```
+
+这里可以看出
+
+**MetadataReader metadataReader =new SimpleMetadataReader(...);**
+
+**2.查看match方法找重点方法**
+
+![图片](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/spring-demo/20220825135728.jpeg)
+
+AnnotationTypeFilter#matchself方法如下：
+
+```
+@Override
+protected boolean matchSelf(MetadataReader metadataReader) {
+   AnnotationMetadata metadata = metadataReader.getAnnotationMetadata();
+   return metadata.hasAnnotation(this.annotationType.getName()) ||
+         (this.considerMetaAnnotations && metadata.hasMetaAnnotation(this.annotationType.getName()));
+}
+```
+
+是metadata.hasMetaAnnotation法，从名称看是处理元注解，我们重点关注
+
+**找metadata.hasMetaAnnotation**
+
+metadata=metadataReader.getAnnotationMetadata();
+
+metadataReader =new SimpleMetadataReader(...)
+
+metadata= new SimpleMetadataReader#getAnnotationMetadata()
+
+```
+//SimpleMetadataReader 的构造方法
+SimpleMetadataReader(Resource resource, @Nullable ClassLoader classLoader) throws IOException {
+   InputStream is = new BufferedInputStream(resource.getInputStream());
+   ClassReader classReader;
+   try {
+      classReader = new ClassReader(is);
+   }
+   catch (IllegalArgumentException ex) {
+      throw new NestedIOException("ASM ClassReader failed to parse class file - " +
+            "probably due to a new Java class file version that isn't supported yet: " + resource, ex);
+   }
+   finally {
+      is.close();
+   }
+
+   AnnotationMetadataReadingVisitor visitor =
+            new AnnotationMetadataReadingVisitor(classLoader);
+   classReader.accept(visitor, ClassReader.SKIP_DEBUG);
+
+   this.annotationMetadata = visitor;
+   // (since AnnotationMetadataReadingVisitor extends ClassMetadataReadingVisitor)
+   this.classMetadata = visitor;
+   this.resource = resource;
+}
+```
+
+metadata=new SimpleMetadataReader(...)**.**getAnnotationMetadata()= new AnnotationMetadataReadingVisitor（。。）
+
+也就是说
+
+**metadata.hasMetaAnnotation=AnnotationMetadataReadingVisitor#hasMetaAnnotation**
+
+其方法如下：
+
+```
+public class AnnotationMetadataReadingVisitor{
+    // 省略部分代码
+@Override
+public boolean hasMetaAnnotation(String metaAnnotationType) {
+   Collection<Set<String>> allMetaTypes = this.metaAnnotationMap.values();
+   for (Set<String> metaTypes : allMetaTypes) {
+      if (metaTypes.contains(metaAnnotationType)) {
+         return true;
+      }
+   }
+   return false;
+}
+}
+```
+
+逻辑很简单，就是判断该注解的元注解在，在不在metaAnnotationMap中，如果在就返回true。
+
+这里面核心就是metaAnnotationMap，搜索AnnotationMetadataReadingVisitor类，没有发现赋值的地方？？！。
+
+**查找metaAnnotationMap赋值**
+
+回到SimpleMetadataReader 的方法，
+
+```
+//这个accept方法，很可疑，在赋值之前执行
+SimpleMetadataReader(Resource resource, @Nullable ClassLoader classLoader) throws IOException {
+//省略其他代码
+AnnotationMetadataReadingVisitor visitor = new AnnotationMetadataReadingVisitor(classLoader);
+classReader.accept(visitor, ClassReader.SKIP_DEBUG);
+ this.annotationMetadata = visitor;
+ }
+```
+
+发现一个可疑的语句：classReader.accept。
+
+查看accept方法
+
+```
+public class ClassReader {
+        //省略其他代码
+public void accept(..省略代码){
+    //省略其他代码
+    readElementValues(
+    classVisitor.visitAnnotation(annotationDescriptor, /* visible = */ true),
+    currentAnnotationOffset,
+     true,
+    charBuffer);
+}
+}
+```
+
+查看readElementValues方法
+
+```
+public class ClassReader{
+    //省略其他代码
+private int readElementValues(
+    final AnnotationVisitor annotationVisitor,
+    final int annotationOffset,
+    final boolean named,
+    final char[] charBuffer) {
+  int currentOffset = annotationOffset;
+  // Read the num_element_value_pairs field (or num_values field for an array_value).
+  int numElementValuePairs = readUnsignedShort(currentOffset);
+  currentOffset += 2;
+  if (named) {
+    // Parse the element_value_pairs array.
+    while (numElementValuePairs-- > 0) {
+      String elementName = readUTF8(currentOffset, charBuffer);
+      currentOffset =
+          readElementValue(annotationVisitor, currentOffset + 2, elementName, charBuffer);
+    }
+  } else {
+    // Parse the array_value array.
+    while (numElementValuePairs-- > 0) {
+      currentOffset =
+          readElementValue(annotationVisitor, currentOffset, /* named = */ null, charBuffer);
+    }
+  }
+  if (annotationVisitor != null) {
+    annotationVisitor.visitEnd();
+  }
+  return currentOffset;
+}
+}
+```
+
+这里面的核心就是  annotationVisitor.visitEnd();
+
+**确定annotationVisitor**
+
+这里的annotationVisitor=AnnotationMetadataReadingVisitor#visitAnnotation
+
+源码如下，注意这里传递了metaAnnotationMap！！
+
+```
+public class AnnotationMetadataReadingVisitor{
+@Override
+public AnnotationVisitor visitAnnotation(String desc, boolean visible) {
+   String className = Type.getType(desc).getClassName();
+   this.annotationSet.add(className);
+   return new AnnotationAttributesReadingVisitor(
+         className, this.attributesMap,
+              this.metaAnnotationMap, this.classLoader);
+}
+}
+```
+
+annotationVisitor=AnnotationAttributesReadingVisitor
+
+**查阅annotationVisitor.visitEnd()**
+
+annotationVisitor=AnnotationAttributesReadingVisitor#visitEnd()
+
+```
+public class AnnotationAttributesReadingVisitor{
+@Override
+public void visitEnd() {
+   super.visitEnd();
+
+   Class<? extends Annotation> annotationClass = this.attributes.annotationType();
+   if (annotationClass != null) {
+      List<AnnotationAttributes> attributeList = this.attributesMap.get(this.annotationType);
+      if (attributeList == null) {
+         this.attributesMap.add(this.annotationType, this.attributes);
+      }
+      else {
+         attributeList.add(0, this.attributes);
+      }
+      if (!AnnotationUtils.isInJavaLangAnnotationPackage(annotationClass.getName())) {
+         try {
+            Annotation[] metaAnnotations = annotationClass.getAnnotations();
+            if (!ObjectUtils.isEmpty(metaAnnotations)) {
+               Set<Annotation> visited = new LinkedHashSet<>();
+               for (Annotation metaAnnotation : metaAnnotations) {
+                  recursivelyCollectMetaAnnotations(visited, metaAnnotation);
+               }
+               if (!visited.isEmpty()) {
+                  Set<String> metaAnnotationTypeNames = new LinkedHashSet<>(visited.size());
+                  for (Annotation ann : visited) {
+                     metaAnnotationTypeNames.add(ann.annotationType().getName());
+                  }
+                  this.metaAnnotationMap.put(annotationClass.getName(), metaAnnotationTypeNames);
+               }
+            }
+         }
+         catch (Throwable ex) {
+            if (logger.isDebugEnabled()) {
+               logger.debug("Failed to introspect meta-annotations on " + annotationClass + ": " + ex);
+            }
+         }
+      }
+   }
+}
+}
+```
+
+内部方法recursivelyCollectMetaAnnotations 递归的读取注解，与注解的元注解（读@Service，再读元注解@Component），并设置到metaAnnotationMap，也就是AnnotationMetadataReadingVisitor 中的metaAnnotationMap中。
+
+### 10.4.总结
+
+大致如下：
+
+ClassPathScanningCandidateComponentProvider#findCandidateComponents
+
+1. 将package转化为ClassLoader类资源搜索路径packageSearchPath
+
+2. 加载搜素路径下的资源。
+
+3. isCandidateComponent 判断是否是备选组件。
+
+   内部调用的TypeFilter的match方法：
+
+   AnnotationTypeFilter#matchself中metadata.hasMetaAnnotation处理元注解
+
+   metadata.hasMetaAnnotation=AnnotationMetadataReadingVisitor#hasMetaAnnotation
+
+   就是判断当前注解的元注解在不在metaAnnotationMap中。
+
+   AnnotationAttributesReadingVisitor#visitEnd()内部方法recursivelyCollectMetaAnnotations 递归的读取注解，与注解的元注解（读@Service，再读元注解@Component），并设置到metaAnnotationMap
+
+4. 添加到返回结果的list
+
+
+
+## 11.springboot设置RestTemplate的超时时间
+
+**Java config方式**
+
+```java
+@Configuration
+public class AppConfig{
+    @Bean
+    public RestTemplate customRestTemplate(){
+        HttpComponentsClientHttpRequestFactory httpRequestFactory = new HttpComponentsClientHttpRequestFactory();
+        httpRequestFactory.setConnectionRequestTimeout(3000);
+        httpRequestFactory.setConnectTimeout(3000);
+        httpRequestFactory.setReadTimeout(3000);
+
+        return new RestTemplate(httpRequestFactory);
+    }
+}
+```
+
+**配置文件指定**
+
+```undefined
+custom.rest.connection.connection-request-timeout=3000
+custom.rest.connection.connect-timeout=3000
+custom.rest.connection.read-timeout=3000
+```
+
+指定
+
+```java
+@Configuration
+public class AppConfig{
+    @Bean
+    @ConfigurationProperties(prefix = "custom.rest.connection")
+    public HttpComponentsClientHttpRequestFactory customHttpRequestFactory() {
+        return new HttpComponentsClientHttpRequestFactory();
+    }
+
+    @Bean
+    public RestTemplate customRestTemplate(){
+        return new RestTemplate(customHttpRequestFactory());
+    }
+}
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 

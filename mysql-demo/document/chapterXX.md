@@ -1570,3 +1570,191 @@ then $NOHUP_NICENESS $ledir/$MYSQLD
 ```
 
 保存退出并重启mysql服务。
+
+
+
+## 10.MySQL 中删除的数据都去哪儿了？
+
+不知道大家有没有想过下面这件事？
+
+> 我们平时调用 `DELETE` 在 MySQL 中删除的数据都去哪儿了？
+
+这还用问吗？当然是被删除了啊
+
+那么这里又有个新的问题了，如果在 InnoDB 下，多事务并发的情况下，如果事务A删除了 `id=1` 的数据，同时事务B又去读取 `id=1` 的数据，如果这条数据真的被删除了，那 MVCC 拿啥数据返回给用户呢？
+
+没错，这就需要了解一下 MySQL 的多版本并发的原理相关的东西，感兴趣的可以去看我之前写的[这篇文章](https://www.cnblogs.com/detectiveHLH/p/15126923.html)。
+
+所以，实际情况中，调用了 `DELETE` 语句删除的数据并不会真正的被**物理删除**，这条数据其实还在那，只不过被打上了一个标记，标记**已删除**。
+
+> 这其实跟我们日常的操作——**软删除**，差不多是一个意思
+
+![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mysql-demo/20220831173034.jpeg)
+
+在 MySQL 中， `UPDATE` 和 `DELETE` 操作本质上是一样的， 都属于**更新**操作，删除操作只不过是把某行数据中的一个特定的比特位标记为已删除，仅此而已。
+
+那么问题又来了，那这些删除的数据如果一直这么堆下去，那不早晚把硬盘撑爆？
+
+如果都玩儿成这样了，那 MySQL 还能像现在这样被大规模的用于生产环境中吗？那 MySQL 到底是怎么玩的？
+
+这就需要提到 **Purge** 操作了。
+
+Purge操作是啥？
+
+Purge 操作才是真正将数据（已被标记为已删除）物理删除的操作。
+
+![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mysql-demo/20220831173050.jpeg)
+
+Purge 操作针对的数据对象，不仅仅是某一行，还有其对应的索引数据和 Undo Log。
+
+好的那么问题又来了。
+
+问题是，Purge 操作什么时候会执行呢？实际上，你可以将执行 Purge 操作的线程（简称 Purge 线程）理解成一个后台周期性执行的线程。
+
+Purge 线程可以有一个，也可以有多个，具体的线程数量可以由 MySQL 的配置项 `innodb_purge_threads` 来进行配置。当然，我相信你肯定不记得在使用 MySQL 的时候配置过这个，因为 `innodb_purge_threads` 有个默认值，值为 `4`。
+
+![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mysql-demo/20220831173103.jpeg)
+
+InnoDB 会根据 MySQL 中表的数量和 Purge 线程的数量进行分配。
+
+![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mysql-demo/20220831173113.jpeg)
+
+但正是因为有这种特性，Purge 线程的数量才需要根据业务的实际情况来做调整。举个例子，假设 **DML** 操作都集中在某张表，比如**表1**上...
+
+你先等等，我打断一下......
+
+什么叫 DML 操作？总喜欢搞些复杂的名词...DML（**D**ata **M**anipulation **L**anguage）数据操作语句，实际上就是CRUD增删改查...
+
+与之类似的概念还有DDL（**D**ata **D**efinition **L**anguage）数据定义语句，也就是`CREATE`、`DROP`和`ALTER`等等.
+
+以及DCL（**D**ata **C**ontrol **L**anguage）数据控制语句，也就是`GRANT`、`REVOKE`等等...
+
+继续说回来，虽然 Purge 线程的数量是可配置的，但是也不是你想配多少就配多少的。不然你给它干个 `10000` 个线程，那不就直接原地 OOM 了吗？
+
+`innodb_purge_threads` 的最大值为 32，而且并不是我们配了 32 InnoDB 就真的会启动 32 个 Purge 线程，为啥呢？举个很简单的例子，假设此时只有一张表，然后我们配置了 32 个 Purge 线程。
+
+![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mysql-demo/20220831173127.jpeg)
+
+你看着上面这个图问问自己，这「河里」吗？这样不仅浪费了系统的资源，同时还使得不同的 Purge 线程之间发生了**数据竞争**。不仅如此，Purge 线程还可能跟用户线程产生竞争。
+
+但是当系统中真的有 32 张表的时候，情况又不一样了，一个 Purge 线程对应一张表，线程与线程之间就不会存在数据竞争，并且没有浪费系统资源，还能够提升执行 Purge 操作的性能。
+
+这就是为啥 InnoDB 会根据**实际情况**来调整 MySQL 中 Purge 线程的数量，所以我们在配置的时候也要按照实际情况来设置。
+
+举个例子，如果你的数据库中，**增删改** 的操作只集中在某几张表上，则可以考虑将 `innodb_purge_threads` 设置的稍微低一点。相反，如果 **增删改** 的操作几乎每张表都有，那么 `innodb_purge_threads` 就可以设置的大一些。
+
+了解完 Purge 线程本身之后，我们就可以来了解 Purge 线程所针对的对象了。Purge 线程主要清理的对象是 Undo Logs，其次是行记录。
+
+![img](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mysql-demo/20220831173156.jpeg)
+
+因为 Undo Log 可以分为：
+
+- Insert Undo Log
+- Update Undo Log
+
+所以更准确的说法是，Purge 线程清理的对象是 Update Undo Log 和 行记录，因为 Insert Undo Log 会在事务提交之后就会被删除。
+
+我们都知道 InnoDB 的 MVCC 的数据来源是一个一个 Undo Log 形成的单链表，而 Purge 线程就是用于定期清理 Undo Log 的，并且在清理完 删除数据所生成的 Undo Log 的时候，就会把对应的行记录给移除了。
+
+那么问题又来了，Purge 线程每次会读取多少条件 Undo Log 记录呢？
+
+很明显，它不是看当时的心情来决定取多少条的。它是通过配置项 `innodb_purge_batch_size` 来控制的，默认是 300。然后InnoDB会将这300条 Undo Log 分给`innodb_purge_threads`个 Purge 线程。在清理的过程中，Purge 线程还会释放 Undo Log 表空间内的文件。
+
+
+
+## 11.为什么数据库连接很消耗资源，资源都消耗在哪里？
+
+本文以连接`MySQL`数据库为例，因为`MySQL`数据库是开源的，其通信协议是公开的，所以我们能够详细分析建立连接的整个过程。
+
+> ❝
+>
+> 在本文中，消耗资源的分析主要集中在网络上，当然，资源也包括内存、CPU等计算资源，使用的编程语言是`Java`，但是不排除编程语言也会有一定的影响。
+>
+> ❞
+
+首先先看一下连接数据库的`Java`代码，如下：
+
+```
+Class.forName("com.mysql.jdbc.Driver");
+
+String name = "xttblog2";
+String password = "123456";
+String url = "jdbc:mysql://172.16.100.131:3306/xttblog2";
+Connection conn = DriverManager.getConnection(url, name, password);
+// 之后程序终止，连接被强制关闭
+```
+
+然后通过**「Wireshark」** 分析整个连接的建立过程，如下：
+
+[![图片](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mysql-demo/20220831173637.png)](https://mp.weixin.qq.com/s?__biz=MzUzMTA2NTU2Ng==&mid=2247487551&idx=1&sn=18f64ba49f3f0f9d8be9d1fdef8857d9&scene=21#wechat_redirect)Wireshark抓包
+
+在上图中显示的连接过程中，可以看出`MySQL`的通信协议是基于`TCP`传输协议的，而且该协议是二进制协议，不是类似于`HTTP`的文本协议，其中建立连接的过程具体如下：
+
+- 第1步：建立`TCP`连接，通过三次握手实现；
+- 第2步：服务器发送给客户端**「握手信息」** ，客户端响应该握手消息；
+- 第3步：客户端**「发送认证包」** ，用于用户验证，验证成功后，服务器返回OK响应，之后开始执行命令；
+
+用户验证成功之后，会进行一些连接变量的设置，比如字符集、是否自动提交事务等，其间会有多次数据的交互。完成了这些步骤后，才会执行真正的数据查询和更新等操作。
+
+在本文的测试中，只用了5行代码来建立连接，但是并没有通过该连接去执行任何操作，所以在程序执行完毕之后，连接不是通过`Connection.close()`关闭的，而是由于程序执行完毕，导致进程终止，造成与数据库的连接异常关闭，所以最后会出现`TCP`的`RST`报文。在这个最简单的代码中，没有设置任何额外的连接属性，所以在设置属性上占用的时间可以认为是最少的（其实，虽然我们没有设置任何属性，但是驱动仍然设置了字符集、事务自动提交等，这取决于具体的驱动实现），所以整个连接所使用的时间可以认为是最少的。但从统计信息中可以看出，在不包括最后`TCP`的`RST` 报文时（因为该报文不需要服务器返回任何响应），但是其中仍需在客户端和服务器之间进行往返**「7」** 次，**「也就是说完成一次连接，可以认为，数据在客户端和服务器之间需要至少往返7次」** ，从时间上来看，从开始TCP的三次握手，到最终连接强制断开为止（不包括最后的`RST`报文），总共花费了：
+
+```
+10.416042 - 10.190799 = 0.225243s = **225.243ms**！！！
+```
+
+这意味着，建立一次数据库连接需要225ms，而这还是还可以认为是最少的，当然**「花费的时间可能受到网络状况、数据库服务器性能以及应用代码是否高效的影响」** ，但是这里只是一个最简单的例子，已经足够说明问题了！
+
+由于上面是程序异常终止了，但是在正常的应用程序中，连接的关闭一般都是通过`Connection.close()`完成的，代码如下：
+
+```
+Class.forName("com.mysql.jdbc.Driver");
+
+String name = "shine_user";
+String password = "123";
+String url = "jdbc:mysql://172.16.100.131:3306/clever_mg_test";
+Connection conn = DriverManager.getConnection(url, name, password);
+conn.close();
+```
+
+这样的话，情况发生了变化，主要体现在与数据库连接的断开，如下图：
+
+[![图片](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/mysql-demo/20220831173701.png)](https://mp.weixin.qq.com/s?__biz=MzUzMTA2NTU2Ng==&mid=2247487551&idx=1&sn=18f64ba49f3f0f9d8be9d1fdef8857d9&scene=21#wechat_redirect)网络抓包
+
+- 第1步：此时处于`MySQL`通信协议阶段，客户端发送关闭连接请求，而且不用等待服务端的响应；
+- 第2步：TCP断开连接，4次挥手完成连接断开；
+
+这里是完整地完成了从数据库连接的建立到关闭，整个过程花费了：
+
+```
+747.284311 - 747.100954 = 0.183357s = 183.357ms
+```
+
+这里可能也有网络状况的影响，比上述的225ms少了，但是也几乎达到了200ms的级别。
+
+那么问题来了，想象一下这个场景，对于一个日活2万的网站来说，假设每个用户只会发送5个请求，那么一天就是10万个请求，对于建立数据库连接，我们保守一点计算为150ms好了，那么一天当中花费在建立数据库连接的时间有（还不包括执行查询和更新操作）：
+
+```
+100000 * 150ms = 15000000ms = 15000s = 250min = 4.17h
+```
+
+也就说每天花费在建立数据库连接上的时间已经达到**「4个小时」** ，所以说数据库连接池是必须的嘛，而且当日活增加时，单单使用数据库连接池也不能完全保证你的服务能够正常运行，还需要考虑其他的解决方案：
+
+- 缓存
+- `SQL`的预编译
+- 负载均衡
+- ……
+
+当然这不是本文的主要内容，**「本文想要阐述的核心思想只有一个，数据库连接真的很耗时，所以不要频繁的建立连接」** 。
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -23,8 +23,9 @@
 21. [ElasticSearch 冷热分离架构](https://github.com/HomanLiang/study-demo/blob/main/elastic-search-demo/document/chapter21.md)
 22. [实战：ELK日志分析系统](https://github.com/HomanLiang/study-demo/blob/main/elastic-search-demo/document/chapter22.md)
 23. [Lunece](https://github.com/HomanLiang/study-demo/blob/main/elastic-search-demo/document/chapter23.md)
-24. 实战：多数据源同步
-25. [ElasticSearch 面试题](https://github.com/HomanLiang/study-demo/blob/main/elastic-search-demo/document/chapterXX.md)
+24. [ElasticSearch 配置同义词](https://github.com/HomanLiang/study-demo/blob/main/elastic-search-demo/document/chapter24.md)
+25. ElasticSearch 整体架构](https://github.com/HomanLiang/study-demo/blob/main/elastic-search-demo/document/chapter25.md)
+26. [ElasticSearch 面试题](https://github.com/HomanLiang/study-demo/blob/main/elastic-search-demo/document/chapterXX.md)
 
 
 

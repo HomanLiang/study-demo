@@ -1748,9 +1748,99 @@ public class TestController {
 
 
 
+## 8.@ModelAttribute
 
+### 8.1.前言
 
+项目中遇到这么一个使用场景，用户的登录信息给予token保存，在需要有登录信息的地方，每次都要去获取用户Id,但每次在请求方法中去获取用户信息，代码重复，冗余，很low于是想到了用`@ModelAttribute` 这个属性
 
+### 8.2.使用场景
+
+不用`@ModelAttribute` 时候在需要用户信息的请求中每次需要单独获取用户信息
+
+```Java
+  String token = request.getAttribute("token").toString();
+   User LoginUser = tokenService.decodeToken(token);
+```
+
+代码重复每次都需要单独去写，
+
+于是我想到了去优化一下代码，在需要使用户信息的`controller`中写一个公共方法，每次直接获取就可以了
+
+```java
+private User gerUserInfo(HttpServletRequest request){
+        String token = request.getAttribute("token").toString();
+        User LoginUser = tokenService.decodeToken(token);
+        return LoginUser;
+    }
+```
+
+这样写代码是简化了一些，但是没什么特别大的改观，还是要在每个需求用户信息的请求`Controller`中调用此方法取获取用用户信息，如果多个`Controller`需要获取用户信息的话还需要重复写
+
+也是想到继承，写一个公共的`controller`叫`BaseController`，每次在需要用户信息的controller中继承`BaseController` 然后在调用就可以了
+
+```java
+@RestController
+public class BaseController {
+    @Autowired
+    private TokenService tokenService;
+   
+
+   private User gerUserInfo(HttpServletRequest request){
+        String token = request.getAttribute("token").toString();
+        User LoginUser = tokenService.decodeToken(token);
+        return LoginUser;
+    }
+}
+```
+
+这样看上去似乎比之前两种做法都简单便捷很多，在需要使用用户信息的`controller`中直接继承调用就可以啦，但是并没有根本解决我们的问题，我们还是需要写重复代码，在每个`controller`单独获取用户信息，这是最优嘛？并不是！！！
+
+其实呢`springboot`提供`@ModelAttribute`这个注解属性使用这个通过参数注入就可获取啦
+
+我们把上面的稍微调整一下如：
+
+```java
+@RestController
+public class BaseController {
+    @Autowired
+    private TokenService tokenService;
+ 
+
+    @ModelAttribute
+    public void userInfo(ModelMap modelMap, HttpServletRequest request) {
+        String token = request.getAttribute("token").toString();
+        User LoginUser = tokenService.decodeToken(token);
+    
+        modelMap.addAttribute("LoginUser", LoginUser);
+        modelMap.addAttribute("userId", LoginUser.getUserId());
+
+    }
+}
+```
+
+然后在需要使用用户信息的`controller`中进行参数映射就行啦
+
+```java
+@ApiOperation(value = "用户快过期优惠卷信息",tags = "优惠卷接口")
+    @GetMapping("/expiredCoupon")
+    public List<Coupon> userExpiredCoupon(@ModelAttribute("userId") @ApiParam(hidden = true) String userId){
+        return couponService.getUserExpiredCoupon(userId);
+    }
+@GetMapping("/info")
+    @ApiOperation("获取用户信息")
+    public User getUseInfo(@ModelAttribute("LoginUser") User user) {
+        return user;
+    }
+```
+
+这样用户信息通过形参直接注入到controller中，我们直接在请求中使用就可以啦
+
+### 8.3.`@ModelAttribute`详解
+
+1. 被`@ModelAttribute`注释的方法会在此controller每个方法执行前被执行
+   标注在方法上面的注解，将方法返回的对象存储在model中，该方法在这个控制器其他映射方法执行之前调用
+2. `@ModelAttribute`注释一个方法的参数 从model中获取参数`@ModelAttribute("LoginUser") User user`参数user的值来源于`BaseController`userInfo()方法中的model属性
 
 
 

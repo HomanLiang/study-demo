@@ -124,11 +124,11 @@ debug运行看看：
 
 ## 2.在SpringBoot初始化时搞点事情
 
-## 2.1.容器刷新完成扩展点
+### 2.1.容器刷新完成扩展点
 
-### 2.1.1.监听容器刷新完成扩展点`ApplicationListener<ContextRefreshedEvent>`
+#### 2.1.1.监听容器刷新完成扩展点`ApplicationListener<ContextRefreshedEvent>`
 
-#### 2.1.1.1.基本用法
+##### 2.1.1.1.基本用法
 
 熟悉`Spring`的同学一定知道，容器刷新成功意味着所有的`Bean`初始化已经完成，当容器刷新之后`Spring`将会调用容器内所有实现了`ApplicationListener<ContextRefreshedEvent>`的`Bean`的`onApplicationEvent`方法，应用程序可以以此达到监听容器初始化完成事件的目的。
 
@@ -149,7 +149,7 @@ public class StartupApplicationListenerExample implements
 }
 ```
 
-#### 2.1.1.2.易错的点
+##### 2.1.1.2.易错的点
 
 这个扩展点用在`web`容器中的时候需要额外注意，在web 项目中（例如`spring mvc`），系统会存在两个容器，一个是`root application context`,另一个就是我们自己的`context`（作为`root application context`的子容器）。如果按照上面这种写法，就会造成`onApplicationEvent`方法被执行两次。解决此问题的方法如下：
 
@@ -173,7 +173,7 @@ public class StartupApplicationListenerExample implements
 }
 ```
 
-#### 2.1.1.3.高阶玩法
+##### 2.1.1.3.高阶玩法
 
 当然这个扩展还可以有更高阶的玩法：**自定义事件**，可以借助`Spring`以最小成本实现一个观察者模式：
 
@@ -228,7 +228,7 @@ public class StartupApplicationListenerExample implements
 
 - 执行单元测试可以看到邮件的地址和内容都被打印出来了
 
-### 2.1.2.`SpringBoot`的`CommandLineRunner`接口
+#### 2.1.2.`SpringBoot`的`CommandLineRunner`接口
 
 当容器上下文初始化完成之后，`SpringBoot`也会调用所有实现了`CommandLineRunner`接口的`run`方法，下面这段代码可起到和上文同样的作用：
 
@@ -258,7 +258,7 @@ public class CommandLineAppStartupRunner implements CommandLineRunner {
 java -jar CommandLineAppStartupRunner.jar abc abcd
 ```
 
-### 2.1.3.`SpringBoot`的`ApplicationRunner`接口
+#### 2.1.3.`SpringBoot`的`ApplicationRunner`接口
 
 这个扩展和`SpringBoot`的`CommandLineRunner`接口的扩展类似，只不过接受的参数是一个`ApplicationArguments`类，对控制台输入的参数提供了更好的封装，以`--`开头的被视为带选项的参数，否则是普通的参数
 
@@ -286,11 +286,11 @@ public class AppStartupRunner implements ApplicationRunner {
 java -jar CommandLineAppStartupRunner.jar abc abcd --autho=mark verbose
 ```
 
-## 2.2.`Bean`初始化完成扩展点
+### 2.2.`Bean`初始化完成扩展点
 
 前面的内容总结了针对容器初始化的扩展点，在有些场景，比如监听消息的时候，我们希望`Bean`初始化完成之后立刻注册监听器，而不是等到整个容器刷新完成，`Spring`针对这种场景同样留足了扩展点：
 
-### 2.2.1.`@PostConstruct`注解
+#### 2.2.1.`@PostConstruct`注解
 
 `@PostConstruct`注解一般放在`Bean`的方法上，被`@PostConstruct`修饰的方法会在`Bean`初始化后马上调用：
 
@@ -311,7 +311,7 @@ public class PostConstructExampleBean {
 }
 ```
 
-### 2.2.2.`InitializingBean`接口
+#### 2.2.2.`InitializingBean`接口
 
 `InitializingBean`的用法基本上与`@PostConstruct`一致，只不过相应的`Bean`需要实现`afterPropertiesSet`方法
 
@@ -332,7 +332,7 @@ public class InitializingBeanExampleBean implements InitializingBean {
 }
 ```
 
-### 2.2.3.`@Bean`注解的初始化方法
+#### 2.2.3.`@Bean`注解的初始化方法
 
 通过`@Bean`注入`Bean`的时候可以指定初始化方法：
 
@@ -361,7 +361,7 @@ public InitMethodExampleBean initMethodExampleBean() {
 }
 ```
 
-### 2.2.4.通过构造函数注入
+#### 2.2.4.通过构造函数注入
 
 `Spring`也支持通过构造函数注入，我们可以把搞事情的代码写在构造函数中，同样能达到目的
 
@@ -382,7 +382,7 @@ public class LogicInConstructorExampleBean {
 }
 ```
 
-### 2.2.5.`Bean`初始化完成扩展点执行顺序？
+#### 2.2.5.`Bean`初始化完成扩展点执行顺序？
 
 可以用一个简单的测试：
 

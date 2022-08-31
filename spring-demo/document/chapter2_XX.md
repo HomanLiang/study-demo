@@ -673,3 +673,744 @@ public class MyCorsFilter implements Filter {
 
 
 
+## 4.为什么 SpringBoot 的 jar 可以直接运行？
+
+SpringBoot提供了一个插件spring-boot-maven-plugin用于把程序打包成一个可执行的jar包。在pom文件里加入这个插件即可：
+
+```
+<build>
+    <plugins>
+        <plugin>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-maven-plugin</artifactId>
+        </plugin>
+    </plugins>
+</build>
+```
+
+打包完生成的executable-jar-1.0-SNAPSHOT.jar内部的结构如下：
+
+```
+├── META-INF
+│   ├── MANIFEST.MF
+│   └── maven
+│       └── spring.study
+│           └── executable-jar
+│               ├── pom.properties
+│               └── pom.xml
+├── lib
+│   ├── aopalliance-1.0.jar
+│   ├── classmate-1.1.0.jar
+│   ├── spring-boot-1.3.5.RELEASE.jar
+│   ├── spring-boot-autoconfigure-1.3.5.RELEASE.jar
+│   ├── ...
+├── org
+│   └── springframework
+│       └── boot
+│           └── loader
+│               ├── ExecutableArchiveLauncher$1.class
+│               ├── ...
+└── spring
+    └── study
+        └── executablejar
+            └── ExecutableJarApplication.class
+```
+
+然后可以直接执行jar包就能启动程序了：
+
+```
+java -jar executable-jar-1.0-SNAPSHOT.jar
+```
+
+打包出来fat jar内部有4种文件类型：
+
+- META-INF文件夹：程序入口，其中MANIFEST.MF用于描述jar包的信息
+- lib目录：放置第三方依赖的jar包，比如springboot的一些jar包
+- spring boot loader相关的代码
+- 模块自身的代码
+
+MANIFEST.MF文件的内容：
+
+```
+Manifest-Version: 1.0
+Implementation-Title: executable-jar
+Implementation-Version: 1.0-SNAPSHOT
+Archiver-Version: Plexus Archiver
+Built-By: Format
+Start-Class: spring.study.executablejar.ExecutableJarApplication
+Implementation-Vendor-Id: spring.study
+Spring-Boot-Version: 1.3.5.RELEASE
+Created-By: Apache Maven 3.2.3
+Build-Jdk: 1.8.0_20
+Implementation-Vendor: Pivotal Software, Inc.
+Main-Class: org.springframework.boot.loader.JarLauncher
+```
+
+我们看到，它的Main-Class是org.springframework.boot.loader.JarLauncher，当我们使用java -jar执行jar包的时候会调用JarLauncher的main方法，而不是我们编写的SpringApplication。
+
+那么JarLauncher这个类是的作用是什么的？
+
+它是SpringBoot内部提供的工具Spring Boot Loader提供的一个用于执行Application类的工具类(fat jar内部有spring loader相关的代码就是因为这里用到了)。相当于Spring Boot Loader提供了一套标准用于执行SpringBoot打包出来的jar
+
+### 4.1.Spring Boot Loader抽象的一些类
+
+抽象类Launcher：各种Launcher的基础抽象类，用于启动应用程序；跟Archive配合使用；目前有3种实现，分别是JarLauncher、WarLauncher以及PropertiesLauncher
+
+Archive：归档文件的基础抽象类。JarFileArchive就是jar包文件的抽象。它提供了一些方法比如getUrl会返回这个Archive对应的URL；getManifest方法会获得Manifest数据等。ExplodedArchive是文件目录的抽象
+
+JarFile：对jar包的封装，每个JarFileArchive都会对应一个JarFile。JarFile被构造的时候会解析内部结构，去获取jar包里的各个文件或文件夹，这些文件或文件夹会被封装到Entry中，也存储在JarFileArchive中。如果Entry是个jar，会解析成JarFileArchive。
+
+比如一个JarFileArchive对应的URL为：
+
+```
+jar:file:/Users/format/Develop/gitrepository/springboot-analysis/springboot-executable-jar/target/executable-jar-1.0-SNAPSHOT.jar!/
+```
+
+它对应的JarFile为：
+
+```
+/Users/format/Develop/gitrepository/springboot-analysis/springboot-executable-jar/target/executable-jar-1.0-SNAPSHOT.jar
+```
+
+这个JarFile有很多Entry，比如：
+
+```
+META-INF/
+META-INF/MANIFEST.MF
+spring/
+spring/study/
+....
+spring/study/executablejar/ExecutableJarApplication.class
+lib/spring-boot-starter-1.3.5.RELEASE.jar
+lib/spring-boot-1.3.5.RELEASE.jar
+...
+```
+
+JarFileArchive内部的一些依赖jar对应的URL(SpringBoot使用org.springframework.boot.loader.jar.Handler处理器来处理这些URL)：
+
+```
+jar:file:/Users/Format/Develop/gitrepository/springboot-analysis/springboot-executable-jar/target/executable-jar-1.0-SNAPSHOT.jar!/lib/spring-boot-starter-web-1.3.5.RELEASE.jar!/
+
+jar:file:/Users/Format/Develop/gitrepository/springboot-analysis/springboot-executable-jar/target/executable-jar-1.0-SNAPSHOT.jar!/lib/spring-boot-loader-1.3.5.RELEASE.jar!/org/springframework/boot/loader/JarLauncher.class
+```
+
+我们看到如果有jar包中包含jar，或者jar包中包含jar包里面的class文件，那么会使 用 !/ 分隔开，这种方式只有org.springframework.boot.loader.jar.Handler能处 理，它是SpringBoot内部扩展出来的一种URL协议。
+
+### 4.2.JarLauncher的执行过程
+
+JarLauncher的main方法：
+
+```
+public static void main(String[] args) {
+    // 构造JarLauncher，然后调用它的launch方法。参数是控制台传递的
+    new JarLauncher().launch(args);
+}  
+```
+
+JarLauncher被构造的时候会调用父类ExecutableArchiveLauncher的构造方法。
+
+ExecutableArchiveLauncher的构造方法内部会去构造Archive，这里构造了JarFileArchive。构造JarFileArchive的过程中还会构造很多东西，比如JarFile，Entry …
+
+```
+JarLauncher的launch方法：
+protected void launch(String[] args) {
+  try {
+    // 在系统属性中设置注册了自定义的URL处理器：org.springframework.boot.loader.jar.Handler。如果URL中没有指定处理器，会去系统属性中查询
+    JarFile.registerUrlProtocolHandler();
+    // getClassPathArchives方法在会去找lib目录下对应的第三方依赖JarFileArchive，同时也会项目自身的JarFileArchive
+    // 根据getClassPathArchives得到的JarFileArchive集合去创建类加载器ClassLoader。这里会构造一个LaunchedURLClassLoader类加载器，这个类加载器继承URLClassLoader，并使用这些JarFileArchive集合的URL构造成URLClassPath
+    // LaunchedURLClassLoader类加载器的父类加载器是当前执行类JarLauncher的类加载器
+    ClassLoader classLoader = createClassLoader(getClassPathArchives());
+    // getMainClass方法会去项目自身的Archive中的Manifest中找出key为Start-Class的类
+    // 调用重载方法launch
+    launch(args, getMainClass(), classLoader);
+  }
+  catch (Exception ex) {
+    ex.printStackTrace();
+    System.exit(1);
+  }
+}
+
+// Archive的getMainClass方法
+// 这里会找出spring.study.executablejar.ExecutableJarApplication这个类
+public String getMainClass() throws Exception {
+  Manifest manifest = getManifest();
+  String mainClass = null;
+  if (manifest != null) {
+    mainClass = manifest.getMainAttributes().getValue("Start-Class");
+  }
+  if (mainClass == null) {
+    throw new IllegalStateException(
+        "No 'Start-Class' manifest entry specified in " + this);
+  }
+  return mainClass;
+}
+
+// launch重载方法
+protected void launch(String[] args, String mainClass, ClassLoader classLoader)
+    throws Exception {
+      // 创建一个MainMethodRunner，并把args和Start-Class传递给它
+  Runnable runner = createMainMethodRunner(mainClass, args, classLoader);
+      // 构造新线程
+  Thread runnerThread = new Thread(runner);
+      // 线程设置类加载器以及名字，然后启动
+  runnerThread.setContextClassLoader(classLoader);
+  runnerThread.setName(Thread.currentThread().getName());
+  runnerThread.start();
+}
+```
+
+MainMethodRunner的run方法：
+
+```
+@Override
+public void run() {
+  try {
+    // 根据Start-Class进行实例化
+    Class<?> mainClass = Thread.currentThread().getContextClassLoader()
+        .loadClass(this.mainClassName);
+    // 找出main方法
+    Method mainMethod = mainClass.getDeclaredMethod("main", String[].class);
+    // 如果main方法不存在，抛出异常
+    if (mainMethod == null) {
+      throw new IllegalStateException(
+          this.mainClassName + " does not have a main method");
+    }
+    // 调用
+    mainMethod.invoke(null, new Object[] { this.args });
+  }
+  catch (Exception ex) {
+    UncaughtExceptionHandler handler = Thread.currentThread()
+        .getUncaughtExceptionHandler();
+    if (handler != null) {
+      handler.uncaughtException(Thread.currentThread(), ex);
+    }
+    throw new RuntimeException(ex);
+  }
+}
+```
+
+Start-Class的main方法调用之后，内部会构造Spring容器，启动内置Servlet容器等过程。这些过程我们都已经分析过了。
+
+### 4.3.关于自定义的类加载器LaunchedURLClassLoader
+
+LaunchedURLClassLoader重写了loadClass方法，也就是说它修改了默认的类加载方式(先看该类是否已加载这部分不变，后面真正去加载类的规则改变了，不再是直接从父类加载器中去加载)。LaunchedURLClassLoader定义了自己的类加载规则：
+
+```
+private Class<?> doLoadClass(String name) throws ClassNotFoundException {
+
+  // 1) Try the root class loader
+  try {
+    if (this.rootClassLoader != null) {
+      return this.rootClassLoader.loadClass(name);
+    }
+  }
+  catch (Exception ex) {
+    // Ignore and continue
+  }
+
+  // 2) Try to find locally
+  try {
+    findPackage(name);
+    Class<?> cls = findClass(name);
+    return cls;
+  }
+  catch (Exception ex) {
+    // Ignore and continue
+  }
+
+  // 3) Use standard loading
+  return super.loadClass(name, false);
+}
+```
+
+加载规则：
+
+- 如果根类加载器存在，调用它的加载方法。这里是根类加载是ExtClassLoader
+- 调用LaunchedURLClassLoader自身的findClass方法，也就是URLClassLoader的findClass方法
+- 调用父类的loadClass方法，也就是执行默认的类加载顺序(从BootstrapClassLoader开始从下往下寻找)
+
+LaunchedURLClassLoader自身的findClass方法：
+
+```
+protected Class<?> findClass(final String name)
+     throws ClassNotFoundException
+{
+    try {
+        return AccessController.doPrivileged(
+            new PrivilegedExceptionAction<Class<?>>() {
+                public Class<?> run() throws ClassNotFoundException {
+                    // 把类名解析成路径并加上.class后缀
+                    String path = name.replace('.', '/').concat(".class");
+                    // 基于之前得到的第三方jar包依赖以及自己的jar包得到URL数组，进行遍历找出对应类名的资源
+                    // 比如path是org/springframework/boot/loader/JarLauncher.class，它在jar:file:/Users/Format/Develop/gitrepository/springboot-analysis/springboot-executable-jar/target/executable-jar-1.0-SNAPSHOT.jar!/lib/spring-boot-loader-1.3.5.RELEASE.jar!/中被找出
+                    // 那么找出的资源对应的URL为jar:file:/Users/Format/Develop/gitrepository/springboot-analysis/springboot-executable-jar/target/executable-jar-1.0-SNAPSHOT.jar!/lib/spring-boot-loader-1.3.5.RELEASE.jar!/org/springframework/boot/loader/JarLauncher.class
+                    Resource res = ucp.getResource(path, false);
+                    if (res != null) { // 找到了资源
+                        try {
+                            return defineClass(name, res);
+                        } catch (IOException e) {
+                            throw new ClassNotFoundException(name, e);
+                        }
+                    } else { // 找不到资源的话直接抛出ClassNotFoundException异常
+                        throw new ClassNotFoundException(name);
+                    }
+                }
+            }, acc);
+    } catch (java.security.PrivilegedActionException pae) {
+        throw (ClassNotFoundException) pae.getException();
+    }
+}
+```
+
+下面是LaunchedURLClassLoader的一个测试：
+
+```
+// 注册org.springframework.boot.loader.jar.Handler URL协议处理器
+JarFile.registerUrlProtocolHandler();
+// 构造LaunchedURLClassLoader类加载器，这里使用了2个URL，分别对应jar包中依赖包spring-boot-loader和spring-boot，使用 "!/" 分开，需要org.springframework.boot.loader.jar.Handler处理器处理
+LaunchedURLClassLoader classLoader = new LaunchedURLClassLoader(
+        new URL[] {
+                new URL("jar:file:/Users/Format/Develop/gitrepository/springboot-analysis/springboot-executable-jar/target/executable-jar-1.0-SNAPSHOT.jar!/lib/spring-boot-loader-1.3.5.RELEASE.jar!/")
+                , new URL("jar:file:/Users/Format/Develop/gitrepository/springboot-analysis/springboot-executable-jar/target/executable-jar-1.0-SNAPSHOT.jar!/lib/spring-boot-1.3.5.RELEASE.jar!/")
+        },
+        LaunchedURLClassLoaderTest.class.getClassLoader());
+
+// 加载类
+// 这2个类都会在第二步本地查找中被找出(URLClassLoader的findClass方法)
+classLoader.loadClass("org.springframework.boot.loader.JarLauncher");
+classLoader.loadClass("org.springframework.boot.SpringApplication");
+// 在第三步使用默认的加载顺序在ApplicationClassLoader中被找出
+classLoader.loadClass("org.springframework.boot.autoconfigure.web.DispatcherServletAutoConfiguration");
+```
+
+### 4.4.Spring Boot Loader的作用
+
+SpringBoot在可执行jar包中定义了自己的一套规则，比如第三方依赖jar包在/lib目录下，jar包的URL路径使用自定义的规则并且这个规则需要使用org.springframework.boot.loader.jar.Handler处理器处理。它的Main-Class使用JarLauncher，如果是war包，使用WarLauncher执行。这些Launcher内部都会另起一个线程启动自定义的SpringApplication类。
+
+这些特性通过spring-boot-maven-plugin插件打包完成。
+
+
+
+## 5.如何让Spring Boot 的配置动起来？
+
+看下`Config`的源码，代码关键部分在`org.springframework.cloud.context.refresh.ContextRefresher#refresh()`方法中，如下图：
+
+![image-20220825213432213](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/spring-demo/20220825213432.png)
+
+因此只需要在修改属性之后调用下`ContextRefresher#refresh()`（异步，避免一直阻塞等待）方法即可。
+
+为了方便测试，我们自己手动写一个refresh接口，如下：
+
+```java
+@GetMapping("/show/refresh")
+    public String refresh(){
+        //修改配置文件中属性
+        HashMap<String, Object> map = new HashMap<>();
+        map.put("config.version",99);
+        map.put("config.app.name","appName");
+        map.put("config.platform","ORACLE");
+        MapPropertySource propertySource=new MapPropertySource("dynamic",map);
+        //将修改后的配置设置到environment中
+        environment.getPropertySources().addFirst(propertySource);
+        //异步调用refresh方法，避免阻塞一直等待无响应
+        new Thread(() -> contextRefresher.refresh()).start();
+        return "success";
+    }
+```
+
+> 上述代码中作者只是手动设置了配置文件中的值，实际项目中可以通过持久化的方式从数据库中读取配置刷新。
+
+下面我们测试看看，启动项目，访问`http://localhost:8080/show/version`，发现是之前配置在`application.properties`中的值，如下图：
+
+![image-20220825213534492](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/spring-demo/20220825213534.png)
+
+调用`refresh`接口：`http://localhost:8080/show/refresh`重新设置属性值；
+
+再次调用`http://localhost:8080/show/version`查看下配置是否修改了，如下图：
+
+![image-20220825213549429](https://homan-blog.oss-cn-beijing.aliyuncs.com/study-demo/spring-demo/20220825213549.png)
+
+从上图可以发现，配置果然修改了，达到了动态刷新的效果。
+
+
+
+## 6.SpringBoot静态获取 bean的三种方式
+
+**方式一  注解@PostConstruct**
+
+```
+import com.example.javautilsproject.service.AutoMethodDemoService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+ 
+import javax.annotation.PostConstruct;
+ 
+/**
+ * springboot静态方法获取 bean 的三种方式(一)
+ * @author: clx
+ * @version: 1.1.0
+ */
+@Component
+public class StaticMethodGetBean_1 {
+ 
+    @Autowired
+    private AutoMethodDemoService autoMethodDemoService;
+ 
+    @Autowired
+    private static AutoMethodDemoService staticAutoMethodDemoService;
+ 
+    @PostConstruct
+    public void init() {
+        staticAutoMethodDemoService = autoMethodDemoService;
+    }
+ 
+    public static String getAuthorizer() {
+        return staticAutoMethodDemoService.test();
+    }
+}
+```
+
+注解@PostConstruct说明
+
+PostConstruct 注释用于在依赖关系注入完成之后需要执行的方法上，以执行任何初始化。此方法必须在将类放入服务之前调用。支持依赖关系注入的所有类都必须支持此注释。即使类没有请求注入任何资源，用 PostConstruct 注释的方法也必须被调用。只有一个方法可以用此注释进行注释。
+
+应用 PostConstruct 注释的方法必须遵守以下所有标准：
+
+- 该方法不得有任何参数，除非是在 EJB 拦截器 (interceptor) 的情况下，根据 EJB 规范的定义，在这种情况下它将带有一个 InvocationContext 对象 ；
+- 该方法的返回类型必须为 void；
+- 该方法不得抛出已检查异常；
+- 应用 PostConstruct 的方法可以是 public、protected、package private 或 private；
+- 除了应用程序客户端之外，该方法不能是 static；
+- 该方法可以是 final；
+- 如果该方法抛出未检查异常，那么不得将类放入服务中，除非是能够处理异常并可从中恢复的 EJB。
+
+**方式二  启动类ApplicationContext**
+
+实现方式：在springboot的启动类中，定义static变量ApplicationContext，利用容器的getBean方法获得依赖对象
+
+```
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.ConfigurableApplicationContext;
+/**
+ * @author: clx
+ * @version: 1.1.0
+ */
+@SpringBootApplication
+public class Application {
+    public static ConfigurableApplicationContext ac;
+    public static void main(String[] args) {
+       ac = SpringApplication.run(Application.class, args);
+    }
+ 
+}
+```
+
+调用方式
+
+```
+/**
+ * @author: clx
+ * @version: 1.1.0
+ */
+@RestController
+public class TestController {
+    /**
+     * 方式二
+     */
+    @GetMapping("test2")
+    public void method_2() {
+        AutoMethodDemoService methodDemoService = Application.ac.getBean(AutoMethodDemoService.class);
+        String test2 = methodDemoService.test2();
+        System.out.println(test2);
+    }
+}
+```
+
+**方式三 手动注入ApplicationContext**
+
+手动注入ApplicationContext
+
+```
+import org.springframework.beans.BeansException;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
+import org.springframework.stereotype.Component;
+ 
+ 
+/**
+ * springboot静态方法获取 bean 的三种方式(三)
+ * @author: clx
+ * @version: 1.1.0
+ */
+@Component
+public class StaticMethodGetBean_3<T> implements ApplicationContextAware {
+    private static ApplicationContext applicationContext;
+    @Override
+    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+        StaticMethodGetBean_3.applicationContext = applicationContext;
+    }
+ 
+    public static <T> T  getBean(Class<T> clazz) {
+        return applicationContext != null?applicationContext.getBean(clazz):null;
+    }
+}
+```
+
+调用方式
+
+```
+    /**
+     * 方式三
+     */
+    @Test
+    public void method_3() {
+        AutoMethodDemoService autoMethodDemoService = StaticMethodGetBean_3.getBean(AutoMethodDemoService.class);
+        String test3 = autoMethodDemoService.test3();
+        System.out.println(test3);
+    }
+```
+
+
+
+## 7.SpringBoot的自动配置
+
+在介绍`SpringBoot`的自动配置之前，先了解下注解`@Import`的使用，`SpringBoot`的`@Enable*`开头的注解底层依赖于`@Import`注解导入一些类，使用`@Import`导入的类会被`Spring`加载到`IOC`容器中，而`@Import`提供了以下4中用法：
+
+- 直接导入`Bean`
+- 通过配置类导入`Bean`
+- 导入`ImportSelector`实现类,一般用于加载配置文件的类
+- 导入`ImportBeanDefinitionRegistrar`实现类
+
+下面来分别介绍这几种用法。
+
+- 直接导入Bean就比较简单了，新建一个`User`类
+
+```none
+public class User{
+    private String name;
+    private String address;
+}
+```
+
+然后在启动类上使用`@Import`注解导入即可
+
+```none
+@SpringBootApplication
+@Import(User.class)
+public class Application {
+    public static void main(String[] args) {
+        ConfigurableApplicationContext context = SpringApplication.run(Application.class,args);
+        System.out.println(context.getBean(User.class));
+    }
+}
+```
+
+> 这里需要注意的是，通过上下文获取Bean时，需要使用Bean的class，因为通过Bean的方式导入，Spring存入IOC容器，是用类的全类名存储的。可以使用上下文的`getBeansOfType`方法查看，返回的是Map对象。
+
+```none
+{com.tenghu.sbc.entity.User=User(name=null, age=0)}
+```
+
+从返回的结果可以看出，`key`就是存的`User`的全类名。
+
+- 通过配置类导入`Bean`，创建一个配置类;
+
+```none
+public class UserConfig {
+    @Bean(name = "user")
+    public User user(){
+        return new User();
+    }
+}
+```
+
+然后通过`@Import`导入这个配置类
+
+```none
+@SpringBootApplication
+@Import(UserConfig.class)
+public class Application {
+    public static void main(String[] args) {
+        ConfigurableApplicationContext context = SpringApplication.run(Application.class,args);
+        System.out.println(context.getBean(User.class));
+    }
+}
+```
+
+通过配置类的方式可以在配置类里面定义多个`Bean`，当导入配置类时，配置类下定义的`Bean`都会被导入。
+
+- 导入`ImportSelector`实现类
+
+```none
+public class MyImportSelector implements ImportSelector {
+    @Override
+    public String[] selectImports(AnnotationMetadata annotationMetadata) {
+        return new String[]{User.class.getName()};
+    }
+}
+```
+
+实现`ImportSelector`类，必须实现`selectImports`，然后返回需要导入的`Bean`。与上面一样使用`@Import`导入这个实现类。
+
+```none
+@Import(MyImportSelector.class)
+```
+
+- 导入`ImportBeanDefinitionRegistrar`实现类
+
+```none
+public class MyImportBeanDefinitionRegistrar implements ImportBeanDefinitionRegistrar {
+    @Override
+    public void registerBeanDefinitions(AnnotationMetadata importingClassMetadata, BeanDefinitionRegistry registry) {
+        BeanDefinition beanDefinition = BeanDefinitionBuilder.genericBeanDefinition(User.class).getBeanDefinition();
+        registry.registerBeanDefinition("user",beanDefinition);
+    }
+}
+```
+
+使用方式一样，通过`@Import`导入
+
+```none
+@Import(MyImportBeanDefinitionRegistrar.class)
+```
+
+了解完`@Import`的使用，接下来可以来看下`SpringBoot`的自动配置是怎么处理的。从上面的启动类，使用`SpringBoot`就用了一个注解`@SpringBootApplication`，可以打开这个注解的源码看下：
+
+```none
+@Target({ElementType.TYPE})
+@Retention(RetentionPolicy.RUNTIME)
+@Documented
+@Inherited
+@SpringBootConfiguration
+@EnableAutoConfiguration
+@ComponentScan(
+    excludeFilters = {@Filter(
+    type = FilterType.CUSTOM,
+    classes = {TypeExcludeFilter.class}
+), @Filter(
+    type = FilterType.CUSTOM,
+    classes = {AutoConfigurationExcludeFilter.class}
+)}
+)
+public @interface SpringBootApplication
+```
+
+用到这样一个注解`@EnableAutoConfiguration`注解。底层使用`@Import`导入上面第三种方式`AutoConfigurationImportSelector`。
+
+```none
+@Target({ElementType.TYPE})
+@Retention(RetentionPolicy.RUNTIME)
+@Documented
+@Inherited
+@AutoConfigurationPackage
+@Import({AutoConfigurationImportSelector.class})
+public @interface EnableAutoConfiguration {
+    String ENABLED_OVERRIDE_PROPERTY = "spring.boot.enableautoconfiguration";
+
+    Class<?>[] exclude() default {};
+
+    String[] excludeName() default {};
+}
+```
+
+进入源码找到实现了`selectImports`方法
+
+```none
+public String[] selectImports(AnnotationMetadata annotationMetadata) {
+    if (!this.isEnabled(annotationMetadata)) {
+        return NO_IMPORTS;
+    } else {
+        AutoConfigurationImportSelector.AutoConfigurationEntry autoConfigurationEntry = this.getAutoConfigurationEntry(annotationMetadata);
+        return StringUtils.toStringArray(autoConfigurationEntry.getConfigurations());
+    }
+}
+```
+
+通过调用方法`getAutoConfigurationEntry`
+
+```none
+protected AutoConfigurationImportSelector.AutoConfigurationEntry getAutoConfigurationEntry(AnnotationMetadata annotationMetadata) {
+    if (!this.isEnabled(annotationMetadata)) {
+        return EMPTY_ENTRY;
+    } else {
+        AnnotationAttributes attributes = this.getAttributes(annotationMetadata);
+        List<String> configurations = this.getCandidateConfigurations(annotationMetadata, attributes);
+        configurations = this.removeDuplicates(configurations);
+        Set<String> exclusions = this.getExclusions(annotationMetadata, attributes);
+        this.checkExcludedClasses(configurations, exclusions);
+        configurations.removeAll(exclusions);
+        configurations = this.getConfigurationClassFilter().filter(configurations);
+        this.fireAutoConfigurationImportEvents(configurations, exclusions);
+        return new AutoConfigurationImportSelector.AutoConfigurationEntry(configurations, exclusions);
+    }
+}
+```
+
+这里主要的看调用这个方法`getCandidateConfigurations`，返回的就是要自动加载的`Bean`
+
+```none
+protected List<String> getCandidateConfigurations(AnnotationMetadata metadata, AnnotationAttributes attributes) {
+    List<String> configurations = SpringFactoriesLoader.loadFactoryNames(this.getSpringFactoriesLoaderFactoryClass(), this.getBeanClassLoader());
+    Assert.notEmpty(configurations, "No auto configuration classes found in META-INF/spring.factories. If you are using a custom packaging, make sure that file is correct.");
+    return configurations;
+}
+```
+
+通过`META-INF/spring.factories`配置文件里的`EnableAutoConfiguration`获取配置的`Bean`
+
+```none
+# Auto Configure
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+org.springframework.boot.autoconfigure.admin.SpringApplicationAdminJmxAutoConfiguration,\
+org.springframework.boot.autoconfigure.aop.AopAutoConfiguration,\
+org.springframework.boot.autoconfigure.amqp.RabbitAutoConfiguration,\
+org.springframework.boot.autoconfigure.batch.BatchAutoConfiguration,\
+org.springframework.boot.autoconfigure.cache.CacheAutoConfiguration,\
+org.springframework.boot.autoconfigure.cassandra.CassandraAutoConfiguration,\
+.....
+```
+
+太多了，有兴趣的可以查看`Spring`的`xxx-autoconfigure`包。将读取到的配置最终返回给`selectImports`，然后通过工具类`StringUtils.toStringArray`转换为字符串数组返回给`@Import`，从而实现自动配置。第三方包只要是`xxx-autoconfigure`结尾的包，`META-INF`都有`spring.factories`，这个名字是固定写法。都可以被`SpringBoot`识别并且进行自动配置，前提是需要配置到`org.springframework.boot.autoconfigure.EnableAutoConfiguration`下。
+从以上总结来看，`SpringBoot`的自动配置原理如下：
+
+- `@EnableAutoConfiguration`注解内部使用`Import(AutoConfigurationImportSelector.class)`来加载配置类
+- 通过配置文件：`META-INF/spring.factories`，配置大量的配置类，`SpringBoot`启动时就会自动加载这些类并初始化的`Bean`。
+
+这里需要说明一点，并不是所有配置到配置文件的`Bean`都会被初始化，需要符合配置类中使用`Condition`来加载满足条件的`Bean`。比如我们打开`RedisAutoConfiguration`的源码查看：
+
+```none
+@Configuration(
+    proxyBeanMethods = false
+)
+@ConditionalOnClass({RedisOperations.class})
+@EnableConfigurationProperties({RedisProperties.class})
+@Import({LettuceConnectionConfiguration.class, JedisConnectionConfiguration.class})
+public class RedisAutoConfiguration {
+    public RedisAutoConfiguration() {
+    }
+
+    @Bean
+    @ConditionalOnMissingBean(
+        name = {"redisTemplate"}
+    )
+    @ConditionalOnSingleCandidate(RedisConnectionFactory.class)
+    public RedisTemplate<Object, Object> redisTemplate(RedisConnectionFactory redisConnectionFactory) {
+        RedisTemplate<Object, Object> template = new RedisTemplate();
+        template.setConnectionFactory(redisConnectionFactory);
+        return template;
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    @ConditionalOnSingleCandidate(RedisConnectionFactory.class)
+    public StringRedisTemplate stringRedisTemplate(RedisConnectionFactory redisConnectionFactory) {
+        StringRedisTemplate template = new StringRedisTemplate();
+        template.setConnectionFactory(redisConnectionFactory);
+        return template;
+    }
+}
+```
+
+类上面有这么个注解`@ConditionalOnClass({RedisOperations.class})`，意思就是需要`RedisOperations`类存在的情况下，才自动加载；这还不算完，继续查看下面的方法上有个`@ConditionalOnMissingBean(name = {"redisTemplate"})`，这里的意思是，当其他地方没有`redisTemplate`实例化这个`Bean`时，才自动加载。符合这两个条件，`SpringBoot`才会进行自动加载并初始化。
